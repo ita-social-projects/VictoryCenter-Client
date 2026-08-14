@@ -87,6 +87,7 @@ interface FundsExpenditureSectionProps {
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
+    onExchangeRateValidationChange?: (isValid: boolean) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -110,6 +111,7 @@ export const FundsExpenditureSection = ({
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
+    onExchangeRateValidationChange,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -170,20 +172,26 @@ export const FundsExpenditureSection = ({
     const handleExchangeRateChange = useCallback(
         (value: string) => {
             const normalized = normalizeFundsExpendituresExchangeRateInput(value);
+            const error = validateFundsExpendituresExchangeRate(normalized, 'change');
+
             setExchangeRateValue(normalized);
             onExchangeRateValueChange?.(normalized);
-            setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
+            setExchangeRateError(error);
+            onExchangeRateValidationChange?.(!error);
             onDataChange?.();
         },
-        [onExchangeRateValueChange, onDataChange],
+        [onExchangeRateValueChange, onExchangeRateValidationChange, onDataChange],
     );
 
     const handleExchangeRateBlur = useCallback(() => {
         const normalized = normalizeFundsExpendituresExchangeRateInput(exchangeRateValue, true);
+        const error = validateFundsExpendituresExchangeRate(normalized, 'blur');
+
         setExchangeRateValue(normalized);
         onExchangeRateValueChange?.(normalized || null);
-        setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'blur'));
-    }, [exchangeRateValue, onExchangeRateValueChange]);
+        setExchangeRateError(error);
+        onExchangeRateValidationChange?.(!error);
+    }, [exchangeRateValue, onExchangeRateValueChange, onExchangeRateValidationChange]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);

@@ -14,6 +14,7 @@ import { ProgramExpensesSummaryCard } from './components/program-expenses-summar
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
 import { AddProgramExpenseRecordModal } from './components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal';
 import { DeleteRecordModal } from '../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal';
+import { validateFundsExpendituresExchangeRate } from '@/validation/admin/reports-schema/funds-expenditures-exchange-rate-schema/funds-expenditures-exchange-rate-schema';
 import styles from './ProgramExpensesSection.module.scss';
 
 const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
@@ -34,6 +35,8 @@ interface ProgramExpensesSectionProps {
     onRowEditModeChange?: (isEditing: boolean) => void;
     onCountsChange?: (count: number) => void;
     onDataChange?: () => void;
+    exchangeRate: string | null;
+    isExchangeRateValid: boolean;
 }
 
 export const ProgramExpensesSection = ({
@@ -42,6 +45,8 @@ export const ProgramExpensesSection = ({
     onRowEditModeChange,
     onCountsChange,
     onDataChange,
+    exchangeRate,
+    isExchangeRateValid,
 }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -110,8 +115,9 @@ export const ProgramExpensesSection = ({
     const programExpenseRecordsCount = data.records.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
     const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
-    const exchangeRate = data.exchangeRate;
     const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS || isRowEditMode;
+    const currentExchangeRate = isEditing ? exchangeRate : data.exchangeRate;
+    const hasExchangeRateError = Boolean(validateFundsExpendituresExchangeRate(exchangeRate ?? '', 'blur'));
 
     useEffect(() => {
         onCountsChange?.(programExpenseRecordsCount);
@@ -311,9 +317,9 @@ export const ProgramExpensesSection = ({
                 <ProgramExpensesToolbar
                     programs={data.programs}
                     selectedProgramIds={selectedProgramIds}
-                    exchangeRate={exchangeRate}
+                    exchangeRate={currentExchangeRate}
                     isEditing={isEditing}
-                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled}
+                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || hasExchangeRateError}
                     onProgramChange={setSelectedProgramIds}
                     onAddProgramExpense={handleOpenAddProgramExpenseModal}
                     disabled={isRowEditMode}
@@ -333,7 +339,8 @@ export const ProgramExpensesSection = ({
                     onToggleRecordSelection={toggleRecordSelection}
                     onSelectAllToggle={handleSelectAllToggle}
                     onOpenBulkDelete={handleOpenBulkDeleteModal}
-                    exchangeRate={exchangeRate}
+                    exchangeRate={currentExchangeRate}
+                    isRowActionsDisabled={isRowEditMode || hasExchangeRateError}
                 />
             </div>
 
@@ -341,7 +348,7 @@ export const ProgramExpensesSection = ({
                 isOpen={isAddProgramExpenseModalOpen}
                 programs={data.programs}
                 records={data.records}
-                exchangeRate={exchangeRate}
+                exchangeRate={currentExchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
                 onSubmit={handleSubmitAddProgramExpense}
             />

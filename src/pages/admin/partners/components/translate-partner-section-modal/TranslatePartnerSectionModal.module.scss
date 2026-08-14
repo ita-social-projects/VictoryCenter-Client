@@ -1,0 +1,12 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.error {
+    color: c.$error;
+}

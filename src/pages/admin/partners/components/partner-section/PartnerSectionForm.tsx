@@ -9,6 +9,12 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-form/PartnerForm';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Button } from '@/components/admin/button/Button';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
+import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 import styles from './PartnerSectionForm.module.scss';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import './PartnerSectionForm.scss';
@@ -35,7 +41,14 @@ export interface PartnerSectionProps {
     onChange: (value: PartnerSectionFormValues, errors: PartnerSectionErrors) => void;
     onDelete: (localId: string) => void;
     onPublish: (localId: string, sectionData: PartnerSectionFormValues) => void;
+    onTranslate: (sectionId: number) => void;
     isDirty: boolean;
+    isTextDirty: boolean;
+    localizations: EntityLocalization[];
+    translationLanguages: LocalizationLanguage[];
+    language: LocalizationLanguage;
+    translatedContent: PartnerSectionLocalizationDto | null;
+    disableStructuralActions?: boolean;
 }
 
 const PartnerSectionComponent = ({
@@ -43,33 +56,47 @@ const PartnerSectionComponent = ({
     onChange,
     onDelete,
     onPublish,
+    onTranslate,
     disabled = false,
     errors,
     isDirty,
+    isTextDirty,
+    localizations,
+    translationLanguages,
+    language,
+    translatedContent,
+    disableStructuralActions = false,
 }: PartnerSectionProps) => {
     const [partnerToDeleteLocalId, setPartnerToDeleteLocalId] = useState<string | null>(null);
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const displayedTitle = isBaseLanguage ? value.title : (translatedContent?.title ?? '');
+    const displayedDescription = isBaseLanguage ? value.description : (translatedContent?.description ?? '');
 
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!isBaseLanguage) return;
             const newTitle = e.target.value;
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(newTitle);
 
             onChange({ ...value, title: newTitle }, { ...errors, title: error });
         },
-        [value, errors, onChange],
+        [value, errors, onChange, isBaseLanguage],
     );
 
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!isBaseLanguage) return;
             const newDescription = e.target.value;
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription(newDescription);
 
             onChange({ ...value, description: newDescription }, { ...errors, description: error });
         },
-        [value, errors, onChange],
+        [value, errors, onChange, isBaseLanguage],
     );
 
     const handleAddPartner = useCallback(() => {
+        if (disableStructuralActions) return;
+
         const newPartner: PartnerFormValues = {
             localId: crypto.randomUUID(),
             partnerId: null,
@@ -82,7 +109,7 @@ const PartnerSectionComponent = ({
         const newPartnerErrors = [...errors.partners, {}];
 
         onChange({ ...value, partners: newPartners }, { ...errors, partners: newPartnerErrors });
-    }, [value, errors, onChange]);
+    }, [value, errors, onChange, disableStructuralActions]);
 
     const handlePartnerChange = useCallback(
         (partnerValues: PartnerFormValues, partnerErrors: PartnerFormErrors) => {
@@ -105,15 +132,16 @@ const PartnerSectionComponent = ({
     );
 
     const handlePartnerDeleteRequest = useCallback((localId: string) => {
+        if (disableStructuralActions) return;
         setPartnerToDeleteLocalId(localId);
-    }, []);
+    }, [disableStructuralActions]);
 
     const handleCancelPartnerDelete = useCallback(() => {
         setPartnerToDeleteLocalId(null);
     }, []);
 
     const handleConfirmPartnerDelete = useCallback(() => {
-        if (!partnerToDeleteLocalId) return;
+        if (disableStructuralActions || !partnerToDeleteLocalId) return;
 
         const indexToDelete = value.partners.findIndex((p) => p.localId === partnerToDeleteLocalId);
         if (indexToDelete === -1) {
@@ -137,15 +165,21 @@ const PartnerSectionComponent = ({
         );
 
         setPartnerToDeleteLocalId(null);
-    }, [value, errors, onChange, partnerToDeleteLocalId]);
+    }, [value, errors, onChange, partnerToDeleteLocalId, disableStructuralActions]);
 
     const handleDelete = useCallback(() => {
+        if (disableStructuralActions) return;
         onDelete(value.localId);
-    }, [onDelete, value.localId]);
+    }, [onDelete, value.localId, disableStructuralActions]);
 
     const handlePublish = useCallback(() => {
         onPublish(value.localId, value);
     }, [onPublish, value]);
+
+    const handleTranslate = useCallback(() => {
+        if (value.sectionId === null) return;
+        onTranslate(value.sectionId);
+    }, [onTranslate, value.sectionId]);
 
     const isFormValid = (): boolean => {
         if (PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(value.title)) {
@@ -170,17 +204,28 @@ const PartnerSectionComponent = ({
 
     return (
         <div className={styles.root}>
+            <div className={styles['status-bar']}>
+                <LocalizationStatuses languages={translationLanguages} localizedEntity={{ localizations }} />
+                <IconButton
+                    aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+                    type="button"
+                    onClick={handleTranslate}
+                    DefaultIcon={ACTION_ICONS.translate.default}
+                    disabled={disabled || isTextDirty || value.sectionId === null}
+                />
+            </div>
+
             <div className={styles.inputs}>
                 <div className={styles['title-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.TITLE}
-                        value={value.title}
+                        value={displayedTitle}
                         error={errors.title}
                         onChange={handleTitleChange}
                         name={`partner-section-title-${value.localId}`}
                         id={`partner-section-title-${value.localId}`}
                         isRequired={true}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         placeholder={PARTNERS_TEXT.SECTION.TITLE_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.title.max}
                         rows={3}
@@ -189,13 +234,13 @@ const PartnerSectionComponent = ({
                 <div className={styles['description-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
-                        value={value.description}
+                        value={displayedDescription}
                         error={errors.description}
                         onChange={handleDescriptionChange}
                         name={`partner-section-description-${value.localId}`}
                         id={`partner-section-description-${value.localId}`}
                         isRequired={true}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         placeholder={PARTNERS_TEXT.SECTION.DESCRIPTION_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.description.max}
                         rows={3}
@@ -212,13 +257,22 @@ const PartnerSectionComponent = ({
                         disabled={disabled}
                         onValuesChange={handlePartnerChange}
                         onDelete={handlePartnerDeleteRequest}
+                        language={language}
+                        translatedDescription={
+                            translatedContent?.partners.find((p) => p.partnerId === partner.partnerId)?.description
+                        }
+                        disableStructuralActions={disableStructuralActions}
                     />
                 ))}
                 <div className={styles['add-card']}>
                     <button
                         type="button"
                         onClick={handleAddPartner}
-                        disabled={disabled || value.partners.length >= PARTNER_SECTION_VALIDATION.partners.max}
+                        disabled={
+                            disabled ||
+                            disableStructuralActions ||
+                            value.partners.length >= PARTNER_SECTION_VALIDATION.partners.max
+                        }
                     >
                         <span>{PARTNERS_TEXT.BUTTON.ADD_PARTNER}</span>
                     </button>
@@ -232,12 +286,18 @@ const PartnerSectionComponent = ({
             )}
 
             <div className={styles['actions']}>
-                <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled}>
+                <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled || disableStructuralActions}>
                     {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                 </Button>
-                <Button buttonStyle="primary" onClick={handlePublish} disabled={disabled || !isDirty || !isFormValid()}>
-                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                </Button>
+                {isBaseLanguage && (
+                    <Button
+                        buttonStyle="primary"
+                        onClick={handlePublish}
+                        disabled={disabled || !isDirty || !isFormValid()}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                    </Button>
+                )}
             </div>
 
             <ConfirmationModal

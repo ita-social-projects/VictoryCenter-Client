@@ -202,8 +202,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
     },
     MODAL: {
         SHARED: {
-            REPORTING_YEAR_LABEL: 'Звітній рік',
-            REPORTING_YEAR_PLACEHOLDER: 'Оберіть звітній рік',
+            REPORTING_YEAR_LABEL: 'Звітний рік',
+            REPORTING_YEAR_PLACEHOLDER: 'Оберіть звітний рік',
             AMOUNT_UAH_LABEL: 'Сума (UAH)',
             AMOUNT_USD_LABEL: 'Сума (USD)',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
@@ -302,7 +302,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
     },
     TABLE: {
         COLUMNS: {
-            REPORTING_YEAR: 'Звітній рік',
+            REPORTING_YEAR: 'Звітний рік',
             TYPE: 'Тип',
             CATEGORY: 'Категорія',
             AMOUNT_UAH: 'Сума UAH',

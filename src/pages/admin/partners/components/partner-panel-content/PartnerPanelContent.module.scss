@@ -19,3 +19,18 @@
     overflow-y: auto;
     padding: 24px 32px;
 }
+
+.loader {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+}
+
+.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px 0;
+}

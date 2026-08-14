@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { PartnerBanner } from './PartnerBannerForm';
+import { PartnerBanner, PartnerBannerProps } from './PartnerBannerForm';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -14,6 +14,7 @@ import { ButtonProps } from '@/components/admin/button/Button';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import { InputWithCharacterLimitGroupProps } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import localizationStatusesStyles from '@/components/admin/localization-statuses/LocalizationStatuses.module.scss';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
@@ -75,7 +76,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, value, onChange, onBlur, disabled, id, error, trimOnBlur }: any) => (
+    RichTextInputGroup: ({ label, value, onChange, onBlur, disabled, id, error, trimOnBlur, hideToolbar }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <div
@@ -83,6 +84,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                 contentEditable={!disabled}
                 data-testid={`${id}-rich-text`}
                 data-trimonblur={trimOnBlur ? 'true' : 'false'}
+                data-hidetoolbar={hideToolbar ? 'true' : 'false'}
                 onInput={(e) => {
                     const target = e.target as HTMLElement;
                     onChange(target.innerHTML);
@@ -120,6 +122,36 @@ jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
     },
 }));
 
+const UK_LANGUAGE = { id: 1, code: 'uk', name: 'Ukrainian' };
+const EN_LANGUAGE = { id: 2, code: 'en', name: 'English' };
+const mockTranslationLanguages = [EN_LANGUAGE];
+
+jest.mock('../translate-partner-banner-modal/TranslatePartnerBannerModal', () => ({
+    TranslatePartnerBannerModal: ({ isOpen, onClose, banner, onTranslateBanner }: any) =>
+        isOpen ? (
+            <div data-testid="translate-partner-banner-modal">
+                <button
+                    onClick={() =>
+                        onTranslateBanner({
+                            ...banner,
+                            localizations: [
+                                {
+                                    title: 'Banner title EN',
+                                    description: 'Banner description EN',
+                                    language: { id: 2, code: 'en' },
+                                    translationStatus: 1,
+                                },
+                            ],
+                        })
+                    }
+                >
+                    mock-translate-success
+                </button>
+                <button onClick={onClose}>mock-translate-close</button>
+            </div>
+        ) : null,
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedPartnersApi = PartnersApi as jest.Mocked<typeof PartnersApi>;
 const mockedUseAdminClient = useAdminClient as jest.Mock;
@@ -134,10 +166,12 @@ describe('PartnerBanner', () => {
     const mockAddToast = jest.fn();
 
     const defaultBannerData = {
+        id: 1,
         title: 'Initial Title',
         description: 'Initial Description',
         image: { id: 1, url: 'initial.jpg', mimeType: 'image/jpeg' },
         imageId: 1,
+        localizations: [],
     };
 
     const getLoader = () => screen.queryByTestId('inline-loader');
@@ -182,6 +216,14 @@ describe('PartnerBanner', () => {
         if (button) fireEvent.click(button);
     };
 
+    const renderBanner = (props: Partial<PartnerBannerProps> = {}) => {
+        const defaultProps: PartnerBannerProps = {
+            language: UK_LANGUAGE,
+            translationLanguages: mockTranslationLanguages,
+        };
+        return render(<PartnerBanner {...defaultProps} {...props} />);
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockedUseAdminClient.mockReturnValue('mock-client');
@@ -207,7 +249,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(getLoader()).toBeInTheDocument();
     });
@@ -222,7 +264,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(getErrorMessage()).toBeInTheDocument();
         expect(getTryAgainButton()).toBeInTheDocument();
@@ -232,7 +274,7 @@ describe('PartnerBanner', () => {
     });
 
     it('renders banner form with fetched data and validates field updates', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         const descriptionInput = getDescriptionInput();
 
@@ -248,7 +290,7 @@ describe('PartnerBanner', () => {
     });
 
     it('handles image change', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         clickChangeImage();
 
@@ -258,7 +300,7 @@ describe('PartnerBanner', () => {
     });
 
     it('handles image removal', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         clickRemoveImage();
 
@@ -270,7 +312,7 @@ describe('PartnerBanner', () => {
     it('disables publish button when validation fails and re-enables when corrected', async () => {
         mockValidateTitle.mockImplementation((value: string) => (value ? undefined : 'Title is required'));
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed Description');
         const publishButton = getPublishButton();
@@ -298,7 +340,7 @@ describe('PartnerBanner', () => {
         };
         mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue(updatedBanner.description);
 
@@ -323,10 +365,50 @@ describe('PartnerBanner', () => {
         });
     });
 
+    it('keeps existing localizations when the update response omits them', async () => {
+        const bannerWithLocalization = {
+            ...defaultBannerData,
+            localizations: [
+                {
+                    title: 'Banner title EN',
+                    description: 'Banner description EN',
+                    language: { id: 2, code: 'en' },
+                    translationStatus: 1,
+                },
+            ],
+        };
+
+        mockedUseDataFetch.mockReturnValue({
+            data: bannerWithLocalization,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        mockedPartnersApi.updateBanner.mockResolvedValue({
+            ...bannerWithLocalization,
+            description: 'Published Description',
+            localizations: [],
+        });
+
+        renderBanner();
+
+        changeDescriptionValue('Published Description');
+        clickPublish();
+        clickConfirmPublish();
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_PUBLISHED, ToastType.Success, 3000);
+        });
+
+        expect(screen.getByText('EN')).toHaveClass(localizationStatusesStyles.relevant);
+    });
+
     it('shows error toast when publishing banner fails', async () => {
         mockedPartnersApi.updateBanner.mockRejectedValue(new Error('Update failed'));
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         clickPublish();
@@ -349,7 +431,7 @@ describe('PartnerBanner', () => {
     it('does not call updateBanner if form is invalid', async () => {
         mockValidateTitle.mockReturnValue('Title is required');
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('');
 
@@ -373,7 +455,7 @@ describe('PartnerBanner', () => {
 
         mockedPartnersApi.updateBanner.mockImplementation(createDelayedPromise as any);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         clickPublish();
@@ -393,7 +475,7 @@ describe('PartnerBanner', () => {
     });
 
     it('shows image error and disables publish until resolved', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         const publishButton = getPublishButton();
@@ -413,7 +495,7 @@ describe('PartnerBanner', () => {
     });
 
     it('renders title input as enabled', () => {
-        render(<PartnerBanner />);
+        renderBanner();
         expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
     });
 
@@ -427,7 +509,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER, ToastType.Error);
     });
@@ -435,7 +517,7 @@ describe('PartnerBanner', () => {
     it('does not call updateBanner when form has validation errors', async () => {
         mockValidateDescription.mockReturnValue('Description is required');
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('');
 
@@ -451,7 +533,7 @@ describe('PartnerBanner', () => {
     it('validates description on change and sets error correctly', async () => {
         mockValidateDescription.mockReturnValue('Description too short');
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('AB');
 
@@ -461,7 +543,7 @@ describe('PartnerBanner', () => {
     });
 
     it('clears image error when handleImageError is called with null', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         fireEvent.click(screen.getByRole('button', { name: 'Trigger image error' }));
 
@@ -475,7 +557,7 @@ describe('PartnerBanner', () => {
     });
 
     it('maintains imageId when image is changed', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         clickChangeImage();
 
@@ -511,7 +593,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(getErrorMessage()).toBeInTheDocument();
         expect(getTryAgainButton()).toBeInTheDocument();
@@ -524,7 +606,7 @@ describe('PartnerBanner', () => {
 
         mockedPartnersApi.updateBanner.mockReturnValue(delayedPromise as any);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         clickPublish();
@@ -546,7 +628,7 @@ describe('PartnerBanner', () => {
         mockValidateTitle.mockReturnValue(undefined);
         mockValidateDescription.mockReturnValue(undefined);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         await waitFor(() => {
@@ -561,7 +643,7 @@ describe('PartnerBanner', () => {
         };
         mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         // Create an error by changing description to empty
         changeDescriptionValue('');
@@ -598,7 +680,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(mockAddToast).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER, ToastType.Error);
     });
@@ -607,7 +689,7 @@ describe('PartnerBanner', () => {
         const canceledError = { name: 'CanceledError' };
         mockedPartnersApi.updateBanner.mockRejectedValue(canceledError);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('Changed');
         clickPublish();
@@ -623,7 +705,7 @@ describe('PartnerBanner', () => {
     });
 
     it('resets imageId when image is removed', async () => {
-        render(<PartnerBanner />);
+        renderBanner();
 
         clickRemoveImage();
 
@@ -666,7 +748,7 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         await waitFor(() => {
             expect(getTitleInput()).toHaveTextContent('Initial Title');
@@ -679,7 +761,7 @@ describe('PartnerBanner', () => {
         const htmlTitle = '<p><strong>Bold</strong> Title</p>';
         mockValidateTitle.mockReturnValue(undefined);
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         const titleInput = getTitleInput();
         titleInput.innerHTML = htmlTitle;
@@ -695,7 +777,7 @@ describe('PartnerBanner', () => {
     it('marks description as touched on change and shows error', async () => {
         mockValidateDescription.mockReturnValue('Description is required');
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         changeDescriptionValue('');
 
@@ -715,15 +797,127 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        render(<PartnerBanner />);
+        renderBanner();
 
         expect(getErrorMessage()).toBeInTheDocument();
         expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
     });
 
     it('passes trimOnBlur={true} to RichTextInputGroup for the title field', () => {
-        render(<PartnerBanner />);
+        renderBanner();
         const titleInput = getTitleInput();
         expect(titleInput).toHaveAttribute('data-trimonblur', 'true');
+    });
+
+    it('opens the translate modal when the translate icon is clicked', () => {
+        renderBanner();
+
+        expect(screen.queryByTestId('translate-partner-banner-modal')).not.toBeInTheDocument();
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+
+        expect(screen.getByTestId('translate-partner-banner-modal')).toBeInTheDocument();
+    });
+
+    it('disables the translate icon while there are unpublished changes', () => {
+        renderBanner();
+
+        const translateButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        });
+        expect(translateButton).toBeEnabled();
+
+        changeDescriptionValue('Changed Description');
+
+        expect(translateButton).toBeDisabled();
+    });
+
+    it('merges updated localizations and shows success toast after translating', async () => {
+        renderBanner();
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+        fireEvent.click(screen.getByText('mock-translate-success'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+            );
+        });
+    });
+
+    it('closes the translate modal via onClose', () => {
+        renderBanner();
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+        expect(screen.getByTestId('translate-partner-banner-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('mock-translate-close'));
+
+        expect(screen.queryByTestId('translate-partner-banner-modal')).not.toBeInTheDocument();
+    });
+
+    it('shows translated content and disables fields when a non-base language is selected', () => {
+        const bannerWithLocalization = {
+            ...defaultBannerData,
+            localizations: [
+                {
+                    title: 'Banner title EN',
+                    description: 'Banner description EN',
+                    language: { id: EN_LANGUAGE.id, code: EN_LANGUAGE.code },
+                    translationStatus: 1,
+                },
+            ],
+        };
+        mockedUseDataFetch.mockReturnValue({
+            data: bannerWithLocalization,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        renderBanner({ language: EN_LANGUAGE });
+
+        expect(getTitleInput()).toHaveTextContent('Banner title EN');
+        expect(getTitleInput()).toHaveAttribute('contentEditable', 'false');
+        expect(getTitleInput()).toHaveAttribute('data-hidetoolbar', 'true');
+        expect(getDescriptionInput()).toHaveValue('Banner description EN');
+        expect(getDescriptionInput()).toBeDisabled();
+        expect(getChangeImageButton()).toBeDisabled();
+        expect(getRemoveImageButton()).toBeDisabled();
+        expect(
+            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+        ).not.toBeInTheDocument();
+    });
+
+    it('shows empty fields when the banner has no translation for the selected language', () => {
+        renderBanner({ language: EN_LANGUAGE });
+
+        expect(getTitleInput()).toHaveTextContent('');
+        expect(getDescriptionInput()).toHaveValue('');
+    });
+
+    it('ignores field changes while a non-base language is selected', () => {
+        renderBanner({ language: EN_LANGUAGE });
+
+        fireEvent.change(getDescriptionInput(), { target: { value: 'Should be ignored' } });
+
+        expect(getDescriptionInput()).toHaveValue('');
+    });
+
+    it('renders the publish button and enabled fields for the base language', () => {
+        renderBanner({ language: UK_LANGUAGE });
+
+        expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
+        expect(getTitleInput()).toHaveAttribute('data-hidetoolbar', 'false');
+        expect(getDescriptionInput()).toBeEnabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeInTheDocument();
     });
 });

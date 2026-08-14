@@ -36,29 +36,10 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
     return trimEnd ? normalized.trim() : normalized;
 };
 
-const exceedsMaxDecimalDigits = (value: string): boolean => {
-    if (!value) {
-        return false;
-    }
-
-    const withCommaSeparator = value.replaceAll(/\s+/g, ' ').trimStart().replaceAll('.', ',');
-    const firstCommaIndex = withCommaSeparator.indexOf(',');
-    if (firstCommaIndex === -1) {
-        return false;
-    }
-
-    const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replace(/[^\d]/g, '');
-    return rawDecimalPart.length > 2;
-};
-
 export const validateFundsExpendituresAmount = (
     value: string,
     trigger: FundsExpendituresAmountValidationTrigger = 'change',
 ): string | undefined => {
-    if (exceedsMaxDecimalDigits(value)) {
-        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS;
-    }
-
     const normalized = normalizeFundsExpendituresAmountInput(value, true);
 
     if (!normalized) {

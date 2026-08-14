@@ -96,6 +96,7 @@ export const TranslateProgramCategoryModal = ({
                     languages={englishLanguages}
                     onLanguageChange={setLanguage}
                     generateDisabled={!selectedCategory}
+                    hideGenerateButton={false}
                 />
             )}
             <TranslateProgramCategoryForm

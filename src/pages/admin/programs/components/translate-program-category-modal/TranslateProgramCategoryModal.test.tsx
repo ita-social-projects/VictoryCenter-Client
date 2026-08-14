@@ -16,12 +16,20 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
 }));
 
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
-    TranslationControls: ({ selectedLanguage, languages, onLanguageChange, isSubmitting, generateDisabled }: any) => (
+    TranslationControls: ({
+        selectedLanguage,
+        languages,
+        onLanguageChange,
+        isSubmitting,
+        generateDisabled,
+        hideGenerateButton,
+    }: any) => (
         <div data-testid="translation-controls">
             <span data-testid="selected-language">{selectedLanguage?.code ?? 'none'}</span>
             <span data-testid="is-submitting">{String(isSubmitting)}</span>
             <span data-testid="languages-count">{String(languages?.length ?? 0)}</span>
             <span data-testid="generate-disabled">{String(generateDisabled)}</span>
+            <span data-testid="hide-generate-button">{String(hideGenerateButton)}</span>
             <button
                 data-testid="choose-last-language"
                 onClick={() => onLanguageChange?.(languages?.[languages.length - 1] ?? null)}
@@ -135,13 +143,15 @@ describe('TranslateProgramCategoryModal', () => {
         );
     });
 
-    it('disables Generate before a category is selected, enables it once one is chosen', () => {
+    it('keeps Generate visible (never hidden) and disables it before a category is selected, enables it once one is chosen', () => {
         renderModal();
 
+        expect(screen.getByTestId('hide-generate-button')).toHaveTextContent('false');
         expect(screen.getByTestId('generate-disabled')).toHaveTextContent('true');
 
         fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
 
+        expect(screen.getByTestId('hide-generate-button')).toHaveTextContent('false');
         expect(screen.getByTestId('generate-disabled')).toHaveTextContent('false');
     });
 

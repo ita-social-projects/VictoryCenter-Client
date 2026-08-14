@@ -31,14 +31,12 @@ export const TranslateProgramCategoryModal = ({
 
     const [language, setLanguage] = useState<LocalizationLanguage | null>(englishLanguages[0] ?? null);
 
-    // Keeps the selected language in sync when the modal reopens or `translatedLanguages` resolves after mount.
     useEffect(() => {
         if (!isOpen) return;
         setLanguage(englishLanguages[0] ?? null);
     }, [englishLanguages, isOpen]);
 
-    // Resets stale validity/dirty state left over from a previous open, without touching the initial mount
-    // (the form's own mount effect already reports its real initial validity/dirty state).
+    // Avoid overriding the form's initial validity/dirty state on first mount.
     const wasOpenRef = useRef(isOpen);
     useEffect(() => {
         const wasOpen = wasOpenRef.current;

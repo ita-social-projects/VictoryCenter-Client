@@ -198,7 +198,6 @@ export const ReportAnalytics = () => {
                         registerRefetchSettingsCallback={(fn) => {
                             refetchSettingsRef.current = fn;
                         }}
-                        onExchangeRateValidationChange={setIsExchangeValid}
                     />
                 </div>
                 <div style={{ display: activeTab.id === 'program-expenses' ? 'block' : 'none' }}>

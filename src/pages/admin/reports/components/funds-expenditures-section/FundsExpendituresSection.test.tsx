@@ -1491,36 +1491,36 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
         );
     });
 
-    it('should call onExchangeRateValidationChange with true when exchange rate is valid', () => {
-        const onExchangeRateValidationChange = jest.fn();
+    it('should call onExchangeRateValueChange with valid exchange rate', () => {
+        const onExchangeRateValueChange = jest.fn();
 
         render(
             <FundsExpenditureSection
                 isEditing
                 draftExchangeRate="41.25"
-                onExchangeRateValidationChange={onExchangeRateValidationChange}
+                onExchangeRateValueChange={onExchangeRateValueChange}
             />,
         );
 
         fireEvent.click(screen.getByTestId('blur-rate'));
 
-        expect(onExchangeRateValidationChange).toHaveBeenCalledWith(true);
+        expect(onExchangeRateValueChange).toHaveBeenCalledWith('41,25');
     });
 
-    it('should call onExchangeRateValidationChange with false when exchange rate is invalid', () => {
-        const onExchangeRateValidationChange = jest.fn();
+    it('should call onExchangeRateValueChange with invalid exchange rate', () => {
+        const onExchangeRateValueChange = jest.fn();
 
         render(
             <FundsExpenditureSection
                 isEditing
                 draftExchangeRate={null}
-                onExchangeRateValidationChange={onExchangeRateValidationChange}
+                onExchangeRateValueChange={onExchangeRateValueChange}
             />,
         );
 
         fireEvent.click(screen.getByTestId('change-rate-invalid'));
 
-        expect(onExchangeRateValidationChange).toHaveBeenCalledWith(false);
+        expect(onExchangeRateValueChange).toHaveBeenCalledWith('abc');
     });
 });
 

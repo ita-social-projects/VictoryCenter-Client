@@ -87,7 +87,6 @@ interface FundsExpenditureSectionProps {
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
-    onExchangeRateValidationChange?: (isValid: boolean) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -111,7 +110,6 @@ export const FundsExpenditureSection = ({
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
-    onExchangeRateValidationChange,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -177,10 +175,9 @@ export const FundsExpenditureSection = ({
             setExchangeRateValue(normalized);
             onExchangeRateValueChange?.(normalized);
             setExchangeRateError(error);
-            onExchangeRateValidationChange?.(!error);
             onDataChange?.();
         },
-        [onExchangeRateValueChange, onExchangeRateValidationChange, onDataChange],
+        [onExchangeRateValueChange, onDataChange],
     );
 
     const handleExchangeRateBlur = useCallback(() => {
@@ -190,8 +187,7 @@ export const FundsExpenditureSection = ({
         setExchangeRateValue(normalized);
         onExchangeRateValueChange?.(normalized || null);
         setExchangeRateError(error);
-        onExchangeRateValidationChange?.(!error);
-    }, [exchangeRateValue, onExchangeRateValueChange, onExchangeRateValidationChange]);
+    }, [exchangeRateValue, onExchangeRateValueChange]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);

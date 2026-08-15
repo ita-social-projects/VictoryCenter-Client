@@ -827,9 +827,9 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should use exchange rate from parent component in edit mode', () => {
-        render(<ProgramExpensesSection isEditing exchangeRate="41.25" />);
+        render(<ProgramExpensesSection isEditing exchangeRate="45" />);
 
-        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '45');
     });
 
     it('should use exchange rate from read-only data in non-edit mode', () => {

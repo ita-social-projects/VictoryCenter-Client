@@ -170,11 +170,9 @@ export const FundsExpenditureSection = ({
     const handleExchangeRateChange = useCallback(
         (value: string) => {
             const normalized = normalizeFundsExpendituresExchangeRateInput(value);
-            const error = validateFundsExpendituresExchangeRate(normalized, 'change');
-
             setExchangeRateValue(normalized);
             onExchangeRateValueChange?.(normalized);
-            setExchangeRateError(error);
+            setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
             onDataChange?.();
         },
         [onExchangeRateValueChange, onDataChange],
@@ -182,11 +180,9 @@ export const FundsExpenditureSection = ({
 
     const handleExchangeRateBlur = useCallback(() => {
         const normalized = normalizeFundsExpendituresExchangeRateInput(exchangeRateValue, true);
-        const error = validateFundsExpendituresExchangeRate(normalized, 'blur');
-
         setExchangeRateValue(normalized);
         onExchangeRateValueChange?.(normalized || null);
-        setExchangeRateError(error);
+        setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'blur'));
     }, [exchangeRateValue, onExchangeRateValueChange]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {

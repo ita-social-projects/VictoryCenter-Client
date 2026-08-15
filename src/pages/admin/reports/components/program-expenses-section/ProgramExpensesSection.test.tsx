@@ -760,9 +760,7 @@ describe('ProgramExpensesSection', () => {
         });
 
         it('should cancel inline edit when isEditing turns off', () => {
-            const { rerender } = render(
-                <ProgramExpensesSection isEditing exchangeRate={'41.25'} />,
-            );
+            const { rerender } = render(<ProgramExpensesSection isEditing exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
@@ -772,7 +770,7 @@ describe('ProgramExpensesSection', () => {
         });
 
         it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {
-            render(<ProgramExpensesSection exchangeRate={"45"} />);
+            render(<ProgramExpensesSection exchangeRate={'45'} />);
 
             fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
             expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeInTheDocument();
@@ -829,17 +827,9 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should use exchange rate from parent component in edit mode', () => {
-        render(
-            <ProgramExpensesSection
-                isEditing
-                exchangeRate="41.25"
-            />,
-        );
+        render(<ProgramExpensesSection isEditing exchangeRate="41.25" />);
 
-        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute(
-            'data-exchange-rate',
-            '41.25',
-        );
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
     });
 
     it('should use exchange rate from read-only data in non-edit mode', () => {
@@ -852,26 +842,13 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        render(
-            <ProgramExpensesSection
-                isEditing={false}
-                exchangeRate="41.25"
-            />,
-        );
+        render(<ProgramExpensesSection isEditing={false} exchangeRate="41.25" />);
 
-        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute(
-            'data-exchange-rate',
-            '40.50',
-        );
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '40.50');
     });
 
     it('should disable add program expense control when exchange rate is invalid', () => {
-        render(
-            <ProgramExpensesSection
-                isEditing
-                exchangeRate="invalid"
-            />,
-        );
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
 
         expect(
             screen.getByRole('button', {
@@ -881,12 +858,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should disable row actions when exchange rate is invalid', () => {
-        render(
-            <ProgramExpensesSection
-                isEditing
-                exchangeRate="invalid"
-            />,
-        );
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
 
         expect(screen.getByLabelText('Edit record 1')).toBeDisabled();
         expect(screen.getByLabelText('Delete record 1')).toBeDisabled();

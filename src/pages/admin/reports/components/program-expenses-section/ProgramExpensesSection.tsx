@@ -36,7 +36,6 @@ interface ProgramExpensesSectionProps {
     onCountsChange?: (count: number) => void;
     onDataChange?: () => void;
     exchangeRate: string | null;
-    isExchangeRateValid: boolean;
 }
 
 export const ProgramExpensesSection = ({
@@ -46,7 +45,6 @@ export const ProgramExpensesSection = ({
     onCountsChange,
     onDataChange,
     exchangeRate,
-    isExchangeRateValid,
 }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();

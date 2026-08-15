@@ -35,7 +35,6 @@ export const ReportAnalytics = () => {
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
     const [isFundsEditing, setIsFundsEditing] = useState(false);
     const [exchangeRateDraft, setExchangeRateDraft] = useState<string | null>(null);
-    const [isExchangeRateValid, setIsExchangeValid] = useState(true);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
@@ -210,7 +209,6 @@ export const ReportAnalytics = () => {
                         onCountsChange={setProgramRecordsCount}
                         onDataChange={() => setHasUnpublishedChanges(true)}
                         exchangeRate={exchangeRateDraft}
-                        isExchangeRateValid={isExchangeRateValid}
                     />
                 </div>
             </div>

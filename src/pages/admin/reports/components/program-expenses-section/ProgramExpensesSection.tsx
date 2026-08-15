@@ -115,7 +115,7 @@ export const ProgramExpensesSection = ({
     const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
     const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS || isRowEditMode;
     const currentExchangeRate = isEditing ? exchangeRate : data.exchangeRate;
-    const hasExchangeRateError = Boolean(validateFundsExpendituresExchangeRate(exchangeRate ?? '', 'blur'));
+    const hasExchangeRateError = Boolean(validateFundsExpendituresExchangeRate(currentExchangeRate ?? '', 'blur'));
 
     useEffect(() => {
         onCountsChange?.(programExpenseRecordsCount);

@@ -33,7 +33,9 @@ export const updateFundsAmounts = (
             if (normalized === '') {
                 nextAmountUsd = '';
                 nextAmountUsdError = undefined;
-            } else if (!currentFieldError) {
+            }
+
+            if (normalized !== '' && !currentFieldError) {
                 const convertedAmount = getConvertedAmount(normalized, exchangeRate);
 
                 if (convertedAmount !== null) {

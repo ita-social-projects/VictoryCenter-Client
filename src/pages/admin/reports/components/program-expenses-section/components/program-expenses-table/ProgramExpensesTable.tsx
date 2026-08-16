@@ -309,7 +309,7 @@ export const ProgramExpensesTable = ({
                     <Button
                         buttonStyle="secondary"
                         className={styles['delete-selected-button']}
-                        disabled={isAnyRowEditing}
+                        disabled={isAnyRowEditing || isRowActionsDisabled}
                         onClick={() => onOpenBulkDelete?.()}
                     >
                         {PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON}

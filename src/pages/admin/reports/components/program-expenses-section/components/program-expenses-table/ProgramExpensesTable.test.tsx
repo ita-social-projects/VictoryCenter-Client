@@ -422,4 +422,14 @@ describe('ProgramExpensesTable', () => {
         expect(toTopButton).toHaveAttribute('aria-hidden', 'true');
         expect(toTopButton).toHaveAttribute('tabIndex', '-1');
     });
+
+    it('should disable bulk delete action when row actions are disabled', () => {
+        renderTable({
+            isEditing: true,
+            isRowActionsDisabled: true,
+            selectedRecordIds: [1, 2],
+        });
+
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeDisabled();
+    });
 });

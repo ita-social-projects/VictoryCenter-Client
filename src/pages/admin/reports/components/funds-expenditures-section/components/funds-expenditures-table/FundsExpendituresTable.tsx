@@ -473,6 +473,7 @@ export const FundsExpendituresTable = ({
                     <Button
                         buttonStyle="secondary"
                         className={styles['delete-selected-button']}
+                        disabled={isAnyRowEditing || isRowActionsDisabled}
                         onClick={() => onOpenBulkDelete?.()}
                     >
                         {FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON}

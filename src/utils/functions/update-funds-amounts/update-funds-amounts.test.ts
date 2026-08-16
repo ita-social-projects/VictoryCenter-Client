@@ -295,6 +295,7 @@ describe('updateFundsAmounts', () => {
             const updater = updateFundsAmounts('amountUah', '', '33.5', trigger);
             const result = updater(stateWithUsd);
 
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
             expect(result.amountUah).toBe('');
             expect(result.amountUsd).toBe('');
             expect(result.errors.amountUsd).toBeUndefined();

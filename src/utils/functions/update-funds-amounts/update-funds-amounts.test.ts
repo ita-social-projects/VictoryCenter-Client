@@ -302,6 +302,47 @@ describe('updateFundsAmounts', () => {
             expect(result.errors.amountUah).toBe(uahError);
         });
 
+        it('should apply validation error for non-empty amountUah after clearing', () => {
+            const stateWithUsd: FundsAmountsState = {
+                amountUah: '100',
+                amountUsd: '30',
+                errors: {
+                    amountUah: undefined,
+                    amountUsd: 'Previous USD error',
+                },
+            };
+
+            mockNormalizeFundsExpendituresAmountInput.mockImplementation((input) => input ?? '');
+            mockValidateFundsExpendituresAmount.mockImplementation(
+                (value: string, currentTrigger?: 'change' | 'blur' | 'save') => {
+                    if (value === '') {
+                        return currentTrigger === 'blur' ? 'Field is required' : undefined;
+                    }
+
+                    if (value === '150') {
+                        return 'Invalid amount';
+                    }
+
+                    return undefined;
+                },
+            );
+
+            const clearUpdater = updateFundsAmounts('amountUah', '', '33.5', 'change');
+            const clearedState = clearUpdater(stateWithUsd);
+
+            expect(clearedState.amountUah).toBe('');
+            expect(clearedState.amountUsd).toBe('');
+            expect(clearedState.errors.amountUah).toBeUndefined();
+
+            const invalidUpdater = updateFundsAmounts('amountUah', '150', '33.5', 'change');
+            const result = invalidUpdater(clearedState);
+
+            expect(result.amountUah).toBe('150');
+            expect(result.errors.amountUah).toBe('Invalid amount');
+            expect(result.amountUsd).toBe('');
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+        });
+
         it('should handle very large amounts', () => {
             const largeAmount = '999999999.99';
             mockNormalizeFundsExpendituresAmountInput.mockReturnValue(largeAmount);

@@ -863,4 +863,20 @@ describe('ProgramExpensesSection', () => {
         expect(screen.getByLabelText('Edit record 1')).toBeDisabled();
         expect(screen.getByLabelText('Delete record 1')).toBeDisabled();
     });
+
+    it('should disable add button in empty state when exchange rate has an error', () => {
+        mockUseDataFetchResult = {
+            data: EMPTY_PROGRAM_EXPENSES_DATA,
+            isLoading: false,
+            refetch: mockRefetch,
+        };
+
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
+
+        const addButtons = screen.getAllByRole('button', {
+            name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE,
+        });
+
+        expect(addButtons[1]).toBeDisabled();
+    });
 });

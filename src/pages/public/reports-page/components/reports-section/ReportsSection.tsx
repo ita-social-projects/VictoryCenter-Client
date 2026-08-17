@@ -6,6 +6,7 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { PdfReportDto } from '@/types/admin/pdf-section';
+import { useSignalR } from '@/hooks/public/SignalR/useSignalR';
 import styles from './ReportsSection.module.scss';
 
 const INITIAL_VISIBLE_COUNT = 2;
@@ -15,6 +16,8 @@ export const ReportsSection = () => {
     const { currentLanguage } = useLocale();
     const [isExpanded, setIsExpanded] = useState(false);
     const [reports, setReports] = useState<PdfReportDto[]>([]);
+
+    const signalRConnection = useSignalR(process.env.SIGNALR_PDF_REPORTS_URL || 'https://localhost:5001/hubs/reports');
 
     useEffect(() => {
         let mounted = true;
@@ -33,6 +36,31 @@ export const ReportsSection = () => {
             mounted = false;
         };
     }, [currentLanguage]);
+
+    useEffect(() => {
+        if (!signalRConnection) return;
+
+        const handlePdfCreated = async (updatedLanguageId: number) => {
+            try {
+                const languages = await localizationLanguagesDataFetch();
+                const langCode = currentLanguage?.startsWith('en') ? 'en' : 'uk';
+                const language = languages.find((l) => l.code === langCode);
+
+                if (language && language.id === updatedLanguageId) {
+                    const result = await PdfReportsApi.getAllByLanguageId(language.id, { offset: 0, limit: 1000 });
+                    setReports(result.items);
+                }
+            } catch (err) {
+                console.error('Failed to refetch reports on SignalR event', err);
+            }
+        };
+
+        signalRConnection.on('PdfReportCreated', handlePdfCreated);
+
+        return () => {
+            signalRConnection.off('PdfReportCreated', handlePdfCreated);
+        };
+    }, [signalRConnection, currentLanguage]);
 
     const hasOverflow = reports.length > INITIAL_VISIBLE_COUNT;
     const visibleReports = hasOverflow && !isExpanded ? reports.slice(0, INITIAL_VISIBLE_COUNT) : reports;

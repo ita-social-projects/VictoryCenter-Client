@@ -1,29 +1,77 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ContactDetailsSection } from './components/contact-details-section/ContactDetailsSection';
 import { ContactFormCard } from './components/contact-form-card/ContactFormCard';
 import { CONTACT_US_PAGE_DATA } from '@/utils/mock-data/public';
 import styles from './ContactUsPage.module.scss';
+import { useTranslation } from 'react-i18next';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import {
+    getPublicCompanyProfile,
+    PublicCompanyProfileDto,
+} from '@/services/api/public/company-profile/company-profile-api';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { EntityLocalization } from '@/types/common/language';
+import { LinearProgress } from '@mui/material';
 
 export const ContactUsPage: React.FC = () => {
+    const { t } = useTranslation('contactUsPage');
+
     const handleCopy = useCallback(async (value: string) => {
         await navigator.clipboard.writeText(value);
     }, []);
+
+    const { data, isLoading, error } = useDataFetch<PublicCompanyProfileDto | null>({
+        initialData: null,
+        fetchHandler: getPublicCompanyProfile,
+    });
+
+    const localizations = useMemo<EntityLocalization[]>(() => {
+        if (!data?.contacts?.localizations) {
+            return [];
+        }
+
+        return data.contacts.localizations.map((loc) => ({
+            ...loc,
+            language: loc.localizationInfoDto,
+        })) as EntityLocalization[];
+    }, [data]);
+
+    const fallback = useMemo(() => {
+        return {
+            address: data?.contacts?.address || '',
+            motto: data?.contacts?.motto || '',
+        };
+    }, [data]);
+
+    const { address, motto } = useGetLocalization(localizations, fallback);
+
+    if (isLoading) {
+        return (
+            <div className={styles.loader}>
+                <LinearProgress />
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div className={styles.error}>{t('downloadError')}</div>;
+    }
 
     return (
         <section className={styles.root}>
             <div className={styles.container}>
                 <ContactDetailsSection
-                    title={CONTACT_US_PAGE_DATA.title}
-                    description={CONTACT_US_PAGE_DATA.description}
-                    contactsTitle={CONTACT_US_PAGE_DATA.contactsTitle}
-                    socialLinksTitle={CONTACT_US_PAGE_DATA.socialLinksTitle}
+                    title={t('title')}
+                    description={t('description')}
+                    contactsTitle={t('contactsTitle')}
+                    socialLinksTitle={t('socialsTitle')}
                     email={CONTACT_US_PAGE_DATA.contacts.email}
                     phone={CONTACT_US_PAGE_DATA.contacts.phone}
-                    address={CONTACT_US_PAGE_DATA.contacts.address}
-                    motto={CONTACT_US_PAGE_DATA.contacts.motto}
+                    address={address}
+                    motto={motto}
                     socialLinks={CONTACT_US_PAGE_DATA.socialLinks}
-                    copyEmailLabel={CONTACT_US_PAGE_DATA.copyEmailAria}
-                    copyPhoneLabel={CONTACT_US_PAGE_DATA.copyPhoneAria}
+                    copyEmailLabel={t('copyEmailAria')}
+                    copyPhoneLabel={t('copyPhoneAria')}
                     onCopyEmail={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.email)}
                     onCopyPhone={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.phone)}
                 />

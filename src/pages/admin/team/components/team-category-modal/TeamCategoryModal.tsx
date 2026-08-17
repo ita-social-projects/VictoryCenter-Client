@@ -305,6 +305,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                             id={getFieldId('name')}
                             maxLength={TEAM_CATEGORY_VALIDATION.name.max}
                             disabled={isSubmitting}
+                            showCounterBelow={true}
                         />
 
                         <TextAreaWithCharacterLimitGroup

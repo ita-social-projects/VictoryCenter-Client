@@ -12,6 +12,7 @@ import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-g
 import { PartnerFormProps } from '../partner-form/PartnerForm';
 import { LocalizationLanguage } from '@/types/common/language';
 import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -80,7 +81,7 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="confirmation-modal">
                 <span>{title}</span>
@@ -311,6 +312,9 @@ describe('PartnerSectionForm', () => {
         renderComponent({ value: { ...defaultSectionValue, partners: [partnerWithoutId] }, onChange });
 
         fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
         fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());

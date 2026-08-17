@@ -1,4 +1,4 @@
-import React, { useCallback, memo, useState, useEffect } from 'react';
+import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
@@ -72,8 +72,16 @@ const PartnerSectionComponent = ({
     const displayedTitle = isBaseLanguage ? value.title : (translatedContent?.title ?? '');
     const displayedDescription = isBaseLanguage ? value.description : (translatedContent?.description ?? '');
 
+    const isMounted = useRef(true);
+
     useEffect(() => {
-        if (disabled && partnerToDeleteLocalId !== null) {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (disabled && partnerToDeleteLocalId !== null && isMounted.current) {
             setPartnerToDeleteLocalId(null);
         }
     }, [disabled, partnerToDeleteLocalId]);

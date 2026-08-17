@@ -110,7 +110,9 @@ export const useFundsExpendituresRecordForm = ({
 
     const handleAmountFieldChange = useCallback(
         (field: 'amountUah' | 'amountUsd') => (value: string) => {
-            const normalizedValue = normalizeFundsExpendituresAmountInput(value, false, false);
+            const normalizedValue = normalizeFundsExpendituresAmountInput(value, false, false, {
+                whitespaceOnly: true,
+            });
 
             setFormState((prev) => ({
                 ...prev,

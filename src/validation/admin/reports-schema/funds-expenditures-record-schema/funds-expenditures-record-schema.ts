@@ -18,6 +18,7 @@ export const normalizeFundsExpendituresAmountInput = (
     value: string | undefined | null,
     trimEnd = false,
     preserveSpaces = true,
+    options?: { whitespaceOnly?: boolean },
 ): string => {
     if (!value) {
         return '';
@@ -28,6 +29,10 @@ export const normalizeFundsExpendituresAmountInput = (
 
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     const firstCommaIndex = withCommaSeparator.indexOf(',');
+
+    if (options?.whitespaceOnly) {
+        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+    }
 
     if (firstCommaIndex === -1) {
         return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;

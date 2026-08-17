@@ -13,6 +13,7 @@ import { PartnerFormProps } from '../partner-form/PartnerForm';
 import { LocalizationLanguage } from '@/types/common/language';
 import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
 import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -73,7 +74,7 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, type, buttonStyle: _buttonStyle, ...props }: any) => (
+    Button: ({ children, onClick, disabled, type, buttonStyle: _buttonStyle, ...props }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled} type={type} {...props}>
             {children}
         </button>

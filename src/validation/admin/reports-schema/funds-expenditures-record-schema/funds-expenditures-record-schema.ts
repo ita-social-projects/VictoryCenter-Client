@@ -31,9 +31,12 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
         .slice(firstCommaIndex + 1)
         .replaceAll(/[\s,]/g, '')
         .slice(0, 2);
-    const normalized = `${integerPart},${decimalPart}`;
 
-    return trimEnd ? normalized.trim() : normalized;
+    if (trimEnd) {
+        return (decimalPart === '' ? integerPart : `${integerPart},${decimalPart}`).trim();
+    }
+
+    return `${integerPart},${decimalPart}`;
 };
 
 export const validateFundsExpendituresAmount = (

@@ -55,10 +55,10 @@ export const ReportsSection = () => {
             }
         };
 
-        signalRConnection.on('PdfReportCreated', handlePdfCreated);
+        signalRConnection.on('PdfReportAction', handlePdfCreated);
 
         return () => {
-            signalRConnection.off('PdfReportCreated', handlePdfCreated);
+            signalRConnection.off('PdfReportAction', handlePdfCreated);
         };
     }, [signalRConnection, currentLanguage]);
 

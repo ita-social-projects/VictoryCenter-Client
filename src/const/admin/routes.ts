@@ -28,6 +28,10 @@ export const ADMIN_ROUTES = {
         PATH: 'who-we-are',
         FULL: '/admin-panel/who-we-are',
     },
+    EVENTS: {
+        PATH: 'events',
+        FULL: '/admin-panel/events',
+    },
     PARTNERS: {
         PATH: 'partners',
         FULL: '/admin-panel/partners',

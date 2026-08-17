@@ -11,6 +11,53 @@ import './AdminNavigation.scss';
 export const AdminNavigation = () => {
     const { logout } = useAdminContext();
 
+    const navItems = [
+        {
+            link: ADMIN_ROUTES.MAIN.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.MAIN,
+        },
+        {
+            link: ADMIN_ROUTES.PROFILE_COMPANY.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.PROFILE_COMPANY,
+        },
+        {
+            link: ADMIN_ROUTES.REPORTS.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.REPORTS,
+        },
+        {
+            link: ADMIN_ROUTES.TEAM.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.TEAM_MEMBERS,
+        },
+        {
+            link: ADMIN_ROUTES.PROGRAMS.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.PROGRAMS,
+        },
+        {
+            link: ADMIN_ROUTES.DONATE.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.DONATE,
+        },
+        {
+            link: ADMIN_ROUTES.HISTORY.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.HISTORY,
+        },
+        {
+            link: ADMIN_ROUTES.FAQ.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.FAQ,
+        },
+        {
+            link: ADMIN_ROUTES.WHO_WE_ARE.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.WHO_WE_ARE,
+        },
+        {
+            link: ADMIN_ROUTES.EVENTS.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.EVENTS,
+        },
+        {
+            link: ADMIN_ROUTES.PARTNERS.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.PARTNERS,
+        },
+    ];
+
     return (
         <div className="admin-navigation">
             <div>
@@ -19,125 +66,20 @@ export const AdminNavigation = () => {
                 </div>
                 <div className="admin-pages">
                     <nav>
-                        <NavLink
-                            to={ADMIN_ROUTES.MAIN.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.MAIN}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.PROFILE_COMPANY.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.PROFILE_COMPANY}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.REPORTS.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.REPORTS}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.TEAM.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.TEAM_MEMBERS}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.PROGRAMS.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.DONATE.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.DONATE}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.HISTORY.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.HISTORY}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.FAQ.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.FAQ}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.WHO_WE_ARE.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.WHO_WE_ARE}
-                        </NavLink>
-
-                        <NavLink
-                            to={ADMIN_ROUTES.PARTNERS.FULL}
-                            end
-                            className={({ isActive }) =>
-                                classNames('admin-page-link', {
-                                    'admin-pages-selected': isActive,
-                                })
-                            }
-                        >
-                            {COMMON_TEXT_ADMIN.TAB.PARTNERS}
-                        </NavLink>
+                        {navItems.map((nav) => (
+                            <NavLink
+                                key={nav.link}
+                                to={nav.link}
+                                end
+                                className={({ isActive }) =>
+                                    classNames('admin-page-link', {
+                                        'admin-pages-selected': isActive,
+                                    })
+                                }
+                            >
+                                {nav.text}
+                            </NavLink>
+                        ))}
                     </nav>
                 </div>
             </div>

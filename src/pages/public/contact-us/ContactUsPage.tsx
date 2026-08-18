@@ -10,7 +10,7 @@ import {
     PublicCompanyProfileDto,
 } from '@/services/api/public/company-profile/company-profile-api';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
-import { EntityLocalization } from '@/types/common/language';
+import { EntityLocalization, TranslationStatus } from '@/types/common/language';
 import { LinearProgress } from '@mui/material';
 
 export const ContactUsPage: React.FC = () => {
@@ -30,10 +30,22 @@ export const ContactUsPage: React.FC = () => {
             return [];
         }
 
-        return data.contacts.localizations.map((loc) => ({
-            ...loc,
-            language: loc.localizationInfoDto,
-        })) as EntityLocalization[];
+        return data.contacts.localizations.flatMap((loc) => {
+            if (!loc.localizationInfoDto || !loc.localizationInfoDto.code) {
+                return [];
+            }
+
+            return [
+                {
+                    ...loc,
+                    language: {
+                        id: 0,
+                        code: loc.localizationInfoDto.code,
+                    },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ];
+        });
     }, [data]);
 
     const fallback = useMemo(() => {

@@ -20,7 +20,7 @@ export const ContactUsPage: React.FC = () => {
         await navigator.clipboard.writeText(value);
     }, []);
 
-    const { data, isLoading, error } = useDataFetch<PublicCompanyProfileDto | null>({
+    const { data, isLoading } = useDataFetch<PublicCompanyProfileDto | null>({
         initialData: null,
         fetchHandler: getPublicCompanyProfile,
     });
@@ -38,8 +38,8 @@ export const ContactUsPage: React.FC = () => {
 
     const fallback = useMemo(() => {
         return {
-            address: data?.contacts?.address || '',
-            motto: data?.contacts?.motto || '',
+            address: data?.contacts?.address ?? '',
+            motto: data?.contacts?.motto ?? '',
         };
     }, [data]);
 
@@ -51,10 +51,6 @@ export const ContactUsPage: React.FC = () => {
                 <LinearProgress />
             </div>
         );
-    }
-
-    if (error) {
-        return <div className={styles.error}>{t('downloadError')}</div>;
     }
 
     return (

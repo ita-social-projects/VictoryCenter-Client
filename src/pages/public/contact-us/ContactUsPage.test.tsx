@@ -67,7 +67,7 @@ jest.mock('./components/contact-form-card/ContactFormCard', () => ({
 }));
 
 describe('ContactUsPage', () => {
-    it('renders composed sections using mock data', () => {
+    beforeEach(() => {
         (useDataFetch as jest.Mock).mockReturnValue({
             data: CONTACT_US_PAGE_DATA,
             isLoading: false,
@@ -75,7 +75,9 @@ describe('ContactUsPage', () => {
             refetch: jest.fn(),
             setData: jest.fn(),
         });
+    });
 
+    it('renders composed sections using mock data', () => {
         render(
             <MemoryRouter>
                 <ContactUsPage />
@@ -94,14 +96,6 @@ describe('ContactUsPage', () => {
     });
 
     it('copies email and phone via contact details callbacks', async () => {
-        (useDataFetch as jest.Mock).mockReturnValue({
-            data: CONTACT_US_PAGE_DATA,
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
-
         const user = userEvent.setup();
         const writeTextSpy = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
 
@@ -142,7 +136,7 @@ describe('ContactUsPage', () => {
         expect(screen.queryByTestId('contact-form-card')).not.toBeInTheDocument();
     });
 
-    it('renders error message when data fetch fails', () => {
+    it('still renders contact info and form when profile fetch fails', () => {
         (useDataFetch as jest.Mock).mockReturnValue({
             data: null,
             isLoading: false,
@@ -157,9 +151,9 @@ describe('ContactUsPage', () => {
             </MemoryRouter>,
         );
 
-        expect(screen.getByText('downloadError')).toBeInTheDocument();
+        expect(screen.queryByText('downloadError')).not.toBeInTheDocument();
         expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('contact-details-section')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('contact-form-card')).not.toBeInTheDocument();
+        expect(screen.getByTestId('contact-details-section')).toBeInTheDocument();
+        expect(screen.getByTestId('contact-form-card')).toBeInTheDocument();
     });
 });

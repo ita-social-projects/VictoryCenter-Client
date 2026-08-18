@@ -346,4 +346,45 @@ describe('TranslateProgramCategoryModal', () => {
 
         expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
     });
+
+    it('resets the selected category (and with it, mode/prefill) when reopened after being closed', () => {
+        const onClose = jest.fn();
+
+        const { rerender } = render(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITH_EN_LOCALIZATION.id}`));
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+        );
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={false}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        );
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute('data-initial', 'null');
+    });
 });

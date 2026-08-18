@@ -11,6 +11,7 @@ jest.mock('@/components/admin/button/Button', () => ({
             data-testid="generate-btn"
             className={props.className}
             disabled={props.disabled}
+            aria-hidden={props['aria-hidden']}
             onClick={props.onClick}
             type={props.type}
         >
@@ -59,20 +60,22 @@ describe('TranslationControls', () => {
         expect(button).toHaveAttribute('type', 'button');
     });
 
-    it('renders the generate button as disabled and hidden by default', () => {
+    it('renders the generate button as disabled, hidden and aria-hidden by default', () => {
         render(<TranslationControls {...defaultProps} />);
 
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeDisabled();
         expect(button).toHaveClass('disable');
+        expect(button).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('keeps the generate button hidden regardless of generateDisabled when hideGenerateButton is not overridden', () => {
+    it('keeps the generate button disabled and aria-hidden regardless of generateDisabled when hideGenerateButton is not overridden', () => {
         render(<TranslationControls {...defaultProps} generateDisabled={false} />);
 
         const button = screen.getByTestId('generate-btn');
-        expect(button).toBeEnabled();
+        expect(button).toBeDisabled();
         expect(button).toHaveClass('disable');
+        expect(button).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('shows the generate button as disabled (not hidden) when hideGenerateButton is false and generateDisabled is true', () => {
@@ -81,6 +84,7 @@ describe('TranslationControls', () => {
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeDisabled();
         expect(button).not.toHaveClass('disable');
+        expect(button).toHaveAttribute('aria-hidden', 'false');
     });
 
     it('shows the generate button as enabled when hideGenerateButton and generateDisabled are both false', () => {
@@ -89,6 +93,7 @@ describe('TranslationControls', () => {
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeEnabled();
         expect(button).not.toHaveClass('disable');
+        expect(button).toHaveAttribute('aria-hidden', 'false');
     });
 
     it.skip('disables the button when isSubmitting is true', () => {

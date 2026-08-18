@@ -46,7 +46,8 @@ export const TranslationControls = ({
             <Button
                 className={cn(styles['generate-button'], { [styles.disable]: hideGenerateButton })}
                 buttonStyle="primary"
-                disabled={generateDisabled}
+                disabled={generateDisabled || hideGenerateButton}
+                aria-hidden={hideGenerateButton}
                 onClick={onGenerate}
                 type="button"
             >

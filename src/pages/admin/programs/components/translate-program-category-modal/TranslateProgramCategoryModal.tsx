@@ -46,6 +46,7 @@ export const TranslateProgramCategoryModal = ({
         if (!wasOpen && isOpen) {
             setIsFormValid(false);
             setIsDirty(false);
+            setSelectedCategory(null);
         }
     }, [isOpen]);
 

@@ -80,6 +80,9 @@ export const TranslateProgramCategoryForm = forwardRef<
             onSubmit: (data, _status) => onSubmit(data),
         });
 
+        // Supports both controlled usage (parent passes selectedCategory, e.g. TranslateProgramCategoryModal)
+        // and standalone/uncontrolled usage (prop omitted entirely) by falling back to local state only in the
+        // latter case; when controlled, activeCategory always reflects the prop, never the local fallback.
         const [localSelectedCategory, setLocalSelectedCategory] = useState<ProgramCategory | null>(null);
         const activeCategory = selectedCategory !== undefined ? selectedCategory : localSelectedCategory;
 
@@ -88,9 +91,7 @@ export const TranslateProgramCategoryForm = forwardRef<
         }, [formState, isDirty, onDirtyChange]);
 
         const handleCategoryChange = (category: ProgramCategory | null) => {
-            if (selectedCategory === undefined) {
-                setLocalSelectedCategory(category);
-            }
+            setLocalSelectedCategory(category);
             setFormState((prev) => ({ ...prev, categoryId: category?.id ?? null }));
             setErrors((prev) => ({ ...prev, name: undefined }));
             onCategoryChange?.(category);

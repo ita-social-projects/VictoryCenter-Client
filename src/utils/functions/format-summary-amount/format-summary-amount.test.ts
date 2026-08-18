@@ -22,4 +22,8 @@ describe('formatSummaryAmount', () => {
     it('should round up on .5 boundary values', () => {
         expect(formatSummaryAmount(9.5)).toBe('10');
     });
+
+    it('should round down on values below .5 boundary', () => {
+        expect(formatSummaryAmount(9.49)).toBe('9');
+    });
 });

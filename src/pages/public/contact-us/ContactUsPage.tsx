@@ -31,7 +31,7 @@ export const ContactUsPage: React.FC = () => {
         }
 
         return data.contacts.localizations.flatMap((loc) => {
-            if (!loc.localizationInfoDto || !loc.localizationInfoDto.code) {
+            if (!loc.localizationInfoDto?.code) {
                 return [];
             }
 

@@ -49,6 +49,11 @@ describe('ButtonTooltip', () => {
     const clickTooltip = () => fireEvent.mouseDown(getTooltip()!);
     const clickOutside = () => fireEvent.mouseDown(document.body);
 
+    const hoverButton = () => fireEvent.mouseEnter(getButton());
+    const unhoverButton = () => fireEvent.mouseLeave(getButton());
+    const focusButton = () => fireEvent.focus(getButton());
+    const blurButton = () => fireEvent.blur(getButton());
+
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -61,6 +66,40 @@ describe('ButtonTooltip', () => {
         expect(getTooltip()).not.toBeInTheDocument();
     });
 
+    it('shows tooltip on mouse enter', () => {
+        renderButtonTooltip();
+        expect(getTooltip()).not.toBeInTheDocument();
+
+        hoverButton();
+        expect(getTooltip()).toBeInTheDocument();
+    });
+
+    it('hides tooltip on mouse leave', () => {
+        renderButtonTooltip();
+        hoverButton();
+        expect(getTooltip()).toBeInTheDocument();
+
+        unhoverButton();
+        expect(getTooltip()).not.toBeInTheDocument();
+    });
+
+    it('shows tooltip on focus', () => {
+        renderButtonTooltip();
+        expect(getTooltip()).not.toBeInTheDocument();
+
+        focusButton();
+        expect(getTooltip()).toBeInTheDocument();
+    });
+
+    it('hides tooltip on blur', () => {
+        renderButtonTooltip();
+        focusButton();
+        expect(getTooltip()).toBeInTheDocument();
+
+        blurButton();
+        expect(getTooltip()).not.toBeInTheDocument();
+    });
+
     it('shows tooltip when clicked', () => {
         renderButtonTooltip();
         clickButton();
@@ -70,13 +109,13 @@ describe('ButtonTooltip', () => {
         expect(getButton()).toHaveAttribute('aria-describedby');
     });
 
-    it('hides tooltip when clicked again', () => {
+    it('keeps tooltip visible when clicked again', () => {
         renderButtonTooltip();
         clickButton();
         expect(getTooltip()).toBeInTheDocument();
 
         clickButton();
-        expect(getTooltip()).not.toBeInTheDocument();
+        expect(getTooltip()).toBeInTheDocument();
     });
 
     it('hides tooltip when clicking outside', async () => {
@@ -115,19 +154,6 @@ describe('ButtonTooltip', () => {
 
         expect(button).toHaveAttribute('aria-expanded', 'true');
         expect(button).toHaveAttribute('aria-describedby');
-    });
-
-    it('handles button click and toggles tooltip', () => {
-        renderButtonTooltip();
-
-        // Test that clicking works (this implicitly tests the click handler which calls stopPropagation)
-        expect(getTooltip()).not.toBeInTheDocument();
-
-        clickButton();
-        expect(getTooltip()).toBeInTheDocument();
-
-        clickButton();
-        expect(getTooltip()).not.toBeInTheDocument();
     });
 
     it('does not hide tooltip when clicking on tooltip itself', async () => {

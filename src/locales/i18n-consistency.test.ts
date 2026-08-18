@@ -70,6 +70,7 @@ describe.each(namespaces)('%s.json translation integrity', (namespace) => {
                             `If this is intentional, add "${allowlistId}" to ALLOWED_EMPTY_VALUES.`,
                     );
                 }
+                expect(value).not.toBe('');
             }
         }
     });

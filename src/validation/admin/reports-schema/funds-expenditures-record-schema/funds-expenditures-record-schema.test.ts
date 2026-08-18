@@ -24,6 +24,25 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         it('should keep only first two digits after comma', () => {
             expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
         });
+
+        it('should remove leading zeros from the integer part', () => {
+            expect(normalizeFundsExpendituresAmountInput('00000001')).toBe('1');
+            expect(normalizeFundsExpendituresAmountInput('0050')).toBe('50');
+        });
+
+        it('should leave a single zero if the integer part is only zeros', () => {
+            expect(normalizeFundsExpendituresAmountInput('00000')).toBe('0');
+            expect(normalizeFundsExpendituresAmountInput('0')).toBe('0');
+        });
+
+        it('should remove leading zeros but preserve decimal parts', () => {
+            expect(normalizeFundsExpendituresAmountInput('0005,50')).toBe('5,50');
+            expect(normalizeFundsExpendituresAmountInput('0000,50')).toBe('0,50');
+        });
+
+        it('should handle leading zeros with dot separator correctly', () => {
+            expect(normalizeFundsExpendituresAmountInput('0012.34')).toBe('12,34');
+        });
     });
 
     describe('validateFundsExpendituresAmount', () => {

@@ -6,14 +6,14 @@ describe('formatSummaryAmount', () => {
     });
 
     it('should format integer with thousand separators', () => {
-        expect(formatSummaryAmount(7265)).toBe('7 265');
+        expect(formatSummaryAmount(7265)).toBe('7 265');
     });
 
-    it('should truncate decimals without rounding', () => {
-        expect(formatSummaryAmount(1249854.99)).toBe('1 249 854');
+    it('should round decimals to nearest integer', () => {
+        expect(formatSummaryAmount(1249854.99)).toBe('1 249 855');
     });
 
-    it('should not round up on .9 values', () => {
-        expect(formatSummaryAmount(9.9)).toBe('9');
+    it('should round up on .9 values', () => {
+        expect(formatSummaryAmount(9.9)).toBe('10');
     });
 });

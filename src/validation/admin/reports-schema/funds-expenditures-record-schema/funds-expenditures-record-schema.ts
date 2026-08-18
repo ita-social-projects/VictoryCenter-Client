@@ -20,13 +20,18 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
     }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+
+    const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
+
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
     if (firstCommaIndex === -1) {
-        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+        const noZeros = stripLeadingZeros(withCommaSeparator);
+        return trimEnd ? noZeros.trim() : noZeros;
     }
 
-    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const rawIntegerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const integerPart = stripLeadingZeros(rawIntegerPart);
     const decimalPart = withCommaSeparator
         .slice(firstCommaIndex + 1)
         .replaceAll(/[\s,]/g, '')

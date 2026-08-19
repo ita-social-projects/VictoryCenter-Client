@@ -16,14 +16,7 @@ export const EventsPageAdmin = () => {
     const client = useAdminClient();
 
     const setErrorState = useCallback((message: string, type: EventsErrorType) => setError({ message, type }), []);
-    const {
-        allLanguages,
-        // translationLanguages,
-        // selectedLanguage,
-        onLanguageChange,
-        // translationStatusFilter,
-        onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({
+    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
         setErrorState,
     });
 
@@ -45,9 +38,6 @@ export const EventsPageAdmin = () => {
     // Toolbar handlers
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
-        // setIsSearchResultView(false);
-        // setSearchProgramId(undefined);
-        // updateSearchedProgram(null);
     }, []);
 
     return (
@@ -57,7 +47,6 @@ export const EventsPageAdmin = () => {
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
                     fetchSearchItems={getEventSearchItems}
-                    // renderSearchItemComponent={<div>Search Item</div>}
                     placeholder={EVENTS_TEXT.PLACEHOLDER.SEARCH_EVENTS}
                     onSearchClear={() => null}
                     statusFilter={statusFilter}

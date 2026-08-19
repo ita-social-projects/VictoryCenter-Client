@@ -295,6 +295,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
                         <InputWithCharacterLimitGroup
                             isRequired
+                            showCounterBelow
                             label={TEAM_CATEGORY_TEXT.FORM.LABEL.NAME}
                             error={errors.name}
                             value={formState.name}

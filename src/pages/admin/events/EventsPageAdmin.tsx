@@ -8,6 +8,7 @@ import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { EVENTS_TEXT } from '@/const/admin/events';
+import './EventsPageAdmin.scss';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -41,8 +42,8 @@ export const EventsPageAdmin = () => {
     }, []);
 
     return (
-        <div className="programs-page-wrapper" data-testid="programs-page-content">
-            <div className="programs-page-toolbar-container">
+        <div className="events-page-wrapper" data-testid="events-page-content">
+            <div className="events-page-toolbar-container">
                 <AdminPanelToolbar<EventSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
@@ -60,7 +61,7 @@ export const EventsPageAdmin = () => {
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
                 />
             </div>
-            <div className="programs-page-list-container">
+            <div className="events-page-list-container">
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
         </div>

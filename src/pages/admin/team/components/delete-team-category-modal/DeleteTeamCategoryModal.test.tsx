@@ -128,9 +128,7 @@ const getMockedUseAdminClient = () => useAdminClient as jest.MockedFunction<type
 
 const openConfirmationAndConfirm = async () => {
     fireEvent.click(screen.getByTestId('delete-button'));
-    await act(async () => {
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-    });
+    fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 };
 
 const getMainModal = () => screen.getAllByTestId('modal')[0];
@@ -335,7 +333,9 @@ describe('DeleteTeamCategoryModal', () => {
             const deleteButton = screen.getByTestId('delete-button');
             fireEvent.click(deleteButton);
 
-            expect(screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM),
+            ).not.toBeInTheDocument();
             expect(getMockedApi().delete).not.toHaveBeenCalled();
             expect(props.onConfirm).not.toHaveBeenCalled();
             expect(props.onClose).not.toHaveBeenCalled();
@@ -347,7 +347,9 @@ describe('DeleteTeamCategoryModal', () => {
 
             fireEvent.click(screen.getByTestId('delete-button'));
 
-            expect(screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM),
+            ).not.toBeInTheDocument();
             expect(getMockedApi().delete).not.toHaveBeenCalled();
             expect(props.onConfirm).not.toHaveBeenCalled();
             expect(props.onClose).not.toHaveBeenCalled();

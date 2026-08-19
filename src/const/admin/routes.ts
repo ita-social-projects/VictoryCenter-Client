@@ -44,4 +44,8 @@ export const ADMIN_ROUTES = {
         PATH: 'history',
         FULL: '/admin-panel/history',
     },
+    HIPPOTHERAPY: {
+        PATH: 'hippotherapy',
+        FULL: '/admin-panel/hippotherapy',
+    },
 };

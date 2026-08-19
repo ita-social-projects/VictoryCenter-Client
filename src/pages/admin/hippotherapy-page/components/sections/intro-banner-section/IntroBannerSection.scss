@@ -1,0 +1,23 @@
+@use '@/assets/sass/variables/colors';
+
+.hippotherapy-intro-banner-section {
+    display: flex;
+    gap: 32px;
+    justify-content: space-between;
+
+    &-image {
+        flex-shrink: 0;
+    }
+
+    &-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+    }
+
+    &-error {
+        color: colors.$error;
+        font-size: 14px;
+    }
+}

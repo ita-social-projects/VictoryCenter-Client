@@ -69,6 +69,10 @@ export const API_ROUTES = {
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
     },
+    HIPPOTHERAPY_PAGE: {
+        BASE: 'HippotherapyPage',
+        PUBLIC: 'HippotherapyPage',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },

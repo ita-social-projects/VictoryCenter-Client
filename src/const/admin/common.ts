@@ -10,6 +10,7 @@ export const COMMON_TEXT_ADMIN = {
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
         PARTNERS: 'Партнери',
+        HIPPOTHERAPY: 'Іпотерапія',
     },
 
     ALT: {

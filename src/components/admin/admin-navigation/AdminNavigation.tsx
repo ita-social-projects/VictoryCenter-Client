@@ -138,6 +138,18 @@ export const AdminNavigation = () => {
                         >
                             {COMMON_TEXT_ADMIN.TAB.PARTNERS}
                         </NavLink>
+
+                        <NavLink
+                            to={ADMIN_ROUTES.HIPPOTHERAPY.FULL}
+                            end
+                            className={({ isActive }) =>
+                                classNames('admin-page-link', {
+                                    'admin-pages-selected': isActive,
+                                })
+                            }
+                        >
+                            {COMMON_TEXT_ADMIN.TAB.HIPPOTHERAPY}
+                        </NavLink>
                     </nav>
                 </div>
             </div>

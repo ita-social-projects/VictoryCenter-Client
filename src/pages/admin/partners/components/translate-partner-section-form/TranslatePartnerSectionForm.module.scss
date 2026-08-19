@@ -1,0 +1,14 @@
+.partners-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 24px;
+}
+
+.partner-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 210px;
+}

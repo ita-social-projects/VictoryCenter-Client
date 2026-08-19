@@ -29,7 +29,7 @@ export const validateFundsExpendituresExchangeRate = (
         return trigger === 'blur' ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined;
     }
 
-    if (!/^\d+(?:,\d+)?$/.test(normalized)) {
+    if (!/^(0|[1-9]\d*)(?:,\d+)?$/.test(normalized)) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_ONLY_NUMERIC;
     }
 

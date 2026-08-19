@@ -138,6 +138,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
                     maxLength={TEAM_CATEGORY_VALIDATION.name.max}
                     name={'name'}
                     id={'name'}
+                    showCounterBelow={true}
                 />
 
                 <TextAreaWithCharacterLimitGroup

@@ -48,7 +48,22 @@
         border-radius: 4px;
         overflow: hidden;
 
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: z-index.admin('image-input-hover-overlay');
+            background: c.$white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
         &:hover {
+            &::after {
+                opacity: 0.5;
+            }
+
             .delete-button,
             .crop-button {
                 opacity: 1;

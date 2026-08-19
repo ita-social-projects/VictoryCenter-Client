@@ -1,11 +1,18 @@
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 import { Image, ImageValues } from '../common/image';
 
 export type PartnerBanner = {
+    id: number;
     title: string;
     description: string;
     image: Image | ImageValues | null;
     imageId: number | null;
-};
+} & EntityWithLocalizations<PartnerBannerLocalization>;
 
 export type Partner = {
     id: number;
@@ -19,7 +26,7 @@ export type PartnerSection = {
     title: string;
     description: string;
     partners: Partner[];
-};
+} & EntityWithLocalizations<EntityLocalization>;
 
 export type PartnersPageData = {
     banner: PartnerBanner;
@@ -88,11 +95,34 @@ export interface UpdatePartnerBannerDto {
 }
 
 // Response DTO
-export interface PartnerBannerDto {
+export interface PartnerBannerDto extends EntityWithDtoLocalizations<PartnerBannerLocalizationDto> {
     id: number;
     title: string;
     description: string;
     image: Image | null;
+}
+
+export interface PartnerBannerLocalization extends EntityLocalization {
+    title: string;
+    description: string;
+}
+
+export interface PartnerBannerLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+}
+
+export interface CreatePartnerBannerLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title: string;
+    description: string;
+}
+
+export interface UpdatePartnerBannerLocalizationDto {
+    title: string;
+    description: string;
 }
 
 export interface PartnerDto {
@@ -101,11 +131,42 @@ export interface PartnerDto {
     image: Image;
 }
 
-export interface PartnersSectionDto {
+export interface PartnersSectionDto extends EntityWithDtoLocalizations<EntityLocalizationDto> {
     id: number;
     title: string;
     description: string;
     partners: PartnerDto[];
+}
+
+export interface PartnerLocalizationDto {
+    partnerId: number;
+    description: string;
+}
+
+export interface PartnerLocalization {
+    entityId: number;
+    description: string;
+}
+
+export interface PartnerSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
+}
+
+export interface CreatePartnerSectionLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
+}
+
+export interface UpdatePartnerSectionLocalizationDto {
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
 }
 
 export interface PartnersPageDataDto {

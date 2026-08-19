@@ -1,14 +1,22 @@
 import { Image } from '../common/image';
+import { EntityLocalizationDto } from '../common/language';
 
 export interface PartnerPage {
     banner: PartnersBanner;
     sections: PartnerSection[];
 }
 
+export interface PartnersBannerLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+}
+
 export interface PartnersBanner {
     title: string;
     description: string;
     image?: Image;
+    localizations?: PartnersBannerLocalizationDto[];
 }
 
 export interface PartnerSection {
@@ -16,10 +24,23 @@ export interface PartnerSection {
     title: string;
     description: string;
     partners: Partner[];
+    localizations?: PartnerSectionLocalizationDto[];
 }
 
 export interface Partner {
     id: number;
     description: string;
     image: Image;
+    localizations?: PartnerLocalizationDto[];
+}
+
+export interface PartnerLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    description: string;
+}
+
+export interface PartnerSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
 }

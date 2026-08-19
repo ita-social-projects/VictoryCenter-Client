@@ -31,6 +31,7 @@ export const LanguageSwitcher = ({ onValueChange, className, openOnHover = false
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"
+            optionClassName="language-switcher-option"
             openOnHover={openOnHover}
         >
             {LOCALES.map((lng) => (

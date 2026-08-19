@@ -42,6 +42,23 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should handle leading zeros with dot separator correctly', () => {
             expect(normalizeFundsExpendituresAmountInput('0012.34')).toBe('12,34');
+        it('should prepend zero if input starts with a dot', () => {
+            expect(normalizeFundsExpendituresAmountInput('.12')).toBe('0,12');
+        });
+
+        it('should prepend zero if input starts with a comma', () => {
+            expect(normalizeFundsExpendituresAmountInput(',12')).toBe('0,12');
+        });
+
+        it('should prepend zero for negative values starting with a dot', () => {
+            expect(normalizeFundsExpendituresAmountInput('-.12')).toBe('-0,12');
+        });
+
+        it('should prepend zero for negative values starting with a comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('-,12')).toBe('-0,12');
+        });
+        it('should handle dot with spaces before decimal digits', () => {
+            expect(normalizeFundsExpendituresAmountInput('. 12')).toBe('0,12');
         });
     });
 
@@ -56,6 +73,22 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
+        });
+
+        it('should return numeric error for integer with a leading zero', () => {
+            expect(validateFundsExpendituresAmount('012345678', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
+            );
+        });
+
+        it('should return numeric error for decimal with a leading zero before the comma', () => {
+            expect(validateFundsExpendituresAmount('01,50', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
+            );
+        });
+
+        it('should accept a single zero integer part followed by a decimal', () => {
+            expect(validateFundsExpendituresAmount('0,50', 'change')).toBeUndefined();
         });
 
         it('should return max digits error when integer part is too long', () => {
@@ -90,10 +123,9 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             expect(validateFundsExpendituresAmount('1 200,50', 'save')).toBeUndefined();
         });
 
-        it('should return error when user types more than two decimal digits', () => {
-            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS,
-            );
+        it('should accept value with more than two decimal digits because they will be normalized', () => {
+            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBeUndefined();
+            expect(normalizeFundsExpendituresAmountInput('1 200,123', true)).toBe('1 200,12');
         });
 
         it('should ignore spaces when counting fractional digits', () => {
@@ -103,6 +135,15 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should support dot input by normalizing it to comma', () => {
             expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
+        });
+
+        it('should pass valid value when user types dot and decimal digits without leading zero', () => {
+            expect(validateFundsExpendituresAmount('.12', 'change')).toBeUndefined();
+        });
+        it('should validate negative comma-starting input and return negative error', () => {
+            expect(validateFundsExpendituresAmount('-,12', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+            );
         });
     });
 

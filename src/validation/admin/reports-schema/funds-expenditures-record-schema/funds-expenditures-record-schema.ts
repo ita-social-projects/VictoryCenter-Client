@@ -19,9 +19,16 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
         return '';
     }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
-    const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+    let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+    withCommaSeparator = withCommaSeparator.replace(/^-\s+/, '-');
 
     const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
+
+    const isNegative = withCommaSeparator.startsWith('-');
+    const absoluteValue = isNegative ? withCommaSeparator.slice(1) : withCommaSeparator;
+    const normalizedPrefix = absoluteValue.startsWith(',') ? `0${absoluteValue}` : absoluteValue;
+
+    withCommaSeparator = isNegative ? `-${normalizedPrefix}` : normalizedPrefix;
 
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
@@ -45,17 +52,6 @@ export const validateFundsExpendituresAmount = (
     value: string,
     trigger: FundsExpendituresAmountValidationTrigger = 'change',
 ): string | undefined => {
-    if (value) {
-        const withCommaSeparator = value.replaceAll(/\s+/g, ' ').trimStart().replaceAll('.', ',');
-        const firstCommaIndex = withCommaSeparator.indexOf(',');
-        if (firstCommaIndex !== -1) {
-            const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replace(/[^\d]/g, '');
-            if (rawDecimalPart.length > 2) {
-                return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS;
-            }
-        }
-    }
-
     const normalized = normalizeFundsExpendituresAmountInput(value, true);
 
     if (!normalized) {
@@ -68,7 +64,7 @@ export const validateFundsExpendituresAmount = (
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
     }
 
-    if (!/^\d+(?:,\d{1,2})?$/.test(compact)) {
+    if (!/^(0|[1-9]\d*)(?:,\d{1,2})?$/.test(compact)) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
     }
 

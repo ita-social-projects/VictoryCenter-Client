@@ -34,7 +34,7 @@ export const ReportAnalytics = () => {
     const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
     const [isFundsEditing, setIsFundsEditing] = useState(false);
-    const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
+    const [exchangeRateDraft, setExchangeRateDraft] = useState<string | null>(null);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
@@ -172,9 +172,9 @@ export const ReportAnalytics = () => {
                 <div style={{ display: activeTab.id === 'income-expenses' ? 'block' : 'none' }}>
                     <FundsExpenditureSection
                         isEditing={isFundsEditing}
-                        draftExchangeRate={fundsExchangeRateDraft}
+                        draftExchangeRate={exchangeRateDraft}
                         onEditModeChange={setIsFundsEditing}
-                        onExchangeRateValueChange={setFundsExchangeRateDraft}
+                        onExchangeRateValueChange={setExchangeRateDraft}
                         isAddCategoryModalOpen={isAddCategoryModalOpen}
                         onAddCategoryModalClose={() => setIsAddCategoryModalOpen(false)}
                         isEditCategoryModalOpen={isEditCategoryModalOpen}
@@ -207,6 +207,7 @@ export const ReportAnalytics = () => {
                         onRowEditModeChange={setIsRowEditMode}
                         onCountsChange={setProgramRecordsCount}
                         onDataChange={() => setHasUnpublishedChanges(true)}
+                        exchangeRate={exchangeRateDraft}
                     />
                 </div>
             </div>

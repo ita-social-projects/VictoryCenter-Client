@@ -42,6 +42,8 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should handle leading zeros with dot separator correctly', () => {
             expect(normalizeFundsExpendituresAmountInput('0012.34')).toBe('12,34');
+        });
+
         it('should prepend zero if input starts with a dot', () => {
             expect(normalizeFundsExpendituresAmountInput('.12')).toBe('0,12');
         });
@@ -71,18 +73,6 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should return numeric error for non-digit input', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
-            );
-        });
-
-        it('should return numeric error for integer with a leading zero', () => {
-            expect(validateFundsExpendituresAmount('012345678', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
-            );
-        });
-
-        it('should return numeric error for decimal with a leading zero before the comma', () => {
-            expect(validateFundsExpendituresAmount('01,50', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
         });

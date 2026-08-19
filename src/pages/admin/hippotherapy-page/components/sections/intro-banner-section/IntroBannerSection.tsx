@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -7,10 +7,8 @@ import {
     HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
 } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { useHippotherapySectionFields } from '@/hooks/admin/use-hippotherapy-section-fields/useHippotherapySectionFields';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
-import { ImageValues } from '@/types/common/image';
 import './IntroBannerSection.scss';
 
 export interface IntroBannerSectionProps {
@@ -21,28 +19,15 @@ export interface IntroBannerSectionProps {
 }
 
 const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }: IntroBannerSectionProps) => {
-    const [imageError, setImageError] = useState<string | null>(null);
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
-
-    const handleImageErrorChange = (error: string | null) => {
-        setImageError(error);
-        onImageError?.(error);
-    };
-
-    const handleImageChange = (image: ImageValues | null) => {
-        onChange({ ...value, image });
-    };
-
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-        setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-        setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-    };
+    const {
+        imageError,
+        titleError,
+        descriptionError,
+        handleImageErrorChange,
+        handleImageChange,
+        handleTitleChange,
+        handleDescriptionChange,
+    } = useHippotherapySectionFields({ value, onChange, onImageError });
 
     return (
         <div className="hippotherapy-intro-banner-section">

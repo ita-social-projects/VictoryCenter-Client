@@ -9,8 +9,8 @@ import {
 } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { useHippotherapySectionFields } from '@/hooks/admin/use-hippotherapy-section-fields/useHippotherapySectionFields';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
-import { ImageValues } from '@/types/common/image';
 import './EthicsSection.scss';
 
 export interface EthicsSectionProps {
@@ -21,29 +21,16 @@ export interface EthicsSectionProps {
 }
 
 const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: EthicsSectionProps) => {
-    const [imageError, setImageError] = useState<string | null>(null);
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
+    const {
+        imageError,
+        titleError,
+        descriptionError,
+        handleImageErrorChange,
+        handleImageChange,
+        handleTitleChange,
+        handleDescriptionChange,
+    } = useHippotherapySectionFields({ value, onChange, onImageError });
     const [principleErrors, setPrincipleErrors] = useState<Record<number, string | undefined>>({});
-
-    const handleImageErrorChange = (error: string | null) => {
-        setImageError(error);
-        onImageError?.(error);
-    };
-
-    const handleImageChange = (image: ImageValues | null) => {
-        onChange({ ...value, image });
-    };
-
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-        setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-        setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-    };
 
     const handlePrincipleChange = (index: number, principle: string) => {
         const principles = value.principles.map((item, itemIndex) => (itemIndex === index ? principle : item));

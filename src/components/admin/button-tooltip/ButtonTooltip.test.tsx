@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
 import { TooltipProps } from '../tooltip/Tooltip';
 
@@ -51,8 +51,14 @@ describe('ButtonTooltip', () => {
 
     const hoverButton = () => fireEvent.mouseEnter(getButton());
     const unhoverButton = () => fireEvent.mouseLeave(getButton());
-    const focusButton = () => fireEvent.focus(getButton());
-    const blurButton = () => fireEvent.blur(getButton());
+    const focusButton = () =>
+        act(() => {
+            getButton().focus();
+        });
+    const blurButton = () =>
+        act(() => {
+            getButton().blur();
+        });
 
     afterEach(() => {
         jest.clearAllMocks();

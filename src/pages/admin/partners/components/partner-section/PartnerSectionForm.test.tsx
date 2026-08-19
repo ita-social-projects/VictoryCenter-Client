@@ -10,9 +10,10 @@ import {
 } from '@/validation/admin/partner-schema/partner-schema';
 import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PartnerFormProps } from '../partner-form/PartnerForm';
-import { ButtonProps } from '@/components/admin/button/Button';
 import { LocalizationLanguage } from '@/types/common/language';
 import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -73,11 +74,26 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, type, ...props }: ButtonProps) => (
+    Button: ({ children, onClick, disabled, type, buttonStyle: _buttonStyle, ...props }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled} type={type} {...props}>
             {children}
         </button>
     ),
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: ConfirmationModalProps) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal">
+                <span>{title}</span>
+                <button data-testid="confirm-delete" onClick={onConfirm}>
+                    Так
+                </button>
+                <button data-testid="cancel-delete" onClick={onCancel}>
+                    Ні
+                </button>
+            </div>
+        ) : null,
 }));
 
 jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
@@ -256,12 +272,15 @@ describe('PartnerSectionForm', () => {
         );
     });
 
-    it('removes partner and tracks deleted ids', () => {
+    it('removes partner and tracks deleted ids after confirmation', () => {
         const onChange = jest.fn();
 
         renderComponent({ onChange });
 
         fireEvent.click(screen.getByTestId(`partner-delete-${defaultPartner.localId}`));
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(onChange).toHaveBeenCalledWith(
             {
@@ -271,6 +290,35 @@ describe('PartnerSectionForm', () => {
             },
             { ...defaultSectionErrors, partners: [] },
         );
+    });
+
+    it('cancels partner deletion when No is clicked in the modal', () => {
+        const onChange = jest.fn();
+
+        renderComponent({ onChange });
+
+        fireEvent.click(screen.getByTestId(`partner-delete-${defaultPartner.localId}`));
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-delete'));
+
+        expect(onChange).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('does not push deleted id when partner has no persisted id', () => {
+        const partnerWithoutId = { ...defaultPartner, partnerId: null };
+        const onChange = jest.fn();
+
+        renderComponent({ value: { ...defaultSectionValue, partners: [partnerWithoutId] }, onChange });
+
+        fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());
     });
 
     it('disables publish button when validation fails', () => {
@@ -334,17 +382,6 @@ describe('PartnerSectionForm', () => {
 
         expect(onDelete).toHaveBeenCalledWith(defaultSectionValue.localId);
         expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId, defaultSectionValue);
-    });
-
-    it('does not push deleted id when partner has no persisted id', () => {
-        const partnerWithoutId = { ...defaultPartner, partnerId: null };
-        const onChange = jest.fn();
-
-        renderComponent({ value: { ...defaultSectionValue, partners: [partnerWithoutId] }, onChange });
-
-        fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
-
-        expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());
     });
 
     it('disables publish button when not dirty', () => {

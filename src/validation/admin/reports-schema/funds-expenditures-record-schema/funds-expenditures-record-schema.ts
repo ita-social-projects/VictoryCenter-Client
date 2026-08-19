@@ -14,6 +14,8 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
+const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
+
 export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
     if (!value) {
         return '';
@@ -21,8 +23,6 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     withCommaSeparator = withCommaSeparator.replace(/^-\s+/, '-');
-
-    const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
 
     const isNegative = withCommaSeparator.startsWith('-');
     const absoluteValue = isNegative ? withCommaSeparator.slice(1) : withCommaSeparator;

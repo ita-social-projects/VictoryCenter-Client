@@ -24,6 +24,25 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         it('should keep only first two digits after comma', () => {
             expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
         });
+
+        it('should prepend zero if input starts with a dot', () => {
+            expect(normalizeFundsExpendituresAmountInput('.12')).toBe('0,12');
+        });
+
+        it('should prepend zero if input starts with a comma', () => {
+            expect(normalizeFundsExpendituresAmountInput(',12')).toBe('0,12');
+        });
+
+        it('should prepend zero for negative values starting with a dot', () => {
+            expect(normalizeFundsExpendituresAmountInput('-.12')).toBe('-0,12');
+        });
+
+        it('should prepend zero for negative values starting with a comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('-,12')).toBe('-0,12');
+        });
+        it('should handle dot with spaces before decimal digits', () => {
+            expect(normalizeFundsExpendituresAmountInput('. 12')).toBe('0,12');
+        });
     });
 
     describe('validateFundsExpendituresAmount', () => {
@@ -99,6 +118,15 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should support dot input by normalizing it to comma', () => {
             expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
+        });
+
+        it('should pass valid value when user types dot and decimal digits without leading zero', () => {
+            expect(validateFundsExpendituresAmount('.12', 'change')).toBeUndefined();
+        });
+        it('should validate negative comma-starting input and return negative error', () => {
+            expect(validateFundsExpendituresAmount('-,12', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+            );
         });
     });
 

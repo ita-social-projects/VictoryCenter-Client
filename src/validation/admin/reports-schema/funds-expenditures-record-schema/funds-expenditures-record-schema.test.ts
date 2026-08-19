@@ -24,6 +24,14 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         it('should keep only first two digits after comma', () => {
             expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
         });
+
+        it('should drop trailing comma when trimEnd is true and no decimal digits exist', () => {
+            expect(normalizeFundsExpendituresAmountInput('1 200,', true)).toBe('1 200');
+        });
+
+        it('should keep trailing comma when trimEnd is false', () => {
+            expect(normalizeFundsExpendituresAmountInput('1 200,', false)).toBe('1 200,');
+        });
     });
 
     describe('validateFundsExpendituresAmount', () => {
@@ -99,6 +107,10 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should support dot input by normalizing it to comma', () => {
             expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
+        });
+
+        it('should not return error when user types a trailing comma', () => {
+            expect(validateFundsExpendituresAmount('1 200,', 'change')).toBeUndefined();
         });
     });
 

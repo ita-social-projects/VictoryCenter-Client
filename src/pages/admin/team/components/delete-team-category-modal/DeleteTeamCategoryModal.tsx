@@ -45,18 +45,20 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
             onClose();
         } catch {
             setError(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
+            setCategoryToConfirm(null);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleClose = () => {
-        if (isSubmitting) return;
+        if (isSubmitting || !!categoryToConfirm) return;
         setSelectedCategory(undefined);
         onClose();
     };
 
     const handleConfirmClose = () => {
+        if (isSubmitting) return;
         setCategoryToConfirm(null);
     };
 

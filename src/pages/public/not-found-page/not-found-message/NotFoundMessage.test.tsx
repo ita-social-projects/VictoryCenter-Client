@@ -1,6 +1,18 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { NotFoundMessage } from './NotFoundMessage';
 import { MemoryRouter } from 'react-router-dom';
+
+const mockCurrentLanguage = { value: 'en' };
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage.value }),
+}));
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+}));
 
 jest.mock('./NotFoundMessage.module.scss', () => ({
     root: 'root-class',
@@ -12,18 +24,35 @@ jest.mock('./NotFoundMessage.module.scss', () => ({
 }));
 
 describe('NotFoundMessage', () => {
-    it('renders the component', () => {
+    beforeEach(() => {
+        mockCurrentLanguage.value = 'en';
+    });
+
+    it('renders not found page translation keys', () => {
         const { container } = render(
             <MemoryRouter>
                 <NotFoundMessage />
             </MemoryRouter>,
         );
-        const pageContainer = container.querySelector('.root-class');
-        const pageText = container.querySelector('.title-class');
-        const pageDescription = container.querySelector('.description-class');
 
-        expect(pageContainer).toBeInTheDocument();
-        expect(pageText).toBeInTheDocument();
-        expect(pageDescription).toBeInTheDocument();
+        expect(container.querySelector('.root-class')).toBeInTheDocument();
+        expect(container.querySelector('.title-class')).toHaveTextContent('TEXT');
+        expect(container.querySelector('.description-class')).toHaveTextContent('DESCRIPTION');
+        expect(screen.getByRole('link', { name: 'GO_BACK_BUTTON' })).toBeInTheDocument();
+    });
+
+    it.each([
+        { language: 'en', homeHref: '/en' },
+        { language: 'uk', homeHref: '/' },
+    ])('links to $homeHref when current language is $language', ({ language, homeHref }) => {
+        mockCurrentLanguage.value = language;
+
+        render(
+            <MemoryRouter>
+                <NotFoundMessage />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByRole('link', { name: 'GO_BACK_BUTTON' })).toHaveAttribute('href', homeHref);
     });
 });

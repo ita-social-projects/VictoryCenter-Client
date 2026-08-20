@@ -13,11 +13,31 @@ import {
     TranslationStatusInfo,
 } from '../common/language';
 
+export interface ProgramCategoryLocalizableFields {
+    name: string;
+}
+
+export interface ProgramCategoryLocalization extends EntityLocalization, ProgramCategoryLocalizableFields {}
+
+export interface ProgramCategoryLocalizationDto extends EntityLocalizationDto, ProgramCategoryLocalizableFields {
+    entityId: number;
+}
+
+export type CreateProgramCategoryLocalizationDto = {
+    entityId: number;
+    languageId: number;
+    name: string;
+};
+
+export type UpdateProgramCategoryLocalizationDto = {
+    name: string;
+};
+
 export interface ProgramCategory {
     id: number;
     name: string;
     programsCount: number;
-    localizations?: EntityLocalization[];
+    localizations?: ProgramCategoryLocalization[];
     translationStatuses?: TranslationStatusInfo[];
 }
 

@@ -25,6 +25,7 @@ import { ToastContainer } from '@/components/admin/toast/toast-container/ToastCo
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -464,6 +465,32 @@ export const ProgramsPageContent = () => {
         [updateCategories, selectedCategory],
     );
 
+    const handleTranslateCategory = useCallback(
+        (updatedCategory: ProgramCategory) => {
+            updateCategories((prev) =>
+                prev.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+
+            if (selectedCategory?.id === updatedCategory.id) {
+                setSelectedCategory(updatedCategory);
+            }
+
+            closeModalActions.closeTranslateCategoryModal();
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [updateCategories, selectedCategory?.id, closeModalActions, addToast],
+    );
+
+    const getCategoryName = useCallback(
+        (category: ProgramCategory) => {
+            const localization = (category.localizations ?? []).find(
+                (loc) => loc.language?.code === selectedLanguage?.code || loc.language?.id === selectedLanguage?.id,
+            );
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code, selectedLanguage?.id],
+    );
+
     // Context menu handlers
     const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
@@ -540,7 +567,7 @@ export const ProgramsPageContent = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
@@ -577,6 +604,7 @@ export const ProgramsPageContent = () => {
                 onEditProgram={handleEditProgram}
                 onDeleteProgram={handleDeleteProgram}
                 onTranslateProgram={handleTranslateProgramSuccess}
+                onTranslateCategory={handleTranslateCategory}
                 onAddCategory={handleAddCategory}
                 onEditCategory={handleEditCategory}
                 onDeleteCategory={handleDeleteCategory}

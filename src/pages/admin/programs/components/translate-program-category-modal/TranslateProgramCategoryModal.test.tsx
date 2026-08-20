@@ -86,6 +86,7 @@ describe('TranslateProgramCategoryModal', () => {
             onClose: jest.fn(),
             translatedLanguages: [EN_LANGUAGE],
             categories: CATEGORY_LIST,
+            onTranslateCategory: jest.fn(),
         };
 
         return render(<TranslateProgramCategoryModal {...defaultProps} {...props} />);
@@ -175,6 +176,25 @@ describe('TranslateProgramCategoryModal', () => {
 
         await waitFor(() => {
             expect(mockFormSubmit).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('calls the translation success callback and closes the modal after submit', async () => {
+        const onTranslateCategory = jest.fn();
+        const onClose = jest.fn();
+
+        renderModal({ onTranslateCategory, onClose });
+
+        fireEvent.click(screen.getByTestId('save-localization-btn'));
+
+        await waitFor(() => {
+            expect(onTranslateCategory).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    id: 1,
+                    name: 'Translated category name',
+                }),
+            );
+            expect(onClose).toHaveBeenCalledTimes(1);
         });
     });
 

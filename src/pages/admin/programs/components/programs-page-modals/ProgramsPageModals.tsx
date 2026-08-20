@@ -16,6 +16,7 @@ export interface ProgramsPageModalsProps {
     onEditProgram: (updatedProgram: HippotherapyProgram) => void;
     onDeleteProgram: (program: HippotherapyProgram) => void;
     onTranslateProgram: (program: HippotherapyProgram) => void;
+    onTranslateCategory?: (updatedCategory: ProgramCategory) => void;
     translatedLanguages: LocalizationLanguage[];
     onAddCategory: (newCategory: ProgramCategory) => void;
     onEditCategory: (updatedCategory: ProgramCategory) => void;
@@ -29,6 +30,7 @@ export const ProgramsPageModals = ({
     onEditProgram,
     onDeleteProgram,
     onTranslateProgram,
+    onTranslateCategory,
     translatedLanguages,
     onAddCategory,
     onEditCategory,
@@ -100,6 +102,7 @@ export const ProgramsPageModals = ({
                     onClose={closeModalActions.closeTranslateCategoryModal}
                     categories={categories}
                     translatedLanguages={translatedLanguages}
+                    onTranslateCategory={onTranslateCategory}
                 />
             )}
         </>

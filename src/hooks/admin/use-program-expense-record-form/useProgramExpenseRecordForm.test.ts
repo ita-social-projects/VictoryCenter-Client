@@ -60,8 +60,8 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(1);
-            result.current.handleAmountChange('400');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('400');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
@@ -74,7 +74,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('400');
+            result.current.handleAmountFieldChange('amountUah')('400');
         });
 
         expect(result.current.formState.amountUsd).toBe('10');
@@ -87,8 +87,8 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('400');
-            result.current.handleUsdChange('999');
+            result.current.handleAmountFieldChange('amountUah')('400');
+            result.current.handleAmountFieldChange('amountUsd')('999');
         });
 
         act(() => {
@@ -106,8 +106,8 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('400');
-            result.current.handleUsdChange('999');
+            result.current.handleAmountFieldChange('amountUah')('400');
+            result.current.handleAmountFieldChange('amountUsd')('999');
         });
 
         expect(result.current.usdMismatchMessage).toBeUndefined();
@@ -123,8 +123,8 @@ describe('useProgramExpenseRecordForm', () => {
         const { result } = renderUseProgramExpenseForm();
 
         act(() => {
-            result.current.handleAmountChange('1234567890');
-            result.current.handleUsdChange('0');
+            result.current.handleAmountFieldChange('amountUah')('1234567890');
+            result.current.handleAmountFieldChange('amountUsd')('0');
         });
 
         expect(result.current.formState.errors.amountUah).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS);
@@ -153,7 +153,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountFieldChange('amountUah')('100');
         });
 
         expect(result.current.isDirty).toBe(true);
@@ -211,7 +211,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramInputChange('  New Category  ');
-            result.current.handleAmountChange('400');
+            result.current.handleAmountFieldChange('amountUah')('400');
         });
 
         expect(result.current.isSubmitDisabled).toBe(false);
@@ -257,7 +257,7 @@ describe('useProgramExpenseRecordForm', () => {
         const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
 
         act(() => {
-            result.current.handleAmountChange('100');
+            result.current.handleAmountFieldChange('amountUah')('100');
         });
 
         expect(result.current.formState.amountUsd).toBe('2,5');
@@ -267,8 +267,8 @@ describe('useProgramExpenseRecordForm', () => {
         const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
 
         act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('999');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('999');
         });
 
         expect(result.current.formState.amountUah).toBe('100');
@@ -347,7 +347,7 @@ describe('useProgramExpenseRecordForm', () => {
             const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40' });
 
             act(() => {
-                result.current.handleUsdChange('15');
+                result.current.handleAmountFieldChange('amountUsd')('15');
             });
 
             act(() => {

@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { UI_CONFIG } from '@/const/admin/common';
+import { useCallback, useState, useMemo, useEffect } from 'react';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventsApi } from '@/services/api/admin/events/events-api';
@@ -9,10 +9,19 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import './EventsPageAdmin.scss';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { EventCategory } from '@/types/admin/event-category';
+import { EventsNews } from '@/types/admin/events-news';
+import { EventsPageModals } from './event-page-modals/EventsPageModals';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
+    const [categories, setCategories] = useState<EventCategory[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
+    const modalsStateControl = useModalsState<EventsNews>();
+    const { openModalActions } = modalsStateControl;
 
     const client = useAdminClient();
 
@@ -41,6 +50,51 @@ export const EventsPageAdmin = () => {
         setStatusFilter(status);
     }, []);
 
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            } else if (id === 'translate') {
+                openModalActions.openTranslateCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
+
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
+        ],
+        [],
+    );
+
+    const handleAddEventCategory = useCallback((newCategory: EventCategory) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
+
+    const handleEditEventCategory = useCallback((updatedCategory: EventCategory) => {
+        setCategories((prev) =>
+            prev.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+        );
+    }, []);
+
+    const handleDeleteEventCategory = useCallback((categoryIdToDelete: number) => {
+        setCategories((prev) => prev.filter((category) => category.id !== categoryIdToDelete));
+    }, []);
+
+    const handleTranslateEventCategory = useCallback((translatedCategory: EventCategory) => {
+        setCategories((prev) =>
+            prev.map((category) => (category.id === translatedCategory.id ? translatedCategory : category)),
+        );
+    }, []);
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -62,8 +116,27 @@ export const EventsPageAdmin = () => {
                 />
             </div>
             <div className="events-page-list-container">
+                <CategoryBar<EventCategory>
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={setSelectedCategory}
+                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryKey={(category) => category.id}
+                    displayContextMenuButton={true}
+                    contextMenuOptions={categoryBarContextMenuOptions}
+                    onContextMenuOptionSelected={onContextMenuOptionSelected}
+                />
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
+            <EventsPageModals
+                modalsStateControl={modalsStateControl}
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onAddEventCategory={handleAddEventCategory}
+                onEditEventCategory={handleEditEventCategory}
+                // onDeleteEventCategory={handleDeleteEventCategory}
+                // onTranslateEventCategory={handleTranslateEventCategory}
+            />
         </div>
     );
 };

@@ -9,6 +9,7 @@ export const COMMON_TEXT_ADMIN = {
         HISTORY: 'Історія',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
+        EVENTS: 'Новини і події',
         PARTNERS: 'Партнери',
     },
 
@@ -149,6 +150,7 @@ export const UI_CONFIG = {
         MAX_CHARACTERS_FOR_SEARCH: {
             FAQ: 150,
             PROGRAMS: 90,
+            EVENTS: 90,
             TEAM_MEMBERS: 50,
         },
     },

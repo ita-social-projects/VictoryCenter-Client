@@ -7,9 +7,12 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
 import { PARTNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { LocalizationLanguage } from '@/types/common/language';
 import styles from './PartnerForm.module.scss';
 import './PartnerForm.scss';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 
 export interface PartnerFormValues {
     localId: string;
@@ -30,33 +33,50 @@ export interface PartnerFormProps {
     disabled: boolean;
     onValuesChange: (values: PartnerFormValues, errors: PartnerFormErrors) => void;
     onDelete: (localId: string) => void;
+    language: LocalizationLanguage;
+    translatedDescription?: string;
+    disableStructuralActions?: boolean;
 }
 
-const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDelete }: PartnerFormProps) => {
+const PartnerFormComponent = ({
+    values,
+    errors,
+    disabled,
+    onValuesChange,
+    onDelete,
+    language,
+    translatedDescription,
+    disableStructuralActions = false,
+}: PartnerFormProps) => {
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const displayedDescription = isBaseLanguage ? values.description : (translatedDescription ?? '');
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!isBaseLanguage) return;
             const value = e.target.value;
             const error = PARTNER_VALIDATION_FUNCTIONS.validateDescription(value);
             onValuesChange({ ...values, description: value }, { ...errors, description: error });
         },
-        [onValuesChange, values, errors],
+        [onValuesChange, values, errors, isBaseLanguage],
     );
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
+            if (!isBaseLanguage) return;
             onValuesChange({ ...values, image: value, imageId: null }, { ...errors, image: undefined });
         },
-        [onValuesChange, values, errors],
+        [onValuesChange, values, errors, isBaseLanguage],
     );
 
     const handleImageError = useCallback(
         (error: string | null) => {
-            if (!error) {
+            if (!isBaseLanguage) return;
+            if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
                 return;
             }
             onValuesChange({ ...values }, { ...errors, image: error });
         },
-        [onValuesChange, values, errors],
+        [onValuesChange, values, errors, isBaseLanguage],
     );
 
     const handleDelete = useCallback(() => {
@@ -75,6 +95,7 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                     data-testid={`partner-form-delete-button-${cardHtmlId}`}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}
+                    disabled={disabled || disableStructuralActions}
                 />
             </div>
             <div className={styles.content}>
@@ -86,7 +107,7 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                         name={`partner-form-image-${cardHtmlId}`}
                         onChange={handleImageChange}
                         setError={handleImageError}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         enableCrop={true}
                         cropWidth={PARTNER_VALIDATION.image.width}
                         cropHeight={PARTNER_VALIDATION.image.height}
@@ -108,14 +129,14 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL}
                         placeholder={PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER}
-                        value={values.description}
+                        value={displayedDescription}
                         error={errors.description}
                         onChange={handleDescriptionChange}
                         name={`partner-form-description-${cardHtmlId}`}
                         id={`partner-form-description-${cardHtmlId}`}
                         maxLength={PARTNER_VALIDATION.description.max}
                         isRequired={true}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         rows={3}
                     />
                 </div>

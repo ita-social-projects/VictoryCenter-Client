@@ -57,8 +57,10 @@ jest.mock(
             onBlur,
             error,
             id,
+            autoGrow,
+            maxRows,
         }: TextAreaWithCharacterLimitGroupProps) => (
-            <div data-testid={`group-${id}`}>
+            <div data-testid={`group-${id}`} data-auto-grow={String(autoGrow)} data-max-rows={String(maxRows)}>
                 <label htmlFor={id}>{label}</label>
                 <textarea id={id} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
                 {error && <span data-testid={`error-${id}`}>{error}</span>}
@@ -322,6 +324,15 @@ describe('ProgramForm', () => {
             expect(screen.getByTestId('input-description')).toHaveValue('');
             expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('NoImage');
             expect(screen.getByTestId('value-previewImage')).toHaveTextContent('NoImage');
+        });
+
+        it('should render name and description as uncapped auto-growing textareas', () => {
+            renderProgramForm();
+
+            expect(screen.getByTestId('group-name')).toHaveAttribute('data-auto-grow', 'true');
+            expect(screen.getByTestId('group-name')).toHaveAttribute('data-max-rows', '0');
+            expect(screen.getByTestId('group-description')).toHaveAttribute('data-auto-grow', 'true');
+            expect(screen.getByTestId('group-description')).toHaveAttribute('data-max-rows', '0');
         });
 
         it('should render with initial data when provided', () => {

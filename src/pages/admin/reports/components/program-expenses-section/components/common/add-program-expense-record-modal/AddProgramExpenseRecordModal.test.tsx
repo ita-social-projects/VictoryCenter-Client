@@ -446,7 +446,7 @@ describe('AddProgramExpenseRecordModal', () => {
                     programName: 'Program A',
                     reportingYear: '2025',
                     amountUah: '200',
-                    amountUsd: '4,75', // auto calculated based on rate 42.15 and rounded up
+                    amountUsd: '4,74', // auto calculated based on rate 42.15 and rounded to two decimals
                 });
             });
         });

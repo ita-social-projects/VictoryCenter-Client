@@ -44,7 +44,7 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
 
-    const Select = ({ value, onValueChange, placeholder, children }: any) => {
+    const Select = ({ value, onValueChange, placeholder, children, className }: any) => {
         const options = React.Children.toArray(children)
             .filter((child: any) => child?.props)
             .map((child: any) => ({ value: child.props.value, name: child.props.name }));
@@ -52,6 +52,7 @@ jest.mock('@/components/common/select/Select', () => {
         return (
             <select
                 data-testid={placeholder}
+                className={className}
                 value={value ?? ''}
                 onChange={(event) => {
                     const selected = options.find((item: any) => String(item.value) === event.target.value);
@@ -172,7 +173,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         expect(screen.getByTestId('record-category-disabled-placeholder')).toBeInTheDocument();
     });
 
-    it('renders field errors and usd mismatch message', () => {
+    it('renders field errors and applies select-error class to dropdowns when errors exist', () => {
         mockedHook.mockReturnValue({
             ...baseHookResult,
             usdMismatchMessage: 'Mismatch',
@@ -187,13 +188,37 @@ describe('AddFundsExpendituresRecordModal', () => {
             },
         } as any);
 
-        renderComponent();
+        renderComponent('income');
 
         expect(screen.getByText('year error')).toBeInTheDocument();
         expect(screen.getByText('category error')).toBeInTheDocument();
         expect(screen.getByText('uah error')).toBeInTheDocument();
         expect(screen.getByText('usd error')).toBeInTheDocument();
         expect(screen.getByText('Mismatch')).toBeInTheDocument();
+
+        const yearSelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        expect(yearSelect.className).toContain('select-error');
+
+        const categorySelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER);
+        expect(categorySelect.className).toContain('select-error');
+    });
+
+    it('does not apply select-error class to dropdowns when no errors exist', () => {
+        mockedHook.mockReturnValue({
+            ...baseHookResult,
+            formState: {
+                ...baseHookResult.formState,
+                errors: {},
+            },
+        } as any);
+
+        renderComponent('income');
+
+        const yearSelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        expect(yearSelect.className).not.toContain('select-error');
+
+        const categorySelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER);
+        expect(categorySelect.className).not.toContain('select-error');
     });
 
     it('calls handlers from hook on interactions', () => {

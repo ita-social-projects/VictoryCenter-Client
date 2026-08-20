@@ -66,6 +66,12 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    EVENTS: {
+        BASE: 'Events',
+        SEARCH: 'Events/search',
+        PUBLISHED: 'Events/published',
+        BY_SLUG: 'Events/slug',
+    },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
     },
@@ -94,6 +100,12 @@ export const API_ROUTES = {
         BANNER: 'Partners/banner',
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
+    },
+    PARTNERS_PAGE_BANNER_LOCALIZATIONS: {
+        BASE: 'PartnersPageBannerLocalizations',
+    },
+    PARTNER_SECTION_LOCALIZATIONS: {
+        BASE: 'PartnerSectionLocalizations',
     },
     REPORTS: {
         MEDIA_SETTINGS: 'Report/report',

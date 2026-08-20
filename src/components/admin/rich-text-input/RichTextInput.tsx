@@ -37,6 +37,8 @@ export interface RichTextInputProps {
      * text content when the input loses focus.
      */
     trimOnBlur?: boolean;
+    showCounter?: boolean;
+    onLengthChange?: (length: number) => void;
 }
 
 const theme = {
@@ -64,6 +66,8 @@ export const RichTextInput = ({
     className,
     hasError = false,
     trimOnBlur = false,
+    showCounter = true,
+    onLengthChange,
 }: RichTextInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [currentLength, setCurrentLength] = useState(0);
@@ -72,9 +76,13 @@ export const RichTextInput = ({
         setIsFocused(focused);
     }, []);
 
-    const handleLengthChange = useCallback((length: number) => {
-        setCurrentLength(length);
-    }, []);
+    const handleLengthChange = useCallback(
+        (length: number) => {
+            setCurrentLength(length);
+            onLengthChange?.(length);
+        },
+        [onLengthChange],
+    );
 
     const showClearButton = isFocused && !isEditorEmpty(value) && !disabled;
 
@@ -152,9 +160,11 @@ export const RichTextInput = ({
                 >
                     <RemoveIcon />
                 </button>
-                <output className={styles.counter}>
-                    {currentLength}/{maxLength}
-                </output>
+                {showCounter && (
+                    <output className={styles.counter}>
+                        {currentLength}/{maxLength}
+                    </output>
+                )}
             </div>
         </div>
     );

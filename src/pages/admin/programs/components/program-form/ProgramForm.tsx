@@ -617,7 +617,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.name.max,
                                 )}
                                 autoGrow={true}
-                                maxRows={12}
+                                maxRows={0}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -686,7 +686,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.description.max,
                                 )}
                                 autoGrow={true}
-                                maxRows={16}
+                                maxRows={0}
                             />
 
                             <PhotoInputGroup

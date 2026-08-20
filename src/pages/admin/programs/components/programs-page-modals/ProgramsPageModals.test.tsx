@@ -35,6 +35,11 @@ jest.mock('../translate-program-modal/TranslateProgramModal', () => ({
         isOpen ? <div data-testid="translate-program-modal" /> : null,
 }));
 
+jest.mock('../translate-program-category-modal/TranslateProgramCategoryModal', () => ({
+    TranslateProgramCategoryModal: ({ isOpen }: { isOpen: boolean }) =>
+        isOpen ? <div data-testid="translate-program-category-modal" /> : null,
+}));
+
 describe('ProgramsPageModals', () => {
     const mockProgram: HippotherapyProgram = {
         id: 1,
@@ -133,6 +138,7 @@ describe('ProgramsPageModals', () => {
     const getEditCategoryModal = () => screen.queryByTestId('program-category-modal-edit');
     const getDeleteCategoryModal = () => screen.queryByTestId('delete-category-modal');
     const getTranslateProgramModal = () => screen.queryByTestId('translate-program-modal');
+    const getTranslateProgramCategoryModal = () => screen.queryByTestId('translate-program-category-modal');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -146,8 +152,9 @@ describe('ProgramsPageModals', () => {
         expect(getEditProgramModal()).not.toBeInTheDocument();
         expect(getDeleteProgramModal()).not.toBeInTheDocument();
         expect(getAddCategoryModal()).not.toBeInTheDocument();
-        // translation modal also closed
+        // translation modals also closed
         expect(screen.queryByTestId('translate-program-modal')).not.toBeInTheDocument();
+        expect(getTranslateProgramCategoryModal()).not.toBeInTheDocument();
         expect(getEditCategoryModal()).not.toBeInTheDocument();
         expect(getDeleteCategoryModal()).not.toBeInTheDocument();
     });
@@ -184,6 +191,16 @@ describe('ProgramsPageModals', () => {
         renderProgramsPageModals(modalsState);
 
         expect(getTranslateProgramModal()).toBeInTheDocument();
+        expect(getAddProgramModal()).not.toBeInTheDocument();
+        expect(getEditProgramModal()).not.toBeInTheDocument();
+        expect(getDeleteProgramModal()).not.toBeInTheDocument();
+    });
+
+    it('should render translate program category modal when isCategoryToTranslate is true', () => {
+        const modalsState = createMockModalsState({ isCategoryToTranslate: true });
+        renderProgramsPageModals(modalsState);
+
+        expect(getTranslateProgramCategoryModal()).toBeInTheDocument();
         expect(getAddProgramModal()).not.toBeInTheDocument();
         expect(getEditProgramModal()).not.toBeInTheDocument();
         expect(getDeleteProgramModal()).not.toBeInTheDocument();

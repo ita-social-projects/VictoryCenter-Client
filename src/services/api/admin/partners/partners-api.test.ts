@@ -34,6 +34,7 @@ describe('PartnersApi (admin)', () => {
                 title: 'Banner title',
                 description: 'Banner description',
                 image: { id: 5, url: 'https://img', mimeType: 'image/png' },
+                localizations: [],
             };
 
             mockClient.get.mockResolvedValueOnce({ data: bannerDto });
@@ -42,10 +43,12 @@ describe('PartnersApi (admin)', () => {
 
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PARTNERS.BANNER);
             const expected: PartnerBanner = {
+                id: bannerDto.id,
                 title: bannerDto.title,
                 description: bannerDto.description,
                 image: bannerDto.image,
                 imageId: bannerDto.image?.id ?? null,
+                localizations: [],
             };
             expect(result).toEqual(expected);
         });
@@ -67,6 +70,7 @@ describe('PartnersApi (admin)', () => {
                 title: request.title,
                 description: request.description,
                 image: { id: 7, url: 'https://new-image', mimeType: 'image/png' },
+                localizations: [],
             };
             mockClient.put.mockResolvedValueOnce({ data: responseDto });
 
@@ -81,10 +85,12 @@ describe('PartnersApi (admin)', () => {
             expect(mockedImageApi.delete).toHaveBeenCalledWith(mockClient, 3);
 
             const expected: PartnerBanner = {
+                id: responseDto.id,
                 title: responseDto.title,
                 description: responseDto.description,
                 image: responseDto.image,
                 imageId: responseDto.image?.id ?? null,
+                localizations: [],
             };
             expect(result).toEqual(expected);
         });
@@ -144,10 +150,12 @@ describe('PartnersApi (admin)', () => {
 
             const expected: PartnersPageData = {
                 banner: {
+                    id: dto.banner.id,
                     title: dto.banner.title,
                     description: dto.banner.description,
                     image: dto.banner.image,
                     imageId: dto.banner.image?.id ?? null,
+                    localizations: [],
                 },
                 sections: [
                     {
@@ -162,6 +170,7 @@ describe('PartnersApi (admin)', () => {
                                 imageId: dto.sections[0].partners[0].image?.id ?? null,
                             },
                         ],
+                        localizations: [],
                     },
                 ],
             };
@@ -196,6 +205,7 @@ describe('PartnersApi (admin)', () => {
                     title: 'First',
                     description: 'Desc',
                     partners: [{ id: 2, description: 'Partner', image: sectionsDto[0].partners[0].image, imageId: 3 }],
+                    localizations: [],
                 },
             ];
             expect(result).toEqual(expected);
@@ -261,6 +271,7 @@ describe('PartnersApi (admin)', () => {
                         imageId: responseDto.partners[0].image?.id ?? null,
                     },
                 ],
+                localizations: [],
             };
             expect(result).toEqual(expected);
         });
@@ -328,6 +339,7 @@ describe('PartnersApi (admin)', () => {
                     image: partner.image,
                     imageId: partner.image?.id ?? null,
                 })),
+                localizations: [],
             };
             expect(updated).toEqual(expected);
         });

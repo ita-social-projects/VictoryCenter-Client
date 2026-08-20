@@ -23,6 +23,12 @@
             transition: all 0.5s ease;
         }
 
+        .name {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+        }
+
         .description {
             opacity: 1;
             max-height: 200px;
@@ -111,4 +117,10 @@
     transition:
         max-height 0.5s ease,
         opacity 0.4s ease 0.1s;
+}
+
+@media (max-width: 767px) {
+    .description {
+        display: none;
+    }
 }

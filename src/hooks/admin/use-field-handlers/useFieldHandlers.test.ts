@@ -51,6 +51,69 @@ describe('useFieldHandlers', () => {
         expect(managerResult.current.formState.name).toBe('Bob');
     });
 
+    it('does NOT set an error on change when no error is shown yet', () => {
+        const validateName = jest.fn((value: string) => (value.length >= 5 ? undefined : 'Too short'));
+        const { result: managerResult } = makeManager();
+
+        const { result: fieldsResult } = renderHook(() =>
+            useFieldHandlers(managerResult.current, [{ name: 'name', validateFn: validateName }]),
+        );
+
+        act(() => {
+            fieldsResult.current.name.onChange({
+                target: { value: 'ab' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        expect(managerResult.current.errors.name).toBeUndefined();
+    });
+
+    it('clears the error on change when error is already shown', () => {
+        const validateName = jest.fn((value: string) => (value.length >= 5 ? undefined : 'Too short'));
+        const { result: managerResult } = makeManager();
+
+        const { result: fieldsResult } = renderHook(() =>
+            useFieldHandlers(managerResult.current, [{ name: 'name', validateFn: validateName }]),
+        );
+
+        act(() => {
+            fieldsResult.current.name.onBlur();
+        });
+
+        expect(managerResult.current.errors.name).toBe('Too short');
+
+        act(() => {
+            fieldsResult.current.name.onChange({
+                target: { value: 'abcde' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        expect(managerResult.current.errors.name).toBeUndefined();
+    });
+
+    it('keeps the error on change while the value is still invalid', () => {
+        const validateName = jest.fn((value: string) => (value.length >= 5 ? undefined : 'Too short'));
+        const { result: managerResult } = makeManager();
+
+        const { result: fieldsResult } = renderHook(() =>
+            useFieldHandlers(managerResult.current, [{ name: 'name', validateFn: validateName }]),
+        );
+
+        act(() => {
+            fieldsResult.current.name.onBlur();
+        });
+
+        expect(managerResult.current.errors.name).toBe('Too short');
+
+        act(() => {
+            fieldsResult.current.name.onChange({
+                target: { value: 'abc' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        expect(managerResult.current.errors.name).toBe('Too short');
+    });
+
     it('calls validateFn and sets error on onBlur', () => {
         const validateName = jest.fn((value: string) => (value ? undefined : 'Required'));
         const { result: managerResult } = makeManager();

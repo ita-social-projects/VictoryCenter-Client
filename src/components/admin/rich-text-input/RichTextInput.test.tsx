@@ -359,6 +359,24 @@ describe('RichTextInput', () => {
             });
             expect(rootElement).not.toHaveClass('root--focused');
         });
+
+        it('calls onLengthChange prop when length changes', () => {
+            const onLengthChange = jest.fn();
+            renderRichTextInput({ maxLength: 100, onLengthChange });
+
+            const onLengthChangeInternal = mockMaxLengthPluginProps.onLengthChange;
+            act(() => {
+                onLengthChangeInternal(25);
+            });
+
+            expect(onLengthChange).toHaveBeenCalledWith(25);
+        });
+
+        it('does not render internal counter when showCounter is false', () => {
+            renderRichTextInput({ maxLength: 100, showCounter: false });
+
+            expect(screen.queryByText('0/100')).not.toBeInTheDocument();
+        });
     });
 
     describe('Initial Configuration', () => {

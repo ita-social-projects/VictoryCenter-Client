@@ -871,4 +871,14 @@ describe('FundsExpendituresTable program aggregate row', () => {
 
         expect(screen.getByLabelText('Edit program reporting year')).toBeDisabled();
     });
+
+    it('should disable bulk delete action when row actions are disabled', () => {
+        renderTable({
+            isEditing: true,
+            isRowActionsDisabled: true,
+            selectedRecordIds: [1, 2],
+        });
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON)).toBeDisabled();
+    });
 });

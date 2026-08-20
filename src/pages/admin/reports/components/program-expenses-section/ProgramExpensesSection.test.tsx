@@ -328,14 +328,14 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
 
     it('should render summary, toolbar and all records by default', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.TITLE)).toBeInTheDocument();
         expect(screen.getByText('41.25')).toBeInTheDocument();
@@ -349,7 +349,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should filter table records by selected program', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.change(screen.getByTestId('program-select'), {
             target: { value: '2' },
@@ -364,7 +364,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should filter table records by multiple selected programs', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByTestId('program-select-first-two'));
 
@@ -378,7 +378,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should restore all table records when selected programs are cleared', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.change(screen.getByTestId('program-select'), {
             target: { value: '2' },
@@ -394,7 +394,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should drop selected program ids that are no longer present in programs data', async () => {
-        const { rerender } = render(<ProgramExpensesSection />);
+        const { rerender } = render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.change(screen.getByTestId('program-select'), {
             target: { value: '2' },
@@ -412,7 +412,7 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        rerender(<ProgramExpensesSection />);
+        rerender(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         await waitFor(() => {
             expect(within(screen.getByRole('table')).getAllByText('Program A')).toHaveLength(2);
@@ -421,7 +421,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should render filtered empty state when selected program has no matching records', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByTestId('program-select-no-records'));
 
@@ -440,7 +440,7 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
@@ -453,7 +453,7 @@ describe('ProgramExpensesSection', () => {
     it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData with client', async () => {
         mockGetReadOnlyData.mockResolvedValue(MOCK_PROGRAM_EXPENSES_DATA);
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         const useDataFetchProps = mockUseDataFetch.mock.calls[0][0] as {
             fetchHandler: (options?: unknown) => Promise<ProgramExpensesReadOnlyData>;
@@ -468,7 +468,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should render edit mode controls when edit mode is active', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
         expect(screen.getByRole('checkbox', { name: 'Select all program expense records' })).toBeEnabled();
@@ -476,7 +476,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should display mock exchange rate in edit mode', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByText('41.25')).toBeInTheDocument();
         expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
@@ -503,13 +503,13 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
     it('should open delete confirmation modal when delete icon is clicked', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
 
@@ -518,13 +518,13 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should not show delete icons when not in edit mode', () => {
-        render(<ProgramExpensesSection isEditing={false} />);
+        render(<ProgramExpensesSection isEditing={false} exchangeRate={'41.25'} />);
 
         expect(screen.queryByLabelText('Delete record 1')).not.toBeInTheDocument();
     });
 
     it('should close delete modal when Cancel is clicked without calling API', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
@@ -538,7 +538,7 @@ describe('ProgramExpensesSection', () => {
     it('should delete record after confirmation and show success toast', async () => {
         (ProgramExpensesApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
@@ -559,7 +559,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast and keep modal open when delete fails', async () => {
         (ProgramExpensesApi.delete as jest.Mock).mockRejectedValueOnce(new Error('delete failed'));
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
@@ -583,7 +583,7 @@ describe('ProgramExpensesSection', () => {
                 }),
         );
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
@@ -597,7 +597,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should open bulk delete modal when delete selected button is clicked', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -607,7 +607,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should close bulk delete modal and clear selection when cancel is clicked', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -620,7 +620,7 @@ describe('ProgramExpensesSection', () => {
     it('should bulk delete selected records and show success toast', async () => {
         (ProgramExpensesApi.bulkDelete as jest.Mock).mockResolvedValueOnce(undefined);
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -637,7 +637,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast when bulk delete fails', async () => {
         (ProgramExpensesApi.bulkDelete as jest.Mock).mockRejectedValueOnce(new Error('failed'));
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -659,7 +659,7 @@ describe('ProgramExpensesSection', () => {
         it('should open modal in add mode, submit, call API.post and refetch', async () => {
             mockPost.mockResolvedValueOnce(undefined);
 
-            render(<ProgramExpensesSection />);
+            render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
 
@@ -689,7 +689,7 @@ describe('ProgramExpensesSection', () => {
             mockAddProgramCategory.mockResolvedValueOnce({ id: 99, name: 'New Category', programsCount: 0 });
             mockPost.mockResolvedValueOnce(undefined);
 
-            render(<ProgramExpensesSection />);
+            render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
             fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
@@ -713,7 +713,7 @@ describe('ProgramExpensesSection', () => {
         it('should show error toast and not call API.post when creating the new category fails', async () => {
             mockAddProgramCategory.mockRejectedValueOnce(new Error('failed to create category'));
 
-            render(<ProgramExpensesSection />);
+            render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
             fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
@@ -730,7 +730,7 @@ describe('ProgramExpensesSection', () => {
         it('should start inline row edit mode, select program category, click accept, call API.update and refetch', async () => {
             mockUpdate.mockResolvedValueOnce(undefined);
 
-            render(<ProgramExpensesSection />);
+            render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             // Click the edit button on the first record (id: 1)
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -760,17 +760,17 @@ describe('ProgramExpensesSection', () => {
         });
 
         it('should cancel inline edit when isEditing turns off', () => {
-            const { rerender } = render(<ProgramExpensesSection isEditing />);
+            const { rerender } = render(<ProgramExpensesSection isEditing exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
 
-            rerender(<ProgramExpensesSection isEditing={false} />);
+            rerender(<ProgramExpensesSection isEditing={false} exchangeRate={'41.25'} />);
             expect(screen.queryByLabelText('Accept record 1')).not.toBeInTheDocument();
         });
 
         it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {
-            render(<ProgramExpensesSection />);
+            render(<ProgramExpensesSection exchangeRate={'45'} />);
 
             fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
             expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeInTheDocument();
@@ -790,7 +790,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast if inline record update fails (catch branch)', async () => {
         jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Edit record 1'));
 
@@ -812,7 +812,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast if adding a new program expense fails (catch branch)', async () => {
         jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
 
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
 
@@ -824,5 +824,59 @@ describe('ProgramExpensesSection', () => {
                 expect.anything(),
             );
         });
+    });
+
+    it('should use exchange rate from parent component in edit mode', () => {
+        render(<ProgramExpensesSection isEditing exchangeRate="45" />);
+
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '45');
+    });
+
+    it('should use exchange rate from read-only data in non-edit mode', () => {
+        mockUseDataFetchResult = {
+            data: {
+                ...MOCK_PROGRAM_EXPENSES_DATA,
+                exchangeRate: '40.50',
+            },
+            isLoading: false,
+            refetch: mockRefetch,
+        };
+
+        render(<ProgramExpensesSection isEditing={false} exchangeRate="41.25" />);
+
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '40.50');
+    });
+
+    it('should disable add program expense control when exchange rate is invalid', () => {
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
+
+        expect(
+            screen.getByRole('button', {
+                name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE,
+            }),
+        ).toBeDisabled();
+    });
+
+    it('should disable row actions when exchange rate is invalid', () => {
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
+
+        expect(screen.getByLabelText('Edit record 1')).toBeDisabled();
+        expect(screen.getByLabelText('Delete record 1')).toBeDisabled();
+    });
+
+    it('should disable add button in empty state when exchange rate has an error', () => {
+        mockUseDataFetchResult = {
+            data: EMPTY_PROGRAM_EXPENSES_DATA,
+            isLoading: false,
+            refetch: mockRefetch,
+        };
+
+        render(<ProgramExpensesSection isEditing exchangeRate="invalid" />);
+
+        const addButtons = screen.getAllByRole('button', {
+            name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE,
+        });
+
+        expect(addButtons[1]).toBeDisabled();
     });
 });

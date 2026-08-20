@@ -171,7 +171,7 @@ export const ImageInput = ({
     const handleCropCancel = async () => {
         setShowCropperModal(false);
 
-        if (!previewImage && rawImage && 'base64' in rawImage) {
+        if (rawImage && 'base64' in rawImage) {
             setPreviewImage(rawImage);
             onChange(rawImage);
 

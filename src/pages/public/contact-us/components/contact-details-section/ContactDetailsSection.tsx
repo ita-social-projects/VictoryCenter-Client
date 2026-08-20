@@ -6,6 +6,7 @@ import { ReactComponent as MapPinIcon } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as CopyIcon } from '@/assets/icons/copy.svg';
 import { ContactUsSocialLink } from '@/types/public/company-profile';
 import styles from './ContactDetailsSection.module.scss';
+import { useTranslation } from 'react-i18next';
 
 interface ContactDetailsSectionProps {
     title: string;
@@ -38,6 +39,8 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
     onCopyEmail,
     onCopyPhone,
 }) => {
+    const { t } = useTranslation('global');
+
     const [copiedItem, setCopiedItem] = useState<'email' | 'phone' | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -71,7 +74,7 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
                             />
                             {copiedItem === 'email' && (
                                 <span className={styles['copy-snackbar']} role="status" aria-live="polite">
-                                    Скопійовано
+                                    {t('COPIED_GLOBAL_MESSAGE')}
                                 </span>
                             )}
                         </div>
@@ -90,7 +93,7 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
                             />
                             {copiedItem === 'phone' && (
                                 <span className={styles['copy-snackbar']} role="status" aria-live="polite">
-                                    Скопійовано
+                                    {t('COPIED_GLOBAL_MESSAGE')}
                                 </span>
                             )}
                         </div>

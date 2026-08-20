@@ -17,6 +17,7 @@ import {
     contactUsPageUk,
     mainPageUk,
     historyPageUk,
+    notFoundPageUk,
 } from './uk';
 import {
     headerEn,
@@ -34,6 +35,7 @@ import {
     contactUsPageEn,
     mainPageEn,
     historyPageEn,
+    notFoundPageEn,
 } from './en';
 import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 
@@ -54,6 +56,7 @@ const resources = {
         contactUsPage: contactUsPageUk,
         mainPage: mainPageUk,
         historyPage: historyPageUk,
+        notFoundPage: notFoundPageUk,
     },
     en: {
         header: headerEn,
@@ -71,6 +74,7 @@ const resources = {
         contactUsPage: contactUsPageEn,
         mainPage: mainPageEn,
         historyPage: historyPageEn,
+        notFoundPage: notFoundPageEn,
     },
 };
 
@@ -100,6 +104,7 @@ i18n.use(initReactI18next).init({
         'contactUsPage',
         'mainPage',
         'historyPage',
+        'notFoundPage',
     ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {

@@ -481,6 +481,43 @@ describe('Select Component', () => {
         expect(selectContainer).toHaveClass('select-closed');
         expect(selectContainer).toHaveClass('select-disabled');
     });
+
+    it('closes the dropdown when a click outside occurs', () => {
+        const { container } = render(
+            <div>
+                <Select {...defaultProps} />
+                <button data-testid="outside-button">Click Me</button>
+            </div>,
+        );
+        const selectContainer = container.querySelector('.select') as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+        const outsideButton = screen.getByTestId('outside-button');
+
+        fireEvent.click(selectButton);
+        expect(selectContainer).toHaveClass('select-opened');
+
+        fireEvent.mouseDown(outsideButton);
+        expect(selectContainer).toHaveClass('select-closed');
+    });
+
+    it('closes the dropdown when focus is lost (blur) to an outside element', () => {
+        const { container } = render(
+            <div>
+                <Select {...defaultProps} />
+                <button data-testid="outside-button">Focus Me</button>
+            </div>,
+        );
+        const selectContainer = container.querySelector('.select') as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+        const outsideButton = screen.getByTestId('outside-button');
+
+        fireEvent.click(selectButton);
+        expect(selectContainer).toHaveClass('select-opened');
+
+        fireEvent.blur(selectContainer, { relatedTarget: outsideButton });
+
+        expect(selectContainer).toHaveClass('select-closed');
+    });
 });
 
 describe('Select Component (openOnHover coverage)', () => {

@@ -139,16 +139,16 @@
         max-width: 100%;
 
         @media (min-width: 768px) {
+            flex-direction: row;
+            align-items: flex-start;
             font-size: 18px;
             line-height: 26px;
             gap: 16px;
         }
 
         @media (min-width: 1024px) {
-            flex-direction: row;
             font-size: 20px;
             line-height: 28px;
-            align-items: flex-start;
         }
 
         p {

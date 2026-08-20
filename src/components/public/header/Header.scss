@@ -22,8 +22,14 @@ $header-height: 4rem;
         justify-content: space-between;
         align-items: center;
         height: 100%;
-        padding-left: 3.5rem;
-        padding-right: 3.5rem;
+
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        @media (min-width: 1025px) {
+            padding-left: 3.5rem;
+            padding-right: 3.5rem;
+        }
 
         .logo-container {
             .logo {
@@ -143,6 +149,22 @@ $header-height: 4rem;
     }
 }
 
+@media (min-width: 768px) and (max-width: 1024px) {
+    .header-block {
+        .header-content-container {
+            .button-container {
+                .language-switcher {
+                    margin-right: 0.75rem;
+                }
+
+                .burger-menu-icon {
+                    margin-left: 0.75rem;
+                }
+            }
+        }
+    }
+}
+
 @media (max-width: 559px) {
     .header-block {
         .header-content-container {
@@ -168,6 +190,8 @@ $header-height: 4rem;
 
         .mobile-language-switcher {
             display: flex;
+
+            width: auto;
             padding: 1rem;
             border-top: 1px solid colors.$blue-50;
         }
@@ -178,7 +202,6 @@ $header-height: 4rem;
     .header-block {
         .header-content-container {
             .button-container {
-
                 .contact-us-button,
                 .language-switcher {
                     display: none;

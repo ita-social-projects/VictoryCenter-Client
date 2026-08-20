@@ -1,12 +1,26 @@
 .language-switcher {
-    width: 5.25rem;
+    width: 3.5rem;
     &-head {
-        width: 5.25rem;
+        width: 3.5rem;
+
+        padding-left: 0;
+        padding-right: 0;
         border: none;
         background-color: transparent;
 
         &:hover {
             background-color: transparent;
+        }
+    }
+
+    .language-switcher-option {
+        padding-left: 0;
+        padding-right: 0;
+        justify-content: center;
+
+        span {
+            white-space: nowrap;
+            overflow-wrap: normal;
         }
     }
 }

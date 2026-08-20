@@ -13,6 +13,7 @@ import successPageEn from './success.json';
 import contactUsPageEn from './contact-us.json';
 import mainPageEn from './main-page.json';
 import historyPageEn from './history.json';
+import notFoundPageEn from './not-found-page.json';
 
 export {
     headerEn,
@@ -30,4 +31,5 @@ export {
     contactUsPageEn,
     mainPageEn,
     historyPageEn,
+    notFoundPageEn,
 };

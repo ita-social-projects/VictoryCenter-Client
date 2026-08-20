@@ -40,6 +40,17 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
             >
                 Set Error
             </button>
+            <button
+                type="button"
+                data-testid={`${id}-set-large-error`}
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    setError(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
+                }}
+                disabled={disabled}
+            >
+                Set Large Error
+            </button>
         </div>
     ),
 }));
@@ -103,6 +114,9 @@ const cardHtmlId = defaultValues.localId;
 const descriptionTestId = `partner-form-description-${cardHtmlId}`;
 const imageTestId = `partner-form-image-${cardHtmlId}`;
 
+const UK_LANGUAGE = { id: 1, code: 'uk', name: 'Ukrainian' };
+const EN_LANGUAGE = { id: 2, code: 'en', name: 'English' };
+
 describe('PartnerForm', () => {
     let onValuesChange: jest.Mock;
     let onDelete: jest.Mock;
@@ -111,6 +125,7 @@ describe('PartnerForm', () => {
     const getImageChangeButton = () => screen.getByTestId(`${imageTestId}-change`);
     const getImageRemoveButton = () => screen.getByTestId(`${imageTestId}-remove`);
     const getImageSetErrorButton = () => screen.getByTestId(`${imageTestId}-set-error`);
+    const getImageSetLargeErrorButton = () => screen.getByTestId(`${imageTestId}-set-large-error`);
     const getDeleteButton = () => screen.queryByTestId(`partner-form-delete-button-${cardHtmlId}`);
     const getDescriptionError = () => screen.queryByTestId(`${descriptionTestId}-error`);
     const getImageError = () => screen.queryByTestId('input-error');
@@ -121,6 +136,7 @@ describe('PartnerForm', () => {
     const clickImageChange = () => fireEvent.click(getImageChangeButton());
     const clickImageRemove = () => fireEvent.click(getImageRemoveButton());
     const clickImageSetError = () => fireEvent.click(getImageSetErrorButton());
+    const clickImageSetLargeError = () => fireEvent.click(getImageSetLargeErrorButton());
     const clickDelete = () => {
         const button = getDeleteButton();
         if (button) fireEvent.click(button);
@@ -134,6 +150,7 @@ describe('PartnerForm', () => {
                 disabled={false}
                 onValuesChange={onValuesChange}
                 onDelete={onDelete}
+                language={UK_LANGUAGE}
                 {...props}
             />,
         );
@@ -225,6 +242,16 @@ describe('PartnerForm', () => {
         expect(onValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { ...defaultErrors, image: errorToSet });
     });
 
+    it('ignores ImageDimensionsTooLargeError from ImageInput', () => {
+        renderComponent({
+            errors: { ...defaultErrors, image: undefined },
+        });
+
+        clickImageSetLargeError();
+
+        expect(onValuesChange).not.toHaveBeenCalled();
+    });
+
     it('renders errors when provided', () => {
         const errors: PartnerFormErrors = {
             description: 'Description is required',
@@ -251,6 +278,42 @@ describe('PartnerForm', () => {
         expect(getImageChangeButton()).toBeDisabled();
         expect(getImageRemoveButton()).toBeDisabled();
         expect(getImageSetErrorButton()).toBeDisabled();
+        expect(getImageSetLargeErrorButton()).toBeDisabled();
         expect(getDescriptionTextarea()).toBeDisabled();
+    });
+
+    it('shows the translated description and disables fields when a non-base language is selected', () => {
+        renderComponent({ language: EN_LANGUAGE, translatedDescription: 'Translated description' });
+
+        expect(getDescriptionTextarea()).toHaveValue('Translated description');
+        expect(getDescriptionTextarea()).toBeDisabled();
+        expect(getImageChangeButton()).toBeDisabled();
+        expect(getImageRemoveButton()).toBeDisabled();
+        expect(getImageSetErrorButton()).toBeDisabled();
+        expect(getImageSetLargeErrorButton()).toBeDisabled();
+    });
+
+    it('falls back to an empty description when no translation exists yet', () => {
+        renderComponent({ language: EN_LANGUAGE, translatedDescription: undefined });
+
+        expect(getDescriptionTextarea()).toHaveValue('');
+    });
+
+    it('ignores description and image changes while a non-base language is selected', () => {
+        renderComponent({ language: EN_LANGUAGE });
+
+        fireEvent.change(getDescriptionTextarea(), { target: { value: 'Should be ignored' } });
+        clickImageChange();
+        clickImageRemove();
+        clickImageSetError();
+        clickImageSetLargeError();
+
+        expect(onValuesChange).not.toHaveBeenCalled();
+    });
+
+    it('disables the delete button when structural actions are disabled', () => {
+        renderComponent({ disableStructuralActions: true });
+
+        expect(getDeleteButton()).toBeDisabled();
     });
 });

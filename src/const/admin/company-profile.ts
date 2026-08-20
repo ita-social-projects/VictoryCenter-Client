@@ -55,6 +55,7 @@ export const COMPANY_PROFILE_TEXT = {
 
     SOCIAL_MEDIA_TAB: {
         SECTION_TITLE: 'Соціальні мережі',
+        TOOLTIP: 'Використовується для відображення у футері та на сторінці контакти',
         PLATFORMS: {
             FACEBOOK: 'Facebook',
             INSTAGRAM: 'Instagram',

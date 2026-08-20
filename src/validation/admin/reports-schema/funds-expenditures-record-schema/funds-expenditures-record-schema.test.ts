@@ -42,6 +42,8 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should handle leading zeros with dot separator correctly', () => {
             expect(normalizeFundsExpendituresAmountInput('0012.34')).toBe('12,34');
+        });
+
         it('should drop trailing comma when trimEnd is true and no decimal digits exist', () => {
             expect(normalizeFundsExpendituresAmountInput('1 200,', true)).toBe('1 200');
         });

@@ -9,20 +9,11 @@ jest.mock('react-i18next', () => ({
     useTranslation: jest.fn(),
 }));
 
-const TRANSLATIONS: Record<string, string> = {
-    'SLOGAN.FIRST_TEXT': 'First Text',
-    'SLOGAN.SECOND_TEXT': 'Second Text',
-    'SLOGAN.THIRD_TEXT': 'Third Text',
-    'SLOGAN.FOURTH_TEXT': 'Fourth Text',
-    'SLOGAN.FIFTH_TEXT': 'Fifth Text',
-    'SLOGAN.SIXTH_TEXT': 'Sixth Text',
-};
-
 describe('SloganSection', () => {
     beforeEach(() => {
         const { useTranslation } = require('react-i18next');
         (useTranslation as jest.Mock).mockReturnValue({
-            t: (key: string) => TRANSLATIONS[key] || key,
+            t: (key: string) => key,
             i18n: { changeLanguage: jest.fn() },
         });
     });
@@ -53,12 +44,12 @@ describe('SloganSection', () => {
 
     it('should render all translation keys', () => {
         render(<SloganSection />);
-        expect(screen.getByText('First Text')).toBeInTheDocument();
-        expect(screen.getByText('Second Text')).toBeInTheDocument();
-        expect(screen.getByText('Third Text')).toBeInTheDocument();
-        expect(screen.getByText('Fourth Text')).toBeInTheDocument();
-        expect(screen.getByText('Fifth Text')).toBeInTheDocument();
-        expect(screen.getByText('Sixth Text')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.FIRST_TEXT')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.SECOND_TEXT')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.THIRD_TEXT')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.FOURTH_TEXT')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.FIFTH_TEXT')).toBeInTheDocument();
+        expect(screen.getByText('SLOGAN.SIXTH_TEXT')).toBeInTheDocument();
     });
 
     it('should render br elements', () => {
@@ -73,7 +64,7 @@ describe('SloganSection', () => {
         let firstTextSpan: Element | null = null;
 
         for (let i = 0; i < spans.length; i++) {
-            if (spans[i].textContent === 'First Text') {
+            if (spans[i].textContent === 'SLOGAN.FIRST_TEXT') {
                 firstTextSpan = spans[i];
                 break;
             }

@@ -5,9 +5,11 @@ export type PublicCompanyProfileDto = {
     contacts: {
         email?: string;
         phone?: string;
+        address?: string;
         motto?: string;
         localizations?: Array<{
             localizationInfoDto?: { code?: string };
+            address?: string;
             motto?: string;
         }>;
     };

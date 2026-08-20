@@ -14,5 +14,6 @@
     "subjectPlaceholder": "Subject",
     "messagePlaceholder": "Write your message",
     "formLabel": "Contact form",
-    "submitButton": "Send"
+    "submitButton": "Send",
+    "downloadError": "The page data could not be loaded. Please try again later."
 }

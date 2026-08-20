@@ -15,14 +15,18 @@ export const ButtonTooltip = ({ children, position = 'bottom', isRenderInPortal 
     const wrapperRef = useRef<HTMLButtonElement>(null);
     const tooltipId = useId();
 
-    const toggleTooltip = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setIsVisible((prev) => !prev);
-    };
+    const showTooltip = useCallback(() => {
+        setIsVisible(true);
+    }, []);
 
     const closeTooltip = useCallback(() => {
         setIsVisible(false);
     }, []);
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        showTooltip();
+    };
 
     useOnClickOutside({
         ignoreClickRefs: [wrapperRef],
@@ -35,7 +39,11 @@ export const ButtonTooltip = ({ children, position = 'bottom', isRenderInPortal 
             ref={wrapperRef}
             type="button"
             className="button-tooltip-wrapper"
-            onClick={toggleTooltip}
+            onClick={handleClick}
+            onMouseEnter={showTooltip}
+            onMouseLeave={closeTooltip}
+            onFocus={showTooltip}
+            onBlur={closeTooltip}
             aria-haspopup="true"
             aria-expanded={isVisible}
             aria-label="Show additional information"

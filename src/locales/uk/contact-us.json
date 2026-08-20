@@ -14,5 +14,6 @@
     "subjectPlaceholder": "Тема звернення",
     "messagePlaceholder": "Напишіть ваше повідомлення",
     "formLabel": "Форма зворотного зв'язку",
-    "submitButton": "Надіслати"
+    "submitButton": "Надіслати",
+    "downloadError": "Не вдалося завантажити дані сторінки. Будь ласка, спробуйте пізніше."
 }

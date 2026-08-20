@@ -126,7 +126,7 @@ const createProps = (overrides: any = {}): any => ({
 const getMockedApi = () => TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 const getMockedUseAdminClient = () => useAdminClient as jest.MockedFunction<typeof useAdminClient>;
 
-const openConfirmationAndConfirm = async () => {
+const openConfirmationAndConfirm = () => {
     fireEvent.click(screen.getByTestId('delete-button'));
     fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 };
@@ -181,7 +181,7 @@ describe('DeleteTeamCategoryModal', () => {
             const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
 
             rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(
@@ -197,6 +197,19 @@ describe('DeleteTeamCategoryModal', () => {
             ).not.toBeInTheDocument();
             const categorySelect = screen.getByTestId('category-select') as HTMLSelectElement;
             expect(categorySelect.value).toBe(mockCategoriesWithMembers[0].id.toString());
+        });
+
+        it('resets categoryToConfirm state when parent modal closes while confirmation is open and then reopens', () => {
+            const props = createProps({ categories: mockCategoriesNoMembers });
+            const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
+
+            fireEvent.click(screen.getByTestId('delete-button'));
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeInTheDocument();
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={false} />);
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.YES)).not.toBeInTheDocument();
         });
     });
 
@@ -287,7 +300,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             expect(within(getMainModal()).getByTestId('delete-button')).toBeDisabled();
             await act(async () => resolveDelete());
@@ -299,7 +312,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(getMockedApi().delete).toHaveBeenCalledWith(mockClient, mockCategoriesNoMembers[0].id);
@@ -314,7 +327,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(
@@ -394,7 +407,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             const mainModal = getMainModal();
             fireEvent.click(within(mainModal).getByTestId('close-modal'));
@@ -409,7 +422,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             expect(within(getMainModal()).getByTestId('cancel-button')).toBeDisabled();
             await act(async () => resolveDelete());
@@ -421,7 +434,7 @@ describe('DeleteTeamCategoryModal', () => {
             const resolveDelete = setupSlowDelete();
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             const categorySelect = screen.getByTestId('category-select');
             expect(categorySelect).toBeDisabled();
@@ -456,7 +469,7 @@ describe('DeleteTeamCategoryModal', () => {
 
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
-            await openConfirmationAndConfirm();
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 const errorContainer = document.querySelector('.team-category-modal-error-container');

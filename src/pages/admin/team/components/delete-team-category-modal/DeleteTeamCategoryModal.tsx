@@ -63,7 +63,10 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
     };
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            setCategoryToConfirm(null);
+            return;
+        }
 
         setError('');
         if (categories.length > 0) {

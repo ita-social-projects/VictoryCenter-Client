@@ -96,6 +96,18 @@ describe('TranslationControls', () => {
         expect(button).toHaveAttribute('aria-hidden', 'false');
     });
 
+    it('centers the container when the generate button is hidden (default)', () => {
+        const { container } = render(<TranslationControls {...defaultProps} />);
+
+        expect(container.firstChild).not.toHaveClass('has-generate-button');
+    });
+
+    it('left-aligns the container when the generate button is shown', () => {
+        const { container } = render(<TranslationControls {...defaultProps} hideGenerateButton={false} />);
+
+        expect(container.firstChild).toHaveClass('has-generate-button');
+    });
+
     it.skip('disables the button when isSubmitting is true', () => {
         render(<TranslationControls {...defaultProps} isSubmitting={true} />);
 

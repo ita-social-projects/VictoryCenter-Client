@@ -24,7 +24,7 @@ export const TranslationControls = ({
     hideGenerateButton = true,
 }: TranslationControlsProps) => {
     return (
-        <div className={styles.container}>
+        <div className={cn(styles.container, { [styles['has-generate-button']]: !hideGenerateButton })}>
             <div className={styles['language-select']}>
                 {selectedLanguage && (
                     <Select<string>

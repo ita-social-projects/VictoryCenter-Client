@@ -84,12 +84,12 @@ export const ContactUsPage: React.FC = () => {
                     onCopyPhone={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.phone)}
                 />
                 <ContactFormCard
-                    title={CONTACT_US_PAGE_DATA.formLabel}
-                    namePlaceholder={CONTACT_US_PAGE_DATA.namePlaceholder}
-                    emailPlaceholder={CONTACT_US_PAGE_DATA.emailPlaceholder}
-                    subjectPlaceholder={CONTACT_US_PAGE_DATA.subjectPlaceholder}
-                    messagePlaceholder={CONTACT_US_PAGE_DATA.messagePlaceholder}
-                    submitLabel={CONTACT_US_PAGE_DATA.submitButton}
+                    title={t('formLabel')}
+                    namePlaceholder={t('namePlaceholder')}
+                    emailPlaceholder={t('emailPlaceholder')}
+                    subjectPlaceholder={t('subjectPlaceholder')}
+                    messagePlaceholder={t('messagePlaceholder')}
+                    submitLabel={t('submitButton')}
                 />
             </div>
         </section>

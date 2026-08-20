@@ -25,6 +25,25 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
         });
 
+        it('should remove leading zeros from the integer part', () => {
+            expect(normalizeFundsExpendituresAmountInput('00000001')).toBe('1');
+            expect(normalizeFundsExpendituresAmountInput('0050')).toBe('50');
+        });
+
+        it('should leave a single zero if the integer part is only zeros', () => {
+            expect(normalizeFundsExpendituresAmountInput('00000')).toBe('0');
+            expect(normalizeFundsExpendituresAmountInput('0')).toBe('0');
+        });
+
+        it('should remove leading zeros but preserve decimal parts', () => {
+            expect(normalizeFundsExpendituresAmountInput('0005,50')).toBe('5,50');
+            expect(normalizeFundsExpendituresAmountInput('0000,50')).toBe('0,50');
+        });
+
+        it('should handle leading zeros with dot separator correctly', () => {
+            expect(normalizeFundsExpendituresAmountInput('0012.34')).toBe('12,34');
+        });
+
         it('should drop trailing comma when trimEnd is true and no decimal digits exist', () => {
             expect(normalizeFundsExpendituresAmountInput('1 200,', true)).toBe('1 200');
         });
@@ -63,18 +82,6 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should return numeric error for non-digit input', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
-            );
-        });
-
-        it('should return numeric error for integer with a leading zero', () => {
-            expect(validateFundsExpendituresAmount('012345678', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
-            );
-        });
-
-        it('should return numeric error for decimal with a leading zero before the comma', () => {
-            expect(validateFundsExpendituresAmount('01,50', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
         });

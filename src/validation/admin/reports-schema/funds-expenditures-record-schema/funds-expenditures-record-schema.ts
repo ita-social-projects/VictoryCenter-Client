@@ -14,13 +14,14 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
+const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
+
 export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
     if (!value) {
         return '';
     }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
-
     withCommaSeparator = withCommaSeparator.replace(/^-\s+/, '-');
 
     const isNegative = withCommaSeparator.startsWith('-');
@@ -32,10 +33,12 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
     if (firstCommaIndex === -1) {
-        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+        const noZeros = stripLeadingZeros(withCommaSeparator);
+        return trimEnd ? noZeros.trim() : noZeros;
     }
 
-    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const rawIntegerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const integerPart = stripLeadingZeros(rawIntegerPart);
     const decimalPart = withCommaSeparator
         .slice(firstCommaIndex + 1)
         .replaceAll(/[\s,]/g, '')

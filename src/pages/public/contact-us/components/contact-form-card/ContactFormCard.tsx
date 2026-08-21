@@ -22,38 +22,19 @@ interface ContactFormCardProps {
     submitLabel: string;
 }
 
-const getSubjectHint = (
+const getCharacterLimitHint = (
     length: number,
+    maxLength: number,
+    warnAt: number,
     t: TFunction<'contactUsPage', undefined>,
-): { text: string; type: 'warn' | 'error' } | null => {
-    if (length >= CONTACT_FORM_LIMITS.SUBJECT.MAX) {
-        return { text: t('contactForm.limitReached'), type: 'error' };
+): string | null => {
+    if (length >= maxLength) {
+        return t('contactForm.limitReached');
     }
-    if (length >= CONTACT_FORM_LIMITS.SUBJECT.WARN_AT) {
-        return {
-            text: t('contactForm.charactersRemaining', {
-                count: CONTACT_FORM_LIMITS.SUBJECT.MAX - length,
-            }),
-            type: 'warn',
-        };
-    }
-    return null;
-};
-
-const getMessageHint = (
-    length: number,
-    t: TFunction<'contactUsPage', undefined>,
-): { text: string; type: 'warn' | 'error' } | null => {
-    if (length >= CONTACT_FORM_LIMITS.MESSAGE.MAX) {
-        return { text: t('contactForm.limitReached'), type: 'error' };
-    }
-    if (length >= CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) {
-        return {
-            text: t('contactForm.charactersRemaining', {
-                count: CONTACT_FORM_LIMITS.MESSAGE.MAX - length,
-            }),
-            type: 'warn',
-        };
+    if (length >= warnAt) {
+        return t('contactForm.charactersRemaining', {
+            count: maxLength - length,
+        });
     }
     return null;
 };
@@ -112,8 +93,18 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     const subjectValue = watch('subject') ?? '';
     const messageValue = watch('message') ?? '';
 
-    const subjectHint = getSubjectHint(subjectValue.length, t);
-    const messageHint = getMessageHint(messageValue.length, t);
+    const subjectHint = getCharacterLimitHint(
+        subjectValue.length,
+        CONTACT_FORM_LIMITS.SUBJECT.MAX,
+        CONTACT_FORM_LIMITS.SUBJECT.WARN_AT,
+        t,
+    );
+    const messageHint = getCharacterLimitHint(
+        messageValue.length,
+        CONTACT_FORM_LIMITS.MESSAGE.MAX,
+        CONTACT_FORM_LIMITS.MESSAGE.WARN_AT,
+        t,
+    );
 
     const onSubmit = async (data: ContactFormData) => {
         if (!turnstileToken) return;
@@ -202,16 +193,8 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                         </span>
                     )}
                     {!errors.subject && subjectHint && (
-                        <span
-                            className={
-                                subjectHint.type === 'error'
-                                    ? styles['contact-form-message--error']
-                                    : styles['contact-form-message--info']
-                            }
-                            role="status"
-                            aria-live="polite"
-                        >
-                            {subjectHint.text}
+                        <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
+                            {subjectHint}
                         </span>
                     )}
                 </div>
@@ -232,16 +215,8 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                         </span>
                     )}
                     {!errors.message && messageHint && (
-                        <span
-                            className={
-                                messageHint.type === 'error'
-                                    ? styles['contact-form-message--error']
-                                    : styles['contact-form-message--info']
-                            }
-                            role="status"
-                            aria-live="polite"
-                        >
-                            {messageHint.text}
+                        <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
+                            {messageHint}
                         </span>
                     )}
                 </div>

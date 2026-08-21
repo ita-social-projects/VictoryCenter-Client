@@ -19,13 +19,15 @@
     "contactForm": {
         "nameRequired": "Введіть Ваше ім'я",
         "emailRequired": "Введіть E-mail для зв'язку",
-        "emailInvalid": "Не вірний E-mail",
+        "emailInvalid": "Некоректний E-mail",
         "subjectRequired": "Введіть тему звернення",
-        "subjectMinLengthError": "Мін 5 символів",
+        "subjectMinLengthError": "Мінімум 5 символів",
         "limitReached": "Ліміт символів вичерпано",
-        "charactersRemaining": "Залишилось {{count}} символів",
+        "charactersRemaining_one": "Залишився {{count}} символ",
+        "charactersRemaining_few": "Залишилось {{count}} символи",
+        "charactersRemaining_many": "Залишилось {{count}} символів",
         "messageRequired": "Введіть повідомлення",
-        "messageMinLengthError": "Мін 10 символів",
+        "messageMinLengthError": "Мінімум 10 символів",
         "submitSuccess": "Ваш запит надіслано успішно. Очікуйте на відповідь.",
         "submitError": "Сталася помилка. Спробуйте пізніше."
     }

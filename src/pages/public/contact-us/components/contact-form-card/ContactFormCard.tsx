@@ -121,7 +121,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
             reset();
             resetTurnstile();
             showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
-        } catch (error) {
+        } catch {
             showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }
     };
@@ -141,7 +141,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
             >
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.name ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={`${styles['contact-form-field']}${errors.name ? ' ' + styles['contact-form-field--error'] : ''}`}
                     >
                         <input
                             type="text"
@@ -159,7 +159,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.email ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={`${styles['contact-form-field']}${errors.email ? ' ' + styles['contact-form-field--error'] : ''}`}
                     >
                         <input
                             type="email"
@@ -177,7 +177,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.subject ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={`${styles['contact-form-field']}${errors.subject ? ' ' + styles['contact-form-field--error'] : ''}`}
                     >
                         <input
                             type="text"

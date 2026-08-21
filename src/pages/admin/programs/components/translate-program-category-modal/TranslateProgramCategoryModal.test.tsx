@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
-import { LocalizationLanguage } from '@/types/common/language';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 import { TranslateProgramCategoryModal } from './TranslateProgramCategoryModal';
 
 let mockFormIsValid = true;
@@ -16,11 +16,20 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
 }));
 
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
-    TranslationControls: ({ selectedLanguage, languages, onLanguageChange, isSubmitting }: any) => (
+    TranslationControls: ({
+        selectedLanguage,
+        languages,
+        onLanguageChange,
+        isSubmitting,
+        generateDisabled,
+        hideGenerateButton,
+    }: any) => (
         <div data-testid="translation-controls">
             <span data-testid="selected-language">{selectedLanguage?.code ?? 'none'}</span>
             <span data-testid="is-submitting">{String(isSubmitting)}</span>
             <span data-testid="languages-count">{String(languages?.length ?? 0)}</span>
+            <span data-testid="generate-disabled">{String(generateDisabled)}</span>
+            <span data-testid="hide-generate-button">{String(hideGenerateButton)}</span>
             <button
                 data-testid="choose-last-language"
                 onClick={() => onLanguageChange?.(languages?.[languages.length - 1] ?? null)}
@@ -36,7 +45,10 @@ jest.mock('../translate-program-category-form/TranslateProgramCategoryForm', () 
 
     return {
         TranslateProgramCategoryForm: React.forwardRef(
-            ({ onSubmit, onValidationChange, onDirtyChange, categories }: any, ref: React.Ref<any>) => {
+            (
+                { onSubmit, onValidationChange, onDirtyChange, onCategoryChange, categories, initialData }: any,
+                ref: React.Ref<any>,
+            ) => {
                 React.useImperativeHandle(ref, () => ({
                     submit: () => {
                         mockFormSubmit();
@@ -55,7 +67,21 @@ jest.mock('../translate-program-category-form/TranslateProgramCategoryForm', () 
                     <div
                         data-testid="translate-program-category-form"
                         data-categories={String(categories?.length ?? 0)}
-                    />
+                        data-initial={initialData ? JSON.stringify(initialData) : 'null'}
+                    >
+                        {categories?.map((category: ProgramCategory) => (
+                            <button
+                                key={category.id}
+                                data-testid={`select-category-${category.id}`}
+                                onClick={() => onCategoryChange?.(category)}
+                            >
+                                {category.name}
+                            </button>
+                        ))}
+                        <button data-testid="clear-category" onClick={() => onCategoryChange?.(null)}>
+                            clear
+                        </button>
+                    </div>
                 );
             },
         ),
@@ -74,10 +100,22 @@ const PL_LANGUAGE: LocalizationLanguage = {
     name: 'Polish',
 };
 
-const CATEGORY_LIST: ProgramCategory[] = [
-    { id: 1, name: 'Category 1', programsCount: 2 },
-    { id: 2, name: 'Category 2', programsCount: 4 },
-];
+const CATEGORY_WITHOUT_LOCALIZATION: ProgramCategory = { id: 1, name: 'Category 1', programsCount: 2 };
+
+const CATEGORY_WITH_EN_LOCALIZATION: ProgramCategory = {
+    id: 2,
+    name: 'Category 2',
+    programsCount: 4,
+    localizations: [
+        {
+            name: 'Category 2 EN',
+            language: { id: EN_LANGUAGE.id, code: EN_LANGUAGE.code },
+            translationStatus: TranslationStatus.Relevant,
+        },
+    ],
+};
+
+const CATEGORY_LIST: ProgramCategory[] = [CATEGORY_WITHOUT_LOCALIZATION, CATEGORY_WITH_EN_LOCALIZATION];
 
 describe('TranslateProgramCategoryModal', () => {
     const renderModal = (props: Partial<React.ComponentProps<typeof TranslateProgramCategoryModal>> = {}) => {
@@ -97,9 +135,63 @@ describe('TranslateProgramCategoryModal', () => {
         mockFormIsDirty = true;
     });
 
-    it('always renders with the "Додати переклад" title', () => {
+    it('renders with the "Додати переклад" title before a category is selected', () => {
         renderModal();
 
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        );
+    });
+
+    it('keeps Generate visible (never hidden) and disables it before a category is selected, enables it once one is chosen', () => {
+        renderModal();
+
+        expect(screen.getByTestId('hide-generate-button')).toHaveTextContent('false');
+        expect(screen.getByTestId('generate-disabled')).toHaveTextContent('true');
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
+
+        expect(screen.getByTestId('hide-generate-button')).toHaveTextContent('false');
+        expect(screen.getByTestId('generate-disabled')).toHaveTextContent('false');
+    });
+
+    it('switches to edit mode and prefills the form when the selected category already has an EN translation', () => {
+        renderModal();
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITH_EN_LOCALIZATION.id}`));
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+        );
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute(
+            'data-initial',
+            JSON.stringify({ categoryId: CATEGORY_WITH_EN_LOCALIZATION.id, name: 'Category 2 EN' }),
+        );
+    });
+
+    it('stays in add mode with an empty prefill when the selected category has no EN translation', () => {
+        renderModal();
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        );
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute(
+            'data-initial',
+            JSON.stringify({ categoryId: CATEGORY_WITHOUT_LOCALIZATION.id, name: '' }),
+        );
+    });
+
+    it('recomputes mode and prefill when switching between categories', () => {
+        renderModal();
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITH_EN_LOCALIZATION.id}`));
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+        );
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
         expect(screen.getByTestId('modal-title')).toHaveTextContent(
             COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
         );
@@ -253,5 +345,46 @@ describe('TranslateProgramCategoryModal', () => {
         );
 
         expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
+    });
+
+    it('resets the selected category (and with it, mode/prefill) when reopened after being closed', () => {
+        const onClose = jest.fn();
+
+        const { rerender } = render(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITH_EN_LOCALIZATION.id}`));
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+        );
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={false}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        );
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute('data-initial', 'null');
     });
 });

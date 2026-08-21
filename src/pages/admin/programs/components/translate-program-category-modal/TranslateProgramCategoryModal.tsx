@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ModalMode } from '@/types/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { LocalizationLanguage } from '@/types/common/language';
 import {
@@ -26,6 +27,7 @@ export const TranslateProgramCategoryModal = ({
     const formRef = useRef<TranslateProgramCategoryFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
 
     const englishLanguages = useMemo(() => translatedLanguages.filter((l) => l.code === 'en'), [translatedLanguages]);
 
@@ -44,8 +46,22 @@ export const TranslateProgramCategoryModal = ({
         if (!wasOpen && isOpen) {
             setIsFormValid(false);
             setIsDirty(false);
+            setSelectedCategory(null);
         }
     }, [isOpen]);
+
+    const existingLocalization = useMemo(() => {
+        if (!selectedCategory?.localizations || !language) return null;
+        return selectedCategory.localizations.find((loc) => loc.language.id === language.id) ?? null;
+    }, [selectedCategory, language]);
+
+    const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
+    const isEditMode = mode === ModalMode.Edit;
+
+    const initialData = useMemo<TranslateProgramCategoryFormValues | null>(() => {
+        if (!selectedCategory) return null;
+        return { categoryId: selectedCategory.id, name: existingLocalization?.name ?? '' };
+    }, [selectedCategory, existingLocalization]);
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;
@@ -59,11 +75,15 @@ export const TranslateProgramCategoryModal = ({
     // TODO: wire real persistence (create/update translation, close on success, toast, badge update) — see US #1858.
     const handleFormSubmit = async (_data: TranslateProgramCategoryFormValues) => {};
 
+    const modalTitle = isEditMode
+        ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
+        : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
+
     return (
         <LocalizationModal
             isOpen={isOpen}
             onClose={onClose}
-            title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+            title={modalTitle}
             onSave={handleSaveClick}
             isSubmitting={false}
             isFormValid={isFormValid}
@@ -76,11 +96,16 @@ export const TranslateProgramCategoryModal = ({
                     isSubmitting={false}
                     languages={englishLanguages}
                     onLanguageChange={setLanguage}
+                    generateDisabled={!selectedCategory}
+                    hideGenerateButton={false}
                 />
             )}
             <TranslateProgramCategoryForm
                 ref={formRef}
                 categories={categories}
+                selectedCategory={selectedCategory}
+                initialData={initialData}
+                onCategoryChange={setSelectedCategory}
                 onValidationChange={setIsFormValid}
                 onDirtyChange={setIsDirty}
                 onSubmit={handleFormSubmit}

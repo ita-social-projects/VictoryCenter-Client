@@ -9,6 +9,10 @@
     align-items: center;
     gap: 10px;
     margin: 0.5rem 0;
+
+    &.has-generate-button {
+        justify-content: flex-start;
+    }
 }
 
 .language-select {

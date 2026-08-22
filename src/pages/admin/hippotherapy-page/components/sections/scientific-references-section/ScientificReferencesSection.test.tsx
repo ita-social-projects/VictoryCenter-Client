@@ -98,6 +98,16 @@ describe('ScientificReferencesSection', () => {
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
     });
 
+    it('calls onChange with the updated description', () => {
+        renderComponent();
+
+        fireEvent.change(screen.getByTestId('mock-rich-input-scientific-references-description'), {
+            target: { value: 'New description' },
+        });
+
+        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
+    });
+
     it('hides delete on every card once only one reference remains', () => {
         renderComponent({ value: { ...defaultValue, scientificReferences: [defaultValue.scientificReferences[0]] } });
 
@@ -162,5 +172,23 @@ describe('ScientificReferencesSection', () => {
 
         const errors = screen.getAllByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
         expect(errors).toHaveLength(2);
+    });
+
+    it('re-validates the name and url as soon as they change once an error has already been shown', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [{ localId: 'ref-1', id: 1, name: '', url: '' }],
+            },
+        });
+
+        fireEvent.blur(screen.getByTestId('name-input-ref-1'));
+        fireEvent.blur(screen.getByTestId('url-input-ref-1'));
+        expect(screen.getAllByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toHaveLength(2);
+
+        fireEvent.change(screen.getByTestId('name-input-ref-1'), { target: { value: 'Fixed name' } });
+        fireEvent.change(screen.getByTestId('url-input-ref-1'), { target: { value: 'https://example.com/fixed' } });
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
     });
 });

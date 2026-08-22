@@ -35,6 +35,7 @@ import { HistoryPageContent } from '@/pages/admin/history/components/history-pag
 import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
 import { MainPage } from '@/pages/public/main-page/MainPage';
 import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
+import { HippotherapyPageAdmin } from '@/pages/admin/hippotherapy-page/HippotherapyPageAdmin';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -93,6 +94,7 @@ export const AppRouter = () => {
                             <Route path={ADMIN_ROUTES.REPORTS.PATH} element={<ReportsPanelContent />} />
                             <Route path={ADMIN_ROUTES.HISTORY.PATH} element={<HistoryPageContent />} />
                             <Route path={ADMIN_ROUTES.MAIN.PATH} element={<MainPageContent />} />
+                            <Route path={ADMIN_ROUTES.HIPPOTHERAPY.PATH} element={<HippotherapyPageAdmin />} />
                         </Route>
                     </Route>
                 </Route>

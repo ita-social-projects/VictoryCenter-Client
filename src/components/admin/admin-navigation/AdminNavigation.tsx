@@ -56,6 +56,10 @@ export const AdminNavigation = () => {
             link: ADMIN_ROUTES.PARTNERS.FULL,
             text: COMMON_TEXT_ADMIN.TAB.PARTNERS,
         },
+        {
+            link: ADMIN_ROUTES.HIPPOTHERAPY.FULL,
+            text: COMMON_TEXT_ADMIN.TAB.HIPPOTHERAPY,
+        },
     ];
 
     return (

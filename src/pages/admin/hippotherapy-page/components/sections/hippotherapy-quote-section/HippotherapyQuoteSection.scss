@@ -1,0 +1,28 @@
+@use '@/assets/sass/variables/colors';
+
+.hippotherapy-quote-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    &-image {
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    &-fields {
+        display: flex;
+        gap: 32px;
+
+        > * {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+    }
+
+    &-error {
+        color: colors.$error;
+        font-size: 14px;
+    }
+}

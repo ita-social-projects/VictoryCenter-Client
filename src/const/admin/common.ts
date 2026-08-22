@@ -11,6 +11,7 @@ export const COMMON_TEXT_ADMIN = {
         WHO_WE_ARE: 'Хто ми',
         EVENTS: 'Новини і події',
         PARTNERS: 'Партнери',
+        HIPPOTHERAPY: 'Іпотерапія',
     },
 
     ALT: {

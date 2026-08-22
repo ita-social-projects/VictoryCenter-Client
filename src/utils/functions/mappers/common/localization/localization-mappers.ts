@@ -17,11 +17,12 @@ export type LocalizationLanguageSource = {
 export function mapLocalizationDtoToModel<TDto extends EntityLocalizationDto, TModel extends EntityLocalization>(
     dto: TDto,
 ): Omit<TDto, 'localizationInfoDto'> & TModel {
+    const raw = dto as unknown as { localizationInfoDto?: TModel['language']; language?: TModel['language'] };
     const { localizationInfoDto, ...rest } = dto;
 
     return {
         ...rest,
-        language: localizationInfoDto,
+        language: localizationInfoDto ?? raw.language,
     } as Omit<TDto, 'localizationInfoDto'> & TModel;
 }
 

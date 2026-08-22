@@ -1490,6 +1490,38 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
             expect.objectContaining({ programExpendituresReportingYear: 2024 }),
         );
     });
+
+    it('should call onExchangeRateValueChange with valid exchange rate', () => {
+        const onExchangeRateValueChange = jest.fn();
+
+        render(
+            <FundsExpenditureSection
+                isEditing
+                draftExchangeRate="41.25"
+                onExchangeRateValueChange={onExchangeRateValueChange}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('blur-rate'));
+
+        expect(onExchangeRateValueChange).toHaveBeenCalledWith('41,25');
+    });
+
+    it('should call onExchangeRateValueChange with invalid exchange rate', () => {
+        const onExchangeRateValueChange = jest.fn();
+
+        render(
+            <FundsExpenditureSection
+                isEditing
+                draftExchangeRate={null}
+                onExchangeRateValueChange={onExchangeRateValueChange}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('change-rate-invalid'));
+
+        expect(onExchangeRateValueChange).toHaveBeenCalledWith('abc');
+    });
 });
 
 describe('FundsExpenditureSection fetch handler delegation', () => {

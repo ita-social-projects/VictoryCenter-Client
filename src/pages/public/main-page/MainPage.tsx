@@ -12,6 +12,7 @@ import { MainProgramsSection } from './main-programs-section/MainProgramsSection
 import { MainStatisticsSection } from './main-statistics-section/MainStatisticsSection';
 import { DonationSection } from './danatation-section/DonationSection';
 import styles from './MainPage.module.scss';
+import { AboutUsSection } from './about-us/AboutUsSection';
 
 const getFilledText = (...values: Array<string | null | undefined>): string => {
     return values.find((value) => value?.trim())?.trim() ?? '';
@@ -65,6 +66,7 @@ export const MainPage = () => {
     return (
         <div className={styles.page}>
             <IntroSection introData={introData} buttonHref={PUBLIC_ROUTES.PROGRAMS.FULL} />
+            <AboutUsSection mainAboutUs={mainPageData?.mainAboutUs} />
             <MainProgramsSection />
             <MainStatisticsSection impactStatistics={mainPageData?.impactStatistics} />
             <DonationSection donationData={mainPageData?.mainDonations} />

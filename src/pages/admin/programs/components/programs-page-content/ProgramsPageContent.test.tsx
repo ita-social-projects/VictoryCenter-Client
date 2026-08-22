@@ -131,6 +131,9 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
             <button data-testid="ctx-delete" onClick={() => onContextMenuOptionSelected?.('delete')}>
                 Delete Category
             </button>
+            <button data-testid="ctx-addTranslation" onClick={() => onContextMenuOptionSelected?.('addTranslation')}>
+                Add Translation
+            </button>
         </div>
     ),
 }));
@@ -494,6 +497,7 @@ describe('ProgramsPageContent', () => {
             openAddCategoryModal: jest.fn(),
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
+            openTranslateCategoryModal: jest.fn(),
         };
 
         closeActions = {
@@ -512,6 +516,7 @@ describe('ProgramsPageContent', () => {
                 isAddCategoryModalOpen: false,
                 isEditCategoryModalOpen: false,
                 isDeleteCategoryModalOpen: false,
+                isCategoryToTranslate: false,
                 itemToEdit: null,
                 itemToDelete: null,
                 itemToTranslate: null,
@@ -633,6 +638,9 @@ describe('ProgramsPageContent', () => {
 
         fireEvent.click(screen.getByTestId('ctx-delete'));
         expect(openActions.openDeleteCategoryModal).toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId('ctx-addTranslation'));
+        expect(openActions.openTranslateCategoryModal).toHaveBeenCalled();
     });
 
     it('shows loader when data is loading', async () => {

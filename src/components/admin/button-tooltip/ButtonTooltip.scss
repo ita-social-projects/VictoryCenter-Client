@@ -14,7 +14,7 @@
     display: flex;
 
     &:hover,
-    &:focus {
+    &:focus-visible {
         background-color: colors.$blue-50;
     }
 }

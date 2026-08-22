@@ -470,6 +470,7 @@ export const ProgramsPageContent = () => {
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
             { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'addTranslation', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );
@@ -482,6 +483,8 @@ export const ProgramsPageContent = () => {
                 openModalActions.openEditCategoryModal();
             } else if (id === 'delete') {
                 openModalActions.openDeleteCategoryModal();
+            } else if (id === 'addTranslation') {
+                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],

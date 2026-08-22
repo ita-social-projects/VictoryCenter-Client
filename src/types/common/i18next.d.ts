@@ -14,6 +14,7 @@ import {
     contactUsPageUk,
     mainPageUk,
     historyPageUk,
+    notFoundPageUk,
 } from '../../locales/uk';
 
 declare module 'i18next' {
@@ -34,6 +35,7 @@ declare module 'i18next' {
             contactUsPage: typeof contactUsPageUk;
             mainPage: typeof mainPageUk;
             historyPage: typeof historyPageUk;
+            notFoundPage: typeof notFoundPageUk;
         };
     }
 }

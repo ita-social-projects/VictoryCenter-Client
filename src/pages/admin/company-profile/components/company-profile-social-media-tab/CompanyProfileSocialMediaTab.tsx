@@ -102,7 +102,11 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                 <h2 className={styles['social-media-tab-title']}>
                     {COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE}
                 </h2>
-                <ButtonTooltip position="bottom">Опубліковано на: Профайл</ButtonTooltip>
+                <ButtonTooltip position="bottom">
+                    <span className={styles['social-media-tooltip-text']}>
+                        {COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.TOOLTIP}
+                    </span>
+                </ButtonTooltip>
             </div>
 
             {!disabled && (

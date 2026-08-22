@@ -6,6 +6,7 @@ import { DeleteProgramModal } from './delete-program-modal/DeleteProgramModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
 import { TranslateProgramModal } from '../translate-program-modal/TranslateProgramModal';
+import { TranslateProgramCategoryModal } from '../translate-program-category-modal/TranslateProgramCategoryModal';
 import { ModalMode } from '@/types/admin/common';
 
 export interface ProgramsPageModalsProps {
@@ -92,6 +93,15 @@ export const ProgramsPageModals = ({
                 onDeleteCategory={onDeleteCategory}
                 categories={categories}
             />
+
+            {modalState.isCategoryToTranslate && (
+                <TranslateProgramCategoryModal
+                    isOpen={modalState.isCategoryToTranslate}
+                    onClose={closeModalActions.closeTranslateCategoryModal}
+                    categories={categories}
+                    translatedLanguages={translatedLanguages}
+                />
+            )}
         </>
     );
 };

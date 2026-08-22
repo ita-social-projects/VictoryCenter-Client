@@ -12,6 +12,7 @@ import { LocalizationLanguage } from '@/types/common/language';
 import styles from './PartnerForm.module.scss';
 import './PartnerForm.scss';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 
 export interface PartnerFormValues {
     localId: string;
@@ -70,7 +71,7 @@ const PartnerFormComponent = ({
     const handleImageError = useCallback(
         (error: string | null) => {
             if (!isBaseLanguage) return;
-            if (!error) {
+            if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
                 return;
             }
             onValuesChange({ ...values }, { ...errors, image: error });

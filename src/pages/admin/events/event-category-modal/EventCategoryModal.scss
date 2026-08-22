@@ -1,0 +1,11 @@
+.event-category-modal {
+    &-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+
+    &-save-button {
+        width: 100% !important;
+    }
+}

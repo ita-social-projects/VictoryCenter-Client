@@ -6,7 +6,10 @@ import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-s
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import './EventCategoryModal.scss';
+import { EVENT_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-schema/event-category-schema';
+import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
 
 interface EventCategoryFormValues {
     name: string;
@@ -48,6 +51,10 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     const [errors, setErrors] = useState<FormErrorState>({});
     const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [initialFormState, setInitialFormState] = useState<EventCategoryFormValues>(defaultFormState);
+
+    const isDirty = JSON.stringify(formState) !== JSON.stringify(initialFormState);
 
     const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setFormState((prev) => ({
@@ -75,74 +82,117 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
             return;
         }
 
-        if (mode === ModalMode.Edit && categories.length > 0) {
-            const firstCategory = categories[0];
+        setSelectedCategory(null);
+        setFormState(defaultFormState);
+        setErrors({});
+    }, [isOpen, defaultFormState]);
 
-            setSelectedCategory(firstCategory);
+    const handleClose = useCallback(() => {
+        if (isSubmitting)
+            return;
 
-            setFormState({
-                name: firstCategory.name,
-            });
-        } else {
-            setSelectedCategory(null);
-            setFormState(defaultFormState);
+        if (isDirty) {
+            setShowCloseConfirmModal(true);
+            return;
         }
-    }, [isOpen, mode, categories, defaultFormState]);
 
-    const handleSubmit = useCallback(async () => {
-        // TODO: add implementation.
+        onClose();
+    }, [isSubmitting, isDirty, onClose]);
+
+    const handleConfirmClose = useCallback(() => {
+        setShowCloseConfirmModal(false);
+        onClose();
+    }, [onClose]);
+
+    const handleCloseConfirmModalClose = useCallback(() => {
+        setShowCloseConfirmModal(false);
     }, []);
 
+    const handleNameBlur = useCallback(() => {
+        const error = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        setErrors((prev) => ({ ...prev, name: error }));
+    }, [formState.name]);
+
+    const isSubmitDisabled = () => {
+        const nameValidationError = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        const hasValidationErrors = nameValidationError !== undefined;
+        const hasEmptyFields = !formState.name.trim();
+
+        if (mode === ModalMode.Edit) {
+            const hasNoSelectedCategory = !selectedCategory;
+
+            const noChanges =
+                !!selectedCategory &&
+                formState.name.trim() === selectedCategory.name.trim()
+
+            return isSubmitting || hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges
+        }
+
+        return isSubmitting || hasValidationErrors || hasEmptyFields;
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <Modal.Title>
-                {mode === ModalMode.Add
-                    ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY
-                    : COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY}
-            </Modal.Title>
+        <>
+            <Modal isOpen={isOpen} onClose={handleClose}>
+                <Modal.Title>
+                    {mode === ModalMode.Add
+                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY
+                        : COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY}
+                </Modal.Title>
 
-            <Modal.Content>
-                <form>
-                    {mode === ModalMode.Edit && (
-                        <SingleSelectInputGroup
-                            id="edit-event-category-select"
-                            label={TEAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                <Modal.Content>
+                    <form className="event-category-modal-form">
+                        {mode === ModalMode.Edit && (
+                            <SingleSelectInputGroup
+                                id="edit-event-category-select"
+                                label={EVENT_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                                isRequired
+                                options={categories}
+                                getOptionId={(category) => category.id}
+                                getOptionName={(category) => category.name}
+                                disabled={isSubmitting}
+                                onChange={handleCategoryChange}
+                                placeholder={EVENT_CATEGORY_TEXT.FORM.SELECT_CATEGORY_PLACEHOLDER}
+                                value={selectedCategory || undefined}
+                            />
+                        )}
+
+                        <InputWithCharacterLimitGroup
                             isRequired
-                            options={categories}
-                            getOptionId={(category) => category.id}
-                            getOptionName={(category) => category.name}
+                            label={EVENT_CATEGORY_TEXT.FORM.LABEL.NAME}
+                            error={errors.name}
+                            value={formState.name}
+                            onChange={handleNameChange}
+                            onBlur={handleNameBlur}
+                            name="name"
+                            type="text"
+                            id="event-category-name"
                             disabled={isSubmitting}
-                            onChange={handleCategoryChange}
-                            placeholder=""
-                            value={selectedCategory || undefined}
+                            maxLength={EVENT_CATEGORY_VALIDATION.name.max}
+                            placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
                         />
-                    )}
+                    </form>
+                </Modal.Content>
 
-                    <InputWithCharacterLimitGroup
-                        isRequired
-                        label={TEAM_CATEGORY_TEXT.FORM.LABEL.NAME}
-                        error={errors.name}
-                        value={formState.name}
-                        onChange={handleNameChange}
-                        name="name"
-                        type="text"
-                        id="event-category-name"
-                        disabled={isSubmitting}
-                        maxLength={TEAM_CATEGORY_VALIDATION.name.max}
-                    />
-                </form>
-            </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        type="button"
+                        buttonStyle="primary"
+                        disabled={isSubmitDisabled()}
+                        className="event-category-modal-save-button"
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE}
+                    </Button>
+                </Modal.Actions>
+            </Modal>
 
-            <Modal.Actions>
-                <Button
-                    type="button"
-                    onClick={handleSubmit}
-                    buttonStyle="primary"
-                    disabled={isSubmitting || !formState.name.trim()}
-                >
-                    {COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
-                </Button>
-            </Modal.Actions>
-        </Modal>
+            <ConfirmationModal
+                isOpen={showCloseConfirmModal}
+                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
+                onClose={handleCloseConfirmModalClose}
+                onCancel={handleCloseConfirmModalClose}
+                onConfirm={handleConfirmClose}
+            />
+        </>
     );
 };

@@ -14,6 +14,7 @@ import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/
 import { EventCategory } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
+import { EventCategoriesApi } from './event-categories/event-categories-api';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -50,16 +51,13 @@ export const EventsPageAdmin = () => {
         setStatusFilter(status);
     }, []);
 
+    // Category handlers
     const onContextMenuOptionSelected = useCallback(
         (id: string) => {
             if (id === 'add') {
                 openModalActions.openAddCategoryModal();
             } else if (id === 'edit') {
                 openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            } else if (id === 'translate') {
-                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],
@@ -68,9 +66,7 @@ export const EventsPageAdmin = () => {
     const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );
@@ -85,15 +81,19 @@ export const EventsPageAdmin = () => {
         );
     }, []);
 
-    const handleDeleteEventCategory = useCallback((categoryIdToDelete: number) => {
-        setCategories((prev) => prev.filter((category) => category.id !== categoryIdToDelete));
-    }, []);
+    const fetchCategories = useCallback(async () => {
+        try {
+            const fetchedCategories = await EventCategoriesApi.getAll(client);
 
-    const handleTranslateEventCategory = useCallback((translatedCategory: EventCategory) => {
-        setCategories((prev) =>
-            prev.map((category) => (category.id === translatedCategory.id ? translatedCategory : category)),
-        );
-    }, []);
+            setCategories(fetchedCategories);
+        } catch {
+            setErrorState(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+        }
+    }, [client, setErrorState]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
@@ -128,14 +128,12 @@ export const EventsPageAdmin = () => {
                 />
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
+
             <EventsPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
-                selectedCategory={selectedCategory}
                 onAddEventCategory={handleAddEventCategory}
                 onEditEventCategory={handleEditEventCategory}
-                // onDeleteEventCategory={handleDeleteEventCategory}
-                // onTranslateEventCategory={handleTranslateEventCategory}
             />
         </div>
     );

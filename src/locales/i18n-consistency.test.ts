@@ -47,6 +47,10 @@ function buildAllowlistId(namespace: string, locale: string, key: string): strin
     return `${namespace}.${locale}.${key}`;
 }
 
+function buildIgnoredStructureId(namespace: string, key: string): string {
+    return `${namespace}.${key}`;
+}
+
 const LOCALES_DIR = __dirname;
 
 if (!fs.existsSync(LOCALES_DIR) || !fs.statSync(LOCALES_DIR).isDirectory()) {
@@ -68,6 +72,14 @@ for (const locale of LOCALES) {
 const ALLOWED_EMPTY_VALUES = new Set<string>([buildAllowlistId('history', 'en', 'YEAR_SUFFIX')]);
 const usedAllowlistEntries = new Set<string>();
 
+const IGNORED_STRUCTURE_KEYS = new Set<string>([
+    buildIgnoredStructureId('contact-us', 'contactForm.charactersRemaining_one'),
+    buildIgnoredStructureId('contact-us', 'contactForm.charactersRemaining_other'),
+    buildIgnoredStructureId('contact-us', 'contactForm.charactersRemaining_few'),
+    buildIgnoredStructureId('contact-us', 'contactForm.charactersRemaining_many'),
+]);
+const usedIgnoredStructureKeys = new Set<string>();
+
 const namespaces = Array.from(
     new Set(
         LOCALES.flatMap((locale) =>
@@ -84,10 +96,23 @@ describe.each(namespaces)('%s.json translation integrity', (namespace) => {
         LOCALES.map((locale) => [locale, readTranslationFile(LOCALES_DIR, locale, namespace)]),
     );
 
+    const filterIgnoredKeys = (keys: string[]) => {
+        return keys.filter((key) => {
+            const exclusionId = buildIgnoredStructureId(namespace, key);
+
+            if (IGNORED_STRUCTURE_KEYS.has(exclusionId)) {
+                usedIgnoredStructureKeys.add(exclusionId);
+                return false;
+            }
+
+            return true;
+        });
+    };
+
     it('should have identical key structure across locales', () => {
-        const baseKeys = getKeyPaths(translations[BASE_LOCALE]).sort();
+        const baseKeys = filterIgnoredKeys(getKeyPaths(translations[BASE_LOCALE])).sort();
         for (const locale of OTHER_LOCALES) {
-            expect(getKeyPaths(translations[locale]).sort()).toEqual(baseKeys);
+            expect(filterIgnoredKeys(getKeyPaths(translations[locale])).sort()).toEqual(baseKeys);
         }
     });
 
@@ -114,7 +139,8 @@ describe.each(namespaces)('%s.json translation integrity', (namespace) => {
     });
 
     it('should have matching value types across locales', () => {
-        const baseKeys = getKeyPaths(translations[BASE_LOCALE]);
+        const baseKeys = filterIgnoredKeys(getKeyPaths(translations[BASE_LOCALE]));
+
         for (const locale of OTHER_LOCALES) {
             for (const key of baseKeys) {
                 const baseValue = getValueAtPath(translations[BASE_LOCALE], key);
@@ -138,6 +164,13 @@ afterAll(() => {
         const unused = Array.from(ALLOWED_EMPTY_VALUES).filter((id) => !usedAllowlistEntries.has(id));
         throw new Error(
             `Unused entries in ALLOWED_EMPTY_VALUES (remove them or fix the key/locale/namespace): ${unused.join(', ')}`,
+        );
+    }
+
+    if (usedIgnoredStructureKeys.size !== IGNORED_STRUCTURE_KEYS.size) {
+        const unused = Array.from(IGNORED_STRUCTURE_KEYS).filter((id) => !usedIgnoredStructureKeys.has(id));
+        throw new Error(
+            `Unused entries in IGNORED_STRUCTURE_KEYS (remove them or fix the key/namespace): ${unused.join(', ')}`,
         );
     }
 });

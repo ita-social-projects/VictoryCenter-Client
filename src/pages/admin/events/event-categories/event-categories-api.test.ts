@@ -14,9 +14,7 @@ describe('EventCategoriesApi', () => {
 
             await EventCategoriesApi.getAll(client);
 
-            expect(client.get).toHaveBeenCalledWith(
-                API_ROUTES.EVENT_CATEGORIES.BASE
-            );
+            expect(client.get).toHaveBeenCalledWith(API_ROUTES.EVENT_CATEGORIES.BASE);
         });
 
         it('returns event categories from response', async () => {

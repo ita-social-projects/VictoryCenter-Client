@@ -58,10 +58,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     }) => (
         <div data-testid="category-bar">
             {contextMenuOptions.map((option) => (
-                <button
-                    key={option.id}
-                    onClick={() => onContextMenuOptionSelected(option.id)}
-                >
+                <button key={option.id} onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
                 </button>
             ))}
@@ -100,16 +97,12 @@ describe('EventsPageAdmin', () => {
     it('renders add category context menu option', () => {
         render(<EventsPageAdmin />);
 
-        expect(
-            screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY),
-        ).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY)).toBeInTheDocument();
     });
 
     it('renders edit category context menu option', () => {
         render(<EventsPageAdmin />);
-        expect(
-            screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY),
-        ).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
     });
 
     it('opens add category modal when add option is selected', async () => {
@@ -117,9 +110,7 @@ describe('EventsPageAdmin', () => {
 
         render(<EventsPageAdmin />);
 
-        await user.click(
-            screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY),
-        );
+        await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
 
         expect(mockOpenAddCategoryModal).toHaveBeenCalledTimes(1);
     });
@@ -129,9 +120,7 @@ describe('EventsPageAdmin', () => {
 
         render(<EventsPageAdmin />);
 
-        await user.click(
-            screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY),
-        );
+        await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
         expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
     });

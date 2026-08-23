@@ -88,8 +88,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     }, [isOpen, defaultFormState]);
 
     const handleClose = useCallback(() => {
-        if (isSubmitting)
-            return;
+        if (isSubmitting) return;
 
         if (isDirty) {
             setShowCloseConfirmModal(true);
@@ -121,11 +120,9 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         if (mode === ModalMode.Edit) {
             const hasNoSelectedCategory = !selectedCategory;
 
-            const noChanges =
-                !!selectedCategory &&
-                formState.name.trim() === selectedCategory.name.trim()
+            const noChanges = !!selectedCategory && formState.name.trim() === selectedCategory.name.trim();
 
-            return isSubmitting || hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges
+            return isSubmitting || hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges;
         }
 
         return isSubmitting || hasValidationErrors || hasEmptyFields;

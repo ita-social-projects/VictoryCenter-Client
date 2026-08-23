@@ -7,14 +7,11 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockValidateName = jest.fn();
 
-jest.mock(
-    '@/validation/admin/event-category-schema/event-category-schema',
-    () => ({
-        EVENT_CATEGORY_VALIDATION_FUNCTIONS: {
-            validateName: (...args: unknown[]) => mockValidateName(...args),
-        },
-    }),
-);
+jest.mock('@/validation/admin/event-category-schema/event-category-schema', () => ({
+    EVENT_CATEGORY_VALIDATION_FUNCTIONS: {
+        validateName: (...args: unknown[]) => mockValidateName(...args),
+    },
+}));
 
 jest.mock('@/components/common/modal/Modal', () => {
     const Modal = ({ isOpen, children, onClose }: any) =>
@@ -27,138 +24,85 @@ jest.mock('@/components/common/modal/Modal', () => {
             </div>
         ) : null;
 
-    Modal.Title = ({ children }: any) => (
-        <div data-testid="modal-title">{children}</div>
-    );
+    Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
 
-    Modal.Content = ({ children }: any) => (
-        <div data-testid="modal-content">{children}</div>
-    );
+    Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
 
-    Modal.Actions = ({ children }: any) => (
-        <div data-testid="modal-actions">{children}</div>
-    );
+    Modal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
 
     return { Modal };
 });
 
-jest.mock(
-    '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup',
-    () => ({
-        SingleSelectInputGroup: ({
-            options,
-            onChange,
-            value,
-            placeholder,
-            disabled,
-        }: any) => (
-            <select
-                data-testid="category-select"
-                value={value?.id ?? ''}
+jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
+    SingleSelectInputGroup: ({ options, onChange, value, placeholder, disabled }: any) => (
+        <select
+            data-testid="category-select"
+            value={value?.id ?? ''}
+            disabled={disabled}
+            onChange={(e) => {
+                const selected = options.find((category: EventCategory) => category.id === Number(e.target.value));
+
+                if (selected) {
+                    onChange(selected);
+                }
+            }}
+        >
+            <option value="">{placeholder}</option>
+
+            {options.map((category: EventCategory) => (
+                <option key={category.id} value={category.id}>
+                    {category.name}
+                </option>
+            ))}
+        </select>
+    ),
+}));
+
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, error, disabled, placeholder, name }: any) => (
+        <div>
+            <input
+                name={name}
+                value={value}
                 disabled={disabled}
-                onChange={(e) => {
-                    const selected = options.find(
-                        (category: EventCategory) =>
-                            category.id === Number(e.target.value),
-                    );
+                placeholder={placeholder}
+                onChange={onChange}
+                onBlur={onBlur}
+            />
 
-                    if (selected) {
-                        onChange(selected);
-                    }
-                }}
-            >
-                <option value="">{placeholder}</option>
-
-                {options.map((category: EventCategory) => (
-                    <option key={category.id} value={category.id}>
-                        {category.name}
-                    </option>
-                ))}
-            </select>
-        ),
-    }),
-);
-
-jest.mock(
-    '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: ({
-            value,
-            onChange,
-            onBlur,
-            error,
-            disabled,
-            placeholder,
-            name,
-        }: any) => (
-            <div>
-                <input
-                    name={name}
-                    value={value}
-                    disabled={disabled}
-                    placeholder={placeholder}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                />
-
-                {error && (
-                    <span data-testid="name-error">{error}</span>
-                )}
-            </div>
-        ),
-    }),
-);
+            {error && <span data-testid="name-error">{error}</span>}
+        </div>
+    ),
+}));
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, disabled, onClick, ...props }: any) => (
-        <button
-            {...props}
-            disabled={disabled}
-            onClick={onClick}
-        >
+        <button {...props} disabled={disabled} onClick={onClick}>
             {children}
         </button>
     ),
 }));
 
-jest.mock(
-    '@/components/admin/confirmation-modal/ConfirmationModal',
-    () => ({
-        ConfirmationModal: ({
-            isOpen,
-            title,
-            onClose,
-            onCancel,
-            onConfirm,
-        }: any) =>
-            isOpen ? (
-                <div data-testid="confirmation-modal">
-                    <span>{title}</span>
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onClose, onCancel, onConfirm }: any) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal">
+                <span>{title}</span>
 
-                    <button
-                        data-testid="confirmation-close"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
+                <button data-testid="confirmation-close" onClick={onClose}>
+                    Close
+                </button>
 
-                    <button
-                        data-testid="confirmation-cancel"
-                        onClick={onCancel}
-                    >
-                        Cancel
-                    </button>
+                <button data-testid="confirmation-cancel" onClick={onCancel}>
+                    Cancel
+                </button>
 
-                    <button
-                        data-testid="confirmation-confirm"
-                        onClick={onConfirm}
-                    >
-                        Confirm
-                    </button>
-                </div>
-            ) : null,
-    }),
-);
+                <button data-testid="confirmation-confirm" onClick={onConfirm}>
+                    Confirm
+                </button>
+            </div>
+        ) : null,
+}));
 
 const categories: EventCategory[] = [
     {
@@ -186,13 +130,7 @@ describe('EventCategoryModal', () => {
 
     describe('Add mode', () => {
         it('renders add category title', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             expect(screen.getByTestId('modal-title')).toHaveTextContent(
                 COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY,
@@ -200,31 +138,15 @@ describe('EventCategoryModal', () => {
         });
 
         it('renders name input and does not render category select', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
-            expect(
-                screen.getByRole('textbox', { name: '' }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('textbox', { name: '' })).toBeInTheDocument();
 
-            expect(
-                screen.queryByTestId('category-select'),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByTestId('category-select')).not.toBeInTheDocument();
         });
 
         it('disables save button when name is empty', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             const saveButton = screen.getByRole('button', {
                 name: COMMON_TEXT_ADMIN.BUTTON.SAVE,
@@ -234,13 +156,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('enables save button when valid name is entered', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             const input = screen.getByRole('textbox');
 
@@ -258,13 +174,7 @@ describe('EventCategoryModal', () => {
         it('disables save button when name validation fails', () => {
             mockValidateName.mockReturnValue('Name is invalid');
 
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             const input = screen.getByRole('textbox');
 
@@ -282,13 +192,7 @@ describe('EventCategoryModal', () => {
         it('sets validation error on name blur', () => {
             mockValidateName.mockReturnValue('Invalid name');
 
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             const input = screen.getByRole('textbox');
 
@@ -298,9 +202,7 @@ describe('EventCategoryModal', () => {
 
             fireEvent.blur(input);
 
-            expect(
-                screen.getByTestId('name-error'),
-            ).toHaveTextContent('Invalid name');
+            expect(screen.getByTestId('name-error')).toHaveTextContent('Invalid name');
 
             expect(mockValidateName).toHaveBeenCalledWith('Invalid name');
         });
@@ -308,13 +210,7 @@ describe('EventCategoryModal', () => {
 
     describe('Edit mode', () => {
         it('renders edit category title', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             expect(screen.getByTestId('modal-title')).toHaveTextContent(
                 COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY,
@@ -322,27 +218,13 @@ describe('EventCategoryModal', () => {
         });
 
         it('renders category select', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
-            expect(
-                screen.getByTestId('category-select'),
-            ).toBeInTheDocument();
+            expect(screen.getByTestId('category-select')).toBeInTheDocument();
         });
 
         it('disables save button when no category is selected', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             expect(
                 screen.getByRole('button', {
@@ -352,13 +234,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('fills name input after selecting a category', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             fireEvent.change(screen.getByTestId('category-select'), {
                 target: { value: '1' },
@@ -368,13 +244,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('disables save button when selected category name was not changed', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             fireEvent.change(screen.getByTestId('category-select'), {
                 target: { value: '1' },
@@ -388,13 +258,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('enables save button when selected category name is changed', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             fireEvent.change(screen.getByTestId('category-select'), {
                 target: { value: '1' },
@@ -412,13 +276,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('keeps save button disabled when only leading and trailing spaces are changed', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Edit}
-                    onEditCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} onEditCategory={jest.fn()} />);
 
             fireEvent.change(screen.getByTestId('category-select'), {
                 target: { value: '1' },
@@ -452,19 +310,11 @@ describe('EventCategoryModal', () => {
             fireEvent.click(screen.getByTestId('modal-close'));
 
             expect(onClose).toHaveBeenCalledTimes(1);
-            expect(
-                screen.queryByTestId('confirmation-modal'),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         });
 
         it('shows confirmation modal when form has unsaved changes', () => {
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             fireEvent.change(screen.getByRole('textbox'), {
                 target: { value: 'New Category' },
@@ -472,9 +322,7 @@ describe('EventCategoryModal', () => {
 
             fireEvent.click(screen.getByTestId('modal-close'));
 
-            expect(
-                screen.getByTestId('confirmation-modal'),
-            ).toBeInTheDocument();
+            expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         });
 
         it('does not close the modal when confirmation is cancelled', () => {
@@ -497,9 +345,7 @@ describe('EventCategoryModal', () => {
             fireEvent.click(screen.getByTestId('confirmation-cancel'));
 
             expect(onClose).not.toHaveBeenCalled();
-            expect(
-                screen.queryByTestId('confirmation-modal'),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         });
 
         it('closes the modal when unsaved changes are confirmed', () => {
@@ -522,31 +368,17 @@ describe('EventCategoryModal', () => {
             fireEvent.click(screen.getByTestId('confirmation-confirm'));
 
             expect(onClose).toHaveBeenCalledTimes(1);
-            expect(
-                screen.queryByTestId('confirmation-modal'),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         });
     });
 
     describe('modal opening', () => {
         it('resets form when modal is opened', () => {
             const { rerender } = render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    isOpen={false}
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
+                <EventCategoryModal {...defaultProps} isOpen={false} mode={ModalMode.Add} onAddCategory={jest.fn()} />,
             );
 
-            rerender(
-                <EventCategoryModal
-                    {...defaultProps}
-                    isOpen
-                    mode={ModalMode.Add}
-                    onAddCategory={jest.fn()}
-                />,
-            );
+            rerender(<EventCategoryModal {...defaultProps} isOpen mode={ModalMode.Add} onAddCategory={jest.fn()} />);
 
             expect(screen.getByRole('textbox')).toHaveValue('');
         });

@@ -92,7 +92,7 @@ describe('ContactUsPage', () => {
 
         expect(detailsSection.getAttribute('data-props')).toContain(CONTACT_US_PAGE_DATA.contacts.email);
         expect(detailsSection.getAttribute('data-props')).toContain('Україна, 04116. (юридична адреса)');
-        expect(formCard.getAttribute('data-props')).toContain("Ваше ім'я");
+        expect(formCard.getAttribute('data-props')).toContain('formLabel');
     });
 
     it('copies email and phone via contact details callbacks', async () => {

@@ -13,7 +13,8 @@ export const HIPPOTHERAPY_PAGE_TEXT = {
     FAIL_TO_FETCH: 'Виникла помилка, не вдалось завантажити сторінку "Іпотерапія"',
     EMPTY_STATE_NOTICE:
         'Ця сторінка ще не має контенту. Заповніть поля нижче та натисніть "Опублікувати", щоб створити її.',
-    MIN_LENGTH: 10,
+    MIN_TITLE_LENGTH: 5,
+    MIN_TEXT_LENGTH: 10,
     LABEL: {
         ADDITIONAL_DESCRIPTION: 'Додатковий опис',
         CITATION_NAME: 'Назва',
@@ -34,7 +35,7 @@ export const HIPPOTHERAPY_PAGE_CHAR_LIMITS = {
     QUOTE_AUTHOR: 50,
     HIPPOVENTION_CENTER_TITLE: 50,
     HIPPOVENTION_CENTER_PROS: 300,
-    HIPPOVENTION_CENTER_DESCRIPTION: 300,
+    HIPPOVENTION_CENTER_DESCRIPTION: 50,
     GALLERY_TITLE: 50,
     GALLERY_CARD_DESCRIPTION: 300,
     RESEARCH_TITLE: 50,

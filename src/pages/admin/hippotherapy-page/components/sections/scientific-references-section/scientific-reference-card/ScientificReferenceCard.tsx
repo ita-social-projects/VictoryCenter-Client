@@ -6,6 +6,7 @@ import { ACTION_ICONS } from '@/const/common/action-icons';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import { InputError } from '@/components/admin/input-error/InputError';
 import './ScientificReferenceCard.scss';
 
 export interface ScientificReferenceCardProps {
@@ -105,6 +106,7 @@ export const ScientificReferenceCard = ({
                         disabled={disabled}
                     />
                 )}
+                {!isExpanded && urlError && <InputError error={urlError} />}
             </div>
         </div>
     );

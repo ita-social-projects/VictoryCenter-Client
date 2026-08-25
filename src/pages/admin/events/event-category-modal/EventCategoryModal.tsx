@@ -58,6 +58,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
             ...prev,
             name: e.target.value,
         }));
+        setErrors({});
     }, []);
 
     const handleCategoryChange = useCallback(

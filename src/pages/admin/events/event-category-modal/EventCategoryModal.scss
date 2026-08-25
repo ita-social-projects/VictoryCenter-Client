@@ -6,8 +6,8 @@
 
         .singleselect-options {
             max-height: 120px;
-            overflow-y: scroll;
-            scrollbar-color: $grey-800;
+            overflow-y: auto;
+            scrollbar-color: $grey-800 transparent;
 
             &::-webkit-scrollbar {
                 width: 8px;

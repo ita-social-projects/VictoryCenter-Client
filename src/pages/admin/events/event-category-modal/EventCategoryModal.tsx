@@ -70,6 +70,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                 const nextFormState = { name: selected.name };
                 setFormState(nextFormState);
                 setInitialFormState(nextFormState);
+                setErrors({});
             }
         },
         [categories],

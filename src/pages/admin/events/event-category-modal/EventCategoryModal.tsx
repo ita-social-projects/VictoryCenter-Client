@@ -104,14 +104,31 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         setShowCloseConfirmModal(false);
     }, []);
 
+    const isDuplicateName = categories.some((category: EventCategory) => {
+        if (mode === ModalMode.Edit) {
+            return (
+                category.id !== selectedCategory?.id &&
+                category.name.trim().toLowerCase() === formState.name.trim().toLowerCase()
+            );
+        }
+        return category.name.trim().toLowerCase() === formState.name.trim().toLowerCase();
+    });
+
     const handleNameBlur = useCallback(() => {
-        const error = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        const validationError = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+
+        const error =
+            validationError ??
+            (isDuplicateName
+                ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME
+                : undefined);
+
         setErrors((prev) => ({ ...prev, name: error }));
-    }, [formState.name]);
+    }, [formState.name, isDuplicateName]);
 
     const isSubmitDisabled = () => {
         const nameValidationError = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
-        const hasValidationErrors = nameValidationError !== undefined;
+        const hasValidationErrors = nameValidationError !== undefined || isDuplicateName;
         const hasEmptyFields = !formState.name.trim();
 
         if (mode === ModalMode.Edit) {

@@ -54,8 +54,6 @@ describe('EventsPageModals', () => {
             <EventsPageModals
                 modalsStateControl={createModalsStateControl(true)}
                 categories={categories}
-                onAddEventCategory={onAddEventCategory}
-                onEditEventCategory={onEditEventCategory}
             />,
         );
 
@@ -66,7 +64,6 @@ describe('EventsPageModals', () => {
                 mode: ModalMode.Add,
                 isOpen: true,
                 onClose: closeAddCategoryModal,
-                onAddCategory: onAddEventCategory,
                 categories,
             }),
         );
@@ -77,8 +74,6 @@ describe('EventsPageModals', () => {
             <EventsPageModals
                 modalsStateControl={createModalsStateControl(false, true)}
                 categories={categories}
-                onAddEventCategory={onAddEventCategory}
-                onEditEventCategory={onEditEventCategory}
             />,
         );
 
@@ -89,7 +84,6 @@ describe('EventsPageModals', () => {
                 mode: ModalMode.Edit,
                 isOpen: true,
                 onClose: closeEditCategoryModal,
-                onEditCategory: onEditEventCategory,
                 categories,
             }),
         );
@@ -100,8 +94,6 @@ describe('EventsPageModals', () => {
             <EventsPageModals
                 modalsStateControl={createModalsStateControl(false, false)}
                 categories={categories}
-                onAddEventCategory={onAddEventCategory}
-                onEditEventCategory={onEditEventCategory}
             />,
         );
 

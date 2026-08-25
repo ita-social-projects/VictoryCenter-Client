@@ -7,17 +7,9 @@ import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
     categories: EventCategory[];
-
-    onAddEventCategory: (newCategory: EventCategory) => void;
-    onEditEventCategory: (updatedCategory: EventCategory) => void;
 }
 
-export const EventsPageModals = ({
-    modalsStateControl,
-    categories,
-    onAddEventCategory,
-    onEditEventCategory,
-}: EventsPageModalsProps) => {
+export const EventsPageModals = ({ modalsStateControl, categories }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
     return (
@@ -26,7 +18,6 @@ export const EventsPageModals = ({
                 mode={ModalMode.Add}
                 isOpen={modalState.isAddCategoryModalOpen}
                 onClose={closeModalActions.closeAddCategoryModal}
-                onAddCategory={onAddEventCategory}
                 categories={categories}
             />
 
@@ -34,7 +25,6 @@ export const EventsPageModals = ({
                 mode={ModalMode.Edit}
                 isOpen={modalState.isEditCategoryModalOpen}
                 onClose={closeModalActions.closeEditCategoryModal}
-                onEditCategory={onEditEventCategory}
                 categories={categories}
             />
         </>

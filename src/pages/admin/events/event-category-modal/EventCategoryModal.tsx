@@ -27,12 +27,10 @@ interface BaseProps {
 
 interface AddModalProps extends BaseProps {
     mode: ModalMode.Add;
-    onAddCategory: (category: EventCategory) => void;
 }
 
 interface EditModalProps extends BaseProps {
     mode: ModalMode.Edit;
-    onEditCategory: (category: EventCategory) => void;
 }
 
 export type EventCategoryModalProps = AddModalProps | EditModalProps;
@@ -50,7 +48,6 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     const [formState, setFormState] = useState<EventCategoryFormValues>(defaultFormState);
     const [errors, setErrors] = useState<FormErrorState>({});
     const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [initialFormState, setInitialFormState] = useState<EventCategoryFormValues>(defaultFormState);
 
@@ -90,15 +87,13 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     }, [isOpen, defaultFormState]);
 
     const handleClose = useCallback(() => {
-        if (isSubmitting) return;
-
         if (isDirty) {
             setShowCloseConfirmModal(true);
             return;
         }
 
         onClose();
-    }, [isSubmitting, isDirty, onClose]);
+    }, [isDirty, onClose]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
@@ -124,10 +119,10 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
 
             const noChanges = !!selectedCategory && formState.name.trim() === selectedCategory.name.trim();
 
-            return isSubmitting || hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges;
+            return hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges;
         }
 
-        return isSubmitting || hasValidationErrors || hasEmptyFields;
+        return hasValidationErrors || hasEmptyFields;
     };
 
     return (
@@ -149,7 +144,6 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                                 options={categories}
                                 getOptionId={(category) => category.id}
                                 getOptionName={(category) => category.name}
-                                disabled={isSubmitting}
                                 onChange={handleCategoryChange}
                                 placeholder={EVENT_CATEGORY_TEXT.FORM.SELECT_CATEGORY_PLACEHOLDER}
                                 value={selectedCategory || undefined}
@@ -166,7 +160,6 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                             name="name"
                             type="text"
                             id="event-category-name"
-                            disabled={isSubmitting}
                             maxLength={EVENT_CATEGORY_VALIDATION.name.max}
                             placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
                         />

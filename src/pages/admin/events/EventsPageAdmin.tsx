@@ -71,16 +71,6 @@ export const EventsPageAdmin = () => {
         [],
     );
 
-    const handleAddEventCategory = useCallback((newCategory: EventCategory) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
-
-    const handleEditEventCategory = useCallback((updatedCategory: EventCategory) => {
-        setCategories((prev) =>
-            prev.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
-        );
-    }, []);
-
     const fetchCategories = useCallback(async () => {
         try {
             const fetchedCategories = await EventCategoriesApi.getAll(client);
@@ -129,12 +119,7 @@ export const EventsPageAdmin = () => {
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
 
-            <EventsPageModals
-                modalsStateControl={modalsStateControl}
-                categories={categories}
-                onAddEventCategory={handleAddEventCategory}
-                onEditEventCategory={handleEditEventCategory}
-            />
+            <EventsPageModals modalsStateControl={modalsStateControl} categories={categories} />
         </div>
     );
 };

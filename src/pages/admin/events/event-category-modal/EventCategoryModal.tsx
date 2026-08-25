@@ -135,7 +135,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                 </Modal.Title>
 
                 <Modal.Content>
-                    <form className="event-category-modal-form">
+                    <form onSubmit={(e) => e.preventDefault()} className="event-category-modal-form">
                         {mode === ModalMode.Edit && (
                             <SingleSelectInputGroup
                                 id="edit-event-category-select"

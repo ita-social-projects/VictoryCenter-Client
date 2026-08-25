@@ -106,18 +106,15 @@ describe('ScientificReferencesSection', () => {
         expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'false');
     });
 
-    if (
-        ('keeps several references expanded at the same time',
-        () => {
-            renderComponent();
+    it('keeps several references expanded at the same time', () => {
+        renderComponent();
 
-            fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
-            fireEvent.click(screen.getByTestId('toggle-expand-ref-2'));
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-2'));
 
-            expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
-            expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'true');
-        })
-    );
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
+        expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'true');
+    });
 
     it('renders the title, description, and one card per reference', () => {
         renderComponent();

@@ -116,6 +116,25 @@ describe('ScientificReferencesSection', () => {
         expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'true');
     });
 
+    it('keeps a reference expanded when its localId is regenerated after saving', () => {
+        const { rerender } = renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
+
+        const reloadedValue: HippotherapyScientificReferencesSectionContent = {
+            ...defaultValue,
+            scientificReferences: [
+                { localId: 'regenerated-1', id: 1, name: 'Citation one', url: 'https://example.com/one' },
+                { localId: 'regenerated-2', id: 2, name: 'Citation two', url: 'https://example.com/two' },
+            ],
+        };
+
+        rerender(<ScientificReferencesSection value={reloadedValue} onChange={mockOnChange} />);
+
+        expect(screen.getByTestId('reference-card-regenerated-1')).toHaveAttribute('data-is-expanded', 'true');
+    });
+
     it('renders the title, description, and one card per reference', () => {
         renderComponent();
 

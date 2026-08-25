@@ -58,6 +58,14 @@ describe('ScientificReferenceCard', () => {
         expect(screen.getByRole('button', { name: 'Collapse reference' })).toBeInTheDocument();
     });
 
+    it('shows the url error while collapsed', () => {
+        renderComponent({ urlError: 'URL is required' });
+
+        expect(screen.getByText('URL is required')).toBeInTheDocument();
+
+        expect(screen.queryByDisplayValue('https://example.com/citation')).not.toBeInTheDocument();
+    });
+
     it('calls onToggleExpand with the localId when the expand button is clicked', () => {
         renderComponent();
 

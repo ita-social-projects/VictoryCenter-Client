@@ -6,9 +6,19 @@
         flex-direction: column;
         gap: 0.375rem;
 
+        .input-group {
+            position: relative;
+        }
+
         .singleselect-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
             max-height: 120px;
             overflow-y: auto;
+            overflow-x: hidden;
             scrollbar-color: #a4a49b transparent;
 
             &::-webkit-scrollbar {

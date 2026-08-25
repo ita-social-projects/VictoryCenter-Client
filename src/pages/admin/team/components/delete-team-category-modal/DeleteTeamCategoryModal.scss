@@ -1,5 +1,8 @@
 @use '@/assets/sass/variables/colors';
 
+$dropdown-max-height: 120px;
+$dropdown-gap: 6px;
+
 .team-category-modal-error-container {
     font-size: 14px;
     line-height: 20px;
@@ -13,12 +16,23 @@
     display: flex;
     flex-direction: column;
     gap: 0.4375rem;
-    overflow-y: visible;
+    overflow-y: hidden;
+
+    .input-group {
+        position: relative;
+
+        &:has(.singleselect-options) {
+            margin-bottom: calc(#{$dropdown-max-height} + #{$dropdown-gap}); 
+        }
+    }
 
     .singleselect-options {
         position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         z-index: 100;
-        max-height: 120px;
+        max-height: $dropdown-max-height;
         overflow-y: auto;
         scrollbar-color: #a4a49b transparent;
 
@@ -39,9 +53,5 @@
                 background-color: #8c8c84;
             }
         }
-    }
-
-    .input-group:has(.singleselect-options) {
-        margin-bottom: 126px;
     }
 }

@@ -50,12 +50,7 @@ describe('EventsPageModals', () => {
     });
 
     it('renders add category modal', () => {
-        render(
-            <EventsPageModals
-                modalsStateControl={createModalsStateControl(true)}
-                categories={categories}
-            />,
-        );
+        render(<EventsPageModals modalsStateControl={createModalsStateControl(true)} categories={categories} />);
 
         const addModalProps = mockedEventCategoryModal.mock.calls[0][0];
 
@@ -70,12 +65,7 @@ describe('EventsPageModals', () => {
     });
 
     it('renders edit category modal', () => {
-        render(
-            <EventsPageModals
-                modalsStateControl={createModalsStateControl(false, true)}
-                categories={categories}
-            />,
-        );
+        render(<EventsPageModals modalsStateControl={createModalsStateControl(false, true)} categories={categories} />);
 
         const editModalProps = mockedEventCategoryModal.mock.calls[1][0];
 
@@ -91,10 +81,7 @@ describe('EventsPageModals', () => {
 
     it('passes false as isOpen when both category modals are closed', () => {
         render(
-            <EventsPageModals
-                modalsStateControl={createModalsStateControl(false, false)}
-                categories={categories}
-            />,
+            <EventsPageModals modalsStateControl={createModalsStateControl(false, false)} categories={categories} />,
         );
 
         const addModalProps = mockedEventCategoryModal.mock.calls[0][0];

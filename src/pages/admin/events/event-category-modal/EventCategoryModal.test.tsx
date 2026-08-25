@@ -298,13 +298,7 @@ describe('EventCategoryModal', () => {
         it('calls onClose immediately when form is not dirty', () => {
             const onClose = jest.fn();
 
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onClose={onClose}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onClose={onClose} />);
 
             fireEvent.click(screen.getByTestId('modal-close'));
 
@@ -327,13 +321,7 @@ describe('EventCategoryModal', () => {
         it('does not close the modal when confirmation is cancelled', () => {
             const onClose = jest.fn();
 
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onClose={onClose}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onClose={onClose} />);
 
             fireEvent.change(screen.getByRole('textbox'), {
                 target: { value: 'New Category' },
@@ -349,13 +337,7 @@ describe('EventCategoryModal', () => {
         it('closes the modal when unsaved changes are confirmed', () => {
             const onClose = jest.fn();
 
-            render(
-                <EventCategoryModal
-                    {...defaultProps}
-                    mode={ModalMode.Add}
-                    onClose={onClose}
-                />,
-            );
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} onClose={onClose} />);
 
             fireEvent.change(screen.getByRole('textbox'), {
                 target: { value: 'New Category' },
@@ -371,9 +353,7 @@ describe('EventCategoryModal', () => {
 
     describe('modal opening', () => {
         it('resets form when modal is opened', () => {
-            const { rerender } = render(
-                <EventCategoryModal {...defaultProps} isOpen={false} mode={ModalMode.Add} />,
-            );
+            const { rerender } = render(<EventCategoryModal {...defaultProps} isOpen={false} mode={ModalMode.Add} />);
 
             rerender(<EventCategoryModal {...defaultProps} isOpen mode={ModalMode.Add} />);
 

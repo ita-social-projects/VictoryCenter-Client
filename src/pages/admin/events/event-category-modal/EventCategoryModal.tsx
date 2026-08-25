@@ -69,9 +69,10 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
 
             if (selected) {
                 setSelectedCategory(selected);
-                setFormState({
-                    name: selected.name,
-                });
+
+                const nextFormState = { name: selected.name };
+                setFormState(nextFormState);
+                setInitialFormState(nextFormState);
             }
         },
         [categories],
@@ -84,6 +85,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
 
         setSelectedCategory(null);
         setFormState(defaultFormState);
+        setInitialFormState(defaultFormState);
         setErrors({});
     }, [isOpen, defaultFormState]);
 

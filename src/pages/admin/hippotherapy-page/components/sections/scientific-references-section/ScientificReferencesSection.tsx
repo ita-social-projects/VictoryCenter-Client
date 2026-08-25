@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -21,6 +21,19 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     const [descriptionError, setDescriptionError] = useState<string | undefined>();
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    const handleToggleExpand = useCallback((localId: string) => {
+        setExpandedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(localId)) {
+                next.delete(localId);
+            } else {
+                next.add(localId);
+            }
+            return next;
+        });
+    }, []);
 
     const handleTitleChange = (title: string) => {
         onChange({ ...value, title });
@@ -104,10 +117,12 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         localId={reference.localId}
                         name={reference.name}
                         url={reference.url}
+                        isExpanded={expandedIds.has(reference.localId)}
                         canDelete={value.scientificReferences.length > 1}
                         nameError={nameErrors[reference.localId]}
                         urlError={urlErrors[reference.localId]}
                         disabled={disabled}
+                        onToggleExpand={handleToggleExpand}
                         onNameChange={handleNameChange}
                         onUrlChange={handleUrlChange}
                         onNameBlur={handleNameBlur}

@@ -6,7 +6,10 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    HippotherapyScientificReference,
+    HippotherapyScientificReferencesSectionContent,
+} from '@/types/admin/hippotherapy-page';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
 
@@ -16,6 +19,9 @@ export interface ScientificReferencesSectionProps {
     disabled?: boolean;
 }
 
+const getExpandKey = (reference: HippotherapyScientificReference) =>
+    reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
+
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
     const [titleError, setTitleError] = useState<string | undefined>();
     const [descriptionError, setDescriptionError] = useState<string | undefined>();
@@ -23,17 +29,25 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-    const handleToggleExpand = useCallback((localId: string) => {
-        setExpandedIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(localId)) {
-                next.delete(localId);
-            } else {
-                next.add(localId);
-            }
-            return next;
-        });
-    }, []);
+    const handleToggleExpand = useCallback(
+        (localId: string) => {
+            const reference = value.scientificReferences.find((item) => item.localId === localId);
+            if (!reference) return;
+
+            const key = getExpandKey(reference);
+
+            setExpandedIds((prev) => {
+                const next = new Set(prev);
+                if (next.has(key)) {
+                    next.delete(key);
+                } else {
+                    next.add(key);
+                }
+                return next;
+            });
+        },
+        [value.scientificReferences],
+    );
 
     const handleTitleChange = (title: string) => {
         onChange({ ...value, title });
@@ -117,7 +131,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         localId={reference.localId}
                         name={reference.name}
                         url={reference.url}
-                        isExpanded={expandedIds.has(reference.localId)}
+                        isExpanded={expandedIds.has(getExpandKey(reference))}
                         canDelete={value.scientificReferences.length > 1}
                         nameError={nameErrors[reference.localId]}
                         urlError={urlErrors[reference.localId]}

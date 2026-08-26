@@ -66,7 +66,7 @@ export const TranslateProgramCategoryForm = forwardRef<
         }: TranslateProgramCategoryFormProps,
         ref,
     ) => {
-        const { formState, setFormState, errors, setErrors, isSubmitting, isDirty } = useFormManager<
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateProgramCategoryFormValues,
             TranslateProgramCategoryFormErrorState
         >({

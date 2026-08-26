@@ -25,7 +25,6 @@ import { ToastContainer } from '@/components/admin/toast/toast-container/ToastCo
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
-import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

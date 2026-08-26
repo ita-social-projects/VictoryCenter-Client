@@ -5,6 +5,13 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 import { TranslateProgramCategoryModal } from './TranslateProgramCategoryModal';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
 
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
@@ -134,6 +141,7 @@ describe('TranslateProgramCategoryModal', () => {
         jest.clearAllMocks();
         mockFormIsValid = true;
         mockFormIsDirty = true;
+        mockedUseAdminClient.mockReturnValue({} as ReturnType<typeof useAdminClient>);
     });
 
     it('renders with the "Додати переклад" title before a category is selected', () => {
@@ -369,6 +377,7 @@ describe('TranslateProgramCategoryModal', () => {
 
     it('resets the selected category (and with it, mode/prefill) when reopened after being closed', () => {
         const onClose = jest.fn();
+        const onTranslateCategory = jest.fn();
 
         const { rerender } = render(
             <TranslateProgramCategoryModal
@@ -376,6 +385,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -390,6 +400,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -399,6 +410,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 

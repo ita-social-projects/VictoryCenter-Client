@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
@@ -773,7 +773,9 @@ describe('TeamPageContent', () => {
             const listContainer = screen.getByTestId('team-page-content').querySelector('.team-page-list-container')!;
             Object.defineProperty(listContainer, 'clientHeight', { value: 600 });
 
-            window.dispatchEvent(new Event('resize'));
+            act(() => {
+                window.dispatchEvent(new Event('resize'));
+            });
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalled();

@@ -1,9 +1,8 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { HIPPOTHERAPY_PAGE_CHAR_LIMITS } from '@/const/admin/hippotherapy-page';
+import { useHippotherapyTextFields } from '@/hooks/admin/use-hippotherapy-text-fields/useHippotherapyTextFields';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 import './TextCardSection.scss';
 
@@ -15,44 +14,14 @@ export interface TextCardSectionProps {
 }
 
 const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: TextCardSectionProps) => {
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
-
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-
-        if (titleError !== undefined) {
-            setTitleError(
-                HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                    getPlainTextFromHtml(title),
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-                ),
-            );
-        }
-    };
-
-    const handleTitleBlur = () => {
-        setTitleError(
-            HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                getPlainTextFromHtml(value.title),
-                HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-            ),
-        );
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-
-        if (descriptionError !== undefined) {
-            setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-        }
-    };
-
-    const handleDescriptionBlur = () => {
-        setDescriptionError(
-            HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.description)),
-        );
-    };
+    const {
+        titleError,
+        descriptionError,
+        handleTitleChange,
+        handleTitleBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+    } = useHippotherapyTextFields({ value, onChange });
 
     return (
         <div className="hippotherapy-text-card-section">

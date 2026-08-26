@@ -5,7 +5,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { useHippotherapyTextFields } from '@/hooks/admin/use-hippotherapy-text-fields/useHippotherapyTextFields';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
@@ -17,46 +17,17 @@ export interface ScientificReferencesSectionProps {
 }
 
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
+    const {
+        titleError,
+        descriptionError,
+        handleTitleChange,
+        handleTitleBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+    } = useHippotherapyTextFields({ value, onChange });
+
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
-
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-
-        if (titleError !== undefined) {
-            setTitleError(
-                HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                    getPlainTextFromHtml(title),
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-                ),
-            );
-        }
-    };
-
-    const handleTitleBlur = () => {
-        setTitleError(
-            HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                getPlainTextFromHtml(value.title),
-                HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-            ),
-        );
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-
-        if (descriptionError !== undefined) {
-            setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-        }
-    };
-
-    const handleDescriptionBlur = () => {
-        setDescriptionError(
-            HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.description)),
-        );
-    };
 
     const handleNameChange = (localId: string, name: string) => {
         const scientificReferences = value.scientificReferences.map((reference) =>

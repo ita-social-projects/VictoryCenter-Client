@@ -6,12 +6,18 @@ import { ProgramCategory } from '@/types/admin/programs';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 import { TranslateProgramCategoryModal } from './TranslateProgramCategoryModal';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ProgramCategoryLocalizationsApi } from '@/services/api/admin/programs/program-category-localizations/program-category-localizations-api';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
+jest.mock('@/services/api/admin/programs/program-category-localizations/program-category-localizations-api');
+
 const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
+const mockedProgramCategoryLocalizationsApi = ProgramCategoryLocalizationsApi as jest.Mocked<
+    typeof ProgramCategoryLocalizationsApi
+>;
 
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
@@ -142,6 +148,12 @@ describe('TranslateProgramCategoryModal', () => {
         mockFormIsValid = true;
         mockFormIsDirty = true;
         mockedUseAdminClient.mockReturnValue({} as ReturnType<typeof useAdminClient>);
+        mockedProgramCategoryLocalizationsApi.create.mockResolvedValue({
+            entityId: CATEGORY_WITHOUT_LOCALIZATION.id,
+            name: 'Translated category name',
+            localizationInfoDto: EN_LANGUAGE,
+            translationStatus: TranslationStatus.Relevant,
+        });
     });
 
     it('renders with the "Додати переклад" title before a category is selected', () => {
@@ -188,10 +200,7 @@ describe('TranslateProgramCategoryModal', () => {
                 COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
             );
         });
-        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute(
-            'data-initial',
-            'null',
-        );
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute('data-initial', 'null');
     });
 
     it('recomputes mode and prefill when switching between categories', () => {
@@ -287,13 +296,17 @@ describe('TranslateProgramCategoryModal', () => {
 
         renderModal({ onTranslateCategory, onClose });
 
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
         fireEvent.click(screen.getByTestId('save-localization-btn'));
 
         await waitFor(() => {
             expect(onTranslateCategory).toHaveBeenCalledWith(
                 expect.objectContaining({
                     id: 1,
-                    name: 'Translated category name',
+                    name: CATEGORY_WITHOUT_LOCALIZATION.name,
+                    localizations: expect.arrayContaining([
+                        expect.objectContaining({ name: 'Translated category name' }),
+                    ]),
                 }),
             );
             expect(onClose).toHaveBeenCalledTimes(1);

@@ -28,16 +28,28 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
         handleImageErrorChange,
         handleImageChange,
         handleTitleChange,
+        handleTitleBlur,
         handleDescriptionChange,
+        handleDescriptionBlur,
     } = useHippotherapySectionFields({ value, onChange, onImageError });
     const [principleErrors, setPrincipleErrors] = useState<Record<number, string | undefined>>({});
 
     const handlePrincipleChange = (index: number, principle: string) => {
         const principles = value.principles.map((item, itemIndex) => (itemIndex === index ? principle : item));
         onChange({ ...value, principles });
+
+        if (principleErrors[index] !== undefined) {
+            setPrincipleErrors((prev) => ({
+                ...prev,
+                [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(principle)),
+            }));
+        }
+    };
+
+    const handlePrincipleBlur = (index: number) => {
         setPrincipleErrors((prev) => ({
             ...prev,
-            [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(principle)),
+            [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.principles[index])),
         }));
     };
 
@@ -70,6 +82,7 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
                             name="hippotherapy-ethics-title"
                             value={value.title}
                             onChange={handleTitleChange}
+                            onBlur={handleTitleBlur}
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_TITLE}
                             error={titleError}
                             disabled={disabled}
@@ -81,6 +94,7 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
                             name="hippotherapy-ethics-description"
                             value={value.description}
                             onChange={handleDescriptionChange}
+                            onBlur={handleDescriptionBlur}
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_DESCRIPTION}
                             error={descriptionError}
                             disabled={disabled}
@@ -96,6 +110,7 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
                                     name={`hippotherapy-ethics-principle-${index}`}
                                     value={principle}
                                     onChange={(nextValue) => handlePrincipleChange(index, nextValue)}
+                                    onBlur={() => handlePrincipleBlur(index)}
                                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE}
                                     error={principleErrors[index]}
                                     disabled={disabled}

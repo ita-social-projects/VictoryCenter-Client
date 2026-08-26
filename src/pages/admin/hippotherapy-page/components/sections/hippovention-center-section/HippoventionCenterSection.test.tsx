@@ -23,12 +23,13 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 id={id}
                 disabled={disabled}
@@ -138,6 +139,7 @@ describe('HippoventionCenterSection', () => {
         fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-pros'), {
             target: { value: 'x' },
         });
+        fireEvent.blur(screen.getByTestId('mock-rich-input-hippovention-center-pros'));
 
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });

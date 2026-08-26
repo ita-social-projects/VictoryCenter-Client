@@ -34,13 +34,22 @@ const HippoventionCenterSectionComponent = ({
         handleImageErrorChange,
         handleImageChange,
         handleTitleChange,
+        handleTitleBlur,
         handleDescriptionChange,
-    } = useHippotherapySectionFields({ value, onChange, onImageError });
+        handleDescriptionBlur,
+    } = useHippotherapySectionFields({ value, onChange, onImageError, isDescriptionOptional: true });
     const [prosError, setProsError] = useState<string | undefined>();
 
     const handleProsChange = (pros: string) => {
         onChange({ ...value, pros });
-        setProsError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(pros)));
+
+        if (prosError !== undefined) {
+            setProsError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(pros)));
+        }
+    };
+
+    const handleProsBlur = () => {
+        setProsError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.pros)));
     };
 
     return (
@@ -73,6 +82,7 @@ const HippoventionCenterSectionComponent = ({
                         name="hippovention-center-title"
                         value={value.title}
                         onChange={handleTitleChange}
+                        onBlur={handleTitleBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE}
                         error={titleError}
                         disabled={disabled}
@@ -88,6 +98,7 @@ const HippoventionCenterSectionComponent = ({
                         name="hippovention-center-pros"
                         value={value.pros}
                         onChange={handleProsChange}
+                        onBlur={handleProsBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS}
                         error={prosError}
                         disabled={disabled}
@@ -95,11 +106,11 @@ const HippoventionCenterSectionComponent = ({
                     <RichTextInputGroup
                         className="hippovention-center-section-description"
                         label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
-                        isRequired
                         id="hippovention-center-description"
                         name="hippovention-center-description"
                         value={value.description}
                         onChange={handleDescriptionChange}
+                        onBlur={handleDescriptionBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION}
                         error={descriptionError}
                         disabled={disabled}

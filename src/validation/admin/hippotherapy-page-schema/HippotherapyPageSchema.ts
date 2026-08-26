@@ -61,7 +61,9 @@ export const isHippotherapyPageContentValid = (content: HippotherapyPageContentM
         isValidTitle(content.scientificReferencesSection.title) &&
         isValidHtmlText(content.scientificReferencesSection.description) &&
         content.scientificReferencesSection.scientificReferences.every(
-            (reference) => isValidText(reference.name) && isValidText(reference.url),
+            (reference) =>
+                isValidText(reference.name, HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH) &&
+                isValidText(reference.url, HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH),
         ) &&
         isValidImage(content.anotherQuoteSection) &&
         isValidHtmlText(content.anotherQuoteSection.quoteText) &&

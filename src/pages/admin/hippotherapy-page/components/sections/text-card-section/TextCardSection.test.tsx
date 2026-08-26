@@ -6,12 +6,13 @@ import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippo
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 id={id}
                 disabled={disabled}
@@ -78,6 +79,7 @@ describe('TextCardSection', () => {
         renderComponent();
 
         fireEvent.change(screen.getByTestId('mock-rich-input-test-card-title'), { target: { value: 'x' } });
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-card-title'));
 
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });

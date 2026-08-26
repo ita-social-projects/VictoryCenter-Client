@@ -26,7 +26,9 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
         handleImageErrorChange,
         handleImageChange,
         handleTitleChange,
+        handleTitleBlur,
         handleDescriptionChange,
+        handleDescriptionBlur,
     } = useHippotherapySectionFields({ value, onChange, onImageError });
 
     return (
@@ -59,6 +61,7 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
                     name="hippotherapy-intro-title"
                     value={value.title}
                     onChange={handleTitleChange}
+                    onBlur={handleTitleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE}
                     error={titleError}
                     disabled={disabled}
@@ -70,6 +73,7 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
                     name="hippotherapy-intro-description"
                     value={value.description}
                     onChange={handleDescriptionChange}
+                    onBlur={handleDescriptionBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION}
                     error={descriptionError}
                     disabled={disabled}

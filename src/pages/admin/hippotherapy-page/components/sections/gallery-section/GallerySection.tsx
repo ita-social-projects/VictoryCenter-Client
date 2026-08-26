@@ -2,7 +2,11 @@ import { CSSProperties, memo, useState } from 'react';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_IMAGE_CONFIGS } from '@/const/admin/hippotherapy-page';
+import {
+    HIPPOTHERAPY_PAGE_CHAR_LIMITS,
+    HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
+    HIPPOTHERAPY_PAGE_TEXT,
+} from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
@@ -32,7 +36,24 @@ const GallerySectionComponent = ({
 
     const handleTitleChange = (title: string) => {
         onChange({ ...value, title });
-        setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
+
+        if (titleError !== undefined) {
+            setTitleError(
+                HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
+                    getPlainTextFromHtml(title),
+                    HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+                ),
+            );
+        }
+    };
+
+    const handleTitleBlur = () => {
+        setTitleError(
+            HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
+                getPlainTextFromHtml(value.title),
+                HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+            ),
+        );
     };
 
     const handleCardImageChange = (index: number, image: ImageValues | null) => {
@@ -43,9 +64,21 @@ const GallerySectionComponent = ({
     const handleCardDescriptionChange = (index: number, description: string) => {
         const cards = value.cards.map((card, cardIndex) => (cardIndex === index ? { ...card, description } : card));
         onChange({ ...value, cards });
+
+        if (cardDescriptionErrors[index] !== undefined) {
+            setCardDescriptionErrors((prev) => ({
+                ...prev,
+                [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)),
+            }));
+        }
+    };
+
+    const handleCardDescriptionBlur = (index: number) => {
         setCardDescriptionErrors((prev) => ({
             ...prev,
-            [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)),
+            [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
+                getPlainTextFromHtml(value.cards[index].description),
+            ),
         }));
     };
 
@@ -58,6 +91,7 @@ const GallerySectionComponent = ({
                 name={`${fieldIdPrefix}-title`}
                 value={value.title}
                 onChange={handleTitleChange}
+                onBlur={handleTitleBlur}
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE}
                 error={titleError}
                 disabled={disabled}
@@ -70,6 +104,7 @@ const GallerySectionComponent = ({
                                 variant="whoWeAre"
                                 value={card.image}
                                 onChange={(image) => handleCardImageChange(index, image)}
+                                onBlur={() => handleCardDescriptionBlur(index)}
                                 setError={(error) => {
                                     setCardImageErrors((prev) => ({ ...prev, [index]: error }));
                                     onCardImageError?.(index, error);

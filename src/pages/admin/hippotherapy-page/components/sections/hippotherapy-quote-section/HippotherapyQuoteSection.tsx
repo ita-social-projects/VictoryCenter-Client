@@ -45,12 +45,26 @@ const HippotherapyQuoteSectionComponent = ({
 
     const handleQuoteTextChange = (quoteText: string) => {
         onChange({ ...value, quoteText });
-        setQuoteTextError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(quoteText)));
+
+        if (quoteTextError !== undefined) {
+            setQuoteTextError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(quoteText)));
+        }
+    };
+
+    const handleQuoteTextBlur = () => {
+        setQuoteTextError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.quoteText)));
     };
 
     const handleAuthorNameChange = (authorName: string) => {
         onChange({ ...value, authorName });
-        setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(authorName)));
+
+        if (authorNameError !== undefined) {
+            setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(authorName)));
+        }
+    };
+
+    const handleAuthorNameBlur = () => {
+        setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.authorName)));
     };
 
     return (
@@ -83,6 +97,7 @@ const HippotherapyQuoteSectionComponent = ({
                     name={`${fieldIdPrefix}-quote-text`}
                     value={value.quoteText}
                     onChange={handleQuoteTextChange}
+                    onBlur={handleQuoteTextBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_TEXT}
                     error={quoteTextError}
                     disabled={disabled}
@@ -94,6 +109,7 @@ const HippotherapyQuoteSectionComponent = ({
                     name={`${fieldIdPrefix}-quote-author`}
                     value={value.authorName}
                     onChange={handleAuthorNameChange}
+                    onBlur={handleAuthorNameBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR}
                     error={authorNameError}
                     disabled={disabled}

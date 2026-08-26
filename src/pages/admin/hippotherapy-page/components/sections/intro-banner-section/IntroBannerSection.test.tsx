@@ -24,12 +24,13 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, maxLength, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 maxLength={maxLength}
                 id={id}
@@ -129,6 +130,7 @@ describe('IntroBannerSection', () => {
         fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
             target: { value: 'x' },
         });
+        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'));
 
         expect(screen.getByText('Title is too short')).toBeInTheDocument();
     });

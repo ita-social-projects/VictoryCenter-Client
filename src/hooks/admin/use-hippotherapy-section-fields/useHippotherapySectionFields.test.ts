@@ -46,6 +46,11 @@ describe('useHippotherapySectionFields', () => {
         });
 
         expect(onChange).toHaveBeenCalledWith({ ...initialValue, title: 'New title' });
+
+        act(() => {
+            result.current.handleTitleBlur();
+        });
+
         expect(result.current.titleError).toBe('Title error');
     });
 
@@ -58,6 +63,11 @@ describe('useHippotherapySectionFields', () => {
         });
 
         expect(onChange).toHaveBeenCalledWith({ ...initialValue, description: 'New description' });
+
+        act(() => {
+            result.current.handleDescriptionBlur();
+        });
+
         expect(result.current.descriptionError).toBe('Description error');
     });
 

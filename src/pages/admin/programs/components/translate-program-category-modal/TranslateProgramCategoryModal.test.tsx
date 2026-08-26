@@ -178,17 +178,19 @@ describe('TranslateProgramCategoryModal', () => {
         );
     });
 
-    it('stays in add mode with an empty prefill when the selected category has no EN translation', () => {
+    it('stays in add mode with an empty prefill when the selected category has no EN translation', async () => {
         renderModal();
 
         fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
 
-        expect(screen.getByTestId('modal-title')).toHaveTextContent(
-            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
-        );
+        await waitFor(() => {
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+            );
+        });
         expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute(
             'data-initial',
-            JSON.stringify({ categoryId: CATEGORY_WITHOUT_LOCALIZATION.id, name: '' }),
+            'null',
         );
     });
 

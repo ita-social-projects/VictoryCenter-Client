@@ -70,7 +70,7 @@ describe('useSignalR', () => {
         await waitFor(() => {
             expect(result.current).not.toBeNull();
         });
-        
+
         expect(mockStart).toHaveBeenCalledTimes(2);
     });
 
@@ -83,7 +83,7 @@ describe('useSignalR', () => {
         }));
 
         const { unmount } = renderHook(() => useSignalR('http://test-url.com'));
-        
+
         unmount();
 
         expect(mockStop).toHaveBeenCalled();

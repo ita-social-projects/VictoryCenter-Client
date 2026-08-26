@@ -19,22 +19,16 @@ $dropdown-gap: 6px;
     overflow-y: hidden;
 
     .input-group {
-        position: relative;
-
         &:has(.singleselect-options) {
             margin-bottom: calc(#{$dropdown-max-height} + #{$dropdown-gap}); 
         }
     }
 
     .singleselect-options {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
         z-index: 100;
         max-height: $dropdown-max-height;
         overflow-y: auto;
-        scrollbar-color: #a4a49b transparent;
+        scrollbar-color: colors.$grey-700 transparent;
 
         &::-webkit-scrollbar {
             width: 8px;
@@ -46,11 +40,11 @@ $dropdown-gap: 6px;
         }
 
         &::-webkit-scrollbar-thumb {
-            background-color: #a4a49b;
+            background-color: colors.$grey-700;
             border-radius: 8px;
 
             &:hover {
-                background-color: #8c8c84;
+                background-color: colors.$grey-600;
             }
         }
     }

@@ -6,20 +6,12 @@
         flex-direction: column;
         gap: 0.375rem;
 
-        .input-group {
-            position: relative;
-        }
-
         .singleselect-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
             z-index: 100;
             max-height: 120px;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-color: #a4a49b transparent;
+            scrollbar-color: colors.$grey-700 transparent;
 
             &::-webkit-scrollbar {
                 width: 8px;
@@ -31,11 +23,11 @@
             }
 
             &::-webkit-scrollbar-thumb {
-                background-color: #a4a49b;
+                background-color: colors.$grey-700;
                 border-radius: 8px;
 
                 &:hover {
-                    background-color: #8c8c84;
+                    background-color: colors.$grey-600;
                 }
             }
         }

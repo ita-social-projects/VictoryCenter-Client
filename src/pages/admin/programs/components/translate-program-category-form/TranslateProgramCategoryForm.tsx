@@ -35,7 +35,6 @@ export interface TranslateProgramCategoryFormProps {
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
     selectedCategory?: ProgramCategory | null;
-    onCategoryChange?: (category: ProgramCategory | null) => void;
 }
 
 const DEFAULT_FORM_STATE: TranslateProgramCategoryFormValues = {

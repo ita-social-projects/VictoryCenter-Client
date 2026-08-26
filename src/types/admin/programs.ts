@@ -41,6 +41,10 @@ export interface ProgramCategory {
     translationStatuses?: TranslationStatusInfo[];
 }
 
+export interface ProgramCategoryLocalization extends EntityLocalization {
+    name: string;
+}
+
 export interface HippotherapyProgramDto
     extends HippotherapyProgramLocalizableFields,
         EntityWithDtoLocalizations<HippotherapyProgramLocalizationDto> {

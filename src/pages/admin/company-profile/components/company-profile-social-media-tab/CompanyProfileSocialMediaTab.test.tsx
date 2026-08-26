@@ -72,6 +72,7 @@ describe('CompanyProfileSocialMediaTab', () => {
         render(<Wrapper disabled={true} />);
         expect(screen.getByText(COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE)).toBeInTheDocument();
         expect(screen.getByTestId('profile-tooltip')).toBeInTheDocument();
+        expect(screen.getByTestId('profile-tooltip')).toHaveTextContent(COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.TOOLTIP);
     });
 
     it('does not show add dropdown when disabled=true (view mode)', () => {

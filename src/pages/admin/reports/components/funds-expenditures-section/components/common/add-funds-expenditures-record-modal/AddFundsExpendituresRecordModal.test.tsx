@@ -80,6 +80,13 @@ jest.mock('@/utils/functions/get-reporting-year-options/get-reporting-year-optio
 
 const mockedHook = useFundsExpendituresRecordForm as jest.MockedFunction<typeof useFundsExpendituresRecordForm>;
 
+const amountChangeHandlers: Record<string, jest.Mock> = {
+    amountUah: jest.fn(),
+    amountUsd: jest.fn(),
+};
+
+const mockHandleAmountFieldChange = jest.fn();
+
 const baseHookResult = {
     formState: {
         reportingYear: '2026',
@@ -102,9 +109,8 @@ const baseHookResult = {
     handleReportingYearBlur: jest.fn(),
     handleCategoryChange: jest.fn(),
     handleCategoryBlur: jest.fn(),
-    handleAmountChange: jest.fn(),
+    handleAmountFieldChange: mockHandleAmountFieldChange,
     handleAmountBlur: jest.fn(),
-    handleUsdChange: jest.fn(),
     handleOpenAddConfirmation: jest.fn(),
     handleConfirmAdd: jest.fn(),
     handleCloseConfirmation: jest.fn(),
@@ -113,6 +119,9 @@ const baseHookResult = {
 describe('AddFundsExpendituresRecordModal', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+
+        mockHandleAmountFieldChange.mockImplementation((field: string) => amountChangeHandlers[field]);
+
         mockedHook.mockReturnValue(baseHookResult as any);
     });
 
@@ -233,9 +242,14 @@ describe('AddFundsExpendituresRecordModal', () => {
         expect(baseHookResult.handleReportingYearBlur).toHaveBeenCalledTimes(1);
         expect(baseHookResult.handleCategoryChange).toHaveBeenCalled();
         expect(baseHookResult.handleCategoryBlur).toHaveBeenCalledTimes(1);
-        expect(baseHookResult.handleAmountChange).toHaveBeenCalledWith('111');
+
+        expect(mockHandleAmountFieldChange).toHaveBeenCalledWith('amountUah');
+        expect(amountChangeHandlers.amountUah).toHaveBeenCalledWith('111');
+
+        expect(mockHandleAmountFieldChange).toHaveBeenCalledWith('amountUsd');
+        expect(amountChangeHandlers.amountUsd).toHaveBeenCalledWith('22');
+
         expect(baseHookResult.handleAmountBlur).toHaveBeenCalledWith('amountUah');
-        expect(baseHookResult.handleUsdChange).toHaveBeenCalledWith('22');
         expect(baseHookResult.handleAmountBlur).toHaveBeenCalledWith('amountUsd');
         expect(baseHookResult.handleOpenAddConfirmation).toHaveBeenCalledTimes(1);
     });

@@ -2,7 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContactFormCard } from './ContactFormCard';
-import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+        },
+    }),
+}));
 
 jest.mock('@/hooks/public/use-turnstile', () => ({
     useTurnstile: () => ({
@@ -57,8 +66,7 @@ describe('ContactFormCard', () => {
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
 
-            const remaining = CONTACT_FORM_LIMITS.SUBJECT.MAX - CONTACT_FORM_LIMITS.SUBJECT.WARN_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(remaining))).toBeInTheDocument();
+            expect(screen.getByText('contactForm.charactersRemaining')).toBeInTheDocument();
         });
 
         it('shows limit-reached message when subject hits MAX characters', async () => {
@@ -67,7 +75,7 @@ describe('ContactFormCard', () => {
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MAX));
 
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).toBeInTheDocument();
+            expect(screen.getByText('contactForm.limitReached')).toBeInTheDocument();
         });
 
         it('shows min-length error on blur when subject < MIN characters', async () => {
@@ -77,7 +85,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(subjectInput, { target: { value: 'ab' } });
             fireEvent.blur(subjectInput);
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.SUBJECT.MIN_ERROR)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.subjectMinLengthError')).toBeInTheDocument();
         });
 
         it('does not show hint below WARN_AT characters', async () => {
@@ -86,14 +94,8 @@ describe('ContactFormCard', () => {
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT - 1));
 
-            expect(screen.queryByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).not.toBeInTheDocument();
-            expect(
-                screen.queryByText(
-                    CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(
-                        CONTACT_FORM_LIMITS.SUBJECT.MAX - (CONTACT_FORM_LIMITS.SUBJECT.WARN_AT - 1),
-                    ),
-                ),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.limitReached')).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.charactersRemaining')).not.toBeInTheDocument();
         });
     });
 
@@ -104,8 +106,7 @@ describe('ContactFormCard', () => {
 
             fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) } });
 
-            const remaining = CONTACT_FORM_LIMITS.MESSAGE.MAX - CONTACT_FORM_LIMITS.MESSAGE.WARN_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(remaining))).toBeInTheDocument();
+            expect(screen.getByText('contactForm.charactersRemaining')).toBeInTheDocument();
         });
 
         it('shows limit-reached message when message hits MAX characters', () => {
@@ -114,7 +115,7 @@ describe('ContactFormCard', () => {
 
             fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX) } });
 
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED)).toBeInTheDocument();
+            expect(screen.getByText('contactForm.limitReached')).toBeInTheDocument();
         });
 
         it('shows min-length error on blur when message < MIN characters', async () => {
@@ -124,7 +125,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(messageTextarea, { target: { value: 'short' } });
             fireEvent.blur(messageTextarea);
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.MESSAGE.MIN_ERROR)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.messageMinLengthError')).toBeInTheDocument();
         });
     });
 
@@ -142,7 +143,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: invalidEmail } });
             submitForm();
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.emailInvalid')).toBeInTheDocument();
         });
 
         it('does not show error for valid email', async () => {
@@ -150,7 +151,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'user@mail.com' } });
             submitForm();
 
-            expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.emailInvalid')).not.toBeInTheDocument();
         });
     });
 });

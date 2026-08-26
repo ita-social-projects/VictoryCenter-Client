@@ -66,6 +66,7 @@ export const TranslateProgramCategoryModal = ({
         if (!wasOpen && isOpen) {
             setIsFormValid(false);
             setIsDirty(false);
+            setSelectedCategory(null);
         }
     }, [isOpen]);
 
@@ -96,6 +97,10 @@ export const TranslateProgramCategoryModal = ({
         ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
         : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
 
+    const modalTitle = isEditMode
+        ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
+        : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
+
     return (
         <LocalizationModal
             isOpen={isOpen}
@@ -113,6 +118,8 @@ export const TranslateProgramCategoryModal = ({
                     isSubmitting={isSubmitting}
                     languages={englishLanguages}
                     onLanguageChange={setLanguage}
+                    generateDisabled={!selectedCategory}
+                    hideGenerateButton={false}
                 />
             )}
             {error && <div className="translate-program-category-error">{error}</div>}

@@ -374,7 +374,6 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
                 isButtonsDisabled={isDeleting}
-                className="delete-file-confirmation-modal"
             />
         </div>
     );

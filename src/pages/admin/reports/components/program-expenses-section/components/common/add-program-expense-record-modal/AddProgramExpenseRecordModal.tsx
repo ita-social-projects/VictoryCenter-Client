@@ -154,8 +154,7 @@ export const AddProgramExpenseRecordModal = ({
         handleProgramChange,
         handleProgramInputChange,
         handleProgramBlur,
-        handleAmountChange,
-        handleUsdChange,
+        handleAmountFieldChange,
         handleAmountBlur,
         handleOpenAddConfirmation,
         handleCloseConfirmation,
@@ -277,7 +276,7 @@ export const AddProgramExpenseRecordModal = ({
                                 label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
                                 value={formState.amountUah}
                                 error={formState.errors.amountUah}
-                                onChange={(event) => handleAmountChange(event.target.value)}
+                                onChange={(event) => handleAmountFieldChange('amountUah')(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUah')}
                                 disabled={isSubmitting}
                             />
@@ -289,7 +288,7 @@ export const AddProgramExpenseRecordModal = ({
                                 value={formState.amountUsd}
                                 error={formState.errors.amountUsd}
                                 headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
-                                onChange={(event) => handleUsdChange(event.target.value)}
+                                onChange={(event) => handleAmountFieldChange('amountUsd')(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
                                 disabled={isSubmitting}
                                 footer={

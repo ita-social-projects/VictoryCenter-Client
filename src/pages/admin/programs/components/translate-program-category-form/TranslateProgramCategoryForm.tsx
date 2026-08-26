@@ -7,6 +7,8 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/program-category-schema/program-category-schema';
 import { forwardRef, useEffect, useState } from 'react';
+import cn from 'classnames';
+import styles from './TranslateProgramCategoryForm.module.scss';
 
 export interface TranslateProgramCategoryFormValues {
     categoryId: number | null;
@@ -29,6 +31,7 @@ export interface TranslateProgramCategoryFormProps {
     categories: ProgramCategory[];
     initialData?: TranslateProgramCategoryFormValues | null;
     formDisabled?: boolean;
+    onCategoryChange?: (category: ProgramCategory | null) => void;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
     selectedCategory?: ProgramCategory | null;
@@ -107,7 +110,7 @@ export const TranslateProgramCategoryForm = forwardRef<
         return (
             <form
                 onSubmit={(e) => e.preventDefault()}
-                className="translate-program-category-form"
+                className={cn('translate-program-category-form', styles.form)}
                 id="translate-program-category-form"
                 noValidate
             >

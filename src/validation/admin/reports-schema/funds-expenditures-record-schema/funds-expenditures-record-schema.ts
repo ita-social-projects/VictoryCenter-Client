@@ -14,13 +14,22 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
-export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
+const stripLeadingZeros = (str: string) => str.replace(/^(-?)0+(?=\d)/, '$1');
+
+export const normalizeFundsExpendituresAmountInput = (
+    value: string | undefined | null,
+    trimEnd = false,
+    preserveSpaces = true,
+    options?: { whitespaceOnly?: boolean },
+): string => {
     if (!value) {
         return '';
     }
-    const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
-    let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
 
+    const spaceReplacement = preserveSpaces ? ' ' : '';
+    const withNormalizedSpaces = value.replaceAll(/\s+/g, spaceReplacement).trimStart();
+
+    let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     withCommaSeparator = withCommaSeparator.replace(/^-\s+/, '-');
 
     const isNegative = withCommaSeparator.startsWith('-');
@@ -31,18 +40,27 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
 
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
-    if (firstCommaIndex === -1) {
+    if (options?.whitespaceOnly) {
         return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
     }
 
-    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    if (firstCommaIndex === -1) {
+        const noZeros = stripLeadingZeros(withCommaSeparator);
+        return trimEnd ? noZeros.trim() : noZeros;
+    }
+
+    const rawIntegerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const integerPart = stripLeadingZeros(rawIntegerPart);
     const decimalPart = withCommaSeparator
         .slice(firstCommaIndex + 1)
         .replaceAll(/[\s,]/g, '')
         .slice(0, 2);
-    const normalized = `${integerPart},${decimalPart}`;
 
-    return trimEnd ? normalized.trim() : normalized;
+    if (trimEnd) {
+        return (decimalPart === '' ? integerPart : `${integerPart},${decimalPart}`).trim();
+    }
+
+    return `${integerPart},${decimalPart}`;
 };
 
 export const validateFundsExpendituresAmount = (

@@ -22,4 +22,8 @@ describe('localizePath', () => {
     test('return path if it already includes the locale prefix', () => {
         expect(localizePath(path, locale)).toBe('/en/services');
     });
+
+    test('localizes paths that only start with the locale code', () => {
+        expect(localizePath('/entry', locale)).toBe('/en/entry');
+    });
 });

@@ -20,8 +20,6 @@ export const useSignalR = (url: string): HubConnection | null => {
                     setConnection(newConnection);
                 }
             } catch (err) {
-                console.error(`SignalR Connection Error (Attempt ${retryCount + 1}): `, err);
-
                 if (retryCount < maxRetries && isMounted.current) {
                     const timeout = Math.pow(2, retryCount) * 1000;
                     retryCount++;

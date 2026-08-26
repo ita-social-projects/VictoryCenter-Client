@@ -40,7 +40,6 @@ export const ReportsSection = () => {
             }
             return fetchedReports;
         } catch (err) {
-            console.error('Failed to fetch reports', err);
             return [];
         }
     }, []);

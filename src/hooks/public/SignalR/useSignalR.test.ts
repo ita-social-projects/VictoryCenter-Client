@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useSignalR } from './useSignalR';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 
@@ -59,11 +59,18 @@ describe('useSignalR', () => {
 
         const { result } = renderHook(() => useSignalR('http://test-url.com'));
 
-        jest.advanceTimersByTime(1000);
+        await waitFor(() => {
+            expect(mockStart).toHaveBeenCalledTimes(1);
+        });
+
+        await act(async () => {
+            jest.advanceTimersByTime(1000);
+        });
 
         await waitFor(() => {
             expect(result.current).not.toBeNull();
         });
+        
         expect(mockStart).toHaveBeenCalledTimes(2);
     });
 
@@ -76,6 +83,7 @@ describe('useSignalR', () => {
         }));
 
         const { unmount } = renderHook(() => useSignalR('http://test-url.com'));
+        
         unmount();
 
         expect(mockStop).toHaveBeenCalled();

@@ -59,12 +59,26 @@ const HippotherapyQuoteSectionComponent = ({
         onChange({ ...value, authorName });
 
         if (authorNameError !== undefined) {
-            setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(authorName)));
+            const plainText = getPlainTextFromHtml(authorName);
+
+            if (!plainText.trim()) {
+                setAuthorNameError(undefined);
+                return;
+            }
+
+            setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText));
         }
     };
 
     const handleAuthorNameBlur = () => {
-        setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.authorName)));
+        const plainText = getPlainTextFromHtml(value.authorName);
+
+        if (!plainText.trim()) {
+            setAuthorNameError(undefined);
+            return;
+        }
+
+        setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText));
     };
 
     return (
@@ -104,7 +118,6 @@ const HippotherapyQuoteSectionComponent = ({
                 />
                 <RichTextInputGroup
                     label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
-                    isRequired
                     id={`${fieldIdPrefix}-quote-author`}
                     name={`${fieldIdPrefix}-quote-author`}
                     value={value.authorName}

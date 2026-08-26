@@ -69,11 +69,11 @@ describe('isHippotherapyPageContentValid', () => {
         expect(isHippotherapyPageContentValid(content)).toBe(false);
     });
 
-    it('returns false when a quote author name is empty', () => {
+    it('returns true when a quote author name is empty', () => {
         const content = buildValidContent();
         content.anotherQuoteSection.authorName = '';
 
-        expect(isHippotherapyPageContentValid(content)).toBe(false);
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
     });
 
     it('returns false when a field is short visible text padded with HTML markup', () => {

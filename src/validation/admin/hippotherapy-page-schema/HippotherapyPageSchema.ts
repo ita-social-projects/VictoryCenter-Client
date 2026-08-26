@@ -47,7 +47,7 @@ export const isHippotherapyPageContentValid = (content: HippotherapyPageContentM
         isValidHtmlText(content.descriptionSection.description) &&
         isValidImage(content.quoteSection) &&
         isValidHtmlText(content.quoteSection.quoteText) &&
-        isValidHtmlText(content.quoteSection.authorName) &&
+        isValidOptionalHtmlText(content.quoteSection.authorName) &&
         isValidTitle(content.hippoventionSection.title) &&
         isValidHtmlText(content.hippoventionSection.description) &&
         isValidImage(content.hippoventionCenterSection) &&
@@ -67,7 +67,7 @@ export const isHippotherapyPageContentValid = (content: HippotherapyPageContentM
         ) &&
         isValidImage(content.anotherQuoteSection) &&
         isValidHtmlText(content.anotherQuoteSection.quoteText) &&
-        isValidHtmlText(content.anotherQuoteSection.authorName) &&
+        isValidOptionalHtmlText(content.anotherQuoteSection.authorName) &&
         isValidTitle(content.participantsSection.title) &&
         content.participantsSection.cards.every((card) => isValidImage(card) && isValidHtmlText(card.description)) &&
         isValidImage(content.ethicsSection) &&

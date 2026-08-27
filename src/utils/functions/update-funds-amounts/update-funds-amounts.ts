@@ -36,11 +36,27 @@ export const updateFundsAmounts = (
             }
 
             if (normalized !== '' && !currentFieldError) {
-                const convertedAmount = getConvertedAmount(normalized, exchangeRate);
+                const convertedAmount = getConvertedAmount(normalized, exchangeRate, 'uahToUsd');
 
                 if (convertedAmount !== null) {
                     nextAmountUsd = convertedAmount;
                     nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, trigger);
+                }
+            }
+        }
+
+        if (field === 'amountUsd') {
+            if (normalized === '') {
+                nextAmountUah = '';
+                nextAmountUahError = undefined;
+            }
+
+            if (normalized !== '' && !currentFieldError) {
+                const convertedAmount = getConvertedAmount(normalized, exchangeRate, 'usdToUah');
+
+                if (convertedAmount !== null) {
+                    nextAmountUah = convertedAmount;
+                    nextAmountUahError = validateFundsExpendituresAmount(convertedAmount, trigger);
                 }
             }
         }

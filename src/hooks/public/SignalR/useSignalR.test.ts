@@ -46,7 +46,7 @@ describe('useSignalR', () => {
     });
 
     it('should not set connection if unmounted before promise resolves', async () => {
-        let resolveStart: any;
+        let resolveStart: any = () => {};
         const mockStart = jest.fn().mockImplementation(
             () =>
                 new Promise((resolve) => {
@@ -62,13 +62,16 @@ describe('useSignalR', () => {
 
         const { result, unmount } = renderHook(() => useSignalR('http://test-url.com'));
 
+        await waitFor(() => {
+            expect(mockStart).toHaveBeenCalledTimes(1);
+        });
+
         unmount();
 
         await act(async () => {
             resolveStart();
         });
 
-        expect(mockStart).toHaveBeenCalledTimes(1);
         expect(result.current).toBeNull();
     });
 
@@ -114,13 +117,17 @@ describe('useSignalR', () => {
 
         for (let i = 0; i < 5; i++) {
             await act(async () => {
+                await Promise.resolve();
                 jest.runOnlyPendingTimers();
             });
         }
 
-        expect(mockStart).toHaveBeenCalledTimes(6);
+        await waitFor(() => {
+            expect(mockStart).toHaveBeenCalledTimes(6);
+        });
 
         await act(async () => {
+            await Promise.resolve();
             jest.runOnlyPendingTimers();
         });
 

@@ -104,15 +104,21 @@ describe('ReportsSection', () => {
         });
 
         it('does not update state if unmounted before initial fetch completes', async () => {
-            let resolveApi: any;
+            let resolveApi: any = () => {};
+
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockImplementation(
                 () =>
-                    new Promise((res) => {
-                        resolveApi = res;
+                    new Promise((resolve) => {
+                        resolveApi = resolve;
                     }),
             );
 
             const { unmount } = render(<ReportsSection />);
+
+            await waitFor(() => {
+                expect(PdfReportsApi.getAllByLanguageId).toHaveBeenCalled();
+            });
+
             unmount();
 
             await act(async () => {

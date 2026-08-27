@@ -70,6 +70,57 @@ describe('ReportsSection', () => {
         });
     });
 
+    describe('Fetch and Pagination coverage', () => {
+        it('fetches additional pages if items returned equal FETCH_LIMIT', async () => {
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockImplementation((langId, params) => {
+                if (params.offset === 0) {
+                    return Promise.resolve({ items: new Array(params.limit).fill(0).map((_, i) => makeReport(i)) });
+                }
+                return Promise.resolve({ items: [] });
+            });
+
+            render(<ReportsSection />);
+            await waitFor(() => {
+                expect(PdfReportsApi.getAllByLanguageId).toHaveBeenCalledTimes(2);
+            });
+        });
+
+        it('returns empty array and handles API error gracefully', async () => {
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockRejectedValue(new Error('Network error'));
+            render(<ReportsSection />);
+            await waitFor(() => {
+                expect(localizationLanguagesDataFetch).toHaveBeenCalled();
+            });
+            expect(screen.queryByTestId('report-item-mock')).not.toBeInTheDocument();
+        });
+
+        it('does not render if matching language is not found', async () => {
+            (localizationLanguagesDataFetch as jest.Mock).mockResolvedValueOnce([]);
+            render(<ReportsSection />);
+            await waitFor(() => {
+                expect(localizationLanguagesDataFetch).toHaveBeenCalled();
+            });
+            expect(screen.queryByTestId('report-item-mock')).not.toBeInTheDocument();
+        });
+
+        it('does not update state if unmounted before initial fetch completes', async () => {
+            let resolveApi: any;
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockImplementation(
+                () =>
+                    new Promise((res) => {
+                        resolveApi = res;
+                    }),
+            );
+
+            const { unmount } = render(<ReportsSection />);
+            unmount();
+
+            await act(async () => {
+                resolveApi({ items: [makeReport(1)] });
+            });
+        });
+    });
+
     describe('without overflow (<= 2 items)', () => {
         it('renders all items and no toggle button', async () => {
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({
@@ -127,6 +178,14 @@ describe('ReportsSection', () => {
         beforeEach(() => {
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValue({
                 items: initialReports,
+            });
+        });
+
+        it('handles null signalR connection safely', async () => {
+            (useSignalR as jest.Mock).mockReturnValue(null);
+            render(<ReportsSection />);
+            await waitFor(() => {
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
             });
         });
 
@@ -200,6 +259,36 @@ describe('ReportsSection', () => {
             await waitFor(() => {
                 expect(screen.getAllByTestId('report-item-mock')).toHaveLength(3);
                 expect(screen.getByText('Звіт 5')).toBeInTheDocument();
+            });
+        });
+
+        it('ignores SignalR events if the report languageId does not match current active language', async () => {
+            render(<ReportsSection />);
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+
+            const createdCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportCreated')[1];
+            const updatedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportUpdated')[1];
+            const reorderedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportsReordered')[1];
+
+            await act(async () => {
+                createdCb({ ...makeReport(99), languageId: 999 });
+                updatedCb({ ...makeReport(1), name: 'Changed', languageId: 999 });
+                await reorderedCb(999);
+            });
+
+            expect(screen.queryByText('Звіт 99')).not.toBeInTheDocument();
+            expect(screen.queryByText('Changed')).not.toBeInTheDocument();
+        });
+
+        it('ignores SignalR deleted event if component is unmounted', async () => {
+            const { unmount } = render(<ReportsSection />);
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+
+            const deletedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportDeleted')[1];
+            unmount();
+
+            act(() => {
+                deletedCb(1);
             });
         });
 

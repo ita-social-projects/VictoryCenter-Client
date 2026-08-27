@@ -45,6 +45,33 @@ describe('useSignalR', () => {
         expect(mockStart).toHaveBeenCalledTimes(1);
     });
 
+    it('should not set connection if unmounted before promise resolves', async () => {
+        let resolveStart: any;
+        const mockStart = jest.fn().mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveStart = resolve;
+                }),
+        );
+
+        (HubConnectionBuilder as jest.Mock).mockImplementation(() => ({
+            withUrl: jest.fn().mockReturnThis(),
+            withAutomaticReconnect: jest.fn().mockReturnThis(),
+            build: jest.fn().mockReturnValue({ start: mockStart, stop: jest.fn() }),
+        }));
+
+        const { result, unmount } = renderHook(() => useSignalR('http://test-url.com'));
+
+        unmount();
+
+        await act(async () => {
+            resolveStart();
+        });
+
+        expect(mockStart).toHaveBeenCalledTimes(1);
+        expect(result.current).toBeNull();
+    });
+
     it('should retry connection on failure and eventually succeed', async () => {
         const mockStart = jest
             .fn()
@@ -72,6 +99,32 @@ describe('useSignalR', () => {
         });
 
         expect(mockStart).toHaveBeenCalledTimes(2);
+    });
+
+    it('should stop retrying after exceeding maxRetries', async () => {
+        const mockStart = jest.fn().mockRejectedValue(new Error('Failed to connect'));
+
+        (HubConnectionBuilder as jest.Mock).mockImplementation(() => ({
+            withUrl: jest.fn().mockReturnThis(),
+            withAutomaticReconnect: jest.fn().mockReturnThis(),
+            build: jest.fn().mockReturnValue({ start: mockStart, stop: jest.fn() }),
+        }));
+
+        renderHook(() => useSignalR('http://test-url.com'));
+
+        for (let i = 0; i < 5; i++) {
+            await act(async () => {
+                jest.runOnlyPendingTimers();
+            });
+        }
+
+        expect(mockStart).toHaveBeenCalledTimes(6);
+
+        await act(async () => {
+            jest.runOnlyPendingTimers();
+        });
+
+        expect(mockStart).toHaveBeenCalledTimes(6);
     });
 
     it('should call stop on unmount', async () => {

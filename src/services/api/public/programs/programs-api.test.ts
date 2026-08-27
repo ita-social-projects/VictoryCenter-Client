@@ -14,6 +14,35 @@ describe('programs-api', () => {
     });
 
     describe('programPageDataFetch', () => {
+        it('normalizes category localization languageId values', async () => {
+            const mockPrograms: PublishedProgramDto[] = [
+                {
+                    id: 1,
+                    previewImage: null,
+                    name: 'Program A',
+                    description: 'Description A',
+                    categories: [
+                        {
+                            id: 1,
+                            name: 'Категорія',
+                            localizations: [{ languageId: 2, name: 'Category' }],
+                        },
+                    ],
+                    slug: 'program-a',
+                    localizations: [],
+                },
+            ];
+
+            (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockPrograms });
+
+            const result = await programPageDataFetch();
+
+            expect(result.programsCategories[0].localizations?.[0].localizationInfoDto).toEqual({
+                id: 2,
+                code: 'en',
+            });
+        });
+
         it('should fetch published programs and return programs + unique categories', async () => {
             const mockPrograms: PublishedProgramDto[] = [
                 {

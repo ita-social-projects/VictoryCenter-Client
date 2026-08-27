@@ -1,0 +1,28 @@
+.scientific-references-section {
+    display: flex;
+    justify-content: space-around;
+    gap: 32px;
+
+    &-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        max-width: 480px;
+    }
+
+    &-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 549px;
+    }
+
+    &-add-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+}

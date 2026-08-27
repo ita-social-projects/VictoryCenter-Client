@@ -75,8 +75,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -102,8 +102,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('15');
         });
 
         act(() => {
@@ -121,8 +121,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('15');
         });
 
         expect(result.current.usdMismatchMessage).toBeUndefined();
@@ -141,8 +141,8 @@ describe('useFundsExpendituresRecordForm', () => {
 
         act(() => {
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         expect(result.current.isSubmitDisabled).toBe(true);
@@ -162,8 +162,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('450');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUah')('450');
+            result.current.handleAmountFieldChange('amountUsd')('15');
             result.current.handleAmountBlur('amountUsd');
         });
 
@@ -204,8 +204,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -228,8 +228,8 @@ describe('useFundsExpendituresRecordForm', () => {
 
         act(() => {
             result.current.handleReportingYearChange('2026');
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -261,8 +261,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {

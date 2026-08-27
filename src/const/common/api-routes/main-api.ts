@@ -36,6 +36,9 @@ export const API_ROUTES = {
     PROGRAMCATEGORY: {
         BASE: 'HippotherapyProgramCategories',
     },
+    PROGRAM_CATEGORY_LOCALIZATIONS: {
+        BASE: 'HippotherapyProgramCategoryLocalizations',
+    },
     PAYMENTS: {
         DONATE: 'payments/donate',
     },
@@ -66,8 +69,18 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    EVENTS: {
+        BASE: 'Events',
+        SEARCH: 'Events/search',
+        PUBLISHED: 'Events/published',
+        BY_SLUG: 'Events/slug',
+    },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
+    },
+    HIPPOTHERAPY_PAGE: {
+        BASE: 'HippotherapyPage',
+        PUBLIC: 'HippotherapyPage',
     },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',

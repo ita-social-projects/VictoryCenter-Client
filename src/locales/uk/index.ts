@@ -14,6 +14,7 @@ import contactUsPageUk from './contact-us.json';
 import mainPageUk from './main-page.json';
 import historyPageUk from './history.json';
 import supportUsPageUk from './support-us.json';
+import notFoundPageUk from './not-found-page.json';
 
 export {
     headerUk,
@@ -32,4 +33,5 @@ export {
     mainPageUk,
     historyPageUk,
     supportUsPageUk,
+    notFoundPageUk,
 };

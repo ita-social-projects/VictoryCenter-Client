@@ -9,7 +9,9 @@ export const COMMON_TEXT_ADMIN = {
         HISTORY: 'Історія',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
+        EVENTS: 'Новини і події',
         PARTNERS: 'Партнери',
+        HIPPOTHERAPY: 'Іпотерапія',
     },
 
     ALT: {
@@ -54,8 +56,8 @@ export const COMMON_TEXT_ADMIN = {
 
     QUESTION: {
         SAVE_CHANGES: 'Зберегти зміни?',
-        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені\nБажаєте продовжити?',
-        CHANGE_LANGUAGE_UNSAVED_CHANGES: 'Зміни будуть втрачені\nБажаєте змінити мову?',
+        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені.\nБажаєте продовжити?',
+        CHANGE_LANGUAGE_UNSAVED_CHANGES: 'Зміни будуть втрачені.\nБажаєте змінити мову?',
         REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },
@@ -149,6 +151,7 @@ export const UI_CONFIG = {
         MAX_CHARACTERS_FOR_SEARCH: {
             FAQ: 150,
             PROGRAMS: 90,
+            EVENTS: 90,
             TEAM_MEMBERS: 50,
         },
     },

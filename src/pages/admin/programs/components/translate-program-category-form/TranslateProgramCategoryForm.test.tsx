@@ -1,7 +1,11 @@
 import React, { createRef } from 'react';
 import { createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TranslateProgramCategoryForm, TranslateProgramCategoryFormRef } from './TranslateProgramCategoryForm';
+import {
+    TranslateProgramCategoryForm,
+    TranslateProgramCategoryFormRef,
+    TranslateProgramCategoryFormValues,
+} from './TranslateProgramCategoryForm';
 import { ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/program-category-schema/program-category-schema';
@@ -108,16 +112,29 @@ describe('TranslateProgramCategoryForm', () => {
         expect(screen.getByTestId('input-name')).toBeEnabled();
     });
 
-    it('resets the name field whenever the selected category changes', () => {
-        renderForm();
+    it('fills the name field from initialData', () => {
+        renderForm({ initialData: { categoryId: 1, name: 'Existing translation' } });
 
-        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '1' } });
-        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Translated name' } });
-        expect(screen.getByTestId('input-name')).toHaveValue('Translated name');
+        expect(screen.getByTestId('input-name')).toHaveValue('Existing translation');
+    });
+
+    it('pre-selects the category when selectedCategory prop is provided', () => {
+        renderForm({ selectedCategory: mockCategories[1] });
+
+        expect(screen.getByTestId('category-select')).toHaveValue('2');
+        expect(screen.getByTestId('input-name')).toBeEnabled();
+    });
+
+    it('calls onCategoryChange with the selected category and null on clear', () => {
+        const onCategoryChange = jest.fn();
+
+        renderForm({ onCategoryChange });
 
         fireEvent.change(screen.getByTestId('category-select'), { target: { value: '2' } });
+        expect(onCategoryChange).toHaveBeenCalledWith(mockCategories[1]);
 
-        expect(screen.getByTestId('input-name')).toHaveValue('');
+        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '' } });
+        expect(onCategoryChange).toHaveBeenLastCalledWith(null);
     });
 
     it('updates the name value on change', () => {
@@ -161,16 +178,17 @@ describe('TranslateProgramCategoryForm', () => {
         });
     });
 
-    it('reports dirty state as soon as a category is selected, even without a name', async () => {
+    it('reports dirty state relative to initialData, not merely category selection', async () => {
         const onDirtyChange = jest.fn();
+        const initialData: TranslateProgramCategoryFormValues = { categoryId: 1, name: '' };
 
-        renderForm({ onDirtyChange });
+        renderForm({ initialData, selectedCategory: mockCategories[0], onDirtyChange });
 
         await waitFor(() => {
             expect(onDirtyChange).toHaveBeenCalledWith(false);
         });
 
-        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '1' } });
+        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Changed name' } });
 
         await waitFor(() => {
             expect(onDirtyChange).toHaveBeenLastCalledWith(true);

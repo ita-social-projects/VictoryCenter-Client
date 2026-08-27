@@ -14,5 +14,21 @@
     "subjectPlaceholder": "Тема звернення",
     "messagePlaceholder": "Напишіть ваше повідомлення",
     "formLabel": "Форма зворотного зв'язку",
-    "submitButton": "Надіслати"
+    "submitButton": "Надіслати",
+    "downloadError": "Не вдалося завантажити дані сторінки. Будь ласка, спробуйте пізніше.",
+    "contactForm": {
+        "nameRequired": "Введіть Ваше ім'я",
+        "emailRequired": "Введіть E-mail для зв'язку",
+        "emailInvalid": "Некоректний E-mail",
+        "subjectRequired": "Введіть тему звернення",
+        "subjectMinLengthError": "Мінімум 5 символів",
+        "limitReached": "Ліміт символів вичерпано",
+        "charactersRemaining_one": "Залишився {{count}} символ",
+        "charactersRemaining_few": "Залишилось {{count}} символи",
+        "charactersRemaining_many": "Залишилось {{count}} символів",
+        "messageRequired": "Введіть повідомлення",
+        "messageMinLengthError": "Мінімум 10 символів",
+        "submitSuccess": "Ваш запит надіслано успішно. Очікуйте на відповідь.",
+        "submitError": "Сталася помилка. Спробуйте пізніше."
+    }
 }

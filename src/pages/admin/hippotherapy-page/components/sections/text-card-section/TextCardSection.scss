@@ -1,0 +1,14 @@
+.hippotherapy-text-card-section {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 48px;
+
+    > *:first-child {
+        flex: 0 0 432px;
+    }
+
+    > *:last-child {
+        flex: 0 1 896px;
+    }
+}

@@ -14,5 +14,20 @@
     "subjectPlaceholder": "Subject",
     "messagePlaceholder": "Write your message",
     "formLabel": "Contact form",
-    "submitButton": "Send"
+    "submitButton": "Send",
+    "downloadError": "The page data could not be loaded. Please try again later.",
+    "contactForm": {
+        "nameRequired": "Enter your name",
+        "emailRequired": "Enter your E-mail address",
+        "emailInvalid": "Invalid E-mail address",
+        "subjectRequired": "Enter the subject",
+        "subjectMinLengthError": "Minimum 5 characters",
+        "limitReached": "Character limit reached",
+        "charactersRemaining_one": "{{count}} character remaining",
+        "charactersRemaining_other": "{{count}} characters remaining",
+        "messageRequired": "Enter your message",
+        "messageMinLengthError": "Minimum 10 characters",
+        "submitSuccess": "Your request has been submitted successfully. Please wait for a response.",
+        "submitError": "An error occurred. Please try again later."
+    }
 }

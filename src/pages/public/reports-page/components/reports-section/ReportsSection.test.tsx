@@ -205,9 +205,9 @@ describe('ReportsSection', () => {
 
         it('cleans up SignalR event listeners on unmount', async () => {
             const { unmount } = render(<ReportsSection />);
-            
+
             await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
-            
+
             unmount();
 
             expect(mockSignalROff).toHaveBeenCalledWith('PdfReportCreated', expect.any(Function));

@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { EventsPageAdmin } from './EventsPageAdmin';
@@ -101,7 +100,9 @@ describe('EventsPageAdmin', () => {
     it('does not render an error message when there is no error', async () => {
         const { container } = render(<EventsPageAdmin />);
 
-        await screen.findByTestId('events-page-content');
+        await waitFor(() => {
+            expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
+        });
 
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
     });
@@ -112,9 +113,9 @@ describe('EventsPageAdmin', () => {
 
         render(<EventsPageAdmin />);
 
-        const errorElement = await screen.findByText(errorMessage);
-
-        expect(errorElement).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
     });
 
     it('renders add category context menu option', () => {
@@ -125,6 +126,7 @@ describe('EventsPageAdmin', () => {
 
     it('renders edit category context menu option', () => {
         render(<EventsPageAdmin />);
+
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
     });
 
@@ -135,7 +137,9 @@ describe('EventsPageAdmin', () => {
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
 
-        expect(mockOpenAddCategoryModal).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(mockOpenAddCategoryModal).toHaveBeenCalledTimes(1);
+        });
     });
 
     it('opens edit category modal when edit option is selected', async () => {
@@ -145,6 +149,8 @@ describe('EventsPageAdmin', () => {
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
-        expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
+        });
     });
 });

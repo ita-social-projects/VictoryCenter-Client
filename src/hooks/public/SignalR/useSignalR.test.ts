@@ -82,7 +82,11 @@ describe('useSignalR', () => {
             build: jest.fn().mockReturnValue({ start: jest.fn().mockResolvedValue(undefined), stop: mockStop }),
         }));
 
-        const { unmount } = renderHook(() => useSignalR('http://test-url.com'));
+        const { result, unmount } = renderHook(() => useSignalR('http://test-url.com'));
+
+        await waitFor(() => {
+            expect(result.current).not.toBeNull();
+        });
 
         unmount();
 

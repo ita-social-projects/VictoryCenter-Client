@@ -136,8 +136,8 @@ describe('ReportsSection', () => {
 
             const createdCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportCreated')[1];
 
-            act(() => {
-                createdCallback(makeReport(99));
+            await act(async () => {
+                await createdCallback(makeReport(99));
             });
 
             const user = userEvent.setup();
@@ -155,8 +155,8 @@ describe('ReportsSection', () => {
 
             const updatedCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportUpdated')[1];
 
-            act(() => {
-                updatedCallback({ ...makeReport(1), name: 'Updated Title.pdf' });
+            await act(async () => {
+                await updatedCallback({ ...makeReport(1), name: 'Updated Title.pdf' });
             });
 
             await waitFor(() => {
@@ -170,8 +170,8 @@ describe('ReportsSection', () => {
 
             const deletedCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportDeleted')[1];
 
-            act(() => {
-                deletedCallback(1);
+            await act(async () => {
+                await deletedCallback(1);
             });
 
             await waitFor(() => {
@@ -203,8 +203,11 @@ describe('ReportsSection', () => {
             });
         });
 
-        it('cleans up SignalR event listeners on unmount', () => {
+        it('cleans up SignalR event listeners on unmount', async () => {
             const { unmount } = render(<ReportsSection />);
+            
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            
             unmount();
 
             expect(mockSignalROff).toHaveBeenCalledWith('PdfReportCreated', expect.any(Function));

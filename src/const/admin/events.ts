@@ -5,9 +5,6 @@ export const EVENTS_TEXT = {
     PLACEHOLDER: {
         SEARCH_EVENTS: 'Введіть назву',
     },
-    MESSAGE: {
-        FAIL_TO_FETCH_CATEGORIES: 'Не вдалось завантажити категорії.',
-    },
 };
 
 export const EVENT_CATEGORY_VALIDATION = {

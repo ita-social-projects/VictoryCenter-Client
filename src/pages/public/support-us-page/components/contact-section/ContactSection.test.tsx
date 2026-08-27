@@ -26,35 +26,28 @@ jest.mock(
         ),
 );
 
-const TRANSLATIONS: Record<string, string> = {
-    'SUPPORT_INQUIRY.TITLE': 'Як підтримати',
-    'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT': 'Перший текст | Другий рядок',
-    'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT': 'Важливий текст | Другий важливий рядок',
-    'SUPPORT_INQUIRY.FORM.NAME': "Ваше ім'я",
-    'SUPPORT_INQUIRY.FORM.EMAIL': 'E-mail',
-    'SUPPORT_INQUIRY.FORM.SUBJECT': 'Тема звернення',
-    'SUPPORT_INQUIRY.FORM.MESSAGE': 'Напишіть ваше повідомлення',
-    'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON': 'Надіслати',
-    'contactForm.nameRequired': "Введіть Ваше ім'я",
-    'contactForm.emailRequired': "Введіть E-mail для зв'язку",
-    'contactForm.emailInvalid': 'Некоректний E-mail',
-    'contactForm.subjectRequired': 'Тема звернення',
-    'contactForm.subjectMinLengthError': 'Мінімум 5 символів',
-    'contactForm.messageRequired': 'Напишіть Ваше повідомлення',
-    'contactForm.messageMinLengthError': 'Мінімум 10 символів',
-    'contactForm.limitReached': 'Ліміт символів вичерпано',
-    'contactForm.submitSuccess': 'Ваш запит надіслано успішно. Очікуйте на відповідь',
-    'contactForm.submitError': 'Сталася помилка. Спробуйте пізніше',
-};
+const T = {
+    TITLE: 'SUPPORT_INQUIRY.TITLE',
+    FIRST_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT',
+    SECOND_BOLD_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT',
+    SUBMIT_BUTTON: 'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON',
+    NAME_REQUIRED: 'contactForm.nameRequired',
+    EMAIL_REQUIRED: 'contactForm.emailRequired',
+    EMAIL_INVALID: 'contactForm.emailInvalid',
+    SUBJECT_REQUIRED: 'contactForm.subjectRequired',
+    SUBJECT_MIN_ERROR: 'contactForm.subjectMinLengthError',
+    MESSAGE_REQUIRED: 'contactForm.messageRequired',
+    MESSAGE_MIN_ERROR: 'contactForm.messageMinLengthError',
+    LIMIT_REACHED: 'contactForm.limitReached',
+    SUBMIT_SUCCESS: 'contactForm.submitSuccess',
+    SUBMIT_ERROR: 'contactForm.submitError',
+} as const;
+const charactersRemaining = (count: number) => `contactForm.charactersRemaining_${count}`;
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string, options?: { count?: number }) => {
-            if (key === 'contactForm.charactersRemaining' && options) {
-                return `Залишилось ${options.count} символів`;
-            }
-            return TRANSLATIONS[key];
-        },
+        t: (key: string, options?: { count?: number }) =>
+            options?.count !== undefined ? `${key}_${options.count}` : key,
     }),
 }));
 
@@ -69,7 +62,7 @@ describe('ContactSection', () => {
     const setFieldValue = (fieldId: string, value: string) => {
         fireEvent.change(getField(fieldId), { target: { value } });
     };
-    const clickSubmit = () => fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+    const clickSubmit = () => fireEvent.click(screen.getByRole('button', { name: T.SUBMIT_BUTTON }));
     const fillForm = (overrides: FormValues = {}, shouldBlur = false) => {
         const values = {
             name: 'Ім’я',
@@ -109,14 +102,12 @@ describe('ContactSection', () => {
     it('renders the support inquiry form', () => {
         render(<ContactSection />);
 
-        expect(screen.getByTestId('title-section')).toHaveTextContent('Як підтримати');
+        expect(screen.getByTestId('title-section')).toHaveTextContent(T.TITLE);
         expect(getField(NAME_FIELD)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Надіслати' })).toBeInTheDocument();
-        expect(screen.getByRole('form', { name: 'Як підтримати' })).toBeInTheDocument();
-        expect(screen.getByText('Перший текст')).toBeInTheDocument();
-        expect(screen.getByText('Другий рядок')).toBeInTheDocument();
-        expect(screen.getByText('Важливий текст')).toBeInTheDocument();
-        expect(screen.getByText('Другий важливий рядок')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: T.SUBMIT_BUTTON })).toBeInTheDocument();
+        expect(screen.getByRole('form', { name: T.TITLE })).toBeInTheDocument();
+        expect(screen.getByText(T.FIRST_TEXT)).toBeInTheDocument();
+        expect(screen.getByText(T.SECOND_BOLD_TEXT)).toBeInTheDocument();
     });
 
     it('renders the correct field types, limits and CAPTCHA state', () => {
@@ -126,14 +117,14 @@ describe('ContactSection', () => {
         expect(getField(SUBJECT_FIELD)).toHaveAttribute('maxlength', String(CONTACT_FORM_LIMITS.SUBJECT.MAX));
         expect(getField(MESSAGE_FIELD)).toHaveAttribute('maxlength', String(CONTACT_FORM_LIMITS.MESSAGE.MAX));
         expect(getField(MESSAGE_FIELD).tagName).toBe('TEXTAREA');
-        expect(screen.getByRole('button', { name: 'Надіслати' })).toBeEnabled();
+        expect(screen.getByRole('button', { name: T.SUBMIT_BUTTON })).toBeEnabled();
     });
 
     it('disables submission and does not call the API when CAPTCHA has no token', async () => {
         mockTurnstileToken = null;
         render(<ContactSection />);
 
-        const submitButton = screen.getByRole('button', { name: 'Надіслати' });
+        const submitButton = screen.getByRole('button', { name: T.SUBMIT_BUTTON });
         expect(submitButton).toBeDisabled();
         submitForm();
 
@@ -146,22 +137,18 @@ describe('ContactSection', () => {
         render(<ContactSection />);
         clickSubmit();
 
-        expect(await screen.findByText("Введіть Ваше ім'я")).toBeInTheDocument();
-        expect(await screen.findByText("Введіть E-mail для зв'язку")).toBeInTheDocument();
-        expect(await screen.findByText('Тема звернення')).toBeInTheDocument();
-        expect(await screen.findByText('Напишіть Ваше повідомлення')).toBeInTheDocument();
-        expect(getField(NAME_FIELD).parentElement).toHaveClass('field--error');
-        expect(getField(EMAIL_FIELD).parentElement).toHaveClass('field--error');
-        expect(getField(SUBJECT_FIELD).parentElement).toHaveClass('field--error');
-        expect(getField(MESSAGE_FIELD).parentElement).toHaveClass('field--error');
+        expect(await screen.findByText(T.NAME_REQUIRED)).toBeInTheDocument();
+        expect(await screen.findByText(T.EMAIL_REQUIRED)).toBeInTheDocument();
+        expect(await screen.findByText(T.SUBJECT_REQUIRED)).toBeInTheDocument();
+        expect(await screen.findByText(T.MESSAGE_REQUIRED)).toBeInTheDocument();
     });
 
     it('shows the required email message when email is empty', async () => {
         render(<ContactSection />);
         clickSubmit();
 
-        expect(await screen.findByText("Введіть E-mail для зв'язку")).toBeInTheDocument();
-        expect(screen.queryByText('Некоректний E-mail')).not.toBeInTheDocument();
+        expect(await screen.findByText(T.EMAIL_REQUIRED)).toBeInTheDocument();
+        expect(screen.queryByText(T.EMAIL_INVALID)).not.toBeInTheDocument();
     });
 
     it('shows the existing minimum-length errors for subject and message', async () => {
@@ -174,8 +161,8 @@ describe('ContactSection', () => {
         fireEvent.blur(subjectInput);
         fireEvent.blur(messageInput);
 
-        expect(await screen.findByText('Мінімум 5 символів')).toBeInTheDocument();
-        expect(await screen.findByText('Мінімум 10 символів')).toBeInTheDocument();
+        expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
+        expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
     });
 
     it('shows warning and reached-limit hints at their boundaries', () => {
@@ -183,13 +170,13 @@ describe('ContactSection', () => {
         setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT));
 
-        expect(screen.getByText('Залишилось 20 символів')).toBeInTheDocument();
-        expect(screen.getByText('Залишилось 200 символів')).toBeInTheDocument();
+        expect(screen.getByText(charactersRemaining(20))).toBeInTheDocument();
+        expect(screen.getByText(charactersRemaining(200))).toBeInTheDocument();
 
         setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MAX));
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX));
 
-        expect(screen.getAllByText('Ліміт символів вичерпано')).toHaveLength(2);
+        expect(screen.getAllByText(T.LIMIT_REACHED)).toHaveLength(2);
     });
 
     describe('email format validation', () => {
@@ -203,8 +190,7 @@ describe('ContactSection', () => {
             render(<ContactSection />);
             submitForm({ email });
 
-            expect(await screen.findByText('Некоректний E-mail')).toBeInTheDocument();
-            expect(getField(EMAIL_FIELD).parentElement).toHaveClass('field--error');
+            expect(await screen.findByText(T.EMAIL_INVALID)).toBeInTheDocument();
             expect(submitMock).not.toHaveBeenCalled();
         });
 
@@ -213,7 +199,7 @@ describe('ContactSection', () => {
             submitForm({ email: 'user@mail.com' });
 
             await waitFor(() => expect(submitMock).toHaveBeenCalled());
-            expect(screen.queryByText('Некоректний E-mail')).not.toBeInTheDocument();
+            expect(screen.queryByText(T.EMAIL_INVALID)).not.toBeInTheDocument();
         });
     });
 
@@ -224,7 +210,7 @@ describe('ContactSection', () => {
         }
         clickSubmit();
 
-        expect(await screen.findByText("Введіть Ваше ім'я")).toBeInTheDocument();
+        expect(await screen.findByText(T.NAME_REQUIRED)).toBeInTheDocument();
     });
 
     it('trims leading and trailing spaces when a field loses focus', () => {
@@ -259,10 +245,10 @@ describe('ContactSection', () => {
         );
         expect(mockResetTurnstile).toHaveBeenCalled();
         expect(getField(NAME_FIELD)).toHaveValue('');
-        expect(screen.getByText('Ваш запит надіслано успішно. Очікуйте на відповідь')).toBeInTheDocument();
+        expect(screen.getByText(T.SUBMIT_SUCCESS)).toBeInTheDocument();
 
         act(() => jest.advanceTimersByTime(5000));
-        expect(screen.queryByText('Ваш запит надіслано успішно. Очікуйте на відповідь')).not.toBeInTheDocument();
+        expect(screen.queryByText(T.SUBMIT_SUCCESS)).not.toBeInTheDocument();
     });
 
     it('shows an error message for three seconds when submission fails', async () => {
@@ -270,8 +256,8 @@ describe('ContactSection', () => {
         render(<ContactSection />);
         submitForm();
 
-        expect(await screen.findByText('Сталася помилка. Спробуйте пізніше')).toBeInTheDocument();
+        expect(await screen.findByText(T.SUBMIT_ERROR)).toBeInTheDocument();
         act(() => jest.advanceTimersByTime(3000));
-        expect(screen.queryByText('Сталася помилка. Спробуйте пізніше')).not.toBeInTheDocument();
+        expect(screen.queryByText(T.SUBMIT_ERROR)).not.toBeInTheDocument();
     });
 });

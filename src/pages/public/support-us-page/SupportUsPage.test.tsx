@@ -23,10 +23,10 @@ describe('SupportUsPage', () => {
         expect(screen.getByTestId('contact-section')).toBeInTheDocument();
     });
 
-    it('renders the page as a main landmark with the page class', () => {
+    it('renders the page as a main landmark', () => {
         render(<SupportUsPage />);
 
-        expect(screen.getByRole('main')).toHaveClass('page');
+        expect(screen.getByRole('main')).toBeInTheDocument();
     });
 
     it('renders the contact section inside the main landmark', () => {

@@ -7,23 +7,46 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
 import styles from './ProgramsSection.module.scss';
 import { ProgramCard } from '@/components/public/program-card/ProgramCard';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
+
+const localizeCategory = (category: ProgramCategoryDto, language: string): ProgramCategoryDto => {
+    const localization = (category.localizations ?? []).find(
+        (item) =>
+            item.localizationInfoDto?.code === language ||
+            (language === 'en' && item.languageId === DEFAULT_ENGLISH_LANGUAGE_ID),
+    );
+
+    return localization?.name ? { ...category, name: localization.name } : category;
+};
 
 export const ProgramsSection: React.FC = () => {
     const { t } = useTranslation(['programsPage', 'footer']);
+    const { currentLanguage } = useLocale();
 
     const [programCategory, setProgramCategory] = useState<ProgramCategoryDto | null>(null);
     const { data, isLoading, error } = useDataFetch<ProgramsPageData | null>({
         initialData: null,
         fetchHandler: programPageDataFetch,
-        autoFetchDependencies: [programCategory],
+        autoFetchDependencies: [currentLanguage, programCategory],
     });
-    const programsByCategory = useMemo<ProgramsPageData['programsData'] | undefined>(
-        () =>
-            programCategory && data
-                ? data.programsData.filter((x) => x.categories.filter((pc) => pc.id === programCategory.id).length > 0)
-                : data?.programsData,
-        [programCategory, data],
-    );
+    const programsByCategory = useMemo<ProgramsPageData['programsData'] | undefined>(() => {
+        if (!data) return undefined;
+
+        const categoryById = new Map(data.programsCategories.map((category) => [category.id, category]));
+        const filteredPrograms = programCategory
+            ? data.programsData.filter((program) =>
+                  program.categories.some((category) => category.id === programCategory.id),
+              )
+            : data.programsData;
+
+        return filteredPrograms.map((program) => ({
+            ...program,
+            categories: program.categories.map((category) =>
+                localizeCategory(categoryById.get(category.id) ?? category, currentLanguage),
+            ),
+        }));
+    }, [currentLanguage, data, programCategory]);
 
     const handleProgramCategoryChange = (programCategory: ProgramCategoryDto | null) => {
         setProgramCategory(programCategory);
@@ -36,14 +59,14 @@ export const ProgramsSection: React.FC = () => {
                 <div className={styles['button-block']}>
                     {data?.programsCategories.map((pc) => (
                         <button
-                            onClick={() => handleProgramCategoryChange(pc)}
+                            onClick={() => handleProgramCategoryChange(localizeCategory(pc, currentLanguage))}
                             key={pc.id}
                             className={classNames({
                                 [styles['white-button']]: programCategory?.id !== pc.id,
                                 [styles['black-button']]: programCategory?.id === pc.id,
                             })}
                         >
-                            {pc.name}
+                            {localizeCategory(pc, currentLanguage).name}
                         </button>
                     ))}
                     <button

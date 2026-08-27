@@ -5,6 +5,19 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 import { TranslateProgramCategoryModal } from './TranslateProgramCategoryModal';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ProgramCategoryLocalizationsApi } from '@/services/api/admin/programs/program-category-localizations/program-category-localizations-api';
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+jest.mock('@/services/api/admin/programs/program-category-localizations/program-category-localizations-api');
+
+const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
+const mockedProgramCategoryLocalizationsApi = ProgramCategoryLocalizationsApi as jest.Mocked<
+    typeof ProgramCategoryLocalizationsApi
+>;
 
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
@@ -124,6 +137,7 @@ describe('TranslateProgramCategoryModal', () => {
             onClose: jest.fn(),
             translatedLanguages: [EN_LANGUAGE],
             categories: CATEGORY_LIST,
+            onTranslateCategory: jest.fn(),
         };
 
         return render(<TranslateProgramCategoryModal {...defaultProps} {...props} />);
@@ -133,6 +147,13 @@ describe('TranslateProgramCategoryModal', () => {
         jest.clearAllMocks();
         mockFormIsValid = true;
         mockFormIsDirty = true;
+        mockedUseAdminClient.mockReturnValue({} as ReturnType<typeof useAdminClient>);
+        mockedProgramCategoryLocalizationsApi.create.mockResolvedValue({
+            entityId: CATEGORY_WITHOUT_LOCALIZATION.id,
+            name: 'Translated category name',
+            localizationInfoDto: EN_LANGUAGE,
+            translationStatus: TranslationStatus.Relevant,
+        });
     });
 
     it('renders with the "Додати переклад" title before a category is selected', () => {
@@ -169,18 +190,17 @@ describe('TranslateProgramCategoryModal', () => {
         );
     });
 
-    it('stays in add mode with an empty prefill when the selected category has no EN translation', () => {
+    it('stays in add mode with an empty prefill when the selected category has no EN translation', async () => {
         renderModal();
 
         fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
 
-        expect(screen.getByTestId('modal-title')).toHaveTextContent(
-            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
-        );
-        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute(
-            'data-initial',
-            JSON.stringify({ categoryId: CATEGORY_WITHOUT_LOCALIZATION.id, name: '' }),
-        );
+        await waitFor(() => {
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+            );
+        });
+        expect(screen.getByTestId('translate-program-category-form')).toHaveAttribute('data-initial', 'null');
     });
 
     it('recomputes mode and prefill when switching between categories', () => {
@@ -270,6 +290,29 @@ describe('TranslateProgramCategoryModal', () => {
         });
     });
 
+    it('calls the translation success callback and closes the modal after submit', async () => {
+        const onTranslateCategory = jest.fn();
+        const onClose = jest.fn();
+
+        renderModal({ onTranslateCategory, onClose });
+
+        fireEvent.click(screen.getByTestId(`select-category-${CATEGORY_WITHOUT_LOCALIZATION.id}`));
+        fireEvent.click(screen.getByTestId('save-localization-btn'));
+
+        await waitFor(() => {
+            expect(onTranslateCategory).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    id: 1,
+                    name: CATEGORY_WITHOUT_LOCALIZATION.name,
+                    localizations: expect.arrayContaining([
+                        expect.objectContaining({ name: 'Translated category name' }),
+                    ]),
+                }),
+            );
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
     it('does not submit when the form is invalid', () => {
         mockFormIsValid = false;
         renderModal();
@@ -349,6 +392,7 @@ describe('TranslateProgramCategoryModal', () => {
 
     it('resets the selected category (and with it, mode/prefill) when reopened after being closed', () => {
         const onClose = jest.fn();
+        const onTranslateCategory = jest.fn();
 
         const { rerender } = render(
             <TranslateProgramCategoryModal
@@ -356,6 +400,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -370,6 +415,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -379,6 +425,7 @@ describe('TranslateProgramCategoryModal', () => {
                 onClose={onClose}
                 translatedLanguages={[EN_LANGUAGE]}
                 categories={CATEGORY_LIST}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 

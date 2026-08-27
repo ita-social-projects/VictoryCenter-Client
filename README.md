@@ -385,6 +385,7 @@ SSL_KEY_FILE=certs/localhost-key.pem
 SSL_CRT_FILE=certs/localhost-cert.pem
 REACT_APP_PROXY_TARGET=https://backend.historycode.online/api
 REACT_APP_BACKEND_URL=/api
+REACT_APP_SIGNALR_PDF_REPORTS_URL=https://backend.victorycenter.online/hubs/reports
 ```
 
 ## AI Assistant Setup

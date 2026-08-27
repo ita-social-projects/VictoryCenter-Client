@@ -1,27 +1,17 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useForm, UseFormRegisterReturn } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 import { ToastItem } from '@/components/admin/toast/toast-item/ToastItem';
 import { Toast, ToastType } from '@/types/admin/toast';
-import { contactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
-import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { createContactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
+import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
 import { useTurnstile } from '@/hooks/public/use-turnstile';
 import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
 import styles from './ContactSection.module.scss';
 
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
-const REQUIRED_MESSAGES = {
-    name: "Введіть Ваше ім'я",
-    email: "Введіть E-mail для зв'язку",
-    subject: 'Тема звернення',
-    message: 'Напишіть Ваше повідомлення',
-} as const;
-
-interface HintMessages {
-    LIMIT_REACHED: string;
-    getWarnMessage: (remaining: number) => string;
-}
 
 interface ContactFormProps {
     title: string;
@@ -108,10 +98,13 @@ const LineBreakText: React.FC<LineBreakTextProps> = ({ text, className }) => (
     </span>
 );
 
-const getHint = (value: string, limit: { MAX: number; WARN_AT: number }, messages: HintMessages) => {
-    if (value.length >= limit.MAX) return { text: messages.LIMIT_REACHED, type: 'error' as const };
+const getHint = (value: string, limit: { MAX: number; WARN_AT: number }, t: TFunction<'contactUsPage', undefined>) => {
+    if (value.length >= limit.MAX) return { text: t('contactForm.limitReached'), type: 'error' as const };
     if (value.length >= limit.WARN_AT) {
-        return { text: messages.getWarnMessage(limit.MAX - value.length), type: 'warn' as const };
+        return {
+            text: t('contactForm.charactersRemaining', { count: limit.MAX - value.length }),
+            type: 'warn' as const,
+        };
     }
     return null;
 };
@@ -124,6 +117,17 @@ const ContactForm: React.FC<ContactFormProps> = ({
     messagePlaceholder,
     submitLabel,
 }) => {
+    const { t } = useTranslation('contactUsPage');
+    const contactFormSchema = useMemo(() => createContactFormSchema(t), [t]);
+    const requiredMessages = useMemo(
+        () => ({
+            name: t('contactForm.nameRequired'),
+            email: t('contactForm.emailRequired'),
+            subject: t('contactForm.subjectRequired'),
+            message: t('contactForm.messageRequired'),
+        }),
+        [t],
+    );
     const {
         register,
         handleSubmit,
@@ -144,8 +148,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
     const emailValue = watch('email') ?? '';
     const subjectValue = watch('subject') ?? '';
     const messageValue = watch('message') ?? '';
-    const subjectHint = getHint(subjectValue, CONTACT_FORM_LIMITS.SUBJECT, CONTACT_FORM_MESSAGES.SUBJECT);
-    const messageHint = getHint(messageValue, CONTACT_FORM_LIMITS.MESSAGE, CONTACT_FORM_MESSAGES.MESSAGE);
+    const subjectHint = getHint(subjectValue, CONTACT_FORM_LIMITS.SUBJECT, t);
+    const messageHint = getHint(messageValue, CONTACT_FORM_LIMITS.MESSAGE, t);
 
     const trimOnBlur =
         (field: keyof ContactFormData) => (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -170,9 +174,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
             });
             reset();
             resetTurnstile();
-            showToast('Ваш запит надіслано успішно. Очікуйте на відповідь', ToastType.Success, 5000);
+            showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
         } catch {
-            showToast('Сталася помилка. Спробуйте пізніше', ToastType.Error, 3000);
+            showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }
     };
 
@@ -180,8 +184,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
     const messageClass = (type: 'error' | 'warn') => (type === 'error' ? styles.error : styles.info);
     const isEmpty = (value?: string) => value !== undefined && !value.trim();
     const isFieldTouched = (field: keyof ContactFormData) => Boolean(touchedFields[field]) || isSubmitted;
-    const getErrorMessage = (field: keyof typeof REQUIRED_MESSAGES, message?: string, type?: string, value?: string) =>
-        isFieldTouched(field) && (type === 'required' || isEmpty(value)) ? REQUIRED_MESSAGES[field] : message;
+    const getErrorMessage = (field: keyof typeof requiredMessages, message?: string, type?: string, value?: string) =>
+        isFieldTouched(field) && (type === 'required' || isEmpty(value)) ? requiredMessages[field] : message;
 
     return (
         <>

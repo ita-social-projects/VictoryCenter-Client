@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ContactSection } from './ContactSection';
-import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
 import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
 
 const mockResetTurnstile = jest.fn();
@@ -26,19 +26,35 @@ jest.mock(
         ),
 );
 
+const TRANSLATIONS: Record<string, string> = {
+    'SUPPORT_INQUIRY.TITLE': 'Як підтримати',
+    'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT': 'Перший текст | Другий рядок',
+    'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT': 'Важливий текст | Другий важливий рядок',
+    'SUPPORT_INQUIRY.FORM.NAME': "Ваше ім'я",
+    'SUPPORT_INQUIRY.FORM.EMAIL': 'E-mail',
+    'SUPPORT_INQUIRY.FORM.SUBJECT': 'Тема звернення',
+    'SUPPORT_INQUIRY.FORM.MESSAGE': 'Напишіть ваше повідомлення',
+    'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON': 'Надіслати',
+    'contactForm.nameRequired': "Введіть Ваше ім'я",
+    'contactForm.emailRequired': "Введіть E-mail для зв'язку",
+    'contactForm.emailInvalid': 'Некоректний E-mail',
+    'contactForm.subjectRequired': 'Тема звернення',
+    'contactForm.subjectMinLengthError': 'Мінімум 5 символів',
+    'contactForm.messageRequired': 'Напишіть Ваше повідомлення',
+    'contactForm.messageMinLengthError': 'Мінімум 10 символів',
+    'contactForm.limitReached': 'Ліміт символів вичерпано',
+    'contactForm.submitSuccess': 'Ваш запит надіслано успішно. Очікуйте на відповідь',
+    'contactForm.submitError': 'Сталася помилка. Спробуйте пізніше',
+};
+
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) =>
-            ({
-                'SUPPORT_INQUIRY.TITLE': 'Як підтримати',
-                'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT': 'Перший текст | Другий рядок',
-                'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT': 'Важливий текст | Другий важливий рядок',
-                'SUPPORT_INQUIRY.FORM.NAME': "Ваше ім'я",
-                'SUPPORT_INQUIRY.FORM.EMAIL': 'E-mail',
-                'SUPPORT_INQUIRY.FORM.SUBJECT': 'Тема звернення',
-                'SUPPORT_INQUIRY.FORM.MESSAGE': 'Напишіть ваше повідомлення',
-                'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON': 'Надіслати',
-            })[key],
+        t: (key: string, options?: { count?: number }) => {
+            if (key === 'contactForm.charactersRemaining' && options) {
+                return `Залишилось ${options.count} символів`;
+            }
+            return TRANSLATIONS[key];
+        },
     }),
 }));
 
@@ -130,7 +146,7 @@ describe('ContactSection', () => {
         render(<ContactSection />);
         clickSubmit();
 
-        expect(await screen.findByText(CONTACT_FORM_MESSAGES.NAME.REQUIRED)).toBeInTheDocument();
+        expect(await screen.findByText("Введіть Ваше ім'я")).toBeInTheDocument();
         expect(await screen.findByText("Введіть E-mail для зв'язку")).toBeInTheDocument();
         expect(await screen.findByText('Тема звернення')).toBeInTheDocument();
         expect(await screen.findByText('Напишіть Ваше повідомлення')).toBeInTheDocument();
@@ -145,7 +161,7 @@ describe('ContactSection', () => {
         clickSubmit();
 
         expect(await screen.findByText("Введіть E-mail для зв'язку")).toBeInTheDocument();
-        expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+        expect(screen.queryByText('Некоректний E-mail')).not.toBeInTheDocument();
     });
 
     it('shows the existing minimum-length errors for subject and message', async () => {
@@ -158,8 +174,8 @@ describe('ContactSection', () => {
         fireEvent.blur(subjectInput);
         fireEvent.blur(messageInput);
 
-        expect(await screen.findByText(CONTACT_FORM_MESSAGES.SUBJECT.MIN_ERROR)).toBeInTheDocument();
-        expect(await screen.findByText(CONTACT_FORM_MESSAGES.MESSAGE.MIN_ERROR)).toBeInTheDocument();
+        expect(await screen.findByText('Мінімум 5 символів')).toBeInTheDocument();
+        expect(await screen.findByText('Мінімум 10 символів')).toBeInTheDocument();
     });
 
     it('shows warning and reached-limit hints at their boundaries', () => {
@@ -167,14 +183,13 @@ describe('ContactSection', () => {
         setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT));
 
-        expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(20))).toBeInTheDocument();
-        expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(200))).toBeInTheDocument();
+        expect(screen.getByText('Залишилось 20 символів')).toBeInTheDocument();
+        expect(screen.getByText('Залишилось 200 символів')).toBeInTheDocument();
 
         setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MAX));
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX));
 
-        expect(screen.getAllByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).toHaveLength(1);
-        expect(screen.getAllByText(CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED)).toHaveLength(1);
+        expect(screen.getAllByText('Ліміт символів вичерпано')).toHaveLength(2);
     });
 
     describe('email format validation', () => {
@@ -188,7 +203,7 @@ describe('ContactSection', () => {
             render(<ContactSection />);
             submitForm({ email });
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).toBeInTheDocument();
+            expect(await screen.findByText('Некоректний E-mail')).toBeInTheDocument();
             expect(getField(EMAIL_FIELD).parentElement).toHaveClass('field--error');
             expect(submitMock).not.toHaveBeenCalled();
         });
@@ -198,7 +213,7 @@ describe('ContactSection', () => {
             submitForm({ email: 'user@mail.com' });
 
             await waitFor(() => expect(submitMock).toHaveBeenCalled());
-            expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+            expect(screen.queryByText('Некоректний E-mail')).not.toBeInTheDocument();
         });
     });
 
@@ -209,7 +224,7 @@ describe('ContactSection', () => {
         }
         clickSubmit();
 
-        expect(await screen.findByText(CONTACT_FORM_MESSAGES.NAME.REQUIRED)).toBeInTheDocument();
+        expect(await screen.findByText("Введіть Ваше ім'я")).toBeInTheDocument();
     });
 
     it('trims leading and trailing spaces when a field loses focus', () => {

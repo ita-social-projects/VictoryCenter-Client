@@ -115,7 +115,7 @@ describe('useSignalR', () => {
 
         renderHook(() => useSignalR('http://test-url.com'));
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
             await act(async () => {
                 await Promise.resolve();
                 jest.runOnlyPendingTimers();
@@ -125,13 +125,6 @@ describe('useSignalR', () => {
         await waitFor(() => {
             expect(mockStart).toHaveBeenCalledTimes(6);
         });
-
-        await act(async () => {
-            await Promise.resolve();
-            jest.runOnlyPendingTimers();
-        });
-
-        expect(mockStart).toHaveBeenCalledTimes(6);
     });
 
     it('should call stop on unmount', async () => {

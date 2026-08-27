@@ -58,6 +58,11 @@ export const PROGRAM_CATEGORY_TEXT = {
             EDIT_NAME: 'Редагувати назву',
             CATEGORY: 'Категорія',
         },
+        MESSAGE: {
+            FAIL_TO_TRANSLATE_PROGRAM_CATEGORY: 'Виникла помилка під час додавання перекладу для категорії програм',
+            FAIL_TO_UPDATE_TRANSLATION_FOR_PROGRAM_CATEGORY:
+                'Виникла помилка під час оновлення перекладу для категорії програм',
+        },
     },
 };
 

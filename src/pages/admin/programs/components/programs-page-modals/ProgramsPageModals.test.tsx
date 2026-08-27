@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
 import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { BaseModalState, UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
@@ -36,8 +36,28 @@ jest.mock('../translate-program-modal/TranslateProgramModal', () => ({
 }));
 
 jest.mock('../translate-program-category-modal/TranslateProgramCategoryModal', () => ({
-    TranslateProgramCategoryModal: ({ isOpen }: { isOpen: boolean }) =>
-        isOpen ? <div data-testid="translate-program-category-modal" /> : null,
+    TranslateProgramCategoryModal: ({
+        isOpen,
+        onTranslateCategory,
+    }: {
+        isOpen: boolean;
+        onTranslateCategory?: (category: ProgramCategory) => void;
+    }) =>
+        isOpen ? (
+            <button
+                data-testid="translate-program-category-modal"
+                onClick={() =>
+                    onTranslateCategory?.({
+                        id: 1,
+                        name: 'Updated category',
+                        programsCount: 3,
+                    })
+                }
+                type="button"
+            >
+                translate category
+            </button>
+        ) : null,
 }));
 
 describe('ProgramsPageModals', () => {
@@ -67,6 +87,7 @@ describe('ProgramsPageModals', () => {
         onEditProgram: jest.fn(),
         onDeleteProgram: jest.fn(),
         onTranslateProgram: jest.fn(),
+        onTranslateCategory: jest.fn(),
         onAddCategory: jest.fn(),
         onEditCategory: jest.fn(),
         onDeleteCategory: jest.fn(),
@@ -204,6 +225,19 @@ describe('ProgramsPageModals', () => {
         expect(getAddProgramModal()).not.toBeInTheDocument();
         expect(getEditProgramModal()).not.toBeInTheDocument();
         expect(getDeleteProgramModal()).not.toBeInTheDocument();
+    });
+
+    it('should call onTranslateCategory when the program category translation modal succeeds', () => {
+        const modalsState = createMockModalsState({ isCategoryToTranslate: true });
+        renderProgramsPageModals(modalsState);
+
+        fireEvent.click(screen.getByTestId('translate-program-category-modal'));
+
+        expect(mockCallbacks.onTranslateCategory).toHaveBeenCalledWith({
+            id: 1,
+            name: 'Updated category',
+            programsCount: 3,
+        });
     });
 
     it('should render add category modal when isAddCategoryModalOpen is true', () => {

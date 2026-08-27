@@ -31,12 +31,20 @@ jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
         nameError,
         urlError,
         disabled,
+        isExpanded,
+        onToggleExpand,
         onNameChange,
         onUrlChange,
         onNameBlur,
         onUrlBlur,
     }: any) => (
-        <div data-testid={`reference-card-${localId}`} data-auto-focus={autoFocus} data-can-delete={canDelete}>
+        <div
+            data-testid={`reference-card-${localId}`}
+            data-auto-focus={autoFocus}
+            data-can-delete={canDelete}
+            data-is-expanded={isExpanded}
+        >
+            <button data-testid={`toggle-expand-${localId}`} onClick={() => onToggleExpand(localId)} />
             <input
                 data-testid={`name-input-${localId}`}
                 value={name}
@@ -77,6 +85,54 @@ describe('ScientificReferencesSection', () => {
 
     beforeEach(() => {
         mockOnChange = jest.fn();
+    });
+
+    it('renders all references collapsed by default', () => {
+        renderComponent();
+
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'false');
+        expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'false');
+    });
+
+    it('expands and collapses a reference when its toggle is clicked', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
+
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'false');
+    });
+
+    it('keeps several references expanded at the same time', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-2'));
+
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
+        expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'true');
+    });
+
+    it('keeps a reference expanded when its localId is regenerated after saving', () => {
+        const { rerender } = renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-expand-ref-1'));
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'true');
+
+        const reloadedValue: HippotherapyScientificReferencesSectionContent = {
+            ...defaultValue,
+            scientificReferences: [
+                { localId: 'regenerated-1', id: 1, name: 'Citation one', url: 'https://example.com/one' },
+                { localId: 'regenerated-2', id: 2, name: 'Citation two', url: 'https://example.com/two' },
+            ],
+        };
+
+        rerender(<ScientificReferencesSection value={reloadedValue} onChange={mockOnChange} />);
+
+        expect(screen.getByTestId('reference-card-regenerated-1')).toHaveAttribute('data-is-expanded', 'true');
     });
 
     it('renders the title, description, and one card per reference', () => {

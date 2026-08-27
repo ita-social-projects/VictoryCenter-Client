@@ -4,7 +4,9 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
+import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import { InputError } from '@/components/admin/input-error/InputError';
 import './ScientificReferenceCard.scss';
 
 export interface ScientificReferenceCardProps {
@@ -16,6 +18,8 @@ export interface ScientificReferenceCardProps {
     nameError?: string;
     urlError?: string;
     disabled?: boolean;
+    isExpanded: boolean;
+    onToggleExpand: (localId: string) => void;
     onNameChange: (localId: string, value: string) => void;
     onUrlChange: (localId: string, value: string) => void;
     onNameBlur: (localId: string) => void;
@@ -31,6 +35,8 @@ export const ScientificReferenceCard = ({
     nameError,
     urlError,
     disabled,
+    isExpanded,
+    onToggleExpand,
     onNameChange,
     onUrlChange,
     onNameBlur,
@@ -47,15 +53,16 @@ export const ScientificReferenceCard = ({
 
     return (
         <div ref={cardRef} className="scientific-reference-card">
-            {/* Expand and delete are disabled for now — placeholders only, no functionality yet. */}
+            {/* Delete is disabled for now — placeholders only, no functionality yet. */}
             <div className="scientific-reference-card-top-row">
                 <button
                     type="button"
                     className="scientific-reference-card-expand-button"
-                    aria-label="Expand reference"
+                    aria-label={isExpanded ? 'Collapse reference' : 'Expand reference'}
+                    onClick={() => onToggleExpand(localId)}
                     disabled={disabled}
                 >
-                    <ArrowIcon className="scientific-reference-card-arrow-icon" />
+                    {isExpanded ? <CrossIcon /> : <ArrowIcon className="scientific-reference-card-arrow-icon" />}
                 </button>
                 {canDelete && (
                     <IconButton
@@ -85,18 +92,21 @@ export const ScientificReferenceCard = ({
                     autoGrow
                     maxRows={6}
                 />
-                <InputWithCharacterLimitGroup
-                    label={HIPPOTHERAPY_PAGE_TEXT.LABEL.CITATION_URL}
-                    isRequired
-                    id={`hippotherapy-research-citation-${localId}-url`}
-                    name={`hippotherapy-research-citation-${localId}-url`}
-                    value={url}
-                    onChange={(event) => onUrlChange(localId, event.target.value)}
-                    onBlur={() => onUrlBlur(localId)}
-                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_CITATION_URL}
-                    error={urlError}
-                    disabled={disabled}
-                />
+                {isExpanded && (
+                    <InputWithCharacterLimitGroup
+                        label={HIPPOTHERAPY_PAGE_TEXT.LABEL.CITATION_URL}
+                        isRequired
+                        id={`hippotherapy-research-citation-${localId}-url`}
+                        name={`hippotherapy-research-citation-${localId}-url`}
+                        value={url}
+                        onChange={(event) => onUrlChange(localId, event.target.value)}
+                        onBlur={() => onUrlBlur(localId)}
+                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_CITATION_URL}
+                        error={urlError}
+                        disabled={disabled}
+                    />
+                )}
+                {!isExpanded && urlError && <InputError error={urlError} />}
             </div>
         </div>
     );

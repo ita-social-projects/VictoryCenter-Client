@@ -8,6 +8,8 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import cn from 'classnames';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
 
 interface ProgramCardProps {
     program: PublishedProgramDto;
@@ -16,7 +18,18 @@ interface ProgramCardProps {
 
 export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
     const navigate = useNavigate();
-    const programCategories = program.categories.map((categorie) => categorie.name).join(', ');
+    const { currentLanguage } = useLocale();
+    const programCategories = program.categories
+        .map((category) => {
+            const localization = (category.localizations ?? []).find(
+                (item) =>
+                    item.localizationInfoDto?.code === currentLanguage ||
+                    (currentLanguage === 'en' && item.languageId === DEFAULT_ENGLISH_LANGUAGE_ID),
+            );
+
+            return localization?.name || category.name;
+        })
+        .join(', ');
     const normalizedLocalizations = program.localizations.map((localization) =>
         mapLocalizationDtoToModel(localization),
     );

@@ -1,10 +1,20 @@
 import { HippotherapyProgramLocalizationDto } from '../admin/programs';
 import { Image } from '../common/image';
 import { HippotherapyProgramSectionDto } from '../common/program-sections';
+import { LocalizationInfo, TranslationStatus } from '../common/language';
+
+export interface PublicProgramCategoryLocalizationDto {
+    entityId?: number;
+    languageId?: number;
+    localizationInfoDto?: LocalizationInfo;
+    translationStatus?: TranslationStatus;
+    name?: string;
+}
 
 export interface ProgramCategoryDto {
     id: number;
     name: string;
+    localizations?: PublicProgramCategoryLocalizationDto[];
 }
 
 export interface PublishedProgramDto {

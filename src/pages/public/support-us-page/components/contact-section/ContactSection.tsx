@@ -130,7 +130,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
         watch,
         reset,
         setValue,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
         mode: 'onBlur',
@@ -179,8 +179,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
     const fieldClass = (hasError: boolean) => `${styles.field}${hasError ? ` ${styles['field--error']}` : ''}`;
     const messageClass = (type: 'error' | 'warn') => (type === 'error' ? styles.error : styles.info);
     const isEmpty = (value?: string) => value !== undefined && !value.trim();
+    const isFieldTouched = (field: keyof ContactFormData) => Boolean(touchedFields[field]) || isSubmitted;
     const getErrorMessage = (field: keyof typeof REQUIRED_MESSAGES, message?: string, type?: string, value?: string) =>
-        type === 'required' || isEmpty(value) ? REQUIRED_MESSAGES[field] : message;
+        isFieldTouched(field) && (type === 'required' || isEmpty(value)) ? REQUIRED_MESSAGES[field] : message;
 
     return (
         <>
@@ -193,7 +194,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <Field error={getErrorMessage('name', errors.name?.message, errors.name?.type)}>
                     <ContactField
                         placeholder={namePlaceholder}
-                        className={fieldClass(Boolean(errors.name))}
+                        className={fieldClass(Boolean(errors.name) && isFieldTouched('name'))}
                         registration={nameRegistration}
                         onBlur={(event) => {
                             nameRegistration.onBlur(event);
@@ -204,7 +205,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <Field error={getErrorMessage('email', errors.email?.message, errors.email?.type, emailValue)}>
                     <ContactField
                         placeholder={emailPlaceholder}
-                        className={fieldClass(Boolean(errors.email))}
+                        className={fieldClass(Boolean(errors.email) && isFieldTouched('email'))}
                         registration={emailRegistration}
                         onBlur={(event) => {
                             emailRegistration.onBlur(event);
@@ -216,7 +217,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <Field error={getErrorMessage('subject', errors.subject?.message, errors.subject?.type, subjectValue)}>
                     <ContactField
                         placeholder={subjectPlaceholder}
-                        className={fieldClass(Boolean(errors.subject))}
+                        className={fieldClass(Boolean(errors.subject) && isFieldTouched('subject'))}
                         registration={subjectRegistration}
                         onBlur={(event) => {
                             subjectRegistration.onBlur(event);
@@ -233,7 +234,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <Field error={getErrorMessage('message', errors.message?.message, errors.message?.type, messageValue)}>
                     <ContactField
                         placeholder={messagePlaceholder}
-                        className={`${fieldClass(Boolean(errors.message))} ${styles['field--textarea']}`}
+                        className={`${fieldClass(Boolean(errors.message) && isFieldTouched('message'))} ${styles['field--textarea']}`}
                         registration={messageRegistration}
                         onBlur={(event) => {
                             messageRegistration.onBlur(event);

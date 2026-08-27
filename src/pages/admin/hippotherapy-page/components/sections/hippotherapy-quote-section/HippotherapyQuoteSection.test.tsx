@@ -23,12 +23,13 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 id={id}
                 disabled={disabled}
@@ -125,6 +126,24 @@ describe('HippotherapyQuoteSection', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
 
         expect(onImageError).toHaveBeenCalledWith('image size error');
+    });
+
+    it('does not show an error for an empty author name on blur', () => {
+        validateTextMock().mockReturnValue('Too short');
+        renderComponent({ value: { ...defaultValue, authorName: '' } });
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-quote-quote-author'));
+
+        expect(screen.queryByText('Too short')).not.toBeInTheDocument();
+    });
+
+    it('shows an error for a filled but invalid author name on blur', () => {
+        validateTextMock().mockReturnValueOnce('Too short');
+        renderComponent();
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-quote-quote-author'));
+
+        expect(screen.getByText('Too short')).toBeInTheDocument();
     });
 
     it('disables all inputs when disabled is true', () => {

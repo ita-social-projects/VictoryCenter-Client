@@ -22,12 +22,13 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 id={id}
                 disabled={disabled}
@@ -124,6 +125,24 @@ describe('GallerySection', () => {
         fireEvent.click(screen.getAllByRole('button', { name: 'Set Error' })[1]);
 
         expect(onCardImageError).toHaveBeenCalledWith(1, 'image size error');
+    });
+
+    it('shows a card description error on blur', () => {
+        validateTextMock().mockReturnValueOnce('Too short');
+        renderComponent();
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-gallery-card-0-description'));
+
+        expect(screen.getByText('Too short')).toBeInTheDocument();
+    });
+
+    it('does not show an error on the card description when the image input is blurred', () => {
+        validateTextMock().mockReturnValue('Too short');
+        renderComponent();
+
+        fireEvent.blur(screen.getAllByTestId('mock-image-input-file')[0]);
+
+        expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
     it('disables every card input when disabled is true', () => {

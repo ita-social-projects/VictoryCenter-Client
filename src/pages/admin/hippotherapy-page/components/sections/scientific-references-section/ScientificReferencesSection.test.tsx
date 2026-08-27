@@ -6,12 +6,13 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
+    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
                 onChange={(e) => !disabled && onChange(e.target.value)}
+                onBlur={() => !disabled && onBlur?.()}
                 value={value}
                 id={id}
                 disabled={disabled}
@@ -190,5 +191,21 @@ describe('ScientificReferencesSection', () => {
         fireEvent.change(screen.getByTestId('url-input-ref-1'), { target: { value: 'https://example.com/fixed' } });
 
         expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
+    });
+
+    it('shows a title error on blur', () => {
+        renderComponent({ value: { ...defaultValue, title: '' } });
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-scientific-references-title'));
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+    });
+
+    it('shows a description error on blur', () => {
+        renderComponent({ value: { ...defaultValue, description: '' } });
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-scientific-references-description'));
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
     });
 });

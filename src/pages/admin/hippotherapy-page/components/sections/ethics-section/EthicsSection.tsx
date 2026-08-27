@@ -1,4 +1,5 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
+import { EthicsPrinciple } from './ethics-principle/EthicsPrinciple';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -6,10 +7,10 @@ import {
     HIPPOTHERAPY_PAGE_CHAR_LIMITS,
     HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
+    HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { useHippotherapySectionFields } from '@/hooks/admin/use-hippotherapy-section-fields/useHippotherapySectionFields';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
+import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
 import './EthicsSection.scss';
 
@@ -21,36 +22,26 @@ export interface EthicsSectionProps {
 }
 
 const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: EthicsSectionProps) => {
-    const {
-        imageError,
-        titleError,
-        descriptionError,
-        handleImageErrorChange,
-        handleImageChange,
-        handleTitleChange,
-        handleTitleBlur,
-        handleDescriptionChange,
-        handleDescriptionBlur,
-    } = useHippotherapySectionFields({ value, onChange, onImageError });
-    const [principleErrors, setPrincipleErrors] = useState<Record<number, string | undefined>>({});
+    const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
+        value,
+        onChange,
+        onImageError,
+    });
+
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
+
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+    });
 
     const handlePrincipleChange = (index: number, principle: string) => {
         const principles = value.principles.map((item, itemIndex) => (itemIndex === index ? principle : item));
         onChange({ ...value, principles });
-
-        if (principleErrors[index] !== undefined) {
-            setPrincipleErrors((prev) => ({
-                ...prev,
-                [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(principle)),
-            }));
-        }
-    };
-
-    const handlePrincipleBlur = (index: number) => {
-        setPrincipleErrors((prev) => ({
-            ...prev,
-            [index]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.principles[index])),
-        }));
     };
 
     return (
@@ -81,10 +72,10 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
                             id="hippotherapy-ethics-title"
                             name="hippotherapy-ethics-title"
                             value={value.title}
-                            onChange={handleTitleChange}
-                            onBlur={handleTitleBlur}
+                            onChange={title.handleChange}
+                            onBlur={title.handleBlur}
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_TITLE}
-                            error={titleError}
+                            error={title.error}
                             disabled={disabled}
                         />
                         <RichTextInputGroup
@@ -93,29 +84,22 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
                             id="hippotherapy-ethics-description"
                             name="hippotherapy-ethics-description"
                             value={value.description}
-                            onChange={handleDescriptionChange}
-                            onBlur={handleDescriptionBlur}
+                            onChange={description.handleChange}
+                            onBlur={description.handleBlur}
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_DESCRIPTION}
-                            error={descriptionError}
+                            error={description.error}
                             disabled={disabled}
                         />
                     </div>
                     <div className="hippotherapy-ethics-section-principles">
                         {value.principles.map((principle, index) => (
-                            <div key={index} className="hippotherapy-ethics-section-principle">
-                                <RichTextInputGroup
-                                    label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                                    isRequired
-                                    id={`hippotherapy-ethics-principle-${index}`}
-                                    name={`hippotherapy-ethics-principle-${index}`}
-                                    value={principle}
-                                    onChange={(nextValue) => handlePrincipleChange(index, nextValue)}
-                                    onBlur={() => handlePrincipleBlur(index)}
-                                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE}
-                                    error={principleErrors[index]}
-                                    disabled={disabled}
-                                />
-                            </div>
+                            <EthicsPrinciple
+                                key={index}
+                                value={principle}
+                                fieldId={`hippotherapy-ethics-principle-${index}`}
+                                onChange={(nextValue) => handlePrincipleChange(index, nextValue)}
+                                disabled={disabled}
+                            />
                         ))}
                     </div>
                 </div>

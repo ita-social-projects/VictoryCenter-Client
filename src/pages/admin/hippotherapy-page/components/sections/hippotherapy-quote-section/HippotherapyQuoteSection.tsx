@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useState } from 'react';
+import { CSSProperties, memo } from 'react';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -7,10 +7,9 @@ import {
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
     HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
-import { ImageValues } from '@/types/common/image';
 import './HippotherapyQuoteSection.scss';
 
 export interface HippotherapyQuoteSectionProps {
@@ -30,56 +29,22 @@ const HippotherapyQuoteSectionComponent = ({
     onImageError,
     disabled,
 }: HippotherapyQuoteSectionProps) => {
-    const [imageError, setImageError] = useState<string | null>(null);
-    const [quoteTextError, setQuoteTextError] = useState<string | undefined>();
-    const [authorNameError, setAuthorNameError] = useState<string | undefined>();
+    const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
+        value,
+        onChange,
+        onImageError,
+    });
 
-    const handleImageErrorChange = (error: string | null) => {
-        setImageError(error);
-        onImageError?.(error);
-    };
+    const quoteText = useValidatedRichTextField({
+        value: value.quoteText,
+        onChange: (quoteText) => onChange({ ...value, quoteText }),
+    });
 
-    const handleImageChange = (image: ImageValues | null) => {
-        onChange({ ...value, image });
-    };
-
-    const handleQuoteTextChange = (quoteText: string) => {
-        onChange({ ...value, quoteText });
-
-        if (quoteTextError !== undefined) {
-            setQuoteTextError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(quoteText)));
-        }
-    };
-
-    const handleQuoteTextBlur = () => {
-        setQuoteTextError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(value.quoteText)));
-    };
-
-    const handleAuthorNameChange = (authorName: string) => {
-        onChange({ ...value, authorName });
-
-        if (authorNameError !== undefined) {
-            const plainText = getPlainTextFromHtml(authorName);
-
-            if (!plainText.trim()) {
-                setAuthorNameError(undefined);
-                return;
-            }
-
-            setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText));
-        }
-    };
-
-    const handleAuthorNameBlur = () => {
-        const plainText = getPlainTextFromHtml(value.authorName);
-
-        if (!plainText.trim()) {
-            setAuthorNameError(undefined);
-            return;
-        }
-
-        setAuthorNameError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText));
-    };
+    const authorName = useValidatedRichTextField({
+        value: value.authorName,
+        onChange: (authorName) => onChange({ ...value, authorName }),
+        isOptional: true,
+    });
 
     return (
         <div className="hippotherapy-quote-section">
@@ -110,10 +75,10 @@ const HippotherapyQuoteSectionComponent = ({
                     id={`${fieldIdPrefix}-quote-text`}
                     name={`${fieldIdPrefix}-quote-text`}
                     value={value.quoteText}
-                    onChange={handleQuoteTextChange}
-                    onBlur={handleQuoteTextBlur}
+                    onChange={quoteText.handleChange}
+                    onBlur={quoteText.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_TEXT}
-                    error={quoteTextError}
+                    error={quoteText.error}
                     disabled={disabled}
                 />
                 <RichTextInputGroup
@@ -121,10 +86,10 @@ const HippotherapyQuoteSectionComponent = ({
                     id={`${fieldIdPrefix}-quote-author`}
                     name={`${fieldIdPrefix}-quote-author`}
                     value={value.authorName}
-                    onChange={handleAuthorNameChange}
-                    onBlur={handleAuthorNameBlur}
+                    onChange={authorName.handleChange}
+                    onBlur={authorName.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR}
-                    error={authorNameError}
+                    error={authorName.error}
                     disabled={disabled}
                 />
             </div>

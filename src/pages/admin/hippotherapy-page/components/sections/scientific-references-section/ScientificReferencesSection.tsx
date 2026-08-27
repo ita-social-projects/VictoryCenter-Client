@@ -5,7 +5,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { useHippotherapyTextFields } from '@/hooks/admin/use-hippotherapy-text-fields/useHippotherapyTextFields';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
@@ -17,14 +17,16 @@ export interface ScientificReferencesSectionProps {
 }
 
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
-    const {
-        titleError,
-        descriptionError,
-        handleTitleChange,
-        handleTitleBlur,
-        handleDescriptionChange,
-        handleDescriptionBlur,
-    } = useHippotherapyTextFields({ value, onChange });
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
+
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+    });
 
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
@@ -40,7 +42,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                 ...prev,
                 [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
                     name,
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+                    HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
                 ),
             }));
         }
@@ -57,7 +59,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                 ...prev,
                 [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
                     url,
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+                    HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH,
                 ),
             }));
         }
@@ -69,7 +71,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
             ...prev,
             [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
                 reference?.name ?? '',
-                HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+                HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
             ),
         }));
     };
@@ -80,7 +82,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
             ...prev,
             [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
                 reference?.url ?? '',
-                HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+                HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH,
             ),
         }));
     };
@@ -94,10 +96,10 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                     id="scientific-references-title"
                     name="scientific-references-title"
                     value={value.title}
-                    onChange={handleTitleChange}
-                    onBlur={handleTitleBlur}
+                    onChange={title.handleChange}
+                    onBlur={title.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE}
-                    error={titleError}
+                    error={title.error}
                     disabled={disabled}
                 />
                 <RichTextInputGroup
@@ -106,10 +108,10 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                     id="scientific-references-description"
                     name="scientific-references-description"
                     value={value.description}
-                    onChange={handleDescriptionChange}
-                    onBlur={handleDescriptionBlur}
+                    onChange={description.handleChange}
+                    onBlur={description.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION}
-                    error={descriptionError}
+                    error={description.error}
                     disabled={disabled}
                 />
             </div>

@@ -6,8 +6,10 @@ import {
     HIPPOTHERAPY_PAGE_CHAR_LIMITS,
     HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
+    HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
-import { useHippotherapySectionFields } from '@/hooks/admin/use-hippotherapy-section-fields/useHippotherapySectionFields';
+import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
 import './IntroBannerSection.scss';
 
@@ -19,17 +21,22 @@ export interface IntroBannerSectionProps {
 }
 
 const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }: IntroBannerSectionProps) => {
-    const {
-        imageError,
-        titleError,
-        descriptionError,
-        handleImageErrorChange,
-        handleImageChange,
-        handleTitleChange,
-        handleTitleBlur,
-        handleDescriptionChange,
-        handleDescriptionBlur,
-    } = useHippotherapySectionFields({ value, onChange, onImageError });
+    const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
+        value,
+        onChange,
+        onImageError,
+    });
+
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
+
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+    });
 
     return (
         <div className="hippotherapy-intro-banner-section">
@@ -60,10 +67,10 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
                     id="hippotherapy-intro-title"
                     name="hippotherapy-intro-title"
                     value={value.title}
-                    onChange={handleTitleChange}
-                    onBlur={handleTitleBlur}
+                    onChange={title.handleChange}
+                    onBlur={title.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE}
-                    error={titleError}
+                    error={title.error}
                     disabled={disabled}
                 />
                 <RichTextInputGroup
@@ -72,10 +79,10 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
                     id="hippotherapy-intro-description"
                     name="hippotherapy-intro-description"
                     value={value.description}
-                    onChange={handleDescriptionChange}
-                    onBlur={handleDescriptionBlur}
+                    onChange={description.handleChange}
+                    onBlur={description.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION}
-                    error={descriptionError}
+                    error={description.error}
                     disabled={disabled}
                 />
             </div>

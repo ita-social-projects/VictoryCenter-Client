@@ -15,6 +15,8 @@ export const HIPPOTHERAPY_PAGE_TEXT = {
         'Ця сторінка ще не має контенту. Заповніть поля нижче та натисніть "Опублікувати", щоб створити її.',
     MIN_TITLE_LENGTH: 5,
     MIN_TEXT_LENGTH: 10,
+    MIN_REFERENCE_NAME_LENGTH: 5,
+    MIN_REFERENCE_URL_LENGTH: 5,
     LABEL: {
         ADDITIONAL_DESCRIPTION: 'Додатковий опис',
         CITATION_NAME: 'Назва',

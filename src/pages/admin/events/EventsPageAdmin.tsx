@@ -77,7 +77,7 @@ export const EventsPageAdmin = () => {
 
             setCategories(fetchedCategories);
         } catch {
-            setErrorState(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
     }, [client, setErrorState]);
 

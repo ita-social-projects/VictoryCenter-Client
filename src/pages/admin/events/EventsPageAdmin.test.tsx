@@ -7,6 +7,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EventCategoriesApi } from './event-categories/event-categories-api';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -72,9 +73,18 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
+jest.mock('./event-categories/event-categories-api', () => ({
+    EventCategoriesApi: {
+        getAll: jest.fn(),
+    },
+}));
+
+const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
+
 describe('EventsPageAdmin', () => {
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
+        mockedEventCategoriesApi.getAll.mockResolvedValue([]);
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
     });
@@ -88,10 +98,23 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT)).toBeInTheDocument();
     });
 
-    it('does not render an error message when there is no error', () => {
+    it('does not render an error message when there is no error', async () => {
         const { container } = render(<EventsPageAdmin />);
 
+        await screen.findByTestId('events-page-content');
+
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
+    });
+
+    it('renders an error message when categories fetch fails', async () => {
+        const errorMessage = COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES;
+        mockedEventCategoriesApi.getAll.mockRejectedValueOnce(new Error(errorMessage));
+
+        render(<EventsPageAdmin />);
+
+        const errorElement = await screen.findByText(errorMessage);
+
+        expect(errorElement).toBeInTheDocument();
     });
 
     it('renders add category context menu option', () => {

@@ -17,6 +17,7 @@ import {
     contactUsPageUk,
     mainPageUk,
     historyPageUk,
+    supportUsPageUk,
 } from './uk';
 import {
     headerEn,
@@ -54,6 +55,7 @@ const resources = {
         contactUsPage: contactUsPageUk,
         mainPage: mainPageUk,
         historyPage: historyPageUk,
+        supportUsPage: supportUsPageUk,
     },
     en: {
         header: headerEn,
@@ -100,6 +102,7 @@ i18n.use(initReactI18next).init({
         'contactUsPage',
         'mainPage',
         'historyPage',
+        'supportUsPage',
     ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {

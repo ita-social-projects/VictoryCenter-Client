@@ -13,6 +13,7 @@ import successPageUk from './success.json';
 import contactUsPageUk from './contact-us.json';
 import mainPageUk from './main-page.json';
 import historyPageUk from './history.json';
+import supportUsPageUk from './support-us.json';
 
 export {
     headerUk,
@@ -30,4 +31,5 @@ export {
     contactUsPageUk,
     mainPageUk,
     historyPageUk,
+    supportUsPageUk,
 };

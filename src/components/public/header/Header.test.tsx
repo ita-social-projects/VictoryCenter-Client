@@ -114,9 +114,10 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
-        expect(howToSupportLink).toBeInTheDocument();
-        expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.SUPPORT_US.FULL,
+        );
         expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,

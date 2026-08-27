@@ -54,6 +54,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'history',
         FULL: '/history',
     },
+    SUPPORT_US: {
+        PATH: 'support-us',
+        FULL: '/support-us',
+    },
     MOCK: {
         PATH: 'about-us',
         FULL: '/about-us',

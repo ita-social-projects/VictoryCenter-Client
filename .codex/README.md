@@ -45,8 +45,9 @@ OpenAI Codex skills use a directory with a required `SKILL.md` file containing
   reports only unresolved `MISSING`, `PARTIAL`, or `INCORRECT` story gaps.
 - `victory-center-verification` - proportionate evidence-gathering workflow for
   targeted tests, typecheck, lint, build, or skipped-check reporting.
-- `victory-center-pr-review` - lightweight PR/diff review workflow focused on
-  correctness, regressions, risk, and missed tests.
+- `victory-center-pr-review` - read-only PR/diff review workflow focused on
+  concrete correctness, regression, architecture, security, accessibility, and
+  test risks.
 
 ## Planning Workflow
 

@@ -88,8 +88,12 @@ describe('EventsPageAdmin', () => {
         mockOpenEditCategoryModal.mockClear();
     });
 
-    it('renders the toolbar with the events placeholder and add-item text', () => {
+    it('renders the toolbar with the events placeholder and add-item text', async () => {
         render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
 
         expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
         expect(screen.getByTestId('events-toolbar')).toBeInTheDocument();
@@ -101,7 +105,7 @@ describe('EventsPageAdmin', () => {
         const { container } = render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
         });
 
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
@@ -118,14 +122,22 @@ describe('EventsPageAdmin', () => {
         });
     });
 
-    it('renders add category context menu option', () => {
+    it('renders add category context menu option', async () => {
         render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY)).toBeInTheDocument();
     });
 
-    it('renders edit category context menu option', () => {
+    it('renders edit category context menu option', async () => {
         render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
     });
@@ -135,11 +147,13 @@ describe('EventsPageAdmin', () => {
 
         render(<EventsPageAdmin />);
 
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
+
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
 
-        await waitFor(() => {
-            expect(mockOpenAddCategoryModal).toHaveBeenCalledTimes(1);
-        });
+        expect(mockOpenAddCategoryModal).toHaveBeenCalledTimes(1);
     });
 
     it('opens edit category modal when edit option is selected', async () => {
@@ -147,10 +161,12 @@ describe('EventsPageAdmin', () => {
 
         render(<EventsPageAdmin />);
 
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
+
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
-        await waitFor(() => {
-            expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
-        });
+        expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
     });
 });

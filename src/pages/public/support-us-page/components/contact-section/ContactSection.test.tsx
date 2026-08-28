@@ -41,6 +41,7 @@ const T = {
     LIMIT_REACHED: 'contactForm.limitReached',
     SUBMIT_SUCCESS: 'contactForm.submitSuccess',
     SUBMIT_ERROR: 'contactForm.submitError',
+    CAPTCHA_REQUIRED: 'contactForm.captchaRequired',
 } as const;
 const charactersRemaining = (count: number) => `contactForm.charactersRemaining_${count}`;
 
@@ -60,9 +61,15 @@ describe('ContactSection', () => {
     type FormValues = Partial<Record<'name' | 'email' | 'subject' | 'message', string>>;
     const getField = (fieldId: string) => screen.getByTestId(fieldId);
     const setFieldValue = (fieldId: string, value: string) => {
-        fireEvent.change(getField(fieldId), { target: { value } });
+        act(() => {
+            fireEvent.change(getField(fieldId), { target: { value } });
+        });
     };
-    const clickSubmit = () => fireEvent.click(screen.getByRole('button', { name: T.SUBMIT_BUTTON }));
+    const clickSubmit = () => {
+        act(() => {
+            fireEvent.click(screen.getByRole('button', { name: T.SUBMIT_BUTTON }));
+        });
+    };
     const fillForm = (overrides: FormValues = {}, shouldBlur = false) => {
         const values = {
             name: 'Ім’я',
@@ -79,7 +86,9 @@ describe('ContactSection', () => {
 
         if (shouldBlur) {
             [NAME_FIELD, EMAIL_FIELD, SUBJECT_FIELD, MESSAGE_FIELD].forEach((fieldId) => {
-                fireEvent.blur(getField(fieldId));
+                act(() => {
+                    fireEvent.blur(getField(fieldId));
+                });
             });
         }
     };
@@ -102,10 +111,14 @@ describe('ContactSection', () => {
     it('renders the support inquiry form', () => {
         render(<ContactSection />);
 
+        const form = screen.getByRole('form', { name: T.TITLE });
+        expect(form).toBeInTheDocument();
+        expect(form).toContainElement(getField(NAME_FIELD));
+        expect(form).toContainElement(getField(EMAIL_FIELD));
+        expect(form).toContainElement(getField(SUBJECT_FIELD));
+        expect(form).toContainElement(getField(MESSAGE_FIELD));
         expect(screen.getByTestId('title-section')).toHaveTextContent(T.TITLE);
-        expect(getField(NAME_FIELD)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: T.SUBMIT_BUTTON })).toBeInTheDocument();
-        expect(screen.getByRole('form', { name: T.TITLE })).toBeInTheDocument();
         expect(screen.getByText(T.FIRST_TEXT)).toBeInTheDocument();
         expect(screen.getByText(T.SECOND_BOLD_TEXT)).toBeInTheDocument();
     });
@@ -158,8 +171,10 @@ describe('ContactSection', () => {
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
         const subjectInput = getField(SUBJECT_FIELD);
         const messageInput = getField(MESSAGE_FIELD);
-        fireEvent.blur(subjectInput);
-        fireEvent.blur(messageInput);
+        act(() => {
+            fireEvent.blur(subjectInput);
+            fireEvent.blur(messageInput);
+        });
 
         expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
         expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
@@ -217,7 +232,9 @@ describe('ContactSection', () => {
         render(<ContactSection />);
         const nameInput = getField(NAME_FIELD);
         setFieldValue(NAME_FIELD, '  Ім’я  ');
-        fireEvent.blur(nameInput);
+        act(() => {
+            fireEvent.blur(nameInput);
+        });
 
         expect(nameInput).toHaveValue('Ім’я');
     });
@@ -245,6 +262,9 @@ describe('ContactSection', () => {
         );
         expect(mockResetTurnstile).toHaveBeenCalled();
         expect(getField(NAME_FIELD)).toHaveValue('');
+        expect(getField(EMAIL_FIELD)).toHaveValue('');
+        expect(getField(SUBJECT_FIELD)).toHaveValue('');
+        expect(getField(MESSAGE_FIELD)).toHaveValue('');
         expect(screen.getByText(T.SUBMIT_SUCCESS)).toBeInTheDocument();
 
         act(() => jest.advanceTimersByTime(5000));
@@ -259,5 +279,18 @@ describe('ContactSection', () => {
         expect(await screen.findByText(T.SUBMIT_ERROR)).toBeInTheDocument();
         act(() => jest.advanceTimersByTime(3000));
         expect(screen.queryByText(T.SUBMIT_ERROR)).not.toBeInTheDocument();
+    });
+
+    it('shows a toast notification when CAPTCHA token expires or becomes null', () => {
+        const { rerender } = render(<ContactSection />);
+
+        act(() => {
+            mockTurnstileToken = null;
+            rerender(<ContactSection />);
+        });
+
+        expect(screen.getByText(T.CAPTCHA_REQUIRED)).toBeInTheDocument();
+        act(() => jest.advanceTimersByTime(3000));
+        expect(screen.queryByText(T.CAPTCHA_REQUIRED)).not.toBeInTheDocument();
     });
 });

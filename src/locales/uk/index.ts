@@ -11,9 +11,9 @@ import reportsPageUk from './reports.json';
 import partnersPageUk from './partners.json';
 import successPageUk from './success.json';
 import contactUsPageUk from './contact-us.json';
+import supportUsPageUk from './support-us.json';
 import mainPageUk from './main-page.json';
 import historyPageUk from './history.json';
-import supportUsPageUk from './support-us.json';
 import notFoundPageUk from './not-found-page.json';
 
 export {
@@ -30,8 +30,8 @@ export {
     successPageUk,
     globalUk,
     contactUsPageUk,
+    supportUsPageUk,
     mainPageUk,
     historyPageUk,
-    supportUsPageUk,
     notFoundPageUk,
 };

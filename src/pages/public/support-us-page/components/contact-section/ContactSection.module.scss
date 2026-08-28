@@ -3,7 +3,7 @@
 @use '@/assets/sass/variables/typography' as t;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
-section {
+.root {
     overflow: hidden;
     display: flex;
     justify-content: space-between;
@@ -14,29 +14,21 @@ section {
 
 .content {
     min-width: 0;
+    flex: 1;
 }
 
 .title {
     @include utils.yellow-blue-text;
     margin: 0 0 24px;
     text-align: left;
+    max-width: 480px;
 }
 
 .form-container {
     z-index: 2;
     flex: 0 0 550px;
     margin-top: -24px;
-    margin-right: 24px;
-
-    form {
-        max-width: none;
-        gap: 29px;
-        padding: 40px;
-    }
-
-    text-area {
-        resize: none;
-    }
+    margin-left: -50px;
 }
 
 .form {
@@ -112,6 +104,11 @@ section {
     padding: 12px 24px;
     align-self: flex-end;
     cursor: pointer;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 .toast {
@@ -125,6 +122,7 @@ section {
 .highlight {
     @include utils.text-highlight;
     font-size: t.$h4-size;
+    line-height: t.$h4-height;
     letter-spacing: t.$h4-spacing;
     text-align: left;
 }
@@ -132,9 +130,10 @@ section {
 .blue {
     @include utils.blue-bg-text;
     display: block;
+    width: 100%;
+    position: relative;
     box-sizing: border-box;
     background-color: c.$light-blue-200;
-    width: 100vw;
     padding: 25px;
 
     &::before {
@@ -142,7 +141,13 @@ section {
     }
 
     &::after {
-        display: none;
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 100%;
+        width: 100vw;
+        background-color: c.$light-blue-200;
     }
 }
 
@@ -158,9 +163,11 @@ section {
     margin-left: 16px;
     margin-right: 16px;
     text-align: left;
+    max-width: 480px;
 }
 
 .bold-description {
     font-weight: t.$fw-bold;
     margin-top: 24px;
+    max-width: 360px;
 }

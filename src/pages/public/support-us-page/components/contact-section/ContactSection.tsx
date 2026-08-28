@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, UseFormRegisterReturn } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { createContactFormSchema, ContactFormData } from '@/validation/public/co
 import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
 import { useTurnstile } from '@/hooks/public/use-turnstile';
 import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
+import classNames from 'classnames';
 import styles from './ContactSection.module.scss';
 
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
@@ -35,11 +36,6 @@ interface ContactFieldProps {
     type?: React.HTMLInputTypeAttribute;
     maxLength?: number;
     multiline?: boolean;
-}
-
-interface LineBreakTextProps {
-    text: string;
-    className?: string;
 }
 
 const Field: React.FC<FieldProps> = ({ error, children }) => (
@@ -87,18 +83,12 @@ const ContactField: React.FC<ContactFieldProps> = ({
     </label>
 );
 
-const LineBreakText: React.FC<LineBreakTextProps> = ({ text, className }) => (
-    <span className={className}>
-        {text.split(' | ').map((part, index, parts) => (
-            <React.Fragment key={`${part}-${index}`}>
-                {part}
-                {index < parts.length - 1 && <br />}
-            </React.Fragment>
-        ))}
-    </span>
-);
-
-const getHint = (value: string, limit: { MAX: number; WARN_AT: number }, t: TFunction<'contactUsPage', undefined>) => {
+const getHint = (
+    value: string,
+    limit: { MAX: number; WARN_AT: number } | undefined,
+    t: TFunction<'contactUsPage', undefined>,
+) => {
+    if (!limit) return null;
     if (value.length >= limit.MAX) return { text: t('contactForm.limitReached'), type: 'error' as const };
     if (value.length >= limit.WARN_AT) {
         return {
@@ -141,6 +131,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
     });
     const { token, containerRef, reset: resetTurnstile } = useTurnstile(CF_TURNSTILE_SITE_KEY);
     const [toast, setToast] = useState<Toast | null>(null);
+    const prevTokenRef = useRef<string | null>(token);
+    const isSubmittedSuccessRef = useRef(false);
     const nameRegistration = register('name');
     const emailRegistration = register('email');
     const subjectRegistration = register('subject');
@@ -162,8 +154,21 @@ const ContactForm: React.FC<ContactFormProps> = ({
         setTimeout(() => setToast((current) => (current?.id === id ? null : current)), duration);
     };
 
+    useEffect(() => {
+        if (prevTokenRef.current && !token && !isSubmittedSuccessRef.current) {
+            showToast(t('contactForm.captchaRequired'), ToastType.Error, 3000);
+        }
+        if (isSubmittedSuccessRef.current && !token) {
+            isSubmittedSuccessRef.current = false;
+        }
+        prevTokenRef.current = token;
+    }, [token, t]);
+
     const onSubmit = async (data: ContactFormData) => {
-        if (!token) return;
+        if (!token) {
+            showToast(t('contactForm.captchaRequired'), ToastType.Error, 3000);
+            return;
+        }
         try {
             await submitContactUsForm({
                 captchaResponseToken: token,
@@ -172,6 +177,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 subject: data.subject,
                 message: data.message,
             });
+            isSubmittedSuccessRef.current = true;
             reset();
             resetTurnstile();
             showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
@@ -180,7 +186,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
         }
     };
 
-    const fieldClass = (hasError: boolean) => `${styles.field}${hasError ? ` ${styles['field--error']}` : ''}`;
+    const fieldClass = (hasError: boolean) =>
+        classNames(styles.field, {
+            [styles['field--error']]: hasError,
+        });
     const messageClass = (type: 'error' | 'warn') => (type === 'error' ? styles.error : styles.info);
     const isEmpty = (value?: string) => value !== undefined && !value.trim();
     const isFieldTouched = (field: keyof ContactFormData) => Boolean(touchedFields[field]) || isSubmitted;
@@ -238,7 +247,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <Field error={getErrorMessage('message', errors.message?.message, errors.message?.type, messageValue)}>
                     <ContactField
                         placeholder={messagePlaceholder}
-                        className={`${fieldClass(Boolean(errors.message) && isFieldTouched('message'))} ${styles['field--textarea']}`}
+                        className={classNames(
+                            fieldClass(Boolean(errors.message) && isFieldTouched('message')),
+                            styles['field--textarea'],
+                        )}
                         registration={messageRegistration}
                         onBlur={(event) => {
                             messageRegistration.onBlur(event);
@@ -254,7 +266,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                     </span>
                 )}
                 <div ref={containerRef} />
-                <button type="submit" className={styles.submit} disabled={!token}>
+                <button type="submit" className={styles.submit} disabled={!token || Object.keys(errors).length > 0}>
                     {submitLabel}
                 </button>
             </form>
@@ -264,21 +276,19 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
 export const ContactSection = () => {
     const { t } = useTranslation('supportUsPage');
-    const blueHighlightClass = `${styles.highlight} ${styles.blue} ${styles['break-text']}`;
+    const blueHighlightClass = classNames(styles.highlight, styles.blue, styles['break-text']);
     const formTitle = t('SUPPORT_INQUIRY.TITLE');
 
     return (
         <>
-            <section aria-labelledby="support-inquiry-title">
+            <section className={styles.root} aria-labelledby="support-inquiry-title">
                 <div className={styles.content}>
                     <h4 className={styles.title} data-testid="title-section" id="support-inquiry-title">
-                        <LineBreakText text={t('SUPPORT_INQUIRY.TITLE')} className={blueHighlightClass} />
+                        <span className={blueHighlightClass}>{t('SUPPORT_INQUIRY.TITLE')}</span>
                     </h4>
-                    <p className={styles.description}>
-                        <LineBreakText text={t('SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT')} />
-                    </p>
-                    <p className={`${styles.description} ${styles['bold-description']}`}>
-                        <LineBreakText text={t('SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT')} />
+                    <p className={styles.description}>{t('SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT')}</p>
+                    <p className={classNames(styles.description, styles['bold-description'])}>
+                        {t('SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT')}
                     </p>
                 </div>
                 <div className={styles['form-container']}>

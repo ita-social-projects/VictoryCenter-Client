@@ -15,9 +15,9 @@ import {
     successPageUk,
     globalUk,
     contactUsPageUk,
+    supportUsPageUk,
     mainPageUk,
     historyPageUk,
-    supportUsPageUk,
     notFoundPageUk,
 } from './uk';
 import {
@@ -34,6 +34,7 @@ import {
     successPageEn,
     globalEn,
     contactUsPageEn,
+    supportUsPageEn,
     mainPageEn,
     historyPageEn,
     notFoundPageEn,
@@ -55,9 +56,9 @@ const resources = {
         successPage: successPageUk,
         global: globalUk,
         contactUsPage: contactUsPageUk,
+        supportUsPage: supportUsPageUk,
         mainPage: mainPageUk,
         historyPage: historyPageUk,
-        supportUsPage: supportUsPageUk,
         notFoundPage: notFoundPageUk,
     },
     en: {
@@ -74,6 +75,7 @@ const resources = {
         successPage: successPageEn,
         global: globalEn,
         contactUsPage: contactUsPageEn,
+        supportUsPage: supportUsPageEn,
         mainPage: mainPageEn,
         historyPage: historyPageEn,
         notFoundPage: notFoundPageEn,
@@ -104,9 +106,9 @@ i18n.use(initReactI18next).init({
         'successPage',
         'global',
         'contactUsPage',
+        'supportUsPage',
         'mainPage',
         'historyPage',
-        'supportUsPage',
         'notFoundPage',
     ], // namespaces
     defaultNS: 'aboutUsPage',

@@ -1,5 +1,8 @@
 @use '@/assets/sass/variables/colors';
 
+$dropdown-max-height: 120px;
+$dropdown-gap: 6px;
+
 .team-category-modal-error-container {
     font-size: 14px;
     line-height: 20px;
@@ -13,4 +16,36 @@
     display: flex;
     flex-direction: column;
     gap: 0.4375rem;
+    overflow-y: hidden;
+
+    .input-group {
+        &:has(.singleselect-options) {
+            margin-bottom: calc(#{$dropdown-max-height} + #{$dropdown-gap}); 
+        }
+    }
+
+    .singleselect-options {
+        z-index: 100;
+        max-height: $dropdown-max-height;
+        overflow-y: auto;
+        scrollbar-color: colors.$grey-700 transparent;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: colors.$grey-700;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: colors.$grey-800;
+            }
+        }
+    }
 }

@@ -325,4 +325,15 @@ describe('ScientificReferencesSection', () => {
             screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(HIPPOTHERAPY_PAGE_TEXT.MIN_LENGTH)),
         ).toBeInTheDocument();
     });
+
+    it('keeps the add button disabled when a value only passes validation thanks to trailing spaces', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [{ localId: 'ref-1', id: 1, name: 'ab', url: 'https://example.com/one' }],
+            },
+        });
+
+        expect(getAddButton()).toBeDisabled();
+    });
 });

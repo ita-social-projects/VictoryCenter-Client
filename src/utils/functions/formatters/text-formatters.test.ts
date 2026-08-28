@@ -85,6 +85,10 @@ describe('text-formatters', () => {
         it('should keep a trailing space so the next word can be typed', () => {
             expect(getNormalizedInputTextWhileTyping('Hello ')).toBe('Hello ');
         });
+
+        it('should keep newlines untouched', () => {
+            expect(getNormalizedInputTextWhileTyping('Hello\nworld')).toBe('Hello\nworld');
+        });
     });
 
     describe('getTrimmedInputText', () => {

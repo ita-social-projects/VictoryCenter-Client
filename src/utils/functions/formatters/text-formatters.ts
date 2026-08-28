@@ -11,6 +11,8 @@ export const generateInitials = (fullName: string, maxInitials: number = 2): str
 export const getNormalizedInputText = (text: string, prefix = ''): string =>
     text.slice(prefix.length).trim().replace(/\s+/g, ' ');
 
+export const getNormalizedInputTextWhileTyping = (text: string): string => text.replace(/\s+/g, ' ').trimStart();
+
 export const getTrimmedInputText = (text: string, prefix = ''): string => text.slice(prefix.length).trim();
 
 export const parseDescriptionList = (description?: string) => {

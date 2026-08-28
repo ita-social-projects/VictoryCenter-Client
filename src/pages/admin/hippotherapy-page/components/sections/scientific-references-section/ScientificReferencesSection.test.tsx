@@ -286,22 +286,6 @@ describe('ScientificReferencesSection', () => {
         expect(getAddButton()).toBeEnabled();
     });
 
-    it('collapses consecutive spaces in the name while typing', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('name-input-ref-1'), {
-            target: { value: '  Hello   world ' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith(
-            expect.objectContaining({
-                scientificReferences: expect.arrayContaining([
-                    expect.objectContaining({ localId: 'ref-1', name: 'Hello world ' }),
-                ]),
-            }),
-        );
-    });
-
     it('ignores a toggle for a reference that is no longer in the list', () => {
         renderComponent();
 

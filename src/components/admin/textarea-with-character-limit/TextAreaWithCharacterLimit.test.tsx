@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
 
@@ -213,12 +213,23 @@ describe('TextAreaWithCharacterLimit', () => {
         expect(getTextArea().value).toBe('');
     });
 
-    it('re-syncs the displayed value with the value prop after a change', async () => {
+    it('normalises the typed value when normalizeValue is provided', () => {
+        renderTextAreaWithCharacterLimit({
+            value: 'Hello',
+            normalizeValue: (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, ''),
+        });
+
+        typeInTextArea('  Hello   world ');
+
+        expect(getTextArea()).toHaveValue('Hello world ');
+    });
+
+    it('keeps the typed value as is when normalizeValue is not provided', () => {
         renderTextAreaWithCharacterLimit({ value: 'Hello' });
 
         typeInTextArea('Hello  world');
 
-        await waitFor(() => expect(getTextArea()).toHaveValue('Hello'));
+        expect(getTextArea()).toHaveValue('Hello  world');
     });
 
     describe('auto-grow functionality', () => {

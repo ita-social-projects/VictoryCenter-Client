@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
 
@@ -211,6 +211,14 @@ describe('TextAreaWithCharacterLimit', () => {
     it('renders empty string when value is undefined', () => {
         renderTextAreaWithCharacterLimit({ value: undefined as any });
         expect(getTextArea().value).toBe('');
+    });
+
+    it('re-syncs the displayed value with the value prop after a change', async () => {
+        renderTextAreaWithCharacterLimit({ value: 'Hello' });
+
+        typeInTextArea('Hello  world');
+
+        await waitFor(() => expect(getTextArea()).toHaveValue('Hello'));
     });
 
     describe('auto-grow functionality', () => {

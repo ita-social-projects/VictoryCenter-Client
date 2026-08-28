@@ -1,4 +1,10 @@
-import { generateInitials, getNormalizedInputText, getTrimmedInputText, parseDescriptionList } from './text-formatters';
+import {
+    generateInitials,
+    getNormalizedInputText,
+    getNormalizedInputTextWhileTyping,
+    getTrimmedInputText,
+    parseDescriptionList,
+} from './text-formatters';
 
 describe('text-formatters', () => {
     describe('generateInitials', () => {
@@ -64,6 +70,20 @@ describe('text-formatters', () => {
 
         it('should not modify already normalized text', () => {
             expect(getNormalizedInputText('hello world')).toBe('hello world');
+        });
+    });
+
+    describe('getNormalizedInputTextWhileTyping', () => {
+        it('should collapse consecutive into a single one', () => {
+            expect(getNormalizedInputTextWhileTyping('Hello   world')).toBe('Hello world');
+        });
+
+        it('should remove leading spaces', () => {
+            expect(getNormalizedInputTextWhileTyping('   Hello')).toBe('Hello');
+        });
+
+        it('should keep a trailing space so the next word can be typed', () => {
+            expect(getNormalizedInputTextWhileTyping('Hello ')).toBe('Hello ');
         });
     });
 

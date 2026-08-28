@@ -13,7 +13,13 @@ verify the touched behavior, and report what changed.
 
 1. Read `AGENTS.md` first for shared project rules.
 2. Check `git status --short` before editing and preserve unrelated user work.
-3. Inspect the closest existing examples before coding:
+3. For medium or large stories, inspect relevant planning artifacts when they
+   exist:
+   - Original user request or `.codex/work/<story-slug>/story.md`
+   - `.codex/work/<story-slug>/analysis.md`
+   - `.codex/work/<story-slug>/plan.md`
+   - `.codex/work/<story-slug>/tasks.md`
+4. Inspect the closest existing examples before coding:
    - Components: `src/components/`, `src/pages/`
    - Hooks: `src/hooks/`
    - API services: `src/services/api/`
@@ -21,11 +27,65 @@ verify the touched behavior, and report what changed.
    - Validation: `src/validation/`
    - Locale strings: `src/locales/uk/`, `src/locales/en/`
    - Tests and mocks near the changed file
-4. Identify the minimal set of files required for the request.
-5. Edit only those files. Do not touch `.claude/`, `.github/`, or `CLAUDE.md`
+5. Identify the minimal set of files required for the request.
+6. Edit only those files. Do not touch `.claude/`, `.github/`, or `CLAUDE.md`
    unless explicitly requested.
-6. Run the narrowest useful verification. Prefer targeted tests first, then
+7. Run the narrowest useful verification. Prefer targeted tests first, then
    broader lint/build checks when risk or scope justifies them.
+
+Planning artifacts are optional. Small fixes must still be able to move directly
+from request to implementation.
+
+## Requirement Authority
+
+Respect this order:
+
+```text
+user story / explicit user clarification
+-> acceptance criteria
+-> implementation plan
+-> tasks
+-> implementation
+```
+
+Implementation must not silently weaken an `AC-*`, remove an `AC-*`,
+reinterpret product behavior for convenience, or treat a completed task list as
+proof that the story is complete. If a lower-level artifact conflicts with the
+original requirement, the higher-level requirement wins. Later explicit user
+clarification wins over older planning artifacts.
+
+## Task-Aware Implementation
+
+For large stories with `tasks.md`, work in meaningful `T-*` units:
+
+1. Confirm the task's referenced `AC-*` entries still exist.
+2. Inspect declared dependencies before editing.
+3. Inspect the closest relevant code before editing.
+4. Keep task scope narrow.
+
+Move a task checkbox to `[x]` only when the intended implementation unit exists,
+the relevant behavior is minimally checked, and no known blocking issue remains
+for that task. Do not mark `[x]` merely because files were edited.
+
+When useful, add short task evidence such as files changed, targeted check run,
+or result. Keep `tasks.md` concise; it should not become an activity log.
+
+## Newly Discovered Work
+
+Small, directly necessary work that clearly belongs to the current task may stay
+inside that task. Materially separate work should become a new `T-*` task using
+the next unused ID, mapped to relevant `AC-*` entries, with a short discovery
+note when the reason is not obvious.
+
+Reconsider the plan instead of silently expanding it when implementation
+discovers materially larger scope, such as a new dependency, API contract
+change, shared abstraction affecting unrelated areas, significantly more files
+than expected, conflict with established project patterns, an invalid technical
+direction, or one task splitting into several independent units.
+
+Inspect the repository first when the issue may be resolved from existing
+behavior. Ask the user only when a real product decision or requirement
+clarification is required.
 
 ## Project Rules To Preserve
 
@@ -50,6 +110,13 @@ verify the touched behavior, and report what changed.
 - Keep components focused; split only when the current change would make the
   component meaningfully harder to test or review.
 - Preserve existing naming, import order, exports, test placement, and format.
+- Do not perform convergence inside implementation.
+- Do not declare the whole story complete merely because all `T-*` tasks are
+  checked.
+- Do not turn implementation into PR review.
+- Do not modify temporary artifacts unrelated to the current story.
+- Do not clean up `.codex/work/<story-slug>/` automatically during
+  implementation.
 
 ## Tests And Docs
 

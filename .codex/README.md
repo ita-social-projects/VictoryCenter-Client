@@ -37,7 +37,12 @@ OpenAI Codex skills use a directory with a required `SKILL.md` file containing
 - `victory-center-task-decomposition` - breaks large-story plans into stable
   `T-*` implementation tasks linked to acceptance criteria.
 - `victory-center-implementation` - implementation workflow for focused code
-  changes in this React/TypeScript application.
+  changes in this React/TypeScript application. For large stories it may consume
+  optional story, analysis, plan, and task artifacts.
+- `victory-center-convergence` - read-only requirement completeness check that
+  reports only unresolved `MISSING`, `PARTIAL`, or `INCORRECT` story gaps.
+- `victory-center-verification` - proportionate evidence-gathering workflow for
+  targeted tests, typecheck, lint, build, or skipped-check reporting.
 - `victory-center-pr-review` - lightweight PR/diff review workflow focused on
   correctness, regressions, risk, and missed tests.
 
@@ -45,13 +50,13 @@ OpenAI Codex skills use a directory with a required `SKILL.md` file containing
 
 Use the planning workflow only when it earns its cost:
 
-- Small task: request -> implementation. Planning artifacts are usually
-  unnecessary.
+- Small task: request -> implementation -> proportionate verification. Planning
+  artifacts are usually unnecessary.
 - Medium feature: request -> story analysis when useful -> planning ->
-  implementation.
+  implementation -> verification.
 - Large story: story -> story analysis -> planning -> task decomposition ->
-  implementation by `T-*` units. Later workflow stages may add convergence and
-  verification artifacts, but those stages are not implemented here.
+  implementation by `T-*` units -> convergence -> resolve gaps -> verification
+  -> optional PR review.
 
 The requirement authority order is:
 
@@ -67,6 +72,13 @@ Lower layers may clarify or decompose higher layers, but they must not silently
 remove requirements, weaken requirements, change product behavior, or mark work
 out of scope without support from the original request or explicit user
 clarification.
+
+Completing every `T-*` task does not prove story completeness. Convergence
+checks whether the implementation satisfies the original story and `AC-*`
+requirements. Verification checks what evidence demonstrates that the
+implementation works. PR review remains a separate quality/risk pass for
+correctness, regressions, maintainability, security, accessibility, and test
+gaps.
 
 ## Temporary Work Artifacts
 
@@ -87,6 +99,8 @@ Potential artifacts:
   expectations.
 - `tasks.md` - stable large-story task checklist using `T-001`, `T-002`, and so
   on.
+- Later workflow stages may add `convergence.md` for unresolved story gaps and
+  `verification.md` for concise verification evidence.
 
 Lifecycle principles:
 
@@ -102,4 +116,6 @@ Lifecycle principles:
 - Cleanup must target only agent-created work artifacts for that story. Do not
   use broad destructive cleanup, and do not delete incomplete work merely
   because one implementation session ended.
+- Implementation does not delete work artifacts automatically. Incomplete work
+  remains resumable; cleanup is a later lifecycle/rules concern.
 

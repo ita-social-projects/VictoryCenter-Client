@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -47,6 +47,12 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
     ) => {
         const [localValue, setLocalValue] = useState(value ?? '');
 
+        const valueRef = useRef(value);
+
+        useLayoutEffect(() => {
+            valueRef.current = value;
+        }, [value]);
+
         useEffect(() => {
             setLocalValue(value ?? '');
         }, [value]);
@@ -81,6 +87,9 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         const onInternalChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setLocalValue(e.target.value);
             handleChange(e);
+            Promise.resolve().then(() => {
+                setLocalValue(valueRef.current ?? '');
+            });
         };
 
         useEffect(() => {

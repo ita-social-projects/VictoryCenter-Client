@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -21,6 +21,7 @@ export interface TextAreaWithCharacterLimitProps {
     onWarningChange?: (warning: string | null) => void;
     autoGrow?: boolean;
     maxRows?: number;
+    normalizeValue?: (value: string) => string;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -42,16 +43,11 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             onWarningChange,
             autoGrow = false,
             maxRows = 10,
+            normalizeValue,
         },
         ref,
     ) => {
         const [localValue, setLocalValue] = useState(value ?? '');
-
-        const valueRef = useRef(value);
-
-        useLayoutEffect(() => {
-            valueRef.current = value;
-        }, [value]);
 
         useEffect(() => {
             setLocalValue(value ?? '');
@@ -85,11 +81,19 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             });
 
         const onInternalChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setLocalValue(e.target.value);
+            const rawValue = e.target.value;
+            const nextValue = normalizeValue ? normalizeValue(rawValue) : rawValue;
+
+            if (normalizeValue && nextValue !== rawValue) {
+                const rawCaret = e.target.selectionStart ?? rawValue.length;
+                const nextCaret = normalizeValue(rawValue.slice(0, rawCaret)).length;
+
+                e.target.value = nextValue;
+                e.target.setSelectionRange(nextCaret, nextCaret);
+            }
+
+            setLocalValue(nextValue);
             handleChange(e);
-            Promise.resolve().then(() => {
-                setLocalValue(valueRef.current ?? '');
-            });
         };
 
         useEffect(() => {

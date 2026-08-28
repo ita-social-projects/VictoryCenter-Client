@@ -6,7 +6,6 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 
 import {
     HippotherapyScientificReference,
@@ -90,16 +89,14 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     };
 
     const handleNameChange = (localId: string, name: string) => {
-        const normalisedName = getNormalizedInputTextWhileTyping(name);
-
         const scientificReferences = value.scientificReferences.map((reference) =>
-            reference.localId === localId ? { ...reference, name: normalisedName } : reference,
+            reference.localId === localId ? { ...reference, name } : reference,
         );
         onChange({ ...value, scientificReferences });
         if (nameErrors[localId] !== undefined) {
             setNameErrors((prev) => ({
                 ...prev,
-                [localId]: validateReferenceText(normalisedName),
+                [localId]: validateReferenceText(name),
             }));
         }
     };

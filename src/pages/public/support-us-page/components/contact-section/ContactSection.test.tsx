@@ -61,14 +61,10 @@ describe('ContactSection', () => {
     type FormValues = Partial<Record<'name' | 'email' | 'subject' | 'message', string>>;
     const getField = (fieldId: string) => screen.getByTestId(fieldId);
     const setFieldValue = (fieldId: string, value: string) => {
-        act(() => {
-            fireEvent.change(getField(fieldId), { target: { value } });
-        });
+        fireEvent.change(getField(fieldId), { target: { value } });
     };
     const clickSubmit = () => {
-        act(() => {
-            fireEvent.click(screen.getByRole('button', { name: T.SUBMIT_BUTTON }));
-        });
+        fireEvent.click(screen.getByRole('button', { name: T.SUBMIT_BUTTON }));
     };
     const fillForm = (overrides: FormValues = {}, shouldBlur = false) => {
         const values = {
@@ -86,9 +82,7 @@ describe('ContactSection', () => {
 
         if (shouldBlur) {
             [NAME_FIELD, EMAIL_FIELD, SUBJECT_FIELD, MESSAGE_FIELD].forEach((fieldId) => {
-                act(() => {
-                    fireEvent.blur(getField(fieldId));
-                });
+                fireEvent.blur(getField(fieldId));
             });
         }
     };
@@ -171,10 +165,8 @@ describe('ContactSection', () => {
         setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
         const subjectInput = getField(SUBJECT_FIELD);
         const messageInput = getField(MESSAGE_FIELD);
-        act(() => {
-            fireEvent.blur(subjectInput);
-            fireEvent.blur(messageInput);
-        });
+        fireEvent.blur(subjectInput);
+        fireEvent.blur(messageInput);
 
         expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
         expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
@@ -232,9 +224,7 @@ describe('ContactSection', () => {
         render(<ContactSection />);
         const nameInput = getField(NAME_FIELD);
         setFieldValue(NAME_FIELD, '  Ім’я  ');
-        act(() => {
-            fireEvent.blur(nameInput);
-        });
+        fireEvent.blur(nameInput);
 
         expect(nameInput).toHaveValue('Ім’я');
     });
@@ -284,10 +274,8 @@ describe('ContactSection', () => {
     it('shows a toast notification when CAPTCHA token expires or becomes null', () => {
         const { rerender } = render(<ContactSection />);
 
-        act(() => {
-            mockTurnstileToken = null;
-            rerender(<ContactSection />);
-        });
+        mockTurnstileToken = null;
+        rerender(<ContactSection />);
 
         expect(screen.getByText(T.CAPTCHA_REQUIRED)).toBeInTheDocument();
         act(() => jest.advanceTimersByTime(3000));

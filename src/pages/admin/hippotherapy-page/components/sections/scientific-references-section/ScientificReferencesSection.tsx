@@ -24,6 +24,8 @@ export interface ScientificReferencesSectionProps {
 const getExpandKey = (reference: HippotherapyScientificReference) =>
     reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
 
+const validateReferenceText = (text: string) => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim());
+
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
     const [titleError, setTitleError] = useState<string | undefined>();
     const [descriptionError, setDescriptionError] = useState<string | undefined>();
@@ -35,9 +37,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     const areAllReferencesValid = useMemo(
         () =>
             value.scientificReferences.every(
-                (reference) =>
-                    !HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(reference.name) &&
-                    !HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(reference.url),
+                (reference) => !validateReferenceText(reference.name) && !validateReferenceText(reference.url),
             ),
         [value.scientificReferences],
     );
@@ -99,7 +99,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         if (nameErrors[localId] !== undefined) {
             setNameErrors((prev) => ({
                 ...prev,
-                [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(normalisedName),
+                [localId]: validateReferenceText(normalisedName),
             }));
         }
     };
@@ -110,7 +110,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         );
         onChange({ ...value, scientificReferences });
         if (urlErrors[localId] !== undefined) {
-            setUrlErrors((prev) => ({ ...prev, [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(url) }));
+            setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceText(url) }));
         }
     };
 
@@ -118,7 +118,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         const reference = value.scientificReferences.find((item) => item.localId === localId);
         setNameErrors((prev) => ({
             ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText((reference?.name ?? '').trim()),
+            [localId]: validateReferenceText(reference?.name ?? ''),
         }));
     };
 
@@ -126,7 +126,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         const reference = value.scientificReferences.find((item) => item.localId === localId);
         setUrlErrors((prev) => ({
             ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText((reference?.url ?? '').trim()),
+            [localId]: validateReferenceText(reference?.url ?? ''),
         }));
     };
 

@@ -314,7 +314,7 @@ describe('ScientificReferencesSection', () => {
         renderComponent({
             value: {
                 ...defaultValue,
-                scientificReferences: [{ localId: 'ref-1', id: 1, name: 'ab', url: 'https://example.com/one' }],
+                scientificReferences: [{ localId: 'ref-1', id: 1, name: 'ab         ', url: 'https://example.com/one' }],
             },
         });
 

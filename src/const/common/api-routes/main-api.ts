@@ -157,4 +157,7 @@ export const API_ROUTES = {
     HISTORY_LOCALIZATIONS: {
         BASE: 'HistoryLocalizations',
     },
+    EVENT_CATEGORIES: {
+        BASE: 'EventNewsCategories',
+    },
 };

@@ -19,6 +19,9 @@ verify the touched behavior, and report what changed.
    - `.codex/work/<story-slug>/analysis.md`
    - `.codex/work/<story-slug>/plan.md`
    - `.codex/work/<story-slug>/tasks.md`
+
+   Reconcile resumed artifacts with current `git status`, relevant diffs, and
+   current code before trusting technical assumptions.
 4. Inspect the closest existing examples before coding:
    - Components: `src/components/`, `src/pages/`
    - Hooks: `src/hooks/`
@@ -35,6 +38,10 @@ verify the touched behavior, and report what changed.
 
 Planning artifacts are optional. Small fixes must still be able to move directly
 from request to implementation.
+
+For non-trivial changes where the closest local pattern is unclear, use
+`victory-center-project-patterns` or perform equivalent bounded nearby
+inspection before creating a new approach.
 
 ## Requirement Authority
 
@@ -82,6 +89,9 @@ discovers materially larger scope, such as a new dependency, API contract
 change, shared abstraction affecting unrelated areas, significantly more files
 than expected, conflict with established project patterns, an invalid technical
 direction, or one task splitting into several independent units.
+
+Re-planning may update the technical plan or task decomposition, but it must not
+weaken requirements.
 
 Inspect the repository first when the issue may be resolved from existing
 behavior. Ask the user only when a real product decision or requirement

@@ -28,6 +28,8 @@ OpenAI Codex skills use a directory with a required `SKILL.md` file containing
 
 ## Skills
 
+- `victory-center-project-patterns` - read-only discovery for the closest
+  existing implementation pattern and directly related files.
 - `victory-center-story-analysis` - turns a non-trivial story/request into
   stable acceptance criteria, assumptions, ambiguities, constraints, edge cases,
   and out-of-scope boundaries before planning.
@@ -48,15 +50,18 @@ OpenAI Codex skills use a directory with a required `SKILL.md` file containing
 
 ## Planning Workflow
 
-Use the planning workflow only when it earns its cost:
+Use the planning workflow only when it earns its cost.
+`victory-center-project-patterns` is a supporting discovery skill, not a
+mandatory artifact-producing phase.
 
-- Small task: request -> implementation -> proportionate verification. Planning
-  artifacts are usually unnecessary.
-- Medium feature: request -> story analysis when useful -> planning ->
-  implementation -> verification.
-- Large story: story -> story analysis -> planning -> task decomposition ->
-  implementation by `T-*` units -> convergence -> resolve gaps -> verification
-  -> optional PR review.
+- Small task: request -> nearby inspection/project-patterns when needed ->
+  implementation -> proportionate verification. Planning artifacts are usually
+  unnecessary.
+- Medium feature: request -> story analysis when useful -> project-patterns ->
+  planning -> implementation -> verification.
+- Large story: story -> story analysis -> project-patterns -> planning -> task
+  decomposition -> implementation by `T-*` units -> convergence -> resolve gaps
+  -> verification -> optional PR review.
 
 The requirement authority order is:
 
@@ -79,6 +84,19 @@ requirements. Verification checks what evidence demonstrates that the
 implementation works. PR review remains a separate quality/risk pass for
 correctness, regressions, maintainability, security, accessibility, and test
 gaps.
+
+## Stage Responsibilities
+
+- Story analysis: define what the request requires and produce `AC-*` outcomes.
+- Project patterns: find repository evidence for how similar work is already
+  implemented.
+- Planning: define how accepted requirements should be implemented.
+- Task decomposition: split large plans into stable `T-*` implementation units.
+- Implementation: make the changes and update active task state when used.
+- Convergence: re-check the implementation against the original story and
+  report only unresolved requirement gaps.
+- Verification: gather proportionate evidence that the implementation works.
+- PR review: assess final quality and risk when requested.
 
 ## Temporary Work Artifacts
 
@@ -109,6 +127,8 @@ Lifecycle principles:
 - Update artifacts as analysis, planning, and task decomposition legitimately
   evolve.
 - Resume later work by reading the relevant story directory first.
+- Reconcile resumed artifacts with current `git status`, relevant diffs, and
+  current code before treating technical assumptions as current.
 - Treat temporary artifacts as working memory; they never override the original
   user request or explicit clarification.
 - Do not rewrite the story into an easier version and then treat that rewrite as

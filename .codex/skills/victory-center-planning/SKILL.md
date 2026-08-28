@@ -13,7 +13,8 @@ a line-by-line coding script.
 
 Convert accepted requirements into a practical technical strategy. Read
 `AGENTS.md` for project conventions and inspect existing repository patterns
-before proposing new abstractions.
+before proposing new abstractions. Use `victory-center-project-patterns` when
+the closest existing implementation pattern is not already clear.
 
 ## Inputs
 

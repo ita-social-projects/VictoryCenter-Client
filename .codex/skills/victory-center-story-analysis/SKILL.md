@@ -13,7 +13,9 @@ small, obvious changes usually do not need durable analysis artifacts.
 
 Convert the original request into a stable requirement model while preserving
 the user's intent. Read `AGENTS.md` first for shared project rules, then inspect
-repository context when existing behavior can answer an ambiguity.
+repository context when existing behavior can answer an ambiguity. Use
+`victory-center-project-patterns` when repository behavior can resolve a
+technical ambiguity without making a product decision.
 
 ## Authority Order
 

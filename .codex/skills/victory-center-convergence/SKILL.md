@@ -42,6 +42,12 @@ Inspect in this authority order:
 Tasks are implementation aids, not proof of completeness. Even if every `T-*`
 is checked, independently re-check the original story and `AC-*` entries.
 
+Use `victory-center-project-patterns` only as supporting evidence for expected
+technical project behavior; do not turn convergence into pattern enforcement.
+
+When resuming from work artifacts, compare them with current code and relevant
+diffs before treating technical assumptions as current.
+
 ## Checks
 
 For each requirement, compare expected behavior with the actual implementation

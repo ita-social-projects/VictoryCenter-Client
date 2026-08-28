@@ -33,6 +33,9 @@ If convergence still has unresolved gaps, verification may still run targeted
 checks, but it must clearly state that story completeness remains unresolved.
 Do not treat verification success as convergence success.
 
+When resuming from work artifacts, reconcile the planned verification strategy
+with the current changed files before choosing checks.
+
 ## Strategy
 
 Prefer the narrowest useful evidence first:

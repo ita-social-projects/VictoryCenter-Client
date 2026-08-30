@@ -1,5 +1,6 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography.scss' as t;
 
 .root {
     width: 100%;
@@ -36,31 +37,39 @@
 
 .content-block {
     background-color: c.$light-blue-300;
-    padding: 40px 16px 32px;
+    padding: 120px 16px 85px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 60px;
 
-    @media (min-width: 768px) {
-        padding: 48px 32px 40px;
+    @media (min-width: 560px) {
+        padding: 120px 63px 68px;
     }
 
-    @media (min-width: 1024px) {
-        padding: 56px 56px 48px;
+    @media (min-width: 768px) {
+        padding: 180px 54px 40px;
     }
 
     @media (min-width: 1440px) {
-        padding: 64px 168px 56px;
+        padding: 150px 56px 105px;
     }
 }
 
 .title {
-    @include type.h2-bold-uppercase;
+    @include type.h2-extrabold-uppercase;
     color: c.$white;
     text-align: center;
 
+    @media (min-width: 560px) {
+        @include type.h2-extrabold-uppercase;
+    }
+
     @media (min-width: 768px) {
-        @include type.h1-bold-uppercase;
+        @include type.h1-extrabold-uppercase;
+    }
+
+    @media (min-width: 768px) {
+        @include type.h1-extrabold-uppercase-huge;
     }
 }
 
@@ -82,7 +91,6 @@
     align-items: center;
     text-align: center;
     gap: 4px;
-    flex: 1;
 }
 
 .metric-value {
@@ -90,13 +98,29 @@
     color: c.$blue-700;
     display: block;
 
+    @media (min-width: 568px) {
+        @include type.h2-bold;
+    }
+
     @media (min-width: 768px) {
         @include type.h2-bold;
+    }
+    @media (min-width: 1440px) {
+        @include type.h2-bold;
+        font-size: 72px;
     }
 }
 
 .metric-name {
-    @include type.body-1-regular;
+    @include type.body-2-regular;
     color: c.$blue-700;
     display: block;
+
+    @media (min-width: 568px) {
+        @include type.body-1-regular;
+    }
+
+    @media (min-width: 768px) {
+        @include type.subtitle-2-medium;
+    }
 }

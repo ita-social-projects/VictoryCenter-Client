@@ -13,12 +13,24 @@
     @include _text(t.$fw-black, t.$h1-size, t.$h1-height, t.$h1-spacing);
 }
 
+@mixin h1-extrabold-uppercase-huge {
+    @include _text(t.$fw-extrabold, t.$h1-size-huge, t.$h1-height-huge, t.$h1-spacing, uppercase);
+}
+
+@mixin h1-extrabold-uppercase {
+    @include _text(t.$fw-extrabold, t.$h1-size, t.$h1-height, t.$h1-spacing, uppercase);
+}
+
 @mixin h1-bold {
     @include _text(t.$fw-bold, t.$h1-size, t.$h1-height, t.$h1-spacing);
 }
 
 @mixin h1-bold-uppercase {
     @include _text(t.$fw-bold, t.$h1-size, t.$h1-height, t.$h1-spacing, uppercase);
+}
+
+@mixin h2-extrabold-uppercase {
+    @include _text(t.$fw-extrabold, t.$h2-size, t.$h2-height, t.$h2-spacing, uppercase);
 }
 
 @mixin h2-bold {

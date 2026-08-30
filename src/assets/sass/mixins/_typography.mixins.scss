@@ -9,16 +9,20 @@
     text-transform: $transform;
 }
 
-@mixin h1-black {
-    @include _text(t.$fw-black, t.$h1-size, t.$h1-height, t.$h1-spacing);
-}
-
-@mixin h1-extrabold-uppercase-huge {
-    @include _text(t.$fw-extrabold, t.$h1-size-huge, t.$h1-height-huge, t.$h1-spacing, uppercase);
-}
-
 @mixin h1-extrabold-uppercase {
     @include _text(t.$fw-extrabold, t.$h1-size, t.$h1-height, t.$h1-spacing, uppercase);
+}
+
+@mixin h1-display-extrabold-uppercase {
+    @include _text(t.$fw-extrabold, t.$h1-size-display, t.$h1-height-display, t.$h1-spacing, uppercase);
+}
+
+@mixin h1-extrabold {
+    @include _text(t.$fw-extrabold, t.$h1-size, t.$h1-height, t.$h1-spacing);
+}
+
+@mixin h1-black {
+    @include _text(t.$fw-black, t.$h1-size, t.$h1-height, t.$h1-spacing);
 }
 
 @mixin h1-bold {
@@ -33,6 +37,14 @@
     @include _text(t.$fw-extrabold, t.$h2-size, t.$h2-height, t.$h2-spacing, uppercase);
 }
 
+@mixin h2-extrabold {
+    @include _text(t.$fw-extrabold, t.$h2-size, t.$h2-height, t.$h2-spacing);
+}
+
+@mixin h2-black {
+    @include _text(t.$fw-black, t.$h2-size, t.$h2-height, t.$h2-spacing);
+}
+
 @mixin h2-bold {
     @include _text(t.$fw-bold, t.$h2-size, t.$h2-height, t.$h2-spacing);
 }
@@ -43,6 +55,14 @@
 
 @mixin h3-medium-uppercase {
     @include _text(t.$fw-medium, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
+}
+
+@mixin h3-extrabold {
+    @include _text(t.$fw-extrabold, t.$h3-size, t.$h3-height, t.$h3-spacing);
+}
+
+@mixin h3-black {
+    @include _text(t.$fw-black, t.$h3-size, t.$h3-height, t.$h3-spacing);
 }
 
 @mixin h3-semibold {
@@ -63,6 +83,14 @@
 
 @mixin h4-regular {
     @include _text(t.$fw-regular, t.$h4-size, t.$h4-height, t.$h4-spacing);
+}
+
+@mixin h4-extrabold {
+    @include _text(t.$fw-extrabold, t.$h4-size, t.$h4-height, t.$h4-spacing);
+}
+
+@mixin h4-black {
+    @include _text(t.$fw-black, t.$h4-size, t.$h4-height, t.$h4-spacing);
 }
 
 @mixin h4-semibold {

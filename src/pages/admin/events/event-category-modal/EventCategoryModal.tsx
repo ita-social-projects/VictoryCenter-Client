@@ -9,7 +9,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import './EventCategoryModal.scss';
 import { EVENT_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-schema/event-category-schema';
-import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
+import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
+import { EventCategoriesApi } from '../event-categories/event-categories-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 interface EventCategoryFormValues {
     name: string;
@@ -27,16 +29,19 @@ interface BaseProps {
 
 interface AddModalProps extends BaseProps {
     mode: ModalMode.Add;
+    onAddCategory: (category: EventCategory) => void;
 }
 
 interface EditModalProps extends BaseProps {
     mode: ModalMode.Edit;
+    onUpdateCategory: (category: EventCategory) => void;
 }
 
 export type EventCategoryModalProps = AddModalProps | EditModalProps;
 
 export const EventCategoryModal = (props: EventCategoryModalProps) => {
     const { isOpen, onClose, categories, mode } = props;
+    const client = useAdminClient();
 
     const defaultFormState = useMemo<EventCategoryFormValues>(
         () => ({
@@ -50,6 +55,9 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [initialFormState, setInitialFormState] = useState<EventCategoryFormValues>(defaultFormState);
+    const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     const isDirty = JSON.stringify(formState) !== JSON.stringify(initialFormState);
 
@@ -86,16 +94,21 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         setFormState(defaultFormState);
         setInitialFormState(defaultFormState);
         setErrors({});
+        setError('');
     }, [isOpen, defaultFormState]);
 
     const handleClose = useCallback(() => {
+        if (isSubmitting) {
+            return;
+        }
+
         if (isDirty) {
             setShowCloseConfirmModal(true);
             return;
         }
 
         onClose();
-    }, [isDirty, onClose]);
+    }, [isSubmitting, isDirty, onClose]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
@@ -144,6 +157,72 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         return hasValidationErrors || hasEmptyFields;
     };
 
+    const onSubmit = useCallback(
+        async (e?: React.FormEvent) => {
+            if (e) {
+                e.preventDefault();
+            }
+
+            setIsSubmitting(true);
+            setError('');
+            setShowSaveConfirmModal(false);
+
+            try {
+                const categoryData = {
+                    id: mode === ModalMode.Edit ? selectedCategory!.id : 1,
+                    name: formState.name.trim(),
+                };
+
+                if (mode === ModalMode.Add) {
+                    const newCategory = await EventCategoriesApi.create(client, categoryData);
+                    props.onAddCategory(newCategory);
+                } else {
+                    const updatedCategory = await EventCategoriesApi.update(client, categoryData);
+                    props.onUpdateCategory(updatedCategory);
+                }
+
+                onClose();
+            } catch {
+                const errorMessage =
+                    mode === ModalMode.Add
+                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
+                        : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
+                setError(errorMessage);
+
+                setTimeout(() => setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+            } finally {
+                setIsSubmitting(false);
+            }
+        },
+        [formState, selectedCategory, mode, props, onClose, client],
+    );
+
+    const handleSubmitClick = useCallback(() => {
+        if (isDuplicateName || isSubmitting) {
+            return;
+        }
+        if (mode === ModalMode.Edit && !selectedCategory) {
+            return;
+        }
+
+        const nameValidationError = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        setErrors((prev) => ({ ...prev, name: nameValidationError }));
+
+        if (nameValidationError !== undefined) {
+            return;
+        }
+
+        if (mode === ModalMode.Edit) {
+            setShowSaveConfirmModal(true);
+        } else {
+            onSubmit();
+        }
+    }, [onSubmit, formState, isSubmitting, isDuplicateName, selectedCategory, mode]);
+
+    const handleSaveConfirmModalClose = useCallback(() => {
+        setShowSaveConfirmModal(false);
+    }, []);
+
     return (
         <>
             <Modal isOpen={isOpen} onClose={handleClose}>
@@ -182,6 +261,8 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                             maxLength={EVENT_CATEGORY_VALIDATION.name.max}
                             placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
                         />
+
+                        {error && <div className="event-category-modal-error-container">{error}</div>}
                     </form>
                 </Modal.Content>
 
@@ -191,6 +272,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                         buttonStyle="primary"
                         disabled={isSubmitDisabled()}
                         className="event-category-modal-save-button"
+                        onClick={handleSubmitClick}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE}
                     </Button>
@@ -203,6 +285,14 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                 onClose={handleCloseConfirmModalClose}
                 onCancel={handleCloseConfirmModalClose}
                 onConfirm={handleConfirmClose}
+            />
+
+            <ConfirmationModal
+                isOpen={showSaveConfirmModal}
+                title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
+                onClose={handleSaveConfirmModalClose}
+                onCancel={handleSaveConfirmModalClose}
+                onConfirm={onSubmit}
             />
         </>
     );

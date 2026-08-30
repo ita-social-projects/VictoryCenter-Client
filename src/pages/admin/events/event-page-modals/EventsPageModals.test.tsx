@@ -27,8 +27,8 @@ describe('EventsPageModals', () => {
 
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
-    const onAddEventCategory = jest.fn();
-    const onEditEventCategory = jest.fn();
+    const onAddCategory = jest.fn();
+    const onUpdateCategory = jest.fn();
 
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
@@ -45,14 +45,24 @@ describe('EventsPageModals', () => {
             },
         }) as unknown as UseModalsStateResult<EventsNews>;
 
+    const getModalPropsByMode = (mode: ModalMode) =>
+        mockedEventCategoryModal.mock.calls.map(([props]) => props).find((props) => props.mode === mode);
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     it('renders add category modal', () => {
-        render(<EventsPageModals modalsStateControl={createModalsStateControl(true)} categories={categories} />);
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(true)}
+                categories={categories}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+            />,
+        );
 
-        const addModalProps = mockedEventCategoryModal.mock.calls[0][0];
+        const addModalProps = getModalPropsByMode(ModalMode.Add);
 
         expect(addModalProps).toEqual(
             expect.objectContaining({
@@ -60,14 +70,22 @@ describe('EventsPageModals', () => {
                 isOpen: true,
                 onClose: closeAddCategoryModal,
                 categories,
+                onAddCategory,
             }),
         );
     });
 
     it('renders edit category modal', () => {
-        render(<EventsPageModals modalsStateControl={createModalsStateControl(false, true)} categories={categories} />);
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, true)}
+                categories={categories}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+            />,
+        );
 
-        const editModalProps = mockedEventCategoryModal.mock.calls[1][0];
+        const editModalProps = getModalPropsByMode(ModalMode.Edit);
 
         expect(editModalProps).toEqual(
             expect.objectContaining({
@@ -75,17 +93,23 @@ describe('EventsPageModals', () => {
                 isOpen: true,
                 onClose: closeEditCategoryModal,
                 categories,
+                onUpdateCategory,
             }),
         );
     });
 
     it('passes false as isOpen when both category modals are closed', () => {
         render(
-            <EventsPageModals modalsStateControl={createModalsStateControl(false, false)} categories={categories} />,
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, false)}
+                categories={categories}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+            />,
         );
 
-        const addModalProps = mockedEventCategoryModal.mock.calls[0][0];
-        const editModalProps = mockedEventCategoryModal.mock.calls[1][0];
+        const addModalProps = getModalPropsByMode(ModalMode.Add);
+        const editModalProps = getModalPropsByMode(ModalMode.Edit);
 
         expect(addModalProps).toEqual(
             expect.objectContaining({

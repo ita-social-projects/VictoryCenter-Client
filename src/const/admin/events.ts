@@ -27,3 +27,7 @@ export const EVENT_CATEGORY_TEXT = {
         SELECT_CATEGORY_PLACEHOLDER: 'Виберіть категорію',
     },
 };
+
+export const EVENT_NOTIFICATION_TIMERS = {
+    SYNC_ERROR_MS: 3000,
+};

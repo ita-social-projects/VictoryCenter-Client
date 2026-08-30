@@ -57,6 +57,10 @@
     @include _text(t.$fw-medium, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
 }
 
+@mixin h3-display-extrabold-uppercase {
+    @include _text(t.$fw-extrabold, t.$h3-display-size, t.$h3-display-height, t.$h3-spacing, uppercase);
+}
+
 @mixin h3-extrabold {
     @include _text(t.$fw-extrabold, t.$h3-size, t.$h3-height, t.$h3-spacing);
 }

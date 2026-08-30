@@ -56,7 +56,7 @@
 }
 
 .title {
-    @include type.h2-extrabold-uppercase;
+    @include type.h3-display-extrabold-uppercase;
     color: c.$white;
     text-align: center;
 
@@ -68,20 +68,51 @@
         @include type.h1-extrabold-uppercase;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 1440px) {
         @include type.h1-display-extrabold-uppercase;
     }
 }
 
 .metrics-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 24px;
 
-    @media (min-width: 768px) {
-        flex-direction: row;
+     @media (min-width: 560px) {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 24px;
+        row-gap: 40px;
+
+        .metric:nth-child(3),
+        .metric:nth-child(4) {
+            grid-column: 1 / -1;
+        }
+    }
+
+     @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 32px;
+        row-gap: 40px;
+
+        .metric:nth-child(3) {
+            grid-column: auto;
+        }
+
+        .metric:nth-child(4) {
+            grid-column: 1 / -1;
+        }
+    }
+
+     @media (min-width: 1440px) {
+        grid-template-columns: repeat(4, max-content);
         justify-content: space-between;
-        gap: 0;
+        column-gap: 24px;
+        row-gap: 0;
+
+        .metric:nth-child(3),
+        .metric:nth-child(4) {
+            grid-column: auto;
+        }
     }
 }
 
@@ -97,8 +128,9 @@
     @include type.h3-bold;
     color: c.$blue-700;
     display: block;
+    white-space: nowrap;
 
-    @media (min-width: 568px) {
+    @media (min-width: 560px) {
         @include type.h2-bold;
     }
 
@@ -106,8 +138,7 @@
         @include type.h2-bold;
     }
     @media (min-width: 1440px) {
-        @include type.h2-bold;
-        font-size: 72px;
+        @include type.h2-bold
     }
 }
 

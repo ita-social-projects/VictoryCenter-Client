@@ -8,6 +8,7 @@ import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from './event-categories/event-categories-api';
 import { EventCategory } from '@/types/admin/event-category';
+import { act } from 'react';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -51,13 +52,21 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
+        categories,
         contextMenuOptions,
         onContextMenuOptionSelected,
     }: {
+        categories: EventCategory[];
         contextMenuOptions: { id: string; name: string }[];
         onContextMenuOptionSelected: (id: string) => void;
     }) => (
         <div data-testid="category-bar">
+            {categories.map((category) => (
+                <div key={category.id} data-testid={`category-${category.id}`}>
+                    {category.name}
+                </div>
+            ))}
+
             {contextMenuOptions.map((option) => (
                 <button key={option.id} onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
@@ -204,7 +213,8 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
         const newCategory: EventCategory = {
@@ -212,11 +222,11 @@ describe('EventsPageAdmin', () => {
             name: 'Category 3',
         };
 
-        mockOnAddCategory(newCategory);
-
-        await waitFor(() => {
-            expect(mockOnAddCategory).toHaveBeenCalledWith(newCategory);
+        await act(async () => {
+            mockOnAddCategory(newCategory);
         });
+
+        expect(screen.getByText('Category 3')).toBeInTheDocument();
     });
 
     it('updates an existing category in the categories list', async () => {
@@ -225,7 +235,8 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
         const updatedCategory: EventCategory = {
@@ -233,10 +244,12 @@ describe('EventsPageAdmin', () => {
             name: 'Updated Category',
         };
 
-        mockOnUpdateCategory(updatedCategory);
-
-        await waitFor(() => {
-            expect(mockOnUpdateCategory).toHaveBeenCalledWith(updatedCategory);
+        await act(async () => {
+            mockOnUpdateCategory(updatedCategory);
         });
+
+        expect(screen.getByText('Updated Category')).toBeInTheDocument();
+        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
 });

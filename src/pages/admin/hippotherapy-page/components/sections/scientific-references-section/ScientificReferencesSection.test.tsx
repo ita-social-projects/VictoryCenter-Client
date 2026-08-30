@@ -45,6 +45,7 @@ jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
             data-is-expanded={isExpanded}
         >
             <button data-testid={`toggle-expand-${localId}`} onClick={() => onToggleExpand(localId)} />
+            <button data-testid={`toggle-unknown-${localId}`} onClick={() => onToggleExpand('unknown-local-id')} />
             <input
                 data-testid={`name-input-${localId}`}
                 value={name}
@@ -85,6 +86,11 @@ describe('ScientificReferencesSection', () => {
 
     beforeEach(() => {
         mockOnChange = jest.fn();
+
+        if (!(global as any).crypto) {
+            Object.defineProperty(global, 'crypto', { value: {}, configurable: true, writable: true });
+        }
+        (global as any).crypto.randomUUID = jest.fn(() => 'generated-uuid');
     });
 
     it('renders all references collapsed by default', () => {
@@ -246,5 +252,74 @@ describe('ScientificReferencesSection', () => {
         fireEvent.change(screen.getByTestId('url-input-ref-1'), { target: { value: 'https://example.com/fixed' } });
 
         expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
+    });
+
+    it('adds a new empty reference at the end of the list when the add button is clicked', () => {
+        renderComponent();
+
+        fireEvent.click(getAddButton());
+
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                scientificReferences: [
+                    ...defaultValue.scientificReferences,
+                    expect.objectContaining({ localId: 'generated-uuid', id: null, name: '', url: '' }),
+                ],
+            }),
+        );
+    });
+
+    it('disables the add button while a reference is incomplete', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [{ localId: 'ref-1', id: 1, name: '', url: '' }],
+            },
+        });
+
+        expect(getAddButton()).toBeDisabled();
+    });
+
+    it('enables the add button when every reference is filled in', () => {
+        renderComponent();
+
+        expect(getAddButton()).toBeEnabled();
+    });
+
+    it('ignores a toggle for a reference that is no longer in the list', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-unknown-ref-1'));
+
+        expect(screen.getByTestId('reference-card-ref-1')).toHaveAttribute('data-is-expanded', 'false');
+        expect(screen.getByTestId('reference-card-ref-2')).toHaveAttribute('data-is-expanded', 'false');
+    });
+
+    it('validates the trimmed name on blur', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [{ localId: 'ref-1', id: 1, name: 'ab ', url: 'https://example.com/one' }],
+            },
+        });
+
+        fireEvent.blur(screen.getByTestId('name-input-ref-1'));
+
+        expect(
+            screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(HIPPOTHERAPY_PAGE_TEXT.MIN_LENGTH)),
+        ).toBeInTheDocument();
+    });
+
+    it('keeps the add button disabled when a value only passes validation thanks to trailing spaces', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [
+                    { localId: 'ref-1', id: 1, name: 'ab         ', url: 'https://example.com/one' },
+                ],
+            },
+        });
+
+        expect(getAddButton()).toBeDisabled();
     });
 });

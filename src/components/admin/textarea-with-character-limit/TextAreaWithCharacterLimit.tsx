@@ -21,6 +21,7 @@ export interface TextAreaWithCharacterLimitProps {
     onWarningChange?: (warning: string | null) => void;
     autoGrow?: boolean;
     maxRows?: number;
+    normalizeValue?: (value: string) => string;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -42,6 +43,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             onWarningChange,
             autoGrow = false,
             maxRows = 10,
+            normalizeValue,
         },
         ref,
     ) => {
@@ -79,7 +81,18 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             });
 
         const onInternalChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setLocalValue(e.target.value);
+            const rawValue = e.target.value;
+            const nextValue = normalizeValue ? normalizeValue(rawValue) : rawValue;
+
+            if (normalizeValue && nextValue !== rawValue) {
+                const rawCaret = e.target.selectionStart ?? rawValue.length;
+                const nextCaret = normalizeValue(rawValue.slice(0, rawCaret)).length;
+
+                e.target.value = nextValue;
+                e.target.setSelectionRange(nextCaret, nextCaret);
+            }
+
+            setLocalValue(nextValue);
             handleChange(e);
         };
 

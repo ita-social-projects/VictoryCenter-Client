@@ -82,11 +82,7 @@
     align-items: center;
     text-align: center;
     gap: 4px;
-
-    @media (min-width: 768px) {
-        align-items: flex-start;
-        text-align: left;
-    }
+    flex: 1;
 }
 
 .metric-value {

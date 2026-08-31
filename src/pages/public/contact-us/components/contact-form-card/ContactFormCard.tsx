@@ -12,6 +12,7 @@ import styles from './ContactFormCard.module.scss';
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
 interface ContactFormCardProps {
+    isPopup?: boolean;
     title: string;
     namePlaceholder: string;
     emailPlaceholder: string;
@@ -20,33 +21,36 @@ interface ContactFormCardProps {
     submitLabel: string;
 }
 
-const getSubjectHint = (length: number): { text: string; type: 'warn' | 'error' } | null => {
+type HintResult = { text: string; type: 'info' } | null;
+
+const getSubjectHint = (length: number): HintResult => {
     if (length >= CONTACT_FORM_LIMITS.SUBJECT.MAX) {
-        return { text: CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED, type: 'error' };
+        return { text: CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED, type: 'info' };
     }
     if (length >= CONTACT_FORM_LIMITS.SUBJECT.WARN_AT) {
         return {
             text: CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(CONTACT_FORM_LIMITS.SUBJECT.MAX - length),
-            type: 'warn',
+            type: 'info',
         };
     }
     return null;
 };
 
-const getMessageHint = (length: number): { text: string; type: 'warn' | 'error' } | null => {
+const getMessageHint = (length: number): HintResult => {
     if (length >= CONTACT_FORM_LIMITS.MESSAGE.MAX) {
-        return { text: CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED, type: 'error' };
+        return { text: CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED, type: 'info' };
     }
     if (length >= CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) {
         return {
             text: CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(CONTACT_FORM_LIMITS.MESSAGE.MAX - length),
-            type: 'warn',
+            type: 'info',
         };
     }
     return null;
 };
 
 export const ContactFormCard: React.FC<ContactFormCardProps> = ({
+    isPopup = false,
     title,
     namePlaceholder,
     emailPlaceholder,
@@ -59,10 +63,12 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         handleSubmit,
         watch,
         reset,
+        clearErrors,
         formState: { errors },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
         mode: 'onBlur',
+        reValidateMode: 'onBlur',
     });
 
     const {
@@ -115,19 +121,32 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 </div>
             )}
             <form
-                className={styles['contact-form-card']}
+                className={`${styles['contact-form-card']} ${isPopup ? `${styles['contact-form-card--popup']}` : ''}`}
                 aria-label={title}
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
             >
-                <label className={styles['contact-form-field']}>
-                    <input
-                        type="text"
-                        placeholder={namePlaceholder}
-                        className={styles['contact-form-input']}
-                        {...register('name')}
-                    />
-                </label>
+                <div className={styles['contact-form-field-wrapper']}>
+                    <label
+                        className={`${styles['contact-form-field']}${errors.name ? ` ${styles['contact-form-field--error']}` : ''}`}
+                    >
+                        <input
+                            type="text"
+                            placeholder={namePlaceholder}
+                            className={styles['contact-form-input']}
+                            {...register('name', {
+                                onChange: () => {
+                                    if (errors.name) clearErrors('name');
+                                },
+                            })}
+                        />
+                    </label>
+                    {errors.name && (
+                        <span className={styles['contact-form-message--error']} role="alert">
+                            {errors.name.message}
+                        </span>
+                    )}
+                </div>
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
@@ -137,7 +156,11 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                             type="email"
                             placeholder={emailPlaceholder}
                             className={styles['contact-form-input']}
-                            {...register('email')}
+                            {...register('email', {
+                                onChange: () => {
+                                    if (errors.email) clearErrors('email');
+                                },
+                            })}
                         />
                     </label>
                     {errors.email && (
@@ -148,13 +171,19 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 </div>
 
                 <div className={styles['contact-form-field-wrapper']}>
-                    <label className={styles['contact-form-field']}>
+                    <label
+                        className={`${styles['contact-form-field']}${errors.subject ? ` ${styles['contact-form-field--error']}` : ''}`}
+                    >
                         <input
                             type="text"
                             placeholder={subjectPlaceholder}
                             className={styles['contact-form-input']}
                             maxLength={CONTACT_FORM_LIMITS.SUBJECT.MAX}
-                            {...register('subject')}
+                            {...register('subject', {
+                                onChange: () => {
+                                    if (errors.subject) clearErrors('subject');
+                                },
+                            })}
                         />
                     </label>
                     {errors.subject && (
@@ -163,28 +192,28 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                         </span>
                     )}
                     {!errors.subject && subjectHint && (
-                        <span
-                            className={
-                                subjectHint.type === 'error'
-                                    ? styles['contact-form-message--error']
-                                    : styles['contact-form-message--info']
-                            }
-                            role="status"
-                            aria-live="polite"
-                        >
+                        <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
                             {subjectHint.text}
                         </span>
                     )}
                 </div>
 
-                <div className={styles['contact-form-field-wrapper']}>
-                    <label className={styles['contact-form-textarea-field']}>
+                <div
+                    className={`${styles['contact-form-field-wrapper']} ${styles['contact-form-field-wrapper--textarea']}`}
+                >
+                    <label
+                        className={`${styles['contact-form-textarea-field']}${errors.message ? ` ${styles['contact-form-textarea-field--error']}` : ''}`}
+                    >
                         <textarea
                             placeholder={messagePlaceholder}
                             className={styles['contact-form-textarea']}
                             rows={6}
                             maxLength={CONTACT_FORM_LIMITS.MESSAGE.MAX}
-                            {...register('message')}
+                            {...register('message', {
+                                onChange: () => {
+                                    if (errors.message) clearErrors('message');
+                                },
+                            })}
                         />
                     </label>
                     {errors.message && (
@@ -193,15 +222,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                         </span>
                     )}
                     {!errors.message && messageHint && (
-                        <span
-                            className={
-                                messageHint.type === 'error'
-                                    ? styles['contact-form-message--error']
-                                    : styles['contact-form-message--info']
-                            }
-                            role="status"
-                            aria-live="polite"
-                        >
+                        <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
                             {messageHint.text}
                         </span>
                     )}

@@ -28,6 +28,7 @@ jest.mock(
 );
 
 const DEFAULT_PROPS = {
+    isPopup: false,
     title: 'Contact form',
     namePlaceholder: "Ваше ім'я",
     emailPlaceholder: 'E-mail',

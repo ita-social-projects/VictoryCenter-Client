@@ -1,0 +1,77 @@
+@use "@/assets/sass/variables/colors" as c;
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(c.$overlay-bg, 0.35);
+    z-index: 9999;
+    display: flex;
+    justify-content: flex-end;
+    backdrop-filter: blur(9.5px);
+}
+
+.popup {
+    width: 100%;
+    max-width: 544px;
+    height: 100vh;
+    background-color: c.$grey-50;
+    position: relative;
+    padding: 60px 56px;
+    overflow-y: auto;
+    animation: slideInRight 0.3s ease-out forwards;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: c.$blue-900;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.content {
+    margin-top: 72px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: c.$blue-900;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .popup {
+        padding: 40px 20px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+}

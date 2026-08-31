@@ -456,8 +456,6 @@ const setupMockDataFetch = (
     });
 };
 
-
-
 describe('FundsExpenditureSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -472,13 +470,10 @@ describe('FundsExpenditureSection', () => {
 
             const { unmount } = render(<FundsExpenditureSection />);
 
-            expect(addSpy).toHaveBeenCalledWith(
-                'program-expenses-updated',
-                expect.any(Function)
-            );
+            expect(addSpy).toHaveBeenCalledWith('program-expenses-updated', expect.any(Function));
 
             const attachedCallback = addSpy.mock.calls.find(
-                (call) => call[0] === 'program-expenses-updated'
+                (call) => call[0] === 'program-expenses-updated',
             )?.[1] as EventListener;
 
             expect(attachedCallback).toBeDefined();
@@ -489,10 +484,7 @@ describe('FundsExpenditureSection', () => {
 
             unmount();
 
-            expect(removeSpy).toHaveBeenCalledWith(
-                'program-expenses-updated',
-                attachedCallback
-            );
+            expect(removeSpy).toHaveBeenCalledWith('program-expenses-updated', attachedCallback);
 
             addSpy.mockRestore();
             removeSpy.mockRestore();

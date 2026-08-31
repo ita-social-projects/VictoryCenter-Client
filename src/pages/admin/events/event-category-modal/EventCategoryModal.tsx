@@ -278,7 +278,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                             placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
                         />
 
-                        {error && <div className="event-category-modal-error-container">{error}</div>}
+                        {error && <div className="event-category-modal-error-container" role='alert'>{error}</div>}
                     </form>
                 </Modal.Content>
 

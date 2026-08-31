@@ -4,20 +4,7 @@ import { EthicsPrinciple } from './EthicsPrinciple';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                onBlur={() => !disabled && onBlur?.()}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
+    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
 }));
 
 describe('EthicsPrinciple', () => {

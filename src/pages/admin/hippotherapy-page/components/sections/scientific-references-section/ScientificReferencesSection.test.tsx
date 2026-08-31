@@ -6,20 +6,7 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                onBlur={() => !disabled && onBlur?.()}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
+    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
 }));
 
 jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({

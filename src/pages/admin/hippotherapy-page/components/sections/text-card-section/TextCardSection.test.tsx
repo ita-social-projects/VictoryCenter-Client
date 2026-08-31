@@ -6,20 +6,7 @@ import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippo
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                onBlur={() => !disabled && onBlur?.()}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
+    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
 }));
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({

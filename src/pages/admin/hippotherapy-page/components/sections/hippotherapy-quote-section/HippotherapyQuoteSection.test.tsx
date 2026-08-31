@@ -7,36 +7,11 @@ import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippo
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
-            <input
-                data-testid="mock-image-input-file"
-                type="file"
-                disabled={disabled}
-                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
-            />
-            <button type="button" onClick={() => !disabled && setError('image size error')}>
-                Set Error
-            </button>
-        </div>
-    ),
+    ImageInput: require('@/utils/test-mocks/hippotherapy-page-mocks').MockImageInput,
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, onBlur, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                onBlur={() => !disabled && onBlur?.()}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
+    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
 }));
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({

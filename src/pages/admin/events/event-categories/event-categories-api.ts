@@ -8,8 +8,10 @@ export const EventCategoriesApi = {
         return response.data;
     },
 
-    create: async (client: AxiosInstance, category: EventCategory): Promise<EventCategory> => {
-        const response = await client.post<EventCategory>(API_ROUTES.EVENT_CATEGORIES.BASE, { name: category.name });
+    create: async (client: AxiosInstance, category: Pick<EventCategory, 'name'>): Promise<EventCategory> => {
+        const response = await client.post<EventCategory>(API_ROUTES.EVENT_CATEGORIES.BASE, {
+            name: category.name,
+        });
         return response.data;
     },
 

@@ -225,7 +225,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('submits form directly on Save click in Add mode', async () => {
-            const newCategory = { id: 1, name: 'New Category' };
+            const newCategory = { name: 'New Category' };
             (EventCategoriesApi.create as jest.Mock).mockResolvedValue(newCategory);
 
             render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} />);
@@ -242,7 +242,6 @@ describe('EventCategoryModal', () => {
 
             await waitFor(() => {
                 expect(EventCategoriesApi.create).toHaveBeenCalledWith(expect.anything(), {
-                    id: 1,
                     name: 'New Category',
                 });
                 expect(mockOnAddCategory).toHaveBeenCalledWith(newCategory);

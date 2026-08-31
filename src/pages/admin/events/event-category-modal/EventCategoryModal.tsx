@@ -170,15 +170,17 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
             setShowSaveConfirmModal(false);
 
             try {
-                const categoryData = {
-                    id: mode === ModalMode.Edit ? selectedCategory!.id : 1,
-                    name: formState.name.trim(),
-                };
-
                 if (mode === ModalMode.Add) {
-                    const newCategory = await EventCategoriesApi.create(client, categoryData);
+                    const newCategory = await EventCategoriesApi.create(client, {
+                        name: formState.name.trim(),
+                    });
                     props.onAddCategory(newCategory);
                 } else {
+                    const categoryData: EventCategory = {
+                        id: selectedCategory!.id,
+                        name: formState.name.trim(),
+                    };
+
                     const updatedCategory = await EventCategoriesApi.update(client, categoryData);
                     props.onUpdateCategory(updatedCategory);
                 }
@@ -195,9 +197,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                     clearTimeout(errorTimeoutRef.current);
                 }
 
-                errorTimeoutRef.current = setTimeout(() =>
-                    setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS
-                );
+                errorTimeoutRef.current = setTimeout(() => setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
             } finally {
                 setIsSubmitting(false);
             }
@@ -278,7 +278,11 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                             placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
                         />
 
-                        {error && <div className="event-category-modal-error-container" role='alert'>{error}</div>}
+                        {error && (
+                            <div className="event-category-modal-error-container" role="alertГ">
+                                {error}
+                            </div>
+                        )}
                     </form>
                 </Modal.Content>
 

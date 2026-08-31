@@ -21,6 +21,21 @@ const triggerAmountUsdBlur = (hook: ReturnType<typeof useAmountBlur>, formState:
     return nextState;
 };
 
+const triggerAmountUahBlur = (
+    hook: ReturnType<typeof useAmountBlur>,
+    formState: object,
+    suppressMismatchCheck = false,
+) => {
+    const setFormState = jest.fn();
+    let nextState: any;
+
+    act(() => {
+        hook.handleAmountBlur('amountUah', setFormState, suppressMismatchCheck);
+        nextState = setFormState.mock.calls[0][0](formState);
+    });
+    return nextState;
+};
+
 describe('useAmountBlur', () => {
     it('recalculates amountUah from amountUsd and clears usdMismatchMessage on blur', () => {
         const { result } = renderHook(() => useAmountBlur('40'));
@@ -53,12 +68,7 @@ describe('useAmountBlur', () => {
     it('does not recalculate amountUsd when amountUah is blurred with an invalid value', () => {
         const { result } = renderHook(() => useAmountBlur('40'));
 
-        const setFormState = jest.fn();
-        let nextState: any;
-        act(() => {
-            result.current.handleAmountBlur('amountUah', setFormState);
-            nextState = setFormState.mock.calls[0][0](createFormState({ amountUah: '0', amountUsd: '2,5' }));
-        });
+        const nextState = triggerAmountUahBlur(result.current, createFormState({ amountUah: '0', amountUsd: '2,5' }));
 
         expect(nextState.errors.amountUah).toBeTruthy();
         expect(nextState.amountUsd).toBe('2,5');
@@ -84,26 +94,18 @@ describe('useAmountBlur', () => {
 
         it('surfaces the mismatch message when the recalculated pair still mismatches', () => {
             jest.spyOn(validateUsdAmountMismatch, 'isUsdAmountMismatch').mockReturnValue(true);
-
             const { result } = renderHook(() => useAmountBlur('40'));
-            const setFormState = jest.fn();
-            act(() => {
-                result.current.handleAmountBlur('amountUah', setFormState);
-                setFormState.mock.calls[0][0](createFormState({ amountUah: '100', amountUsd: '2,5' }));
-            });
+
+            triggerAmountUahBlur(result.current, createFormState({ amountUah: '100', amountUsd: '2,5' }));
 
             expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
         });
 
         it('suppresses the mismatch message when suppressMismatchCheck is true', () => {
             jest.spyOn(validateUsdAmountMismatch, 'isUsdAmountMismatch').mockReturnValue(true);
-
             const { result } = renderHook(() => useAmountBlur('40'));
-            const setFormState = jest.fn();
-            act(() => {
-                result.current.handleAmountBlur('amountUah', setFormState, true);
-                setFormState.mock.calls[0][0](createFormState({ amountUah: '100', amountUsd: '2,5' }));
-            });
+
+            triggerAmountUahBlur(result.current, createFormState({ amountUah: '100', amountUsd: '2,5' }), true);
 
             expect(result.current.usdMismatchMessage).toBeUndefined();
         });

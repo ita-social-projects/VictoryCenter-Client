@@ -11,6 +11,7 @@ import globalEn from './global.json';
 import partnersPageEn from './partners.json';
 import successPageEn from './success.json';
 import contactUsPageEn from './contact-us.json';
+import supportUsPageEn from './support-us.json';
 import mainPageEn from './main-page.json';
 import historyPageEn from './history.json';
 import notFoundPageEn from './not-found-page.json';
@@ -29,6 +30,7 @@ export {
     successPageEn,
     globalEn,
     contactUsPageEn,
+    supportUsPageEn,
     mainPageEn,
     historyPageEn,
     notFoundPageEn,

@@ -1,0 +1,173 @@
+@use '@/assets/sass/mixins/utilits.mixins' as utils;
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 128px;
+    padding: 120px 168px 164px;
+}
+
+.content {
+    min-width: 0;
+    flex: 1;
+}
+
+.title {
+    @include utils.yellow-blue-text;
+    margin: 0 0 24px;
+    text-align: left;
+    max-width: 480px;
+}
+
+.form-container {
+    z-index: 2;
+    flex: 0 0 550px;
+    margin-top: -24px;
+    margin-left: -50px;
+}
+
+.form {
+    background: c.$grey-50;
+    box-shadow: 0 17px 23px -16px c.$donate-box-shadow;
+    width: 100%;
+    border-bottom: 1px solid c.$grey-500;
+    display: flex;
+    flex-direction: column;
+    gap: 29px;
+    padding: 40px;
+}
+
+.field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field {
+    border-bottom: 1px solid c.$blue-100;
+    padding: 8px;
+}
+
+.field--textarea {
+    border: 1px solid c.$blue-100;
+    margin-block: 32px;
+}
+
+.field--error {
+    border-color: c.$error;
+}
+
+.input,
+.textarea {
+    @include type.body-2-regular;
+    color: c.$blue-900;
+    width: 100%;
+    border: none;
+    background: transparent;
+
+    &::placeholder {
+        color: c.$grey-800;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.textarea {
+    resize: none;
+}
+
+.error,
+.info {
+    @include type.small-text-regular;
+}
+
+.error {
+    color: c.$error;
+}
+
+.info {
+    color: c.$grey-800;
+}
+
+.submit {
+    @include type.body-2-semibold;
+    background: c.$blue-900;
+    color: c.$grey-50;
+    border: none;
+    padding: 12px 24px;
+    align-self: flex-end;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.toast {
+    position: fixed;
+    top: 13%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 800;
+}
+
+.highlight {
+    @include utils.text-highlight;
+    font-size: t.$h4-size;
+    line-height: t.$h4-height;
+    letter-spacing: t.$h4-spacing;
+    text-align: left;
+}
+
+.blue {
+    @include utils.blue-bg-text;
+    display: block;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    background-color: c.$light-blue-200;
+    padding: 25px;
+
+    &::before {
+        display: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 100%;
+        width: 100vw;
+        background-color: c.$light-blue-200;
+    }
+}
+
+.break-text {
+    white-space: break-spaces;
+    line-height: 1.2;
+}
+
+.description {
+    @include type.body-1-regular;
+
+    margin-top: 114px;
+    margin-left: 16px;
+    margin-right: 16px;
+    text-align: left;
+    max-width: 480px;
+}
+
+.bold-description {
+    font-weight: t.$fw-bold;
+    margin-top: 24px;
+    max-width: 360px;
+}

@@ -225,7 +225,11 @@ describe('EventCategoryModal', () => {
         });
 
         it('submits form directly on Save click in Add mode', async () => {
-            const newCategory = { name: 'New Category' };
+            const newCategory: EventCategory = {
+                id: 1,
+                name: 'New Category',
+            };
+
             (EventCategoriesApi.create as jest.Mock).mockResolvedValue(newCategory);
 
             render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} />);

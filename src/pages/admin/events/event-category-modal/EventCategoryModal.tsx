@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategory } from '@/types/admin/event-category';
 import { Modal } from '@/components/common/modal/Modal';
@@ -157,6 +157,8 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         return hasValidationErrors || hasEmptyFields;
     };
 
+    const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const onSubmit = useCallback(
         async (e?: React.FormEvent) => {
             if (e) {
@@ -189,13 +191,27 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                         : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
                 setError(errorMessage);
 
-                setTimeout(() => setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+                if (errorTimeoutRef.current) {
+                    clearTimeout(errorTimeoutRef.current);
+                }
+
+                errorTimeoutRef.current = setTimeout(() =>
+                    setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS
+                );
             } finally {
                 setIsSubmitting(false);
             }
         },
         [formState, selectedCategory, mode, props, onClose, client],
     );
+
+    useEffect(() => {
+        return () => {
+            if (errorTimeoutRef.current) {
+                clearTimeout(errorTimeoutRef.current);
+            }
+        };
+    }, []);
 
     const handleSubmitClick = useCallback(() => {
         if (isDuplicateName || isSubmitting) {

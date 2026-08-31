@@ -279,7 +279,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                         />
 
                         {error && (
-                            <div className="event-category-modal-error-container" role="alertГ">
+                            <div role="alert" className="event-category-modal-error-container">
                                 {error}
                             </div>
                         )}

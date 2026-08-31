@@ -16,7 +16,6 @@ interface ContactDetailsSectionProps {
     email: string;
     phone: string;
     address: string;
-    motto: string;
     socialLinks: ContactUsSocialLink[];
     copyEmailLabel: string;
     copyPhoneLabel: string;
@@ -32,7 +31,6 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
     email,
     phone,
     address,
-    motto,
     socialLinks,
     copyEmailLabel,
     copyPhoneLabel,
@@ -101,11 +99,7 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
 
                     <div className={styles['contact-details-item']}>
                         <MapPinIcon className={styles['contact-details-icon']} aria-hidden="true" />
-                        <p className={styles['contact-details-address']}>
-                            {address}
-                            <br />
-                            {motto}
-                        </p>
+                        <p className={styles['contact-details-address']}>{address}</p>
                     </div>
                 </div>
             </div>

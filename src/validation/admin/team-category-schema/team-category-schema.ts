@@ -1,6 +1,9 @@
 import { TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
 import * as Yup from 'yup';
-import { requiredNotWhitespaceOnlyTest, noLeadingTrailingSpacesTest } from '@/utils/functions/yup-string-validation-helper/yup-string-validation-helper';
+import {
+    requiredNotWhitespaceOnlyTest,
+    noLeadingTrailingSpacesTest,
+} from '@/utils/functions/yup-string-validation-helper/yup-string-validation-helper';
 
 export const TeamCategoryValidationSchema = Yup.object({
     name: Yup.string()

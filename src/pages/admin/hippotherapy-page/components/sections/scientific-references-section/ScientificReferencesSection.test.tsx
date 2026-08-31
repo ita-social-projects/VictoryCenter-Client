@@ -24,21 +24,21 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 
 jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
     ScientificReferenceCard: ({
-                                  localId,
-                                  name,
-                                  url,
-                                  autoFocus,
-                                  canDelete,
-                                  nameError,
-                                  urlError,
-                                  disabled,
-                                  isExpanded,
-                                  onToggleExpand,
-                                  onNameChange,
-                                  onUrlChange,
-                                  onNameBlur,
-                                  onUrlBlur,
-                              }: any) => (
+        localId,
+        name,
+        url,
+        autoFocus,
+        canDelete,
+        nameError,
+        urlError,
+        disabled,
+        isExpanded,
+        onToggleExpand,
+        onNameChange,
+        onUrlChange,
+        onNameBlur,
+        onUrlBlur,
+    }: any) => (
         <div
             data-testid={`reference-card-${localId}`}
             data-auto-focus={autoFocus}

@@ -36,6 +36,9 @@ export const API_ROUTES = {
     PROGRAMCATEGORY: {
         BASE: 'HippotherapyProgramCategories',
     },
+    PROGRAM_CATEGORY_LOCALIZATIONS: {
+        BASE: 'HippotherapyProgramCategoryLocalizations',
+    },
     PAYMENTS: {
         DONATE: 'payments/donate',
     },
@@ -153,5 +156,8 @@ export const API_ROUTES = {
 
     HISTORY_LOCALIZATIONS: {
         BASE: 'HistoryLocalizations',
+    },
+    EVENT_CATEGORIES: {
+        BASE: 'EventNewsCategories',
     },
 };

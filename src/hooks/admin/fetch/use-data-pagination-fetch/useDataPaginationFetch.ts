@@ -76,6 +76,7 @@ export const useDataPaginationFetch = <TResult>({
 
                 const result = await fetchHandler(paginationParams);
 
+                // Check abort status before updating state
                 if (newAbortController.signal.aborted) return;
 
                 const totalFetchedPages = pageToFetch + 1;
@@ -102,7 +103,10 @@ export const useDataPaginationFetch = <TResult>({
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
                 }
-                setError(error);
+                // Check abort status before setting error
+                if (!newAbortController.signal.aborted) {
+                    setError(error);
+                }
             } finally {
                 if (!newAbortController.signal.aborted) {
                     setIsLoading(false);

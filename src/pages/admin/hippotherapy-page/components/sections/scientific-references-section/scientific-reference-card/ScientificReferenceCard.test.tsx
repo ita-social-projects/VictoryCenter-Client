@@ -7,11 +7,14 @@ describe('ScientificReferenceCard', () => {
     let mockOnUrlChange: jest.Mock;
     let mockOnNameBlur: jest.Mock;
     let mockOnUrlBlur: jest.Mock;
+    let mockOnToggleExpand: jest.Mock;
 
     const defaultProps: ScientificReferenceCardProps = {
         localId: 'ref-1',
         name: 'Test citation',
         url: 'https://example.com/citation',
+        isExpanded: false,
+        onToggleExpand: jest.fn(),
         onNameChange: jest.fn(),
         onUrlChange: jest.fn(),
         onNameBlur: jest.fn(),
@@ -23,12 +26,14 @@ describe('ScientificReferenceCard', () => {
         mockOnUrlChange = jest.fn();
         mockOnNameBlur = jest.fn();
         mockOnUrlBlur = jest.fn();
+        mockOnToggleExpand = jest.fn();
     });
 
     const renderComponent = (props: Partial<ScientificReferenceCardProps> = {}) =>
         render(
             <ScientificReferenceCard
                 {...defaultProps}
+                onToggleExpand={mockOnToggleExpand}
                 onNameChange={mockOnNameChange}
                 onUrlChange={mockOnUrlChange}
                 onNameBlur={mockOnNameBlur}
@@ -37,12 +42,36 @@ describe('ScientificReferenceCard', () => {
             />,
         );
 
-    it('shows the name and url as editable fields, with a static expand placeholder button', () => {
+    it('shows only the name field when collapsed', () => {
         renderComponent();
 
         expect(screen.getByDisplayValue('Test citation')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('https://example.com/citation')).toBeInTheDocument();
+        expect(screen.queryByDisplayValue('https://example.com/citation')).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Expand reference' })).toBeInTheDocument();
+    });
+
+    it('shows the name and url fields when expanded', () => {
+        renderComponent({ isExpanded: true });
+
+        expect(screen.getByDisplayValue('Test citation')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('https://example.com/citation')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Collapse reference' })).toBeInTheDocument();
+    });
+
+    it('shows the url error while collapsed', () => {
+        renderComponent({ urlError: 'URL is required' });
+
+        expect(screen.getByText('URL is required')).toBeInTheDocument();
+
+        expect(screen.queryByDisplayValue('https://example.com/citation')).not.toBeInTheDocument();
+    });
+
+    it('calls onToggleExpand with the localId when the expand button is clicked', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Expand reference' }));
+
+        expect(mockOnToggleExpand).toHaveBeenCalledWith('ref-1');
     });
 
     it('calls onNameChange with the localId when the name field is edited', () => {
@@ -54,7 +83,7 @@ describe('ScientificReferenceCard', () => {
     });
 
     it('calls onUrlChange with the localId when the url field is edited', () => {
-        renderComponent();
+        renderComponent({ isExpanded: true });
 
         fireEvent.change(screen.getByDisplayValue('https://example.com/citation'), {
             target: { value: 'https://example.com/updated' },
@@ -64,7 +93,7 @@ describe('ScientificReferenceCard', () => {
     });
 
     it('calls onNameBlur with the localId', () => {
-        renderComponent();
+        renderComponent({ isExpanded: true });
 
         fireEvent.blur(screen.getByDisplayValue('Test citation'));
 
@@ -72,7 +101,7 @@ describe('ScientificReferenceCard', () => {
     });
 
     it('calls onUrlBlur with the localId', () => {
-        renderComponent();
+        renderComponent({ isExpanded: true });
 
         fireEvent.blur(screen.getByDisplayValue('https://example.com/citation'));
 
@@ -86,7 +115,7 @@ describe('ScientificReferenceCard', () => {
     });
 
     it('shows a url error when provided', () => {
-        renderComponent({ urlError: 'URL is required' });
+        renderComponent({ urlError: 'URL is required', isExpanded: true });
 
         expect(screen.getByText('URL is required')).toBeInTheDocument();
     });
@@ -104,11 +133,19 @@ describe('ScientificReferenceCard', () => {
     });
 
     it('disables inputs and buttons when disabled is true', () => {
-        renderComponent({ disabled: true });
+        renderComponent({ disabled: true, isExpanded: true });
 
         expect(screen.getByDisplayValue('Test citation')).toBeDisabled();
         expect(screen.getByDisplayValue('https://example.com/citation')).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'Expand reference' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Collapse reference' })).toBeDisabled();
         expect(screen.getByLabelText('Delete reference')).toBeDisabled();
+    });
+
+    it('collapses consecutive spaces in the name while typing', () => {
+        renderComponent();
+
+        fireEvent.change(screen.getByDisplayValue('Test citation'), { target: { value: '  Hello   world ' } });
+
+        expect(mockOnNameChange).toHaveBeenCalledWith('ref-1', 'Hello world ');
     });
 });

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -6,7 +6,10 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
-import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    HippotherapyScientificReference,
+    HippotherapyScientificReferencesSectionContent,
+} from '@/types/admin/hippotherapy-page';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
 
@@ -15,6 +18,15 @@ export interface ScientificReferencesSectionProps {
     onChange: (value: HippotherapyScientificReferencesSectionContent) => void;
     disabled?: boolean;
 }
+
+const getExpandKey = (reference: HippotherapyScientificReference) =>
+    reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
+
+const validateReferenceName = (text: string) =>
+    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH);
+
+const validateReferenceUrl = (text: string) =>
+    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH);
 
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
@@ -30,6 +42,53 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
 
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
+
+    const areAllReferencesValid = useMemo(
+        () =>
+            value.scientificReferences.every(
+                (reference) => !validateReferenceName(reference.name) && !validateReferenceUrl(reference.url),
+            ),
+        [value.scientificReferences],
+    );
+
+    const handleToggleExpand = useCallback(
+        (localId: string) => {
+            const reference = value.scientificReferences.find((item) => item.localId === localId);
+            if (!reference) return;
+
+            const key = getExpandKey(reference);
+
+            setExpandedIds((prev) => {
+                const next = new Set(prev);
+                if (next.has(key)) {
+                    next.delete(key);
+                } else {
+                    next.add(key);
+                }
+                return next;
+            });
+        },
+        [value.scientificReferences],
+    );
+
+    const handleAddReference = useCallback(() => {
+        const newReference: HippotherapyScientificReference = {
+            localId: crypto.randomUUID(),
+            id: null,
+            name: '',
+            url: '',
+        };
+
+        onChange({
+            ...value,
+            scientificReferences: [...value.scientificReferences, newReference],
+        });
+
+        setExpandedIds((prev) => new Set(prev).add(getExpandKey(newReference)));
+        setNewReferenceLocalId(newReference.localId);
+    }, [onChange, value]);
 
     const handleNameChange = (localId: string, name: string) => {
         const scientificReferences = value.scientificReferences.map((reference) =>
@@ -38,13 +97,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         onChange({ ...value, scientificReferences });
 
         if (nameErrors[localId] !== undefined) {
-            setNameErrors((prev) => ({
-                ...prev,
-                [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                    name,
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
-                ),
-            }));
+            setNameErrors((prev) => ({ ...prev, [localId]: validateReferenceName(name) }));
         }
     };
 
@@ -55,36 +108,18 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         onChange({ ...value, scientificReferences });
 
         if (urlErrors[localId] !== undefined) {
-            setUrlErrors((prev) => ({
-                ...prev,
-                [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                    url,
-                    HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH,
-                ),
-            }));
+            setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(url) }));
         }
     };
 
     const handleNameBlur = (localId: string) => {
         const reference = value.scientificReferences.find((item) => item.localId === localId);
-        setNameErrors((prev) => ({
-            ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                reference?.name ?? '',
-                HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
-            ),
-        }));
+        setNameErrors((prev) => ({ ...prev, [localId]: validateReferenceName(reference?.name ?? '') }));
     };
 
     const handleUrlBlur = (localId: string) => {
         const reference = value.scientificReferences.find((item) => item.localId === localId);
-        setUrlErrors((prev) => ({
-            ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(
-                reference?.url ?? '',
-                HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH,
-            ),
-        }));
+        setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(reference?.url ?? '') }));
     };
 
     return (
@@ -122,22 +157,25 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         localId={reference.localId}
                         name={reference.name}
                         url={reference.url}
+                        isExpanded={expandedIds.has(getExpandKey(reference))}
+                        autoFocus={reference.localId === newReferenceLocalId}
                         canDelete={value.scientificReferences.length > 1}
                         nameError={nameErrors[reference.localId]}
                         urlError={urlErrors[reference.localId]}
                         disabled={disabled}
+                        onToggleExpand={handleToggleExpand}
                         onNameChange={handleNameChange}
                         onUrlChange={handleUrlChange}
                         onNameBlur={handleNameBlur}
                         onUrlBlur={handleUrlBlur}
                     />
                 ))}
-                {/* Adding new references is disabled for now — placeholder only, no add functionality yet. */}
                 <Button
                     buttonStyle="primary"
                     type="button"
                     className="scientific-references-section-add-button"
-                    disabled={disabled}
+                    onClick={handleAddReference}
+                    disabled={disabled || !areAllReferencesValid}
                 >
                     {HIPPOTHERAPY_PAGE_TEXT.BUTTON.ADD_REFERENCE}
                     <PlusIcon />

@@ -5,9 +5,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
 jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
     ScientificReferenceCard: ({

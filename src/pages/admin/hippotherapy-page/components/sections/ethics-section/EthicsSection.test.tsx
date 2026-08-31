@@ -5,13 +5,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: require('@/utils/test-mocks/hippotherapy-page-mocks').MockImageInput,
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
-}));
+jest.mock('@/components/admin/image-input/ImageInput');
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {

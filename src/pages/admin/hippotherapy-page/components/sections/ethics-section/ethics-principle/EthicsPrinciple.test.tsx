@@ -3,9 +3,7 @@ import '@testing-library/jest-dom';
 import { EthicsPrinciple } from './EthicsPrinciple';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
 describe('EthicsPrinciple', () => {
     let onChange: jest.Mock;

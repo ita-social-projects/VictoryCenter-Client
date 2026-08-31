@@ -4,13 +4,9 @@ import { GalleryCard } from './GalleryCard';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippotherapyGalleryCardContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: require('@/utils/test-mocks/hippotherapy-page-mocks').MockImageInput,
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: require('@/utils/test-mocks/hippotherapy-page-mocks').MockRichTextInputGroup,
-}));
+jest.mock('@/components/admin/image-input/ImageInput');
 
 describe('GalleryCard', () => {
     let onDescriptionChange: jest.Mock;

@@ -96,7 +96,7 @@ describe('TeamCategoryValidationSchema', () => {
                 TEAM_CATEGORY_VALIDATION.description.getMaxError(),
             );
         });
-        
+
         it('fails when description has a leading space', async () => {
             expect(TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(leadingSpaceDescription)).toBe(
                 TEAM_CATEGORY_VALIDATION.description.getNoSpacesError(),

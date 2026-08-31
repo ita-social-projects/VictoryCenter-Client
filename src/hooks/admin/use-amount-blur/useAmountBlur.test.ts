@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import * as validateUsdAmountMismatch from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { useAmountBlur } from './useAmountBlur';
 
 const createFormState = (overrides = {}) => ({
@@ -74,5 +75,37 @@ describe('useAmountBlur', () => {
         });
 
         expect(result.current.usdMismatchMessage).toBeUndefined();
+    });
+
+    describe('mismatch check on amountUah blur (symmetric with amountUsd)', () => {
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it('surfaces the mismatch message when the recalculated pair still mismatches', () => {
+            jest.spyOn(validateUsdAmountMismatch, 'isUsdAmountMismatch').mockReturnValue(true);
+
+            const { result } = renderHook(() => useAmountBlur('40'));
+            const setFormState = jest.fn();
+            act(() => {
+                result.current.handleAmountBlur('amountUah', setFormState);
+                setFormState.mock.calls[0][0](createFormState({ amountUah: '100', amountUsd: '2,5' }));
+            });
+
+            expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        });
+
+        it('suppresses the mismatch message when suppressMismatchCheck is true', () => {
+            jest.spyOn(validateUsdAmountMismatch, 'isUsdAmountMismatch').mockReturnValue(true);
+
+            const { result } = renderHook(() => useAmountBlur('40'));
+            const setFormState = jest.fn();
+            act(() => {
+                result.current.handleAmountBlur('amountUah', setFormState, true);
+                setFormState.mock.calls[0][0](createFormState({ amountUah: '100', amountUsd: '2,5' }));
+            });
+
+            expect(result.current.usdMismatchMessage).toBeUndefined();
+        });
     });
 });

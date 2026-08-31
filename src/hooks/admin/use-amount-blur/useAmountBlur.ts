@@ -26,7 +26,7 @@ export const useAmountBlur = (exchangeRate: string | null, customMismatchMessage
                 };
 
                 setUsdMismatchMessage(
-                    field === 'amountUsd' && !suppressMismatchCheck
+                    !suppressMismatchCheck
                         ? getUsdMismatchMessage(
                               updated.amountUah,
                               updated.amountUsd,

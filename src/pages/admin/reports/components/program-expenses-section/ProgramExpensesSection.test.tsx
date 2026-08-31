@@ -303,8 +303,11 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
 }));
 
 describe('ProgramExpensesSection', () => {
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
+
     beforeEach(() => {
         jest.clearAllMocks();
+        dispatchEventSpy.mockClear();
         mockUseDataFetchResult = {
             data: MOCK_PROGRAM_EXPENSES_DATA,
             isLoading: false,
@@ -756,6 +759,9 @@ describe('ProgramExpensesSection', () => {
                 });
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
                 expect(mockRefetch).toHaveBeenCalled();
+                expect(dispatchEventSpy).toHaveBeenCalledWith(
+                    expect.objectContaining({ type: 'program-expenses-updated' }),
+                );
             });
         });
 

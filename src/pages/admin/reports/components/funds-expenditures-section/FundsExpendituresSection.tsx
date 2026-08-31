@@ -310,7 +310,7 @@ export const FundsExpenditureSection = ({
 
     useEffect(() => {
         const handleProgramExpensesUpdate = () => {
-            refetchProgramSummary().catch(() => {});
+            refetchProgramSummary()?.catch(() => {});
         };
 
         window.addEventListener('program-expenses-updated', handleProgramExpensesUpdate);

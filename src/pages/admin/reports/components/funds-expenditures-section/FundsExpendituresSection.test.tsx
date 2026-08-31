@@ -17,6 +17,7 @@ import {
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -455,11 +456,47 @@ const setupMockDataFetch = (
     });
 };
 
+
+
 describe('FundsExpenditureSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         setupMockDataFetch();
         mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    describe('cross-tab synchronization', () => {
+        it('should add, execute, and properly clean up the program-expenses-updated event listener', () => {
+            const addSpy = jest.spyOn(window, 'addEventListener');
+            const removeSpy = jest.spyOn(window, 'removeEventListener');
+
+            const { unmount } = render(<FundsExpenditureSection />);
+
+            expect(addSpy).toHaveBeenCalledWith(
+                'program-expenses-updated',
+                expect.any(Function)
+            );
+
+            const attachedCallback = addSpy.mock.calls.find(
+                (call) => call[0] === 'program-expenses-updated'
+            )?.[1] as EventListener;
+
+            expect(attachedCallback).toBeDefined();
+
+            if (attachedCallback) {
+                attachedCallback(new Event('program-expenses-updated'));
+            }
+
+            unmount();
+
+            expect(removeSpy).toHaveBeenCalledWith(
+                'program-expenses-updated',
+                attachedCallback
+            );
+
+            addSpy.mockRestore();
+            removeSpy.mockRestore();
+        });
     });
 
     it('should show success toast when record is saved from table', async () => {

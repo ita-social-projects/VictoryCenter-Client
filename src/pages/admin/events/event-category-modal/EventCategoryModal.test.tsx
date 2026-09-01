@@ -1,15 +1,27 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EventCategoryModal } from './EventCategoryModal';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategory } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
 const mockValidateName = jest.fn();
 
 jest.mock('@/validation/admin/event-category-schema/event-category-schema', () => ({
     EVENT_CATEGORY_VALIDATION_FUNCTIONS: {
         validateName: (...args: unknown[]) => mockValidateName(...args),
+    },
+}));
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => ({}),
+}));
+
+jest.mock('@/services/api/admin/events/event-categories-api', () => ({
+    EventCategoriesApi: {
+        create: jest.fn(),
+        update: jest.fn(),
     },
 }));
 
@@ -115,10 +127,15 @@ const categories: EventCategory[] = [
     },
 ];
 
+const mockOnAddCategory = jest.fn();
+const mockOnUpdateCategory = jest.fn();
+
 const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
     categories,
+    onAddCategory: mockOnAddCategory,
+    onUpdateCategory: mockOnUpdateCategory,
 };
 
 describe('EventCategoryModal', () => {
@@ -206,6 +223,35 @@ describe('EventCategoryModal', () => {
 
             expect(mockValidateName).toHaveBeenCalledWith('Invalid name');
         });
+
+        it('submits form directly on Save click in Add mode', async () => {
+            const newCategory: EventCategory = {
+                id: 1,
+                name: 'New Category',
+            };
+
+            (EventCategoriesApi.create as jest.Mock).mockResolvedValue(newCategory);
+
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} />);
+
+            fireEvent.change(screen.getByRole('textbox'), {
+                target: { value: 'New Category' },
+            });
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.SAVE,
+                }),
+            );
+
+            await waitFor(() => {
+                expect(EventCategoriesApi.create).toHaveBeenCalledWith(expect.anything(), {
+                    name: 'New Category',
+                });
+                expect(mockOnAddCategory).toHaveBeenCalledWith(newCategory);
+                expect(defaultProps.onClose).toHaveBeenCalled();
+            });
+        });
     });
 
     describe('Edit mode', () => {
@@ -291,6 +337,40 @@ describe('EventCategoryModal', () => {
                     name: COMMON_TEXT_ADMIN.BUTTON.SAVE,
                 }),
             ).toBeDisabled();
+        });
+
+        it('shows save confirmation modal and submits on confirm in Edit mode', async () => {
+            const updatedCategory = { id: 1, name: 'Updated Category' };
+            (EventCategoriesApi.update as jest.Mock).mockResolvedValue(updatedCategory);
+
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} />);
+
+            fireEvent.change(screen.getByTestId('category-select'), {
+                target: { value: '1' },
+            });
+
+            fireEvent.change(screen.getByRole('textbox'), {
+                target: { value: 'Updated Category' },
+            });
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.SAVE,
+                }),
+            );
+
+            expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            await waitFor(() => {
+                expect(EventCategoriesApi.update).toHaveBeenCalledWith(expect.anything(), {
+                    id: 1,
+                    name: 'Updated Category',
+                });
+                expect(mockOnUpdateCategory).toHaveBeenCalledWith(updatedCategory);
+                expect(defaultProps.onClose).toHaveBeenCalled();
+            });
         });
     });
 

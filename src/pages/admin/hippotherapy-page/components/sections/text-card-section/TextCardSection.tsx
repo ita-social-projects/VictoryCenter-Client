@@ -1,9 +1,8 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_CHAR_LIMITS } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 import './TextCardSection.scss';
 
@@ -15,18 +14,16 @@ export interface TextCardSectionProps {
 }
 
 const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: TextCardSectionProps) => {
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
 
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-        setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-        setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-    };
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+    });
 
     return (
         <div className="hippotherapy-text-card-section">
@@ -36,9 +33,10 @@ const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: 
                 id={`${fieldIdPrefix}-title`}
                 name={`${fieldIdPrefix}-title`}
                 value={value.title}
-                onChange={handleTitleChange}
+                onChange={title.handleChange}
+                onBlur={title.handleBlur}
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE}
-                error={titleError}
+                error={title.error}
                 disabled={disabled}
             />
             <RichTextInputGroup
@@ -47,9 +45,10 @@ const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: 
                 id={`${fieldIdPrefix}-description`}
                 name={`${fieldIdPrefix}-description`}
                 value={value.description}
-                onChange={handleDescriptionChange}
+                onChange={description.handleChange}
+                onBlur={description.handleBlur}
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION}
-                error={descriptionError}
+                error={description.error}
                 disabled={disabled}
             />
         </div>

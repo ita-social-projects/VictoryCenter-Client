@@ -69,16 +69,16 @@ describe('isHippotherapyPageContentValid', () => {
         expect(isHippotherapyPageContentValid(content)).toBe(false);
     });
 
-    it('returns false when a quote author name is empty', () => {
+    it('returns true when a quote author name is empty', () => {
         const content = buildValidContent();
         content.anotherQuoteSection.authorName = '';
 
-        expect(isHippotherapyPageContentValid(content)).toBe(false);
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
     });
 
     it('returns false when a field is short visible text padded with HTML markup', () => {
         const content = buildValidContent();
-        content.introSection.title = '<p>Hippo</p>';
+        content.introSection.title = '<p>Hipp</p>';
 
         expect(isHippotherapyPageContentValid(content)).toBe(false);
     });
@@ -138,6 +138,27 @@ describe('isHippotherapyPageContentValid', () => {
         const content = buildValidContent();
         content.introSection.image = { base64: 'data:image/png;base64,abc', width: 1440, height: 800 } as any;
         content.introSection.imageId = null;
+
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
+    });
+
+    it('accepts a title with 5 visible characters', () => {
+        const content = buildValidContent();
+        content.introSection.title = 'Hippo';
+
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
+    });
+
+    it('rejects a description shorter than 10 characters', () => {
+        const content = buildValidContent();
+        content.introSection.description = 'Short';
+
+        expect(isHippotherapyPageContentValid(content)).toBe(false);
+    });
+
+    it('accepts an empty additional description in the hippovention center section', () => {
+        const content = buildValidContent();
+        content.hippoventionCenterSection.description = '';
 
         expect(isHippotherapyPageContentValid(content)).toBe(true);
     });

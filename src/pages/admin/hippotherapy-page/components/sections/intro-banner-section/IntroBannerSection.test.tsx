@@ -5,40 +5,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
-            <label htmlFor="mock-image-input-id">{label}</label>
-            <input
-                data-testid="mock-image-input-file"
-                type="file"
-                id="mock-image-input-id"
-                disabled={disabled}
-                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
-            />
-            <button type="button" onClick={() => !disabled && setError('image size error')}>
-                Set Error
-            </button>
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                value={value}
-                maxLength={maxLength}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/image-input/ImageInput');
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
@@ -129,6 +98,7 @@ describe('IntroBannerSection', () => {
         fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
             target: { value: 'x' },
         });
+        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'));
 
         expect(screen.getByText('Title is too short')).toBeInTheDocument();
     });

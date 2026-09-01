@@ -5,8 +5,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import {
     HippotherapyScientificReference,
     HippotherapyScientificReferencesSectionContent,
@@ -23,11 +22,24 @@ export interface ScientificReferencesSectionProps {
 const getExpandKey = (reference: HippotherapyScientificReference) =>
     reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
 
-const validateReferenceText = (text: string) => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim());
+const validateReferenceName = (text: string) =>
+    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH);
+
+const validateReferenceUrl = (text: string) =>
+    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH);
 
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
-    const [titleError, setTitleError] = useState<string | undefined>();
-    const [descriptionError, setDescriptionError] = useState<string | undefined>();
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
+
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+    });
+
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -36,7 +48,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     const areAllReferencesValid = useMemo(
         () =>
             value.scientificReferences.every(
-                (reference) => !validateReferenceText(reference.name) && !validateReferenceText(reference.url),
+                (reference) => !validateReferenceName(reference.name) && !validateReferenceUrl(reference.url),
             ),
         [value.scientificReferences],
     );
@@ -78,26 +90,14 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         setNewReferenceLocalId(newReference.localId);
     }, [onChange, value]);
 
-    const handleTitleChange = (title: string) => {
-        onChange({ ...value, title });
-        setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
-    };
-
-    const handleDescriptionChange = (description: string) => {
-        onChange({ ...value, description });
-        setDescriptionError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(description)));
-    };
-
     const handleNameChange = (localId: string, name: string) => {
         const scientificReferences = value.scientificReferences.map((reference) =>
             reference.localId === localId ? { ...reference, name } : reference,
         );
         onChange({ ...value, scientificReferences });
+
         if (nameErrors[localId] !== undefined) {
-            setNameErrors((prev) => ({
-                ...prev,
-                [localId]: validateReferenceText(name),
-            }));
+            setNameErrors((prev) => ({ ...prev, [localId]: validateReferenceName(name) }));
         }
     };
 
@@ -106,25 +106,20 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
             reference.localId === localId ? { ...reference, url } : reference,
         );
         onChange({ ...value, scientificReferences });
+
         if (urlErrors[localId] !== undefined) {
-            setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceText(url) }));
+            setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(url) }));
         }
     };
 
     const handleNameBlur = (localId: string) => {
         const reference = value.scientificReferences.find((item) => item.localId === localId);
-        setNameErrors((prev) => ({
-            ...prev,
-            [localId]: validateReferenceText(reference?.name ?? ''),
-        }));
+        setNameErrors((prev) => ({ ...prev, [localId]: validateReferenceName(reference?.name ?? '') }));
     };
 
     const handleUrlBlur = (localId: string) => {
         const reference = value.scientificReferences.find((item) => item.localId === localId);
-        setUrlErrors((prev) => ({
-            ...prev,
-            [localId]: validateReferenceText(reference?.url ?? ''),
-        }));
+        setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(reference?.url ?? '') }));
     };
 
     return (
@@ -136,9 +131,10 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                     id="scientific-references-title"
                     name="scientific-references-title"
                     value={value.title}
-                    onChange={handleTitleChange}
+                    onChange={title.handleChange}
+                    onBlur={title.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE}
-                    error={titleError}
+                    error={title.error}
                     disabled={disabled}
                 />
                 <RichTextInputGroup
@@ -147,9 +143,10 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                     id="scientific-references-description"
                     name="scientific-references-description"
                     value={value.description}
-                    onChange={handleDescriptionChange}
+                    onChange={description.handleChange}
+                    onBlur={description.handleBlur}
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION}
-                    error={descriptionError}
+                    error={description.error}
                     disabled={disabled}
                 />
             </div>

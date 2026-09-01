@@ -5,21 +5,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
@@ -78,6 +64,7 @@ describe('TextCardSection', () => {
         renderComponent();
 
         fireEvent.change(screen.getByTestId('mock-rich-input-test-card-title'), { target: { value: 'x' } });
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-card-title'));
 
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });

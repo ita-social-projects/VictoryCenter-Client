@@ -99,8 +99,9 @@ export const ProgramExpensesSection = ({
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
             setSelectedRecordIds([]);
+            refetchReadOnlyData(true).catch(() => {});
         }
-    }, [isEditing]);
+    }, [isEditing, refetchReadOnlyData]);
 
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {

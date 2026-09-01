@@ -27,7 +27,6 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: () => ({
         address: 'вул. Шулявська, буд. 20/22, кв. 41.',
-        motto: 'Україна, 04116. (юридична адреса)',
     }),
 }));
 
@@ -91,7 +90,7 @@ describe('ContactUsPage', () => {
         expect(formCard).toBeInTheDocument();
 
         expect(detailsSection.getAttribute('data-props')).toContain(CONTACT_US_PAGE_DATA.contacts.email);
-        expect(detailsSection.getAttribute('data-props')).toContain('Україна, 04116. (юридична адреса)');
+        expect(detailsSection.getAttribute('data-props')).toContain('вул. Шулявська, буд. 20/22, кв. 41.');
         expect(formCard.getAttribute('data-props')).toContain('formLabel');
     });
 

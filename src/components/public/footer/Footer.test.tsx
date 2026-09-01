@@ -61,10 +61,10 @@ describe('Footer', () => {
             PUBLIC_ROUTES.REPORTS.FULL,
         );
 
-        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
-        expect(howToSupportLink).toBeInTheDocument();
-        expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
-        expect(howToSupportLink).toHaveClass('disable');
+        expect(screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.SUPPORT_US.FULL,
+        );
 
         expect(screen.getByRole('link', { name: footerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',

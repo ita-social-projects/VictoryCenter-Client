@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -6,6 +6,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+
 import {
     HippotherapyScientificReference,
     HippotherapyScientificReferencesSectionContent,
@@ -22,12 +23,23 @@ export interface ScientificReferencesSectionProps {
 const getExpandKey = (reference: HippotherapyScientificReference) =>
     reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
 
+const validateReferenceText = (text: string) => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim());
+
 const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
     const [titleError, setTitleError] = useState<string | undefined>();
     const [descriptionError, setDescriptionError] = useState<string | undefined>();
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
+
+    const areAllReferencesValid = useMemo(
+        () =>
+            value.scientificReferences.every(
+                (reference) => !validateReferenceText(reference.name) && !validateReferenceText(reference.url),
+            ),
+        [value.scientificReferences],
+    );
 
     const handleToggleExpand = useCallback(
         (localId: string) => {
@@ -49,6 +61,23 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         [value.scientificReferences],
     );
 
+    const handleAddReference = useCallback(() => {
+        const newReference: HippotherapyScientificReference = {
+            localId: crypto.randomUUID(),
+            id: null,
+            name: '',
+            url: '',
+        };
+
+        onChange({
+            ...value,
+            scientificReferences: [...value.scientificReferences, newReference],
+        });
+
+        setExpandedIds((prev) => new Set(prev).add(getExpandKey(newReference)));
+        setNewReferenceLocalId(newReference.localId);
+    }, [onChange, value]);
+
     const handleTitleChange = (title: string) => {
         onChange({ ...value, title });
         setTitleError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(title)));
@@ -67,7 +96,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         if (nameErrors[localId] !== undefined) {
             setNameErrors((prev) => ({
                 ...prev,
-                [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(name),
+                [localId]: validateReferenceText(name),
             }));
         }
     };
@@ -78,7 +107,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         );
         onChange({ ...value, scientificReferences });
         if (urlErrors[localId] !== undefined) {
-            setUrlErrors((prev) => ({ ...prev, [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(url) }));
+            setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceText(url) }));
         }
     };
 
@@ -86,7 +115,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         const reference = value.scientificReferences.find((item) => item.localId === localId);
         setNameErrors((prev) => ({
             ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(reference?.name ?? ''),
+            [localId]: validateReferenceText(reference?.name ?? ''),
         }));
     };
 
@@ -94,7 +123,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         const reference = value.scientificReferences.find((item) => item.localId === localId);
         setUrlErrors((prev) => ({
             ...prev,
-            [localId]: HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(reference?.url ?? ''),
+            [localId]: validateReferenceText(reference?.url ?? ''),
         }));
     };
 
@@ -132,6 +161,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         name={reference.name}
                         url={reference.url}
                         isExpanded={expandedIds.has(getExpandKey(reference))}
+                        autoFocus={reference.localId === newReferenceLocalId}
                         canDelete={value.scientificReferences.length > 1}
                         nameError={nameErrors[reference.localId]}
                         urlError={urlErrors[reference.localId]}
@@ -143,12 +173,12 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         onUrlBlur={handleUrlBlur}
                     />
                 ))}
-                {/* Adding new references is disabled for now — placeholder only, no add functionality yet. */}
                 <Button
                     buttonStyle="primary"
                     type="button"
                     className="scientific-references-section-add-button"
-                    disabled={disabled}
+                    onClick={handleAddReference}
+                    disabled={disabled || !areAllReferencesValid}
                 >
                     {HIPPOTHERAPY_PAGE_TEXT.BUTTON.ADD_REFERENCE}
                     <PlusIcon />

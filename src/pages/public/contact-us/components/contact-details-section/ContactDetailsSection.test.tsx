@@ -43,7 +43,6 @@ const DEFAULT_PROPS = {
     email: 'victorycenter@gmail.com',
     phone: '+380 50 334 4448',
     address: 'Kyiv, Khreshchatyk str., 2',
-    motto: 'VICTORY STARTS WITH YOU',
     socialLinks: [{ label: 'Instagram', url: 'https://instagram.com/victorycenterua' }],
     copyEmailLabel: 'Copy email',
     copyPhoneLabel: 'Copy phone',

@@ -140,4 +140,12 @@ describe('ScientificReferenceCard', () => {
         expect(screen.getByRole('button', { name: 'Collapse reference' })).toBeDisabled();
         expect(screen.getByLabelText('Delete reference')).toBeDisabled();
     });
+
+    it('collapses consecutive spaces in the name while typing', () => {
+        renderComponent();
+
+        fireEvent.change(screen.getByDisplayValue('Test citation'), { target: { value: '  Hello   world ' } });
+
+        expect(mockOnNameChange).toHaveBeenCalledWith('ref-1', 'Hello world ');
+    });
 });

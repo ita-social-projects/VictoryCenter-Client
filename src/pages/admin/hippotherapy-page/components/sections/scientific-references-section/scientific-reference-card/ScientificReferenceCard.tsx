@@ -8,6 +8,7 @@ import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { InputError } from '@/components/admin/input-error/InputError';
 import './ScientificReferenceCard.scss';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 
 export interface ScientificReferenceCardProps {
     localId: string;
@@ -91,6 +92,7 @@ export const ScientificReferenceCard = ({
                     rows={2}
                     autoGrow
                     maxRows={6}
+                    normalizeValue={getNormalizedInputTextWhileTyping}
                 />
                 {isExpanded && (
                     <InputWithCharacterLimitGroup

@@ -1,0 +1,6 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.page {
+    background-color: c.$light-blue-50;
+    min-height: 100vh;
+}

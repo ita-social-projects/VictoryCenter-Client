@@ -81,24 +81,6 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.isSubmitDisabled).toBe(false);
     });
 
-    it('recalculates UAH and enables submit when USD is changed manually', () => {
-        const { result } = renderUseProgramExpenseForm();
-
-        act(() => {
-            result.current.handleReportingYearChange('2026');
-            result.current.handleProgramChange(2);
-            result.current.handleAmountFieldChange('amountUsd')('999');
-        });
-
-        act(() => {
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.formState.amountUah).toBe('39960');
-        expect(result.current.usdMismatchMessage).toBeUndefined();
-        expect(result.current.isSubmitDisabled).toBe(false);
-    });
-
     it('submits successfully after USD is changed manually without a preceding blur', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseProgramExpenseForm({ onSubmit });

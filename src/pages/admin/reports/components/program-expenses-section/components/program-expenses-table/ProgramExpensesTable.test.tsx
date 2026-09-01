@@ -7,9 +7,9 @@ jest.mock(
     '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
     () => ({
         ProgramExpensesEmptyState: ({
-            colSpan = 5,
-            variant = 'filtered',
-        }: {
+                                        colSpan = 5,
+                                        variant = 'filtered',
+                                    }: {
             colSpan?: number;
             variant?: 'filtered' | 'program-expenses';
         }) => (
@@ -22,10 +22,10 @@ jest.mock(
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({
-        'aria-label': ariaLabel,
-        onClick,
-        disabled,
-    }: {
+                     'aria-label': ariaLabel,
+                     onClick,
+                     disabled,
+                 }: {
         'aria-label': string;
         onClick?: () => void;
         disabled?: boolean;
@@ -52,10 +52,10 @@ jest.mock('@/components/common/select/Select', () => {
     const SelectOption = (_props: { value: unknown; name: string }) => null;
 
     const MockSelect = ({
-        children,
-        onValueChange,
-        placeholder,
-    }: {
+                            children,
+                            onValueChange,
+                            placeholder,
+                        }: {
         children: React.ReactNode;
         onValueChange: (value: unknown) => void;
         placeholder?: string;
@@ -89,18 +89,23 @@ jest.mock(
     '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema',
     () => ({
         normalizeFundsExpendituresAmountInput: (value: string) => value.trim(),
-        validateFundsExpendituresAmount: (value: string) => (value === 'invalid' ? 'Invalid amount' : undefined),
+        validateFundsExpendituresAmount: (value: string) =>
+            value === 'invalid' ? 'Invalid amount' : undefined,
     }),
 );
 
 jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
     updateFundsAmounts:
         (field: 'amountUah' | 'amountUsd', value: string) =>
-        (state: { amountUah: string; amountUsd: string; errors: Record<string, string | undefined> }) => ({
-            amountUah: field === 'amountUah' ? value : state.amountUah,
-            amountUsd: field === 'amountUsd' ? value : state.amountUsd,
-            errors: { amountUah: undefined, amountUsd: undefined },
-        }),
+            (state: {
+                amountUah: string;
+                amountUsd: string;
+                errors: Record<string, string | undefined>;
+            }) => ({
+                amountUah: field === 'amountUah' ? value : state.amountUah,
+                amountUsd: field === 'amountUsd' ? value : state.amountUsd,
+                errors: { amountUah: undefined, amountUsd: undefined },
+            }),
 }));
 
 jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch', () => ({
@@ -108,6 +113,7 @@ jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mi
 }));
 
 const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
+
 const getEmptyStateCell = () => screen.getByTestId('program-expenses-empty-state-cell');
 
 const expectEmptyState = (variant: 'filtered' | 'program-expenses', colSpan = '5') => {
@@ -146,7 +152,8 @@ describe('ProgramExpensesTable', () => {
         { id: 102, name: 'Program C' },
     ];
 
-    const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
+    const normalizeText = (value: string) =>
+        value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
     const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
         return render(
@@ -186,21 +193,35 @@ describe('ProgramExpensesTable', () => {
     it('should render empty state when records are missing', () => {
         render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords />);
 
-        expectEmptyState('filtered');
+        expectEmptyState('filtered', '4');
     });
 
     it('should render program expenses empty state when there are no records in system', () => {
         render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} />);
 
         expect(screen.getByRole('table')).toBeInTheDocument();
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
-        expectEmptyState('program-expenses');
+        expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).not.toBeInTheDocument();
+        expectEmptyState('program-expenses', '4');
     });
 
     it('should use edit-mode colSpan for empty state', () => {
         render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
 
-        expectEmptyState('program-expenses', '7');
+        expectEmptyState('program-expenses', '5');
+    });
+
+    it('should not render checkbox and program columns in empty edit mode', () => {
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
+
+        expect(screen.queryByLabelText('Select all program expense records')).not.toBeInTheDocument();
+        expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).not.toBeInTheDocument();
+    });
+
+    it('should render checkbox and program columns when records exist', () => {
+        renderTable();
+
+        expect(screen.getByLabelText('Select all program expense records')).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
     });
 
     it('should render checkboxes and action column in edit mode', () => {
@@ -242,7 +263,6 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
         expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
 
-        // Checkboxes and other edit buttons should be disabled
         expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
         expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
@@ -257,10 +277,9 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
 
         const acceptButton = screen.getByLabelText('Accept record 1');
-        // Originally selected program is 100, so accept should be disabled as no change yet
+
         expect(acceptButton).toBeDisabled();
 
-        // Select Program C (id: 102)
         fireEvent.click(screen.getByTestId('select-option-Program C-102'));
 
         expect(acceptButton).not.toBeDisabled();
@@ -339,9 +358,11 @@ describe('ProgramExpensesTable', () => {
         renderTable();
 
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
         expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
 
         fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+
         expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeEnabled();
     });
 
@@ -361,6 +382,7 @@ describe('ProgramExpensesTable', () => {
         await waitFor(() => {
             expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
         });
+
         expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
     });
 

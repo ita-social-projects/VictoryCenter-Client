@@ -7,9 +7,9 @@ jest.mock(
     '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
     () => ({
         ProgramExpensesEmptyState: ({
-                                        colSpan = 5,
-                                        variant = 'filtered',
-                                    }: {
+            colSpan = 5,
+            variant = 'filtered',
+        }: {
             colSpan?: number;
             variant?: 'filtered' | 'program-expenses';
         }) => (
@@ -22,10 +22,10 @@ jest.mock(
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({
-                     'aria-label': ariaLabel,
-                     onClick,
-                     disabled,
-                 }: {
+        'aria-label': ariaLabel,
+        onClick,
+        disabled,
+    }: {
         'aria-label': string;
         onClick?: () => void;
         disabled?: boolean;
@@ -52,10 +52,10 @@ jest.mock('@/components/common/select/Select', () => {
     const SelectOption = (_props: { value: unknown; name: string }) => null;
 
     const MockSelect = ({
-                            children,
-                            onValueChange,
-                            placeholder,
-                        }: {
+        children,
+        onValueChange,
+        placeholder,
+    }: {
         children: React.ReactNode;
         onValueChange: (value: unknown) => void;
         placeholder?: string;
@@ -89,23 +89,18 @@ jest.mock(
     '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema',
     () => ({
         normalizeFundsExpendituresAmountInput: (value: string) => value.trim(),
-        validateFundsExpendituresAmount: (value: string) =>
-            value === 'invalid' ? 'Invalid amount' : undefined,
+        validateFundsExpendituresAmount: (value: string) => (value === 'invalid' ? 'Invalid amount' : undefined),
     }),
 );
 
 jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
     updateFundsAmounts:
         (field: 'amountUah' | 'amountUsd', value: string) =>
-            (state: {
-                amountUah: string;
-                amountUsd: string;
-                errors: Record<string, string | undefined>;
-            }) => ({
-                amountUah: field === 'amountUah' ? value : state.amountUah,
-                amountUsd: field === 'amountUsd' ? value : state.amountUsd,
-                errors: { amountUah: undefined, amountUsd: undefined },
-            }),
+        (state: { amountUah: string; amountUsd: string; errors: Record<string, string | undefined> }) => ({
+            amountUah: field === 'amountUah' ? value : state.amountUah,
+            amountUsd: field === 'amountUsd' ? value : state.amountUsd,
+            errors: { amountUah: undefined, amountUsd: undefined },
+        }),
 }));
 
 jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch', () => ({
@@ -152,8 +147,7 @@ describe('ProgramExpensesTable', () => {
         { id: 102, name: 'Program C' },
     ];
 
-    const normalizeText = (value: string) =>
-        value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
+    const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
     const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
         return render(

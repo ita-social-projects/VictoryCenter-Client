@@ -136,7 +136,7 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => 
     useToast: () => ({ addToast: mockAddToast }),
 }));
 
-const mockRefetch = jest.fn();
+const mockRefetch = jest.fn().mockReturnValue(Promise.resolve());
 let mockUseDataFetchResult = {
     data: MOCK_PROGRAM_EXPENSES_DATA,
     isLoading: false,
@@ -305,6 +305,7 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
 describe('ProgramExpensesSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockRefetch.mockReturnValue(Promise.resolve());
         mockUseDataFetchResult = {
             data: MOCK_PROGRAM_EXPENSES_DATA,
             isLoading: false,

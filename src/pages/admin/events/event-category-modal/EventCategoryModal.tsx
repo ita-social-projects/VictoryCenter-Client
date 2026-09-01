@@ -142,6 +142,10 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     }, [formState.name, isDuplicateName]);
 
     const isSubmitDisabled = () => {
+        if (isSubmitting) {
+            return true;
+        }
+
         const nameValidationError = EVENT_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
         const hasValidationErrors = nameValidationError !== undefined || isDuplicateName;
         const hasEmptyFields = !formState.name.trim();
@@ -261,6 +265,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                                 onChange={handleCategoryChange}
                                 placeholder={EVENT_CATEGORY_TEXT.FORM.SELECT_CATEGORY_PLACEHOLDER}
                                 value={selectedCategory || undefined}
+                                disabled={isSubmitting}
                             />
                         )}
 
@@ -276,6 +281,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                             id="event-category-name"
                             maxLength={EVENT_CATEGORY_VALIDATION.name.max}
                             placeholder={EVENT_CATEGORY_TEXT.FORM.NAME_PLACEHOLDER}
+                            disabled={isSubmitting}
                         />
 
                         {error && (

@@ -51,11 +51,10 @@ export const ContactUsPage: React.FC = () => {
     const fallback = useMemo(() => {
         return {
             address: data?.contacts?.address ?? '',
-            motto: data?.contacts?.motto ?? '',
         };
     }, [data]);
 
-    const { address, motto } = useGetLocalization(localizations, fallback);
+    const { address } = useGetLocalization(localizations, fallback);
 
     if (isLoading) {
         return (
@@ -76,7 +75,6 @@ export const ContactUsPage: React.FC = () => {
                     email={CONTACT_US_PAGE_DATA.contacts.email}
                     phone={CONTACT_US_PAGE_DATA.contacts.phone}
                     address={address}
-                    motto={motto}
                     socialLinks={CONTACT_US_PAGE_DATA.socialLinks}
                     copyEmailLabel={t('copyEmailAria')}
                     copyPhoneLabel={t('copyPhoneAria')}

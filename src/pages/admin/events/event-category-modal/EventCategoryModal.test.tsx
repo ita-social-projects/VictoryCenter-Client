@@ -4,7 +4,7 @@ import { EventCategoryModal } from './EventCategoryModal';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategory } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EventCategoriesApi } from '../event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
 const mockValidateName = jest.fn();
 

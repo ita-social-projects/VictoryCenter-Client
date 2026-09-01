@@ -14,7 +14,7 @@ import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/
 import { EventCategory } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
-import { EventCategoriesApi } from './event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();

@@ -6,7 +6,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EventCategoriesApi } from './event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategory } from '@/types/admin/event-category';
 import { act } from 'react';
 

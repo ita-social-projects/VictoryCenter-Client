@@ -10,7 +10,7 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import './EventCategoryModal.scss';
 import { EVENT_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-schema/event-category-schema';
 import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
-import { EventCategoriesApi } from '../event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 interface EventCategoryFormValues {

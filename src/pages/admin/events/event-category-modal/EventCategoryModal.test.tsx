@@ -18,7 +18,7 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
 
-jest.mock('../event-categories/event-categories-api', () => ({
+jest.mock('@/services/api/admin/events/event-categories-api', () => ({
     EventCategoriesApi: {
         create: jest.fn(),
         update: jest.fn(),

@@ -96,7 +96,7 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock('./event-categories/event-categories-api', () => ({
+jest.mock('@/services/api/admin/events/event-categories-api', () => ({
     EventCategoriesApi: {
         getAll: jest.fn(),
     },

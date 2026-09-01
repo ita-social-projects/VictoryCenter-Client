@@ -19,6 +19,7 @@ jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
         disabled,
         isExpanded,
         onToggleExpand,
+        onDelete,
         onNameChange,
         onUrlChange,
         onNameBlur,
@@ -32,6 +33,7 @@ jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
         >
             <button data-testid={`toggle-expand-${localId}`} onClick={() => onToggleExpand(localId)} />
             <button data-testid={`toggle-unknown-${localId}`} onClick={() => onToggleExpand('unknown-local-id')} />
+            <button data-testid={`delete-${localId}`} onClick={() => onDelete(localId)} />
             <input
                 data-testid={`name-input-${localId}`}
                 value={name}
@@ -325,5 +327,35 @@ describe('ScientificReferencesSection', () => {
         });
 
         expect(getAddButton()).toBeDisabled();
+    });
+
+    it('opens the confirmation modal when a reference delete is requested', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('delete-ref-1'));
+
+        expect(screen.getByText(HIPPOTHERAPY_PAGE_TEXT.CONFIRMATION.DELETE_REFERENCE)).toBeInTheDocument();
+    });
+
+    it('closes the confirmation without deleting when the user declines', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('delete-ref-1'));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+
+        expect(screen.queryByText(HIPPOTHERAPY_PAGE_TEXT.CONFIRMATION.DELETE_REFERENCE)).not.toBeInTheDocument();
+        expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('removes the reference when the user confirms', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('delete-ref-1'));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        expect(mockOnChange).toHaveBeenCalledWith({
+            ...defaultValue,
+            scientificReferences: [defaultValue.scientificReferences[1]],
+        });
     });
 });

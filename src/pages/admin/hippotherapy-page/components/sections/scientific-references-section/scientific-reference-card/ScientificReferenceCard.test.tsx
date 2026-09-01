@@ -8,6 +8,7 @@ describe('ScientificReferenceCard', () => {
     let mockOnNameBlur: jest.Mock;
     let mockOnUrlBlur: jest.Mock;
     let mockOnToggleExpand: jest.Mock;
+    let mockOnDelete: jest.Mock;
 
     const defaultProps: ScientificReferenceCardProps = {
         localId: 'ref-1',
@@ -15,6 +16,7 @@ describe('ScientificReferenceCard', () => {
         url: 'https://example.com/citation',
         isExpanded: false,
         onToggleExpand: jest.fn(),
+        onDelete: jest.fn(),
         onNameChange: jest.fn(),
         onUrlChange: jest.fn(),
         onNameBlur: jest.fn(),
@@ -27,6 +29,7 @@ describe('ScientificReferenceCard', () => {
         mockOnNameBlur = jest.fn();
         mockOnUrlBlur = jest.fn();
         mockOnToggleExpand = jest.fn();
+        mockOnDelete = jest.fn();
     });
 
     const renderComponent = (props: Partial<ScientificReferenceCardProps> = {}) =>
@@ -34,6 +37,7 @@ describe('ScientificReferenceCard', () => {
             <ScientificReferenceCard
                 {...defaultProps}
                 onToggleExpand={mockOnToggleExpand}
+                onDelete={mockOnDelete}
                 onNameChange={mockOnNameChange}
                 onUrlChange={mockOnUrlChange}
                 onNameBlur={mockOnNameBlur}
@@ -147,5 +151,13 @@ describe('ScientificReferenceCard', () => {
         fireEvent.change(screen.getByDisplayValue('Test citation'), { target: { value: '  Hello   world ' } });
 
         expect(mockOnNameChange).toHaveBeenCalledWith('ref-1', 'Hello world ');
+    });
+
+    it('calls onDelete with the localId when the delete button is clicked', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByLabelText('Delete reference'));
+
+        expect(mockOnDelete).toHaveBeenCalledWith('ref-1');
     });
 });

@@ -21,6 +21,7 @@
         gap: 24px;
         height: 100%;
         padding: 32px;
+        pointer-events: none;
     }
 
     &-summary {
@@ -32,6 +33,7 @@
         border-radius: 12px;
         padding: 16px 20px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        pointer-events: auto;
     }
 
     &-principles {
@@ -46,6 +48,7 @@
         border-radius: 12px;
         padding: 16px 20px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        pointer-events: auto;
     }
 
     &-error {

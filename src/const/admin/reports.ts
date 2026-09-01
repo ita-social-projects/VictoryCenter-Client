@@ -181,7 +181,7 @@ export const PDF_SECTION_LOCALIZATION_VALIDATION = {
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
-    DISCLAIMER_LABEL: 'Дісклеймер/ENG',
+    DISCLAIMER_LABEL: 'Дисклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
     MESSAGE: {
         RECORD_CREATED_SUCCESSFULLY: 'Запис додано успішно',

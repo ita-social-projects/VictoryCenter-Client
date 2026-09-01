@@ -153,8 +153,12 @@ export const API_ROUTES = {
         PUBLIC: 'History',
     },
     CONTACT_US: 'ContactUs',
+    SUPPORT_US: 'SupportUs',
 
     HISTORY_LOCALIZATIONS: {
         BASE: 'HistoryLocalizations',
+    },
+    EVENT_CATEGORIES: {
+        BASE: 'EventNewsCategories',
     },
 };

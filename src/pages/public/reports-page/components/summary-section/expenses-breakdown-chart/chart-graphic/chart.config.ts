@@ -31,9 +31,23 @@ export const CHART_CONFIG = {
     },
 };
 
-export const LABEL_OFFSETS = [
-    { dx: -90, dy: 40 },
-    { dx: -50, dy: 40 },
-    { dx: 10, dy: 40 },
-    { dx: 20, dy: 10 },
-];
+export const LABEL_LAYOUT = {
+    mobile: {
+        baseGap: 20,
+        collisionPadding: 4,
+        boundsPadding: -7,
+        stepX: 3,
+        stepY: 3,
+        fallbackWidth: 70,
+        fallbackHeight: 30,
+    },
+    desktop: {
+        baseGap: 35,
+        collisionPadding: 6,
+        boundsPadding: -15,
+        stepX: 3,
+        stepY: 3,
+        fallbackWidth: 90,
+        fallbackHeight: 34,
+    },
+};

@@ -2,11 +2,36 @@ import { renderHook, act } from '@testing-library/react';
 import { useChartGeometry } from './useChartGeometry';
 
 jest.mock('../chart-graphic/chart.config', () => ({
-    LABEL_OFFSETS: [
-        { dx: 10, dy: 5 },
-        { dx: -5, dy: 20 },
-        { dx: 0, dy: 0 },
-    ],
+    CHART_CONFIG: {
+        mobile: {
+            viewBox: '0 0 100 100',
+            strokeWidth: 0,
+        },
+        desktop: {
+            viewBox: '0 0 200 200',
+            strokeWidth: 0,
+        },
+    },
+    LABEL_LAYOUT: {
+        mobile: {
+            baseGap: 0,
+            collisionPadding: 0,
+            boundsPadding: 0,
+            stepX: 0,
+            stepY: 0,
+            fallbackWidth: 20,
+            fallbackHeight: 20,
+        },
+        desktop: {
+            baseGap: 0,
+            collisionPadding: 0,
+            boundsPadding: 0,
+            stepX: 0,
+            stepY: 0,
+            fallbackWidth: 20,
+            fallbackHeight: 20,
+        },
+    },
 }));
 
 type MockPath = {
@@ -40,53 +65,66 @@ describe('useChartGeometry', () => {
 
     beforeEach(() => {
         mockPath1 = createMockPath({
-            bbox: { x: 0, y: 0, width: 100, height: 100 },
+            bbox: { x: 0, y: 0, width: 0, height: 0 },
             totalLength: 100,
-            point: { x: 100, y: 50 },
+            point: { x: 10, y: 0 },
         });
         mockPath2 = createMockPath({
-            bbox: { x: 50, y: 50, width: 100, height: 100 },
+            bbox: { x: 0, y: 0, width: 0, height: 0 },
             totalLength: 200,
-            point: { x: 150, y: 200 },
+            point: { x: 0, y: 20 },
         });
     });
 
-    it('calculates positions correctly', () => {
+    it('calculates positions correctly with new structure', () => {
         const { result, rerender } = renderChartGeometry(2, true, [100, 100]);
+
         act(() => {
             result.current.pathRefs.current = [mockPath1 as any, mockPath2 as any];
         });
+
         rerender({ itemsLength: 2, isDesktop: false, percents: [100, 100] });
-        expect(result.current.positions).toEqual([
-            { x: 110, y: 55 },
-            { x: 145, y: 220 },
-        ]);
+        expect(result.current.positions).toHaveLength(2);
+
+        expect(result.current.positions[0]).toHaveProperty('position');
+        expect(result.current.positions[0]).toHaveProperty('arcPoint');
+        expect(result.current.positions[0].position.x).toBeCloseTo(10, 1);
+        expect(result.current.positions[0].position.y).toBeCloseTo(0, 1);
+        expect(result.current.positions[0].position.anchor).toBe('start');
     });
 
-    it('returns {0,0} when path is null', () => {
+    it('returns empty array when path is null (early return)', () => {
         const { result, rerender } = renderChartGeometry(1, true, [100]);
+
         act(() => {
             result.current.pathRefs.current = [null];
         });
+
         rerender({ itemsLength: 1, isDesktop: false, percents: [100] });
-        expect(result.current.positions).toEqual([{ x: 0, y: 0 }]);
+        expect(result.current.positions).toEqual([]);
     });
 
     it('respects itemsLength slice', () => {
         const { result, rerender } = renderChartGeometry(1, true, [100]);
+
         act(() => {
             result.current.pathRefs.current = [mockPath1 as any, mockPath2 as any];
         });
+
         rerender({ itemsLength: 1, isDesktop: false, percents: [100] });
+
         expect(result.current.positions).toHaveLength(1);
     });
 
     it('recalculates when itemsLength changes', () => {
         const { result, rerender } = renderChartGeometry(1, true, [100]);
+
         act(() => {
             result.current.pathRefs.current = [mockPath1 as any, mockPath2 as any];
         });
+
         rerender({ itemsLength: 2, isDesktop: true, percents: [100, 100] });
+
         expect(result.current.positions).toHaveLength(2);
     });
 });

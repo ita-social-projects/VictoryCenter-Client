@@ -401,14 +401,22 @@ export const FundsExpenditureSection = ({
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
-    const programAggregateRow = useMemo<ProgramAggregateRow>(() => {
+    const programAggregateRow = useMemo<ProgramAggregateRow | null>(() => {
+        if (selectedType !== undefined && selectedType !== 'expense') {
+            return null;
+        }
+
+        if (selectedCategoryId !== undefined) {
+            return null;
+        }
+
         return {
             reportingYear: String(programYearValue),
             categoryName: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL,
             amountUah: formatNumberDecimalComma(programSummary.totalAmountUah),
             amountUsd: formatNumberDecimalComma(programSummary.totalAmountUsd),
         };
-    }, [programSummary, programYearValue]);
+    }, [programSummary, programYearValue, selectedType, selectedCategoryId]);
 
     const handleProgramYearSave = useCallback(
         async (reportingYear: string): Promise<boolean> => {

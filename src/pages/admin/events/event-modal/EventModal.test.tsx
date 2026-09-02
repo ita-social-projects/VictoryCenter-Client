@@ -4,6 +4,7 @@ import { EventModal } from './EventModal';
 import { EventCategory } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
@@ -141,11 +142,7 @@ describe('EventModal', () => {
                 target: { value: 'New Event' },
             });
 
-            fireEvent.click(screen.getByTestId('modal-close'));
-            fireEvent.click(screen.getByTestId('confirmation-cancel'));
-
-            expect(onClose).not.toHaveBeenCalled();
-            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            executeCancelCofirmationFlow(onClose);
         });
 
         it('closes the modal when unsaved changes are confirmed', () => {
@@ -158,11 +155,7 @@ describe('EventModal', () => {
                 target: { value: 'New Event' },
             });
 
-            fireEvent.click(screen.getByTestId('modal-close'));
-            fireEvent.click(screen.getByTestId('confirmation-confirm'));
-
-            expect(onClose).toHaveBeenCalledTimes(1);
-            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            executeConfirmCloseFlow(onClose);
         });
     });
 

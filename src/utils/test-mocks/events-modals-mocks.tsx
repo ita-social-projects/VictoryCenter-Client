@@ -1,3 +1,5 @@
+import { fireEvent, screen } from '@testing-library/react';
+
 export const MockModal = ({ isOpen, children, onClose }: any) =>
     isOpen ? (
         <div data-testid="modal">
@@ -34,7 +36,23 @@ export const MockConfirmationModal = ({ isOpen, title, onClose, onCancel, onConf
     ) : null;
 
 export const MockButton = ({ children, disabled, onClick, buttonStyle, ...props }: any) => (
-    <button {...props} disabled={disabled} buttonStyle={buttonStyle} onClick={onClick}>
+    <button {...props} disabled={disabled} data-button-style={buttonStyle} onClick={onClick}>
         {children}
     </button>
 );
+
+export const executeCancelCofirmationFlow = (onCloseMock: jest.Mock) => {
+    fireEvent.click(screen.getByTestId('modal-close'));
+    fireEvent.click(screen.getByTestId('confirmation-cancel'));
+
+    expect(onCloseMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+};
+
+export const executeConfirmCloseFlow = (onCloseMock: jest.Mock) => {
+    fireEvent.click(screen.getByTestId('modal-close'));
+    fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+};

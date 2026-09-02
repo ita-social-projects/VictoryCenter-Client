@@ -5,6 +5,7 @@ import { ModalMode } from '@/types/admin/common';
 import { EventCategory } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 
 const mockValidateName = jest.fn();
 
@@ -370,11 +371,7 @@ describe('EventCategoryModal', () => {
                 target: { value: 'New Category' },
             });
 
-            fireEvent.click(screen.getByTestId('modal-close'));
-            fireEvent.click(screen.getByTestId('confirmation-cancel'));
-
-            expect(onClose).not.toHaveBeenCalled();
-            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            executeCancelCofirmationFlow(onClose);
         });
 
         it('closes the modal when unsaved changes are confirmed', () => {
@@ -386,11 +383,7 @@ describe('EventCategoryModal', () => {
                 target: { value: 'New Category' },
             });
 
-            fireEvent.click(screen.getByTestId('modal-close'));
-            fireEvent.click(screen.getByTestId('confirmation-confirm'));
-
-            expect(onClose).toHaveBeenCalledTimes(1);
-            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            executeConfirmCloseFlow(onClose);
         });
     });
 

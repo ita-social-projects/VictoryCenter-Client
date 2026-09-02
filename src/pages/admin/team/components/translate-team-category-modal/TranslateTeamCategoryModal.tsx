@@ -47,13 +47,14 @@ export const TranslateTeamCategoryModal = ({
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
+    const normalize = (value: string) => value.trim().replace(/\s+/g, ' ');
 
     const initialData = useMemo<TranslateTeamCategoryFormValues | null>(() => {
         if (!isEditMode || !existingLocalization) return null;
 
         return {
-            name: existingLocalization.name,
-            description: existingLocalization.description,
+            name: normalize(existingLocalization.name),
+            description: normalize(existingLocalization.description),
         };
     }, [existingLocalization, isEditMode]);
 

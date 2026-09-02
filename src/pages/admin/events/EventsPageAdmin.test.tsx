@@ -7,7 +7,7 @@ import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/A
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { act } from 'react';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -56,7 +56,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
         contextMenuOptions,
         onContextMenuOptionSelected,
     }: {
-        categories: EventCategory[];
+        categories: EventCategoryDto[];
         contextMenuOptions: { id: string; name: string }[];
         onContextMenuOptionSelected: (id: string) => void;
     }) => (
@@ -78,17 +78,21 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 
 const mockOnAddCategory = jest.fn();
 const mockOnUpdateCategory = jest.fn();
+const mockOnDeleteCategory = jest.fn();
 
 jest.mock('./event-page-modals/EventsPageModals', () => ({
     EventsPageModals: ({
         onAddCategory,
         onUpdateCategory,
+        onDeleteCategory,
     }: {
-        onAddCategory: (category: EventCategory) => void;
-        onUpdateCategory: (category: EventCategory) => void;
+        onAddCategory: (category: EventCategoryDto) => void;
+        onUpdateCategory: (category: EventCategoryDto) => void;
+        onDeleteCategory: (categoryId: number) => void;
     }) => {
         mockOnAddCategory.mockImplementation(onAddCategory);
         mockOnUpdateCategory.mockImplementation(onUpdateCategory);
+        mockOnDeleteCategory.mockImplementation(onDeleteCategory);
 
         return <div data-testid="events-page-modals" />;
     },
@@ -105,14 +109,16 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
 const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
 
 describe('EventsPageAdmin', () => {
-    const categories: EventCategory[] = [
+    const categories: EventCategoryDto[] = [
         {
             id: 1,
             name: 'Category 1',
+            relatedEventNewsCount: 0,
         },
         {
             id: 2,
             name: 'Category 2',
+            relatedEventNewsCount: 0,
         },
     ];
 
@@ -123,6 +129,7 @@ describe('EventsPageAdmin', () => {
         mockOpenEditCategoryModal.mockClear();
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
+        mockOnDeleteCategory.mockClear();
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -217,9 +224,10 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
-        const newCategory: EventCategory = {
+        const newCategory: EventCategoryDto = {
             id: 3,
             name: 'Category 3',
+            relatedEventNewsCount: 0,
         };
 
         await act(async () => {
@@ -239,9 +247,10 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
-        const updatedCategory: EventCategory = {
+        const updatedCategory: EventCategoryDto = {
             id: 1,
             name: 'Updated Category',
+            relatedEventNewsCount: 0,
         };
 
         await act(async () => {
@@ -249,6 +258,24 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.getByText('Updated Category')).toBeInTheDocument();
+        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
+
+    it('deletes an existing category from the categories list', async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
+        });
+
+        await act(async () => {
+            mockOnDeleteCategory(1);
+        });
+
         expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
     });

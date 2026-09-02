@@ -15,6 +15,10 @@ export const EVENT_CATEGORY_VALIDATION = {
         getMaxError: () => `Не більше ${EVENT_CATEGORY_VALIDATION.name.max} символів.`,
         getRequiredError: () => 'Назва обов’язкова',
     },
+    eventItemsCount: {
+        getHasEventNewsCountError: (count: number) => `Категорія містить ${count} записів`,
+        getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
+    },
 };
 
 export const EVENT_CATEGORY_TEXT = {

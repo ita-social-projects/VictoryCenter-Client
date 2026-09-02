@@ -1,15 +1,18 @@
 import { EventsNews } from '@/types/admin/events-news';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
+import { DeleteEventCategoryConfirmModal } from '../delete-event-category-modal/DeleteEventCategoryConfirmModal';
+import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
-    categories: EventCategory[];
+    categories: EventCategoryDto[];
 
-    onAddCategory(category: EventCategory): void;
-    onUpdateCategory(category: EventCategory): void;
+    onAddCategory(category: EventCategoryDto): void;
+    onUpdateCategory(category: EventCategoryDto): void;
+    onDeleteCategory(categoryId: number): void;
 }
 
 export const EventsPageModals = ({
@@ -17,6 +20,7 @@ export const EventsPageModals = ({
     categories,
     onAddCategory,
     onUpdateCategory,
+    onDeleteCategory,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
@@ -36,6 +40,13 @@ export const EventsPageModals = ({
                 onClose={closeModalActions.closeEditCategoryModal}
                 categories={categories}
                 onUpdateCategory={onUpdateCategory}
+            />
+
+            <DeleteEventCategoryModal
+                isOpen={modalState.isDeleteCategoryModalOpen}
+                categories={categories}
+                onClose={closeModalActions.closeDeleteCategoryModal}
+                onConfirm={onDeleteCategory}
             />
         </>
     );

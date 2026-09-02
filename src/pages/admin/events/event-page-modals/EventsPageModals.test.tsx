@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { ModalMode } from '@/types/admin/common';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 
@@ -14,14 +14,16 @@ jest.mock('../event-category-modal/EventCategoryModal', () => ({
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
 
 describe('EventsPageModals', () => {
-    const categories: EventCategory[] = [
+    const categories: EventCategoryDto[] = [
         {
             id: 1,
             name: 'Category 1',
+            relatedEventNewsCount: 0,
         },
         {
             id: 2,
             name: 'Category 2',
+            relatedEventNewsCount: 0,
         },
     ];
 
@@ -29,6 +31,7 @@ describe('EventsPageModals', () => {
     const closeEditCategoryModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
+    const onDeleteCategory = jest.fn();
 
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
@@ -59,6 +62,7 @@ describe('EventsPageModals', () => {
                 categories={categories}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
             />,
         );
 
@@ -82,6 +86,7 @@ describe('EventsPageModals', () => {
                 categories={categories}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
             />,
         );
 
@@ -105,6 +110,7 @@ describe('EventsPageModals', () => {
                 categories={categories}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
             />,
         );
 

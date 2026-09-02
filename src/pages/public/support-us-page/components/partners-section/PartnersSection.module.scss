@@ -1,0 +1,62 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    max-width: 1440px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding: 80px 0 120px;
+}
+
+.title {
+    @include type.h4-bold-uppercase;
+    margin: 0 0 56px;
+    padding: 0 56px;
+    color: c.$blue-900;
+    text-align: left;
+}
+
+.list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.item {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// Wave rhythm: 1st sits mid-height, 2nd drops the lowest, 3rd rises the highest.
+.item:nth-child(1) {
+    margin-top: 80px;
+}
+
+.item:nth-child(2) {
+    margin-top: 220px;
+}
+
+.item:nth-child(3) {
+    margin-top: 0;
+}
+
+.image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+.caption {
+    @include type.body-1-medium;
+    margin: 0;
+    padding-right: 16px;
+    padding-left: 16px;
+    color: c.$blue-900;
+    text-align: left;
+}

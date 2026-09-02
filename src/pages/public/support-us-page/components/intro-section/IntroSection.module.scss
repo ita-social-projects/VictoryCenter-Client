@@ -1,0 +1,100 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/z-index';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.intro-section {
+    padding: 168px 56px 142px;
+    display: flex;
+    flex-direction: column;
+    gap: 132px;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+    font-family: t.$font-family-base;
+
+    h1 {
+        max-width: 1102px;
+        width: 100%;
+        height: auto;
+        font-weight: 500;
+        font-size: 96px;
+        line-height: 112px;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-transform: uppercase;
+        display: block;
+
+        span {
+            display: inline;
+            max-width: 100%;
+        }
+
+        span:first-child {
+            display: block;
+        }
+    }
+
+    .highlight-yellow,
+    .highlight-blue {
+        font-weight: 800;
+        font-style: italic;
+        display: inline-block;
+    }
+
+    .highlight-yellow {
+        background-color: colors.$yellow-400;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            width: 100vw;
+            background-color: colors.$yellow-400;
+        }
+    }
+
+    .highlight-blue {
+        background-color: colors.$light-blue-200;
+        position: relative;
+        z-index: z-index.public(support-us-page-intro-section-text);
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 100%;
+            width: 100vw;
+            background-color: colors.$light-blue-200;
+            z-index: z-index.public(support-us-page-intro-section-background);
+        }
+    }
+
+    .additional-info {
+        @include type.body-2-medium;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 470px;
+        font-size: 20px;
+        line-height: 28px;
+
+        p {
+            width: 100%;
+            text-align: center;
+        }
+    }
+}

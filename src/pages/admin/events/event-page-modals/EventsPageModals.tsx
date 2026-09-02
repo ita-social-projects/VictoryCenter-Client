@@ -9,9 +9,17 @@ export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
     categories: EventCategory[];
     currentCategory: EventCategory | null;
+    onAddCategory(category: EventCategory): void;
+    onUpdateCategory(category: EventCategory): void;
 }
 
-export const EventsPageModals = ({ modalsStateControl, categories, currentCategory }: EventsPageModalsProps) => {
+export const EventsPageModals = ({
+    modalsStateControl,
+    categories,
+    currentCategory,
+    onAddCategory,
+    onUpdateCategory,
+}: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
     return (
@@ -27,6 +35,7 @@ export const EventsPageModals = ({ modalsStateControl, categories, currentCatego
                 isOpen={modalState.isAddCategoryModalOpen}
                 onClose={closeModalActions.closeAddCategoryModal}
                 categories={categories}
+                onAddCategory={onAddCategory}
             />
 
             <EventCategoryModal
@@ -34,6 +43,7 @@ export const EventsPageModals = ({ modalsStateControl, categories, currentCatego
                 isOpen={modalState.isEditCategoryModalOpen}
                 onClose={closeModalActions.closeEditCategoryModal}
                 categories={categories}
+                onUpdateCategory={onUpdateCategory}
             />
         </>
     );

@@ -137,10 +137,23 @@ describe('updateFundsAmounts', () => {
 
             expect(result.amountUah).toBe('100');
             expect(result.amountUsd).toBe('3');
-            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', '33.5');
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', '33.5', 'uahToUsd');
         });
 
-        it('should not convert amountUsd to amountUah when no error', () => {
+        it('should convert amountUsd to amountUah when no error', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('3.5');
+            mockValidateFundsExpendituresAmount.mockReturnValueOnce(undefined).mockReturnValueOnce(undefined);
+            mockGetConvertedAmount.mockReturnValue('117,25');
+
+            const updater = updateFundsAmounts('amountUsd', '3.5', '33.5', 'change');
+            const result = updater(initialState);
+
+            expect(result.amountUsd).toBe('3.5');
+            expect(result.amountUah).toBe('117,25');
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('3.5', '33.5', 'usdToUah');
+        });
+
+        it('should not convert amountUah when converting amountUsd returns null', () => {
             mockNormalizeFundsExpendituresAmountInput.mockReturnValue('3.5');
             mockValidateFundsExpendituresAmount.mockReturnValueOnce(undefined);
             mockGetConvertedAmount.mockReturnValue(null);
@@ -150,7 +163,7 @@ describe('updateFundsAmounts', () => {
 
             expect(result.amountUsd).toBe('3.5');
             expect(result.amountUah).toBe('100');
-            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('3.5', '33.5', 'usdToUah');
         });
 
         it('should not convert if conversion returns null', () => {
@@ -198,7 +211,7 @@ describe('updateFundsAmounts', () => {
             const result = updater(initialState);
 
             expect(result.amountUah).toBe('100');
-            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', null);
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', null, 'uahToUsd');
         });
     });
 
@@ -300,6 +313,40 @@ describe('updateFundsAmounts', () => {
             expect(result.amountUsd).toBe('');
             expect(result.errors.amountUsd).toBeUndefined();
             expect(result.errors.amountUah).toBe(uahError);
+        });
+
+        it.each([
+            ['change', undefined],
+            ['blur', 'Field is required'],
+        ] as const)('should clear amountUah when amountUsd becomes empty on %s trigger', (trigger, usdError) => {
+            const stateWithUah: FundsAmountsState = {
+                amountUah: '30',
+                amountUsd: '100',
+                errors: {
+                    amountUah: 'Previous UAH error',
+                    amountUsd: 'Previous USD error',
+                },
+            };
+
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('');
+            mockValidateFundsExpendituresAmount.mockImplementation(
+                (value: string, currentTrigger?: 'change' | 'blur' | 'save') => {
+                    if (value === '') {
+                        return currentTrigger === 'blur' ? 'Field is required' : undefined;
+                    }
+
+                    return undefined;
+                },
+            );
+
+            const updater = updateFundsAmounts('amountUsd', '', '33.5', trigger);
+            const result = updater(stateWithUah);
+
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+            expect(result.amountUsd).toBe('');
+            expect(result.amountUah).toBe('');
+            expect(result.errors.amountUah).toBeUndefined();
+            expect(result.errors.amountUsd).toBe(usdError);
         });
 
         it('should apply validation error for non-empty amountUah after clearing', () => {

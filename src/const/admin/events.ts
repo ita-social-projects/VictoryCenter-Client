@@ -55,3 +55,7 @@ export const EVENT_VALIDATION = {
         max: 10000,
     },
 };
+
+export const EVENT_NOTIFICATION_TIMERS = {
+    SYNC_ERROR_MS: 3000,
+};

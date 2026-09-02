@@ -359,7 +359,7 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(getCategoryInput()).toHaveValue('');
     });
 
-    it('auto-fills USD when UAH is entered and shows mismatch message on manual USD change', () => {
+    it('auto-fills USD when UAH is entered and recalculates UAH when USD is changed manually', () => {
         renderModal({ exchangeRate: '40' });
 
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
@@ -369,7 +369,8 @@ describe('AddProgramExpenseRecordModal', () => {
         fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
         fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
 
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+        expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('39960');
+        expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
     });
 
     it('blocks closing the add confirmation dialog when submitting is pending', async () => {

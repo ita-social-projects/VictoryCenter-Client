@@ -4,19 +4,20 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyImageValue, HippotherapyPageContentModel } from '@/types/admin/hippotherapy-page';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
-export const HippotherapyPageTextSchema = Yup.object({
-    text: Yup.string()
-        .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
-        .min(
-            HIPPOTHERAPY_PAGE_TEXT.MIN_LENGTH,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(HIPPOTHERAPY_PAGE_TEXT.MIN_LENGTH),
-        ),
-});
+export const HippotherapyPageTextSchema = (length: number) =>
+    Yup.object({
+        text: Yup.string()
+            .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
+            .min(length, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(length)),
+    });
 
 export const HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS = {
-    validateText: (value: string | null): string | undefined => {
+    validateText: (
+        value: string | null,
+        length: number = HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+    ): string | undefined => {
         try {
-            HippotherapyPageTextSchema.validateSyncAt('text', { text: value });
+            HippotherapyPageTextSchema(length).validateSyncAt('text', { text: value });
             return undefined;
         } catch (error: any) {
             return error.message;
@@ -24,45 +25,54 @@ export const HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS = {
     },
 };
 
-const isValidText = (value: string): boolean => !HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(value);
+const isValidText = (value: string, minLength?: number): boolean =>
+    !HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(value, minLength);
 
-const isValidHtmlText = (value: string): boolean => isValidText(getPlainTextFromHtml(value));
+const isValidHtmlText = (value: string, minLength?: number): boolean =>
+    isValidText(getPlainTextFromHtml(value), minLength);
+
+const isValidTitle = (value: string): boolean => isValidHtmlText(value, HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH);
+
+const isValidOptionalHtmlText = (value: string): boolean =>
+    !getPlainTextFromHtml(value).trim() || isValidHtmlText(value);
 
 const isValidImage = (value: HippotherapyImageValue): boolean => !!(value.image || value.imageId);
 
 export const isHippotherapyPageContentValid = (content: HippotherapyPageContentModel): boolean => {
     return (
         isValidImage(content.introSection) &&
-        isValidHtmlText(content.introSection.title) &&
+        isValidTitle(content.introSection.title) &&
         isValidHtmlText(content.introSection.description) &&
-        isValidHtmlText(content.descriptionSection.title) &&
+        isValidTitle(content.descriptionSection.title) &&
         isValidHtmlText(content.descriptionSection.description) &&
         isValidImage(content.quoteSection) &&
         isValidHtmlText(content.quoteSection.quoteText) &&
-        isValidHtmlText(content.quoteSection.authorName) &&
-        isValidHtmlText(content.hippoventionSection.title) &&
+        isValidOptionalHtmlText(content.quoteSection.authorName) &&
+        isValidTitle(content.hippoventionSection.title) &&
         isValidHtmlText(content.hippoventionSection.description) &&
         isValidImage(content.hippoventionCenterSection) &&
-        isValidHtmlText(content.hippoventionCenterSection.title) &&
-        isValidHtmlText(content.hippoventionCenterSection.description) &&
+        isValidTitle(content.hippoventionCenterSection.title) &&
+        isValidOptionalHtmlText(content.hippoventionCenterSection.description) &&
         isValidHtmlText(content.hippoventionCenterSection.pros) &&
-        isValidHtmlText(content.advantagesSection.title) &&
+        isValidTitle(content.advantagesSection.title) &&
         content.advantagesSection.cards.every((card) => isValidImage(card) && isValidHtmlText(card.description)) &&
-        isValidHtmlText(content.analysisSection.title) &&
+        isValidTitle(content.analysisSection.title) &&
         isValidHtmlText(content.analysisSection.description) &&
-        isValidHtmlText(content.scientificReferencesSection.title) &&
+        isValidTitle(content.scientificReferencesSection.title) &&
         isValidHtmlText(content.scientificReferencesSection.description) &&
         content.scientificReferencesSection.scientificReferences.every(
-            (reference) => isValidText(reference.name) && isValidText(reference.url),
+            (reference) =>
+                isValidText(reference.name, HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH) &&
+                isValidText(reference.url, HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH),
         ) &&
         isValidImage(content.anotherQuoteSection) &&
         isValidHtmlText(content.anotherQuoteSection.quoteText) &&
-        isValidHtmlText(content.anotherQuoteSection.authorName) &&
-        isValidHtmlText(content.participantsSection.title) &&
+        isValidOptionalHtmlText(content.anotherQuoteSection.authorName) &&
+        isValidTitle(content.participantsSection.title) &&
         content.participantsSection.cards.every((card) => isValidImage(card) && isValidHtmlText(card.description)) &&
         isValidImage(content.ethicsSection) &&
-        isValidHtmlText(content.ethicsSection.title) &&
+        isValidTitle(content.ethicsSection.title) &&
         isValidHtmlText(content.ethicsSection.description) &&
-        content.ethicsSection.principles.every(isValidHtmlText)
+        content.ethicsSection.principles.every((principle) => isValidHtmlText(principle))
     );
 };

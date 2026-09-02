@@ -50,6 +50,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'contact-us',
         FULL: '/contact-us',
     },
+    SUPPORT_US: {
+        PATH: 'support-us',
+        FULL: '/support-us',
+    },
     HISTORY: {
         PATH: 'history',
         FULL: '/history',

@@ -14,7 +14,7 @@ import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/
 import { EventCategory } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
-import { EventCategoriesApi } from './event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -71,6 +71,7 @@ export const EventsPageAdmin = () => {
         [],
     );
 
+    // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
         try {
             const fetchedCategories = await EventCategoriesApi.getAll(client);
@@ -88,6 +89,23 @@ export const EventsPageAdmin = () => {
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
+
+    const handleAddCategory = useCallback((newCategory: EventCategory) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
+
+    const handleUpdateCategory = useCallback(
+        (updatedCategory: EventCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+
+            if (selectedCategory?.id === updatedCategory.id) {
+                setSelectedCategory(updatedCategory);
+            }
+        },
+        [selectedCategory?.id],
+    );
 
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
@@ -127,6 +145,8 @@ export const EventsPageAdmin = () => {
                 modalsStateControl={modalsStateControl}
                 categories={categories}
                 currentCategory={selectedCategory}
+                onAddCategory={handleAddCategory}
+                onUpdateCategory={handleUpdateCategory}
             />
         </div>
     );

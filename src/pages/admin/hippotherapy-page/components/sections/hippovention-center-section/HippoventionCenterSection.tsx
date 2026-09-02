@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -8,9 +8,8 @@ import {
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
     HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { useHippotherapySectionFields } from '@/hooks/admin/use-hippotherapy-section-fields/useHippotherapySectionFields';
+import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
+import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
 import './HippoventionCenterSection.scss';
 
@@ -27,21 +26,28 @@ const HippoventionCenterSectionComponent = ({
     onImageError,
     disabled,
 }: HippoventionCenterSectionProps) => {
-    const {
-        imageError,
-        titleError,
-        descriptionError,
-        handleImageErrorChange,
-        handleImageChange,
-        handleTitleChange,
-        handleDescriptionChange,
-    } = useHippotherapySectionFields({ value, onChange, onImageError });
-    const [prosError, setProsError] = useState<string | undefined>();
+    const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
+        value,
+        onChange,
+        onImageError,
+    });
 
-    const handleProsChange = (pros: string) => {
-        onChange({ ...value, pros });
-        setProsError(HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(pros)));
-    };
+    const title = useValidatedRichTextField({
+        value: value.title,
+        onChange: (title) => onChange({ ...value, title }),
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+    });
+
+    const pros = useValidatedRichTextField({
+        value: value.pros,
+        onChange: (pros) => onChange({ ...value, pros }),
+    });
+
+    const description = useValidatedRichTextField({
+        value: value.description,
+        onChange: (description) => onChange({ ...value, description }),
+        isOptional: true,
+    });
 
     return (
         <div className="hippovention-center-section">
@@ -72,9 +78,10 @@ const HippoventionCenterSectionComponent = ({
                         id="hippovention-center-title"
                         name="hippovention-center-title"
                         value={value.title}
-                        onChange={handleTitleChange}
+                        onChange={title.handleChange}
+                        onBlur={title.handleBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE}
-                        error={titleError}
+                        error={title.error}
                         disabled={disabled}
                     />
                 </div>
@@ -87,21 +94,22 @@ const HippoventionCenterSectionComponent = ({
                         id="hippovention-center-pros"
                         name="hippovention-center-pros"
                         value={value.pros}
-                        onChange={handleProsChange}
+                        onChange={pros.handleChange}
+                        onBlur={pros.handleBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS}
-                        error={prosError}
+                        error={pros.error}
                         disabled={disabled}
                     />
                     <RichTextInputGroup
                         className="hippovention-center-section-description"
                         label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
-                        isRequired
                         id="hippovention-center-description"
                         name="hippovention-center-description"
                         value={value.description}
-                        onChange={handleDescriptionChange}
+                        onChange={description.handleChange}
+                        onBlur={description.handleBlur}
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION}
-                        error={descriptionError}
+                        error={description.error}
                         disabled={disabled}
                     />
                 </div>

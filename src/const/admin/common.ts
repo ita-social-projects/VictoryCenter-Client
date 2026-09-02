@@ -23,6 +23,7 @@ export const COMMON_TEXT_ADMIN = {
         UPLOAD_IMAGE: 'Upload image',
         DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
         ADD_FILE_HERE: 'Додайте файл сюди',
+        ENTER_TEXT_PLACEHOLDER: 'Введіть текст...',
         getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
     },
 

@@ -28,6 +28,7 @@
         "messageRequired": "Enter your message",
         "messageMinLengthError": "Minimum 10 characters",
         "submitSuccess": "Your request has been submitted successfully. Please wait for a response.",
-        "submitError": "An error occurred. Please try again later."
+        "submitError": "An error occurred. Please try again later.",
+        "captchaRequired": "Please complete the CAPTCHA verification."
     }
 }

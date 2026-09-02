@@ -8,6 +8,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './RichTextInput.module.scss';
 import {
     MaxLengthPlugin,
@@ -62,7 +63,7 @@ export const RichTextInput = ({
     maxLength,
     disabled = false,
     hideToolbar = false,
-    placeholder = 'Enter text...',
+    placeholder = COMMON_TEXT_ADMIN.INPUT.ENTER_TEXT_PLACEHOLDER,
     className,
     hasError = false,
     trimOnBlur = false,

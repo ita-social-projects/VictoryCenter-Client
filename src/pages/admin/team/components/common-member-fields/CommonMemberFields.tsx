@@ -52,6 +52,7 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     disabled={isSubmitting || formDisabled}
                     error={errors.fullName && Array.isArray(errors.fullName) ? errors.fullName[0] : undefined}
                     maxLimitWarning={TEAM_MEMBER_VALIDATION.fullName.getMaxError()}
+                    showCounterBelow={true}
                 />
             </div>
 

@@ -40,6 +40,10 @@
         }
     }
 
+    &-error-container {
+        color: $error;
+    }
+
     &-save-button {
         width: 100% !important;
     }

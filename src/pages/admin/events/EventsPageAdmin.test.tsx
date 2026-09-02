@@ -6,7 +6,9 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EventCategoriesApi } from './event-categories/event-categories-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventCategory } from '@/types/admin/event-category';
+import { act } from 'react';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -52,13 +54,21 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
+        categories,
         contextMenuOptions,
         onContextMenuOptionSelected,
     }: {
+        categories: EventCategory[];
         contextMenuOptions: { id: string; name: string }[];
         onContextMenuOptionSelected: (id: string) => void;
     }) => (
         <div data-testid="category-bar">
+            {categories.map((category) => (
+                <div key={category.id} data-testid={`category-${category.id}`}>
+                    {category.name}
+                </div>
+            ))}
+
             {contextMenuOptions.map((option) => (
                 <button key={option.id} onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
@@ -68,13 +78,27 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     ),
 }));
 
+const mockOnAddCategory = jest.fn();
+const mockOnUpdateCategory = jest.fn();
+
 jest.mock('./event-page-modals/EventsPageModals', () => ({
-    EventsPageModals: () => <div data-testid="events-page-modals" />,
+    EventsPageModals: ({
+        onAddCategory,
+        onUpdateCategory,
+    }: {
+        onAddCategory: (category: EventCategory) => void;
+        onUpdateCategory: (category: EventCategory) => void;
+    }) => {
+        mockOnAddCategory.mockImplementation(onAddCategory);
+        mockOnUpdateCategory.mockImplementation(onUpdateCategory);
+
+        return <div data-testid="events-page-modals" />;
+    },
 }));
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock('./event-categories/event-categories-api', () => ({
+jest.mock('@/services/api/admin/events/event-categories-api', () => ({
     EventCategoriesApi: {
         getAll: jest.fn(),
     },
@@ -83,12 +107,25 @@ jest.mock('./event-categories/event-categories-api', () => ({
 const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
 
 describe('EventsPageAdmin', () => {
+    const categories: EventCategory[] = [
+        {
+            id: 1,
+            name: 'Category 1',
+        },
+        {
+            id: 2,
+            name: 'Category 2',
+        },
+    ];
+
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
         mockedEventCategoriesApi.getAll.mockResolvedValue([]);
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
+        mockOnAddCategory.mockClear();
+        mockOnUpdateCategory.mockClear();
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -185,5 +222,51 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
 
         expect(mockOpenAddItemModal).toHaveBeenCalledTimes(1);
+    }); 
+
+    it('adds a new category to the categories list', async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+              
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
+        });
+
+        const newCategory: EventCategory = {
+            id: 3,
+            name: 'Category 3',
+        };
+
+        await act(async () => {
+            mockOnAddCategory(newCategory);
+        });
+
+        expect(screen.getByText('Category 3')).toBeInTheDocument();
+    });
+
+    it('updates an existing category in the categories list', async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
+        });
+
+        const updatedCategory: EventCategory = {
+            id: 1,
+            name: 'Updated Category',
+        };
+
+        await act(async () => {
+            mockOnUpdateCategory(updatedCategory);
+        });
+
+        expect(screen.getByText('Updated Category')).toBeInTheDocument();
+        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
 });

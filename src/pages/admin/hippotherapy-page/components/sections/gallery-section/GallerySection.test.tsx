@@ -5,37 +5,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
-            <input
-                data-testid="mock-image-input-file"
-                type="file"
-                disabled={disabled}
-                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
-            />
-            <button type="button" onClick={() => !disabled && setError('image size error')}>
-                Set Error
-            </button>
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
-jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, id, disabled, error }: any) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => !disabled && onChange(e.target.value)}
-                value={value}
-                id={id}
-                disabled={disabled}
-            />
-            {error && <span>{error}</span>}
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/image-input/ImageInput');
 
 jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
@@ -124,6 +96,24 @@ describe('GallerySection', () => {
         fireEvent.click(screen.getAllByRole('button', { name: 'Set Error' })[1]);
 
         expect(onCardImageError).toHaveBeenCalledWith(1, 'image size error');
+    });
+
+    it('shows a card description error on blur', () => {
+        validateTextMock().mockReturnValueOnce('Too short');
+        renderComponent();
+
+        fireEvent.blur(screen.getByTestId('mock-rich-input-test-gallery-card-0-description'));
+
+        expect(screen.getByText('Too short')).toBeInTheDocument();
+    });
+
+    it('does not show an error on the card description when the image input is blurred', () => {
+        validateTextMock().mockReturnValue('Too short');
+        renderComponent();
+
+        fireEvent.blur(screen.getAllByTestId('mock-image-input-file')[0]);
+
+        expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
     it('disables every card input when disabled is true', () => {

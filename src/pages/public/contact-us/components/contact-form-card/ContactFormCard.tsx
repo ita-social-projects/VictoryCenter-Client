@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { contactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
@@ -121,14 +122,18 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 </div>
             )}
             <form
-                className={`${styles['contact-form-card']} ${isPopup ? `${styles['contact-form-card--popup']}` : ''}`}
+                className={classNames(styles['contact-form-card'], {
+                    [styles['contact-form-card--popup']]: isPopup,
+                })}
                 aria-label={title}
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
             >
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.name ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.name,
+                        })}
                     >
                         <input
                             type="text"
@@ -150,7 +155,9 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.email ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.email,
+                        })}
                     >
                         <input
                             type="email"
@@ -172,7 +179,9 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.subject ? ` ${styles['contact-form-field--error']}` : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.subject,
+                        })}
                     >
                         <input
                             type="text"
@@ -199,10 +208,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 </div>
 
                 <div
-                    className={`${styles['contact-form-field-wrapper']} ${styles['contact-form-field-wrapper--textarea']}`}
+                    className={classNames(
+                        styles['contact-form-field-wrapper'],
+                        styles['contact-form-field-wrapper--textarea'],
+                    )}
                 >
                     <label
-                        className={`${styles['contact-form-textarea-field']}${errors.message ? ` ${styles['contact-form-textarea-field--error']}` : ''}`}
+                        className={classNames(styles['contact-form-textarea-field'], {
+                            [styles['contact-form-textarea-field--error']]: errors.message,
+                        })}
                     >
                         <textarea
                             placeholder={messagePlaceholder}

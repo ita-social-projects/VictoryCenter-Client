@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/variables/fonts';
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .modal {
     padding: 40px 30px 44px 30px !important;
@@ -19,7 +19,7 @@
     margin-bottom: 12px;
 }
 
-.categoryChip {
+.category-chip {
     align-self: flex-start;
     box-sizing: border-box;
     display: inline-flex;
@@ -28,77 +28,66 @@
     padding: 4px 12px 5px 17px;
     border: 1px solid c.$blue-500;
     border-radius: 20px;
-    background: c.$solitude;
+    background: c.$blue-25;
     color: c.$blue-500;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0%;
+    @include type.small-text-medium;
     vertical-align: middle;
     margin-bottom: 4px;
 }
 
-.modalTitle {
+.modal-title {
     margin: 0;
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 400;
-    line-height: 24px;
-    letter-spacing: -0.02em;
+    @include type.h4-regular;
     text-align: center;
     vertical-align: middle;
-    font-size: 32px;
     color: c.$blue-900;
     margin-top: 25px;
     margin-bottom: 17px;
 }
 
-.titleInput {
+.title-input {
     margin-bottom: 12px;
 }
 
-.twoColumnContainer {
+.two-column-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin-bottom: 26px;
 }
 
-.leftColumn {
+.left-column {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.datePlaceholder {
+.date-placeholder {
     height: 77px;
 }
 
-.imagePlaceholder {
+.image-placeholder {
     height: 152px;
 }
 
-.linkSectionTitle {
+.link-section-title {
     margin: 0;
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 400;
-    line-height: 1.5;
-    letter-spacing: -0.02em;
-    font-size: 16px;
+    @include type.body-2-regular;
     color: c.$blue-900;
     margin-bottom: 6px;
     margin-left: 12px;
 }
 
-.linkUkr {
+.link-ukr {
     margin-bottom: 5px;
     margin-left: 12px;
 }
 
-.linkEng {
+.link-eng {
     margin-bottom: 8px;
     margin-left: 12px;
 }
 
-.buttonsWrapper {
+.buttons-wrapper {
     display: flex;
     width: 100%;
     gap: 37px;

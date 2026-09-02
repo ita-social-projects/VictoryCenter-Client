@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { ModalMode } from '@/types/admin/common';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryUpdate, EventCategoryDto, EventCategoryCreate } from '@/types/admin/event-category';
 import { Modal } from '@/components/common/modal/Modal';
 import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -24,17 +24,17 @@ interface FormErrorState {
 interface BaseProps {
     isOpen: boolean;
     onClose: () => void;
-    categories: EventCategory[];
+    categories: EventCategoryDto[];
 }
 
 interface AddModalProps extends BaseProps {
     mode: ModalMode.Add;
-    onAddCategory: (category: EventCategory) => void;
+    onAddCategory: (category: EventCategoryDto) => void;
 }
 
 interface EditModalProps extends BaseProps {
     mode: ModalMode.Edit;
-    onUpdateCategory: (category: EventCategory) => void;
+    onUpdateCategory: (category: EventCategoryDto) => void;
 }
 
 export type EventCategoryModalProps = AddModalProps | EditModalProps;
@@ -52,7 +52,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
 
     const [formState, setFormState] = useState<EventCategoryFormValues>(defaultFormState);
     const [errors, setErrors] = useState<FormErrorState>({});
-    const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [initialFormState, setInitialFormState] = useState<EventCategoryFormValues>(defaultFormState);
     const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
@@ -70,7 +70,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
     }, []);
 
     const handleCategoryChange = useCallback(
-        (category: EventCategory) => {
+        (category: EventCategoryDto) => {
             const selected = categories.find((cat) => cat.id === category.id);
 
             if (selected) {
@@ -119,7 +119,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
         setShowCloseConfirmModal(false);
     }, []);
 
-    const isDuplicateName = categories.some((category: EventCategory) => {
+    const isDuplicateName = categories.some((category: EventCategoryDto) => {
         if (mode === ModalMode.Edit) {
             return (
                 category.id !== selectedCategory?.id &&
@@ -175,12 +175,14 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
 
             try {
                 if (mode === ModalMode.Add) {
-                    const newCategory = await EventCategoriesApi.create(client, {
+                    const categoryData: EventCategoryCreate = {
                         name: formState.name.trim(),
-                    });
+                    };
+
+                    const newCategory = await EventCategoriesApi.create(client, categoryData);
                     props.onAddCategory(newCategory);
                 } else {
-                    const categoryData: EventCategory = {
+                    const categoryData: EventCategoryUpdate = {
                         id: selectedCategory!.id,
                         name: formState.name.trim(),
                     };

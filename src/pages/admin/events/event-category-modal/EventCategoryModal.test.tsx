@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EventCategoryModal } from './EventCategoryModal';
 import { ModalMode } from '@/types/admin/common';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto, EventCategoryCreate, EventCategoryUpdate } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
@@ -52,7 +52,7 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
             value={value?.id ?? ''}
             disabled={disabled}
             onChange={(e) => {
-                const selected = options.find((category: EventCategory) => category.id === Number(e.target.value));
+                const selected = options.find((category: EventCategoryDto) => category.id === Number(e.target.value));
 
                 if (selected) {
                     onChange(selected);
@@ -61,7 +61,7 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
         >
             <option value="">{placeholder}</option>
 
-            {options.map((category: EventCategory) => (
+            {options.map((category: EventCategoryDto) => (
                 <option key={category.id} value={category.id}>
                     {category.name}
                 </option>
@@ -116,14 +116,16 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
         ) : null,
 }));
 
-const categories: EventCategory[] = [
+const categories: EventCategoryDto[] = [
     {
         id: 1,
         name: 'Category 1',
+        relatedEventNewsCount: 0,
     },
     {
         id: 2,
         name: 'Category 2',
+        relatedEventNewsCount: 0,
     },
 ];
 
@@ -225,8 +227,7 @@ describe('EventCategoryModal', () => {
         });
 
         it('submits form directly on Save click in Add mode', async () => {
-            const newCategory: EventCategory = {
-                id: 1,
+            const newCategory: EventCategoryCreate = {
                 name: 'New Category',
             };
 

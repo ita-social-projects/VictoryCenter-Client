@@ -76,23 +76,24 @@ export const EventModal = (props: EventModalProps) => {
     }, []);
 
     useEffect(() => {
-        if (!isOpen) {
+        if (isOpen) {
             return;
         }
         setFormState(defaultFormState);
         setErrors({});
+        setShowCloseConfirmModal(false);
     }, [isOpen]);
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleClose} maxWidth="665px" className={styles.modal}>
+            <Modal isOpen={isOpen} onClose={handleClose} maxWidth="665px" className={styles['modal']}>
                 <Modal.Title>
-                    <h2 className={styles.modalTitle}>{EVENTS_TEXT.FORM.MODAL_TITLE}</h2>
+                    <h2 className={styles['modal-title']}>{EVENTS_TEXT.FORM.MODAL_TITLE}</h2>
                 </Modal.Title>
 
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className={styles.container}>
-                        {currentCategory && <span className={styles.categoryChip}>{currentCategory.name}</span>}
+                    <form onSubmit={(e) => e.preventDefault()} className={styles['container']}>
+                        {currentCategory && <span className={styles['category-chip']}>{currentCategory.name}</span>}
 
                         <InputWithCharacterLimitGroup
                             label={EVENTS_TEXT.FORM.LABEL.TITLE}
@@ -118,13 +119,13 @@ export const EventModal = (props: EventModalProps) => {
                             rows={4}
                         />
 
-                        <div className={styles.twoColumnContainer}>
-                            <div className={styles.leftColumn}>
+                        <div className={styles['two-column-container']}>
+                            <div className={styles['left-column']}>
                                 {/*date picker*/}
-                                <div className={styles.datePlaceholder}></div>
+                                <div className={styles['date-placeholder']}></div>
 
                                 {/*image upload*/}
-                                <div className={styles.imagePlaceholder}></div>
+                                <div className={styles['image-placeholder']}></div>
                             </div>
 
                             <div>
@@ -141,9 +142,9 @@ export const EventModal = (props: EventModalProps) => {
                             </div>
                         </div>
 
-                        <div className={styles.divider} />
+                        <div className={styles['divider']} />
 
-                        <h4 className={styles.linkSectionTitle}>{EVENTS_TEXT.FORM.LINKS_SECTION_TITLE}</h4>
+                        <h4 className={styles['link-section-title']}>{EVENTS_TEXT.FORM.LINKS_SECTION_TITLE}</h4>
 
                         <InputWithCharacterLimitGroup
                             label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
@@ -155,7 +156,7 @@ export const EventModal = (props: EventModalProps) => {
                             error={errors.linkUkr}
                             isRequired
                             showCounter={false}
-                            className={styles.linkUkr}
+                            className={styles['link-ukr']}
                         />
 
                         <InputWithCharacterLimitGroup
@@ -167,17 +168,17 @@ export const EventModal = (props: EventModalProps) => {
                             maxLength={EVENT_VALIDATION.link.max}
                             error={errors.linkEng}
                             showCounter={false}
-                            className={styles.linkEng}
+                            className={styles['link-eng']}
                         />
                     </form>
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <div className={styles.buttonsWrapper}>
-                        <Button type="button" buttonStyle="secondary" disabled={true} className={styles.button}>
+                    <div className={styles['buttons-wrapper']}>
+                        <Button type="button" buttonStyle="secondary" disabled={true} className={styles['button']}>
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                         </Button>
-                        <Button type="button" buttonStyle="primary" disabled={true} className={styles.button}>
+                        <Button type="button" buttonStyle="primary" disabled={true} className={styles['button']}>
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>

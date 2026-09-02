@@ -41,7 +41,7 @@ describe('EventsPageModals', () => {
     const closeAddItemModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
-  
+
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
         isEditCategoryModalOpen = false,
@@ -157,6 +157,8 @@ describe('EventsPageModals', () => {
                 modalsStateControl={createModalsStateControl(false, false, true)}
                 categories={categories}
                 currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
             />,
         );
 

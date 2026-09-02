@@ -222,11 +222,11 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
 
         expect(mockOpenAddItemModal).toHaveBeenCalledTimes(1);
-    }); 
+    });
 
     it('adds a new category to the categories list', async () => {
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-              
+
         render(<EventsPageAdmin />);
 
         await waitFor(() => {

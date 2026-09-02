@@ -88,7 +88,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, disabled, onClick, buttonStyle, ...props }: any) => (
+    Button: ({ children, disabled, onClick, ...props }: any) => (
         <button {...props} disabled={disabled} onClick={onClick}>
             {children}
         </button>

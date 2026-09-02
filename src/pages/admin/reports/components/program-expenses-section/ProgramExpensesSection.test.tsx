@@ -421,6 +421,14 @@ describe('ProgramExpensesSection', () => {
         expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).not.toBeInTheDocument();
     });
 
+    it('should refetch read-only data with true when isEditing changes from true to false', () => {
+        const { rerender } = render(<ProgramExpensesSection isEditing={true} exchangeRate="41.25" />);
+
+        expect(mockRefetch).not.toHaveBeenCalledWith(true);
+        rerender(<ProgramExpensesSection isEditing={false} exchangeRate="41.25" />);
+        expect(mockRefetch).toHaveBeenCalledWith(true);
+    });
+
     it('should render filtered empty state when selected program has no matching records', () => {
         render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 

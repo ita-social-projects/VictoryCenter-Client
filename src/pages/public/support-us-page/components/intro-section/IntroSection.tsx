@@ -7,8 +7,9 @@ export const IntroSection: React.FC = () => {
 
     return (
         <section className={styles['intro-section']}>
-            <h1>
+            <h1 className={styles.title}>
                 <span className={styles['highlight-yellow']}>{t('PAGE_TITLE.FIRST_HIGHLIGHT')}</span>
+                <br />
                 <span>{t('PAGE_TITLE.SECOND_TEXT')}</span>
                 <span className={styles['highlight-blue']}>{t('PAGE_TITLE.SECOND_HIGHLIGHT')}</span>
             </h1>

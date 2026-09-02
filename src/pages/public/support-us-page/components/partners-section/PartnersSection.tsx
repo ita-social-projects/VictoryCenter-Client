@@ -19,7 +19,7 @@ export const PartnersSection: React.FC = () => {
             </h2>
             <ul className={styles.list}>
                 {SUPPORT_US_DATA.PARTNERS_DATA.map((partner, index) => (
-                    <li key={partner.IMG} className={styles.item}>
+                    <li key={partner.id} className={styles.item}>
                         <img className={styles.image} src={partner.IMG} alt={partner.ALT} />
                         <p className={styles.caption}>{t(CAPTION_KEYS[index])}</p>
                     </li>

@@ -11,6 +11,8 @@ type ContactUsPageMockData = ContactUsPageContent & {
     subjectPlaceholder: string;
     messagePlaceholder: string;
     submitButton: string;
+    contactFormHeader1?: string;
+    contactFormHeader2?: string;
 };
 
 export const CONTACT_US_PAGE_DATA: ContactUsPageMockData = {
@@ -37,4 +39,6 @@ export const CONTACT_US_PAGE_DATA: ContactUsPageMockData = {
     subjectPlaceholder: 'Тема звернення',
     messagePlaceholder: 'Напишіть ваше повідомлення',
     submitButton: 'Надіслати',
+    contactFormHeader1: 'МИ ЗАВЖДИ',
+    contactFormHeader2: 'ВІДКРИТІ ДЛЯ ВАС',
 };

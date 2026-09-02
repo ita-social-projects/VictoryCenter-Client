@@ -85,6 +85,10 @@ export const EventsPageAdmin = () => {
         fetchCategories();
     }, [fetchCategories]);
 
+    const handleAddEvent = useCallback(() => {
+        openModalActions.openAddItemModal();
+    }, [openModalActions]);
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -96,7 +100,7 @@ export const EventsPageAdmin = () => {
                     onSearchClear={() => null}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={() => null}
+                    onAddItem={handleAddEvent}
                     AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
                     onSuggestionSelect={() => null}
                     languages={allLanguages}
@@ -119,7 +123,11 @@ export const EventsPageAdmin = () => {
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
 
-            <EventsPageModals modalsStateControl={modalsStateControl} categories={categories} />
+            <EventsPageModals
+                modalsStateControl={modalsStateControl}
+                categories={categories}
+                currentCategory={selectedCategory}
+            />
         </div>
     );
 };

@@ -63,6 +63,7 @@ jobs:
             REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}
           build-args: |
             REACT_APP_CF_TURNSTILE_SITE_KEY=${{ secrets.REACT_APP_CF_TURNSTILE_SITE_KEY }}
+            REACT_APP_SIGNALR_PDF_REPORTS_URL: ${{ secrets.REACT_APP_SIGNALR_PDF_REPORTS_URL }}
   manual_approval_deploy:
     needs: docker 
     environment: stage 
@@ -127,7 +128,6 @@ jobs:
         CLOUDFLARE_TURNSTILE_SECRET_KEY: ${{ secrets.CLOUDFLARE_TURNSTILE_SECRET_KEY }}
         CLOUDFLARE_TURNSTILE_SITE_VERIFY_URL: ${{ secrets.CLOUDFLARE_TURNSTILE_SITE_VERIFY_URL }}
         CONTACT_US_EMAIL_OPTIONS_FROM_ADDRESS: ${{ secrets.CONTACT_US_EMAIL_OPTIONS_FROM_ADDRESS }}
-        REACT_APP_SIGNALR_PDF_REPORTS_URL: ${{ secrets.REACT_APP_SIGNALR_PDF_REPORTS_URL }}
       run: |
         docker compose up -d   
   manual_approval_rollback:

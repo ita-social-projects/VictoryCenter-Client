@@ -25,25 +25,9 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
     },
 }));
 
-jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, children, onClose }: any) =>
-        isOpen ? (
-            <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose}>
-                    Close
-                </button>
-                {children}
-            </div>
-        ) : null;
-
-    Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
-
-    Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
-
-    Modal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
-
-    return { Modal };
-});
+jest.mock('@/components/common/modal/Modal', () => ({
+    Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
+}));
 
 jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
     SingleSelectInputGroup: ({ options, onChange, value, placeholder, disabled }: any) => (
@@ -88,32 +72,11 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, disabled, onClick, ...props }: any) => (
-        <button {...props} disabled={disabled} onClick={onClick}>
-            {children}
-        </button>
-    ),
+    Button: require('@/utils/test-mocks/events-modals-mocks').MockButton,
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onClose, onCancel, onConfirm }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <span>{title}</span>
-
-                <button data-testid="confirmation-close" onClick={onClose}>
-                    Close
-                </button>
-
-                <button data-testid="confirmation-cancel" onClick={onCancel}>
-                    Cancel
-                </button>
-
-                <button data-testid="confirmation-confirm" onClick={onConfirm}>
-                    Confirm
-                </button>
-            </div>
-        ) : null,
+    ConfirmationModal: require('@/utils/test-mocks/events-modals-mocks').MockConfirmationModal,
 }));
 
 const categories: EventCategory[] = [

@@ -241,7 +241,7 @@ export const ProgramExpensesSection = ({
                 // Refetch error handled by useDataFetch
             }
         } catch {
-            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error, 5000);
         } finally {
             setIsDeletingRecord(false);
             setRecordToDelete(null);

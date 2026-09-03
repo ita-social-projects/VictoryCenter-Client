@@ -26,6 +26,10 @@ export const HIPPOTHERAPY_PAGE_TEXT = {
     BUTTON: {
         ADD_REFERENCE: 'Додати',
     },
+
+    CONFIRMATION: {
+        DELETE_REFERENCE: 'Видалити наукове дослідження?',
+    },
 };
 
 export const HIPPOTHERAPY_PAGE_CHAR_LIMITS = {

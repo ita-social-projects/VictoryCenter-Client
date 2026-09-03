@@ -1,6 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -44,6 +45,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     const [urlErrors, setUrlErrors] = useState<Record<string, string | undefined>>({});
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
+    const [referenceToDeleteLocalId, setReferenceToDeleteLocalId] = useState<string | null>(null);
 
     const areAllReferencesValid = useMemo(
         () =>
@@ -89,6 +91,39 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         setExpandedIds((prev) => new Set(prev).add(getExpandKey(newReference)));
         setNewReferenceLocalId(newReference.localId);
     }, [onChange, value]);
+
+    const handleDeleteRequest = useCallback((localId: string) => {
+        setReferenceToDeleteLocalId(localId);
+    }, []);
+
+    const handleDeleteCancel = useCallback(() => {
+        setReferenceToDeleteLocalId(null);
+    }, []);
+
+    const handleDeleteConfirm = useCallback(() => {
+        if (!referenceToDeleteLocalId) return;
+
+        const reference = value.scientificReferences.find((item) => item.localId === referenceToDeleteLocalId);
+
+        onChange({
+            ...value,
+            scientificReferences: value.scientificReferences.filter(
+                (item) => item.localId !== referenceToDeleteLocalId,
+            ),
+        });
+
+        if (reference) {
+            const key = getExpandKey(reference);
+            setExpandedIds((prev) => {
+                if (!prev.has(key)) return prev;
+                const next = new Set(prev);
+                next.delete(key);
+                return next;
+            });
+        }
+
+        setReferenceToDeleteLocalId(null);
+    }, [onChange, value, referenceToDeleteLocalId]);
 
     const handleNameChange = (localId: string, name: string) => {
         const scientificReferences = value.scientificReferences.map((reference) =>
@@ -164,6 +199,7 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         urlError={urlErrors[reference.localId]}
                         disabled={disabled}
                         onToggleExpand={handleToggleExpand}
+                        onDelete={handleDeleteRequest}
                         onNameChange={handleNameChange}
                         onUrlChange={handleUrlChange}
                         onNameBlur={handleNameBlur}
@@ -181,6 +217,13 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                     <PlusIcon />
                 </Button>
             </div>
+            <ConfirmationModal
+                isOpen={referenceToDeleteLocalId !== null}
+                title={HIPPOTHERAPY_PAGE_TEXT.CONFIRMATION.DELETE_REFERENCE}
+                onClose={handleDeleteCancel}
+                onCancel={handleDeleteCancel}
+                onConfirm={handleDeleteConfirm}
+            />
         </div>
     );
 };

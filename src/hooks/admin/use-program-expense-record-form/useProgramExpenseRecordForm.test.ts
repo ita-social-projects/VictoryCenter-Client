@@ -269,6 +269,17 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.amountUah).toBe('100');
     });
 
+    it('matches typed text with multiple inner spaces to an existing program option', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('Program   B');
+        });
+
+        expect(result.current.formState.programId).toBe(2);
+        expect(result.current.formState.errors.programId).toBeUndefined();
+    });
+
     describe('edit mode', () => {
         const recordToEdit: ProgramExpensesRecord = {
             id: 1,

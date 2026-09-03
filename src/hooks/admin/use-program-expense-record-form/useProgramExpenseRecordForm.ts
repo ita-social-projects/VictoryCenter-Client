@@ -202,9 +202,9 @@ export const useProgramExpenseRecordForm = ({
 
     const handleProgramInputChange = useCallback(
         (text: string) => {
-            const normalizedText = text.trim().toLowerCase();
+            const normalizedText = text.trim().replace(/\s+/g, ' ').toLowerCase();
             const matchedOption = programOptions.find(
-                (program) => program.name.trim().toLowerCase() === normalizedText,
+                (program) => program.name.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedText,
             );
 
             setFormState((previousState) => ({
@@ -235,7 +235,8 @@ export const useProgramExpenseRecordForm = ({
         return (
             formState.reportingYear !== recordToEdit.reportingYear ||
             formState.programId !== recordToEdit.programId ||
-            formState.programInputValue.trim() !== recordToEdit.programName.trim() ||
+            formState.programInputValue.trim().replace(/\s+/g, ' ') !==
+                recordToEdit.programName.trim().replace(/\s+/g, ' ') ||
             formState.amountUah !== recordToEdit.amountUah ||
             formState.amountUsd !== recordToEdit.amountUsd
         );
@@ -287,7 +288,7 @@ export const useProgramExpenseRecordForm = ({
     }, []);
 
     const submitRecord = useCallback(async (): Promise<boolean> => {
-        const trimmedProgramName = formState.programInputValue.trim();
+        const trimmedProgramName = formState.programInputValue.trim().replace(/\s+/g, ' ');
         const hasProgram = formState.programId !== undefined || trimmedProgramName !== '';
 
         if (!hasProgram || !formState.reportingYear || isSubmitting) return false;

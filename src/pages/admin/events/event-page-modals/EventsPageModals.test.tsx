@@ -11,6 +11,10 @@ jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),
 }));
 
+jest.mock('../delete-event-category-modal/DeleteEventCategoryModal', () => ({
+    DeleteEventCategoryModal: jest.fn(() => <div data-testid="delete-event-category-modal" />),
+}));
+
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
 
 describe('EventsPageModals', () => {

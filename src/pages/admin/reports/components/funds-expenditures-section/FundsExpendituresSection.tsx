@@ -402,11 +402,10 @@ export const FundsExpenditureSection = ({
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
     const programAggregateRow = useMemo<ProgramAggregateRow | null>(() => {
-        if (selectedType !== undefined && selectedType !== 'expense') {
-            return null;
-        }
+        const shouldHideProgramAggregateRow =
+            (selectedType !== undefined && selectedType !== 'expense') || selectedCategoryId !== undefined;
 
-        if (selectedCategoryId !== undefined) {
+        if (shouldHideProgramAggregateRow) {
             return null;
         }
 

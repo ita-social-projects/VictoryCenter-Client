@@ -451,7 +451,7 @@ const setupMockDataFetch = (
             data: data ?? initialData,
             isLoading: loadingBySlot[slot] ?? false,
             error: null,
-            refetch: jest.fn(),
+            refetch: jest.fn().mockResolvedValue(undefined),
         };
     });
 };

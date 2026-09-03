@@ -394,6 +394,9 @@ export const FundsExpenditureSection = ({
             .map((r) => r.id);
     }, [filteredRecords, programCategoryLabel]);
 
+    const isProgramAggregateVisible =
+        (selectedType === undefined || selectedType === 'expense') && selectedCategoryId === undefined;
+
     const isAddIncomeDisabled =
         summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
     const isAddExpenseDisabled =
@@ -845,7 +848,7 @@ export const FundsExpenditureSection = ({
                 isRowActionsDisabled={hasExchangeRateError}
                 onRowEditModeChange={handleRowEditModeChange}
                 onRecordSave={handleRecordSave}
-                programAggregateRow={programAggregateRow}
+                programAggregateRow={isProgramAggregateVisible ? programAggregateRow : null}
                 onProgramYearSave={handleProgramYearSave}
                 onDeleteRecord={handleDeleteClick}
                 selectedRecordIds={selectedRecordIds}

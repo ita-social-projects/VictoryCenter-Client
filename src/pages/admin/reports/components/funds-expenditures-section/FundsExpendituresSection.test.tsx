@@ -229,10 +229,16 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
         onToggleRecordSelection,
         onOpenBulkDelete,
         onProgramYearSave,
+        programAggregateRow,
     }: any) => {
         const { FUNDS_EXPENDITURES_TEXT: FET } = require('@/const/admin/reports');
         return (
-            <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
+            <div
+                data-testid="funds-table"
+                data-record-count={records.length}
+                data-editing={String(isEditing ?? false)}
+                data-has-program-aggregate={String(Boolean(programAggregateRow))}
+            >
                 <input type="checkbox" aria-label="Select all records" onClick={() => onSelectAllToggle?.(true)} />
                 <button
                     data-testid="select-row-1"
@@ -647,6 +653,36 @@ describe('FundsExpenditureSection', () => {
         render(<FundsExpenditureSection />);
 
         expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+    });
+
+    it('should pass the program aggregate row when no filters are selected', () => {
+        render(<FundsExpenditureSection />);
+
+        expect(screen.getByTestId('funds-table')).toHaveAttribute('data-has-program-aggregate', 'true');
+    });
+
+    it('should pass the program aggregate row when expense type is selected', () => {
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('filter-expense'));
+
+        expect(screen.getByTestId('funds-table')).toHaveAttribute('data-has-program-aggregate', 'true');
+    });
+
+    it('should not pass the program aggregate row when income type is selected', () => {
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+
+        expect(screen.getByTestId('funds-table')).toHaveAttribute('data-has-program-aggregate', 'false');
+    });
+
+    it('should not pass the program aggregate row when a category is selected', () => {
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('filter-cat-1'));
+
+        expect(screen.getByTestId('funds-table')).toHaveAttribute('data-has-program-aggregate', 'false');
     });
 
     describe('edit mode', () => {

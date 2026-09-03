@@ -4,6 +4,12 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    &-image-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
 
     &-image {
         position: relative;

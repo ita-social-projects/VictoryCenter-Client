@@ -48,24 +48,26 @@ const HippotherapyQuoteSectionComponent = ({
 
     return (
         <div className="hippotherapy-quote-section">
-            <div className="hippotherapy-quote-section-image">
-                <ImageInput
-                    variant="whoWeAre"
-                    value={value.image}
-                    onChange={handleImageChange}
-                    setError={handleImageErrorChange}
-                    label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                    subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropHeight,
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropWidth,
-                    )}
-                    cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropWidth}
-                    cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropHeight}
-                    minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.minWidth}
-                    minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.minHeight}
-                    style={defaultImageStyle}
-                    disabled={disabled}
-                />
+            <div className="hippotherapy-quote-section-image-container">
+                <div className="hippotherapy-quote-section-image">
+                    <ImageInput
+                        variant="whoWeAre"
+                        value={value.image}
+                        onChange={handleImageChange}
+                        setError={handleImageErrorChange}
+                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropHeight,
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropWidth,
+                        )}
+                        cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropWidth}
+                        cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.cropHeight}
+                        minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.minWidth}
+                        minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.QUOTE.minHeight}
+                        style={defaultImageStyle}
+                        disabled={disabled}
+                    />
+                </div>
                 {imageError && <p className="hippotherapy-quote-section-error">{imageError}</p>}
             </div>
             <div className="hippotherapy-quote-section-fields">

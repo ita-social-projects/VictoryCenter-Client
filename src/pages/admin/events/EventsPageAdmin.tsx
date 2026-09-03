@@ -86,6 +86,10 @@ export const EventsPageAdmin = () => {
         fetchCategories();
     }, [fetchCategories]);
 
+    const handleAddEvent = useCallback(() => {
+        openModalActions.openAddItemModal();
+    }, [openModalActions]);
+
     const handleAddCategory = useCallback((newCategory: EventCategory) => {
         setCategories((prev) => [...prev, newCategory]);
     }, []);
@@ -114,7 +118,7 @@ export const EventsPageAdmin = () => {
                     onSearchClear={() => null}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={() => null}
+                    onAddItem={handleAddEvent}
                     AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
                     onSuggestionSelect={() => null}
                     languages={allLanguages}
@@ -140,6 +144,7 @@ export const EventsPageAdmin = () => {
             <EventsPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
+                currentCategory={selectedCategory}
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
             />

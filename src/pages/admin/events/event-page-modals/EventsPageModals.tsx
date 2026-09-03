@@ -3,11 +3,12 @@ import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsSt
 import { EventCategory } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
+import { EventModal } from '../event-modal/EventModal';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
     categories: EventCategory[];
-
+    currentCategory: EventCategory | null;
     onAddCategory(category: EventCategory): void;
     onUpdateCategory(category: EventCategory): void;
 }
@@ -15,6 +16,7 @@ export interface EventsPageModalsProps {
 export const EventsPageModals = ({
     modalsStateControl,
     categories,
+    currentCategory,
     onAddCategory,
     onUpdateCategory,
 }: EventsPageModalsProps) => {
@@ -22,6 +24,12 @@ export const EventsPageModals = ({
 
     return (
         <>
+            <EventModal
+                isOpen={modalState.isAddModalOpen}
+                onClose={closeModalActions.closeAddItemModal}
+                currentCategory={currentCategory}
+            />
+
             <EventCategoryModal
                 mode={ModalMode.Add}
                 isOpen={modalState.isAddCategoryModalOpen}

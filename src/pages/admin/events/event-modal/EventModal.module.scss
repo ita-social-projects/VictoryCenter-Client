@@ -1,0 +1,102 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.modal {
+    padding: 40px 30px 44px 30px;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: c.$grey-700;
+    margin-bottom: 12px;
+}
+
+.category-chip {
+    @include type.small-text-medium;
+    align-self: flex-start;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 12px 5px 17px;
+    border: 1px solid c.$blue-500;
+    border-radius: 20px;
+    background: c.$blue-25;
+    color: c.$blue-500;
+    vertical-align: middle;
+    margin-bottom: 4px;
+}
+
+.modal-title {
+    @include type.h4-regular;
+    margin: 0;
+    text-align: center;
+    vertical-align: middle;
+    color: c.$blue-900;
+    margin-top: 25px;
+    margin-bottom: 17px;
+}
+
+.title-input {
+    margin-bottom: 12px;
+}
+
+.two-column-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 26px;
+}
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.date-placeholder {
+    height: 77px;
+}
+
+.image-placeholder {
+    height: 152px;
+}
+
+.link-section-title {
+    @include type.body-2-regular;
+    margin: 0;
+    color: c.$blue-900;
+    margin-bottom: 6px;
+    margin-left: 12px;
+}
+
+.link-ukr {
+    margin-bottom: 5px;
+    margin-left: 12px;
+}
+
+.link-eng {
+    margin-bottom: 8px;
+    margin-left: 12px;
+}
+
+.buttons-wrapper {
+    display: flex;
+    width: 100%;
+    gap: 37px;
+    margin-left: 35px;
+}
+
+.action-button {
+    height: 40px !important;
+    width: 241px !important;
+    font-size: 16px;
+    margin: 0 !important;
+}

@@ -51,67 +51,69 @@ const HippoventionCenterSectionComponent = ({
 
     return (
         <div className="hippovention-center-section">
-            <div className="hippovention-center-section-image">
-                <ImageInput
-                    variant="whoWeAre"
-                    value={value.image}
-                    onChange={handleImageChange}
-                    setError={handleImageErrorChange}
-                    label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                    subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropHeight,
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropWidth,
-                    )}
-                    cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropWidth}
-                    cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropHeight}
-                    minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.minWidth}
-                    minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.minHeight}
-                    style={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.HIPPOVENTION_CENTER}
-                    disabled={disabled}
-                />
+            <div className="hippovention-center-section-image-container">
+                <div className="hippovention-center-section-image">
+                    <ImageInput
+                        variant="whoWeAre"
+                        value={value.image}
+                        onChange={handleImageChange}
+                        setError={handleImageErrorChange}
+                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropHeight,
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropWidth,
+                        )}
+                        cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropWidth}
+                        cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.cropHeight}
+                        minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.minWidth}
+                        minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.HIPPOVENTION_CENTER.minHeight}
+                        style={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.HIPPOVENTION_CENTER}
+                        disabled={disabled}
+                    />
 
-                <div className="hippovention-center-section-overlay hippovention-center-section-overlay--top">
-                    <RichTextInputGroup
-                        className="hippovention-center-section-title"
-                        label={COMMON_TEXT_ADMIN.TYPE.TITLE}
-                        isRequired
-                        id="hippovention-center-title"
-                        name="hippovention-center-title"
-                        value={value.title}
-                        onChange={title.handleChange}
-                        onBlur={title.handleBlur}
-                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE}
-                        error={title.error}
-                        disabled={disabled}
-                    />
-                </div>
+                    <div className="hippovention-center-section-overlay hippovention-center-section-overlay--top">
+                        <RichTextInputGroup
+                            className="hippovention-center-section-title"
+                            label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                            isRequired
+                            id="hippovention-center-title"
+                            name="hippovention-center-title"
+                            value={value.title}
+                            onChange={title.handleChange}
+                            onBlur={title.handleBlur}
+                            maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE}
+                            error={title.error}
+                            disabled={disabled}
+                        />
+                    </div>
 
-                <div className="hippovention-center-section-overlay hippovention-center-section-overlay--bottom">
-                    <RichTextInputGroup
-                        className="hippovention-center-section-pros"
-                        label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                        isRequired
-                        id="hippovention-center-pros"
-                        name="hippovention-center-pros"
-                        value={value.pros}
-                        onChange={pros.handleChange}
-                        onBlur={pros.handleBlur}
-                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS}
-                        error={pros.error}
-                        disabled={disabled}
-                    />
-                    <RichTextInputGroup
-                        className="hippovention-center-section-description"
-                        label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
-                        id="hippovention-center-description"
-                        name="hippovention-center-description"
-                        value={value.description}
-                        onChange={description.handleChange}
-                        onBlur={description.handleBlur}
-                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION}
-                        error={description.error}
-                        disabled={disabled}
-                    />
+                    <div className="hippovention-center-section-overlay hippovention-center-section-overlay--bottom">
+                        <RichTextInputGroup
+                            className="hippovention-center-section-pros"
+                            label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                            isRequired
+                            id="hippovention-center-pros"
+                            name="hippovention-center-pros"
+                            value={value.pros}
+                            onChange={pros.handleChange}
+                            onBlur={pros.handleBlur}
+                            maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS}
+                            error={pros.error}
+                            disabled={disabled}
+                        />
+                        <RichTextInputGroup
+                            className="hippovention-center-section-description"
+                            label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
+                            id="hippovention-center-description"
+                            name="hippovention-center-description"
+                            value={value.description}
+                            onChange={description.handleChange}
+                            onBlur={description.handleBlur}
+                            maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION}
+                            error={description.error}
+                            disabled={disabled}
+                        />
+                    </div>
                 </div>
                 {imageError && <p className="hippovention-center-section-error">{imageError}</p>}
             </div>

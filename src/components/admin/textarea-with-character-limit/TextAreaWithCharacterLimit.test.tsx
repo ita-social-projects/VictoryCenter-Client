@@ -213,6 +213,25 @@ describe('TextAreaWithCharacterLimit', () => {
         expect(getTextArea().value).toBe('');
     });
 
+    it('normalises the typed value when normalizeValue is provided', () => {
+        renderTextAreaWithCharacterLimit({
+            value: 'Hello',
+            normalizeValue: (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, ''),
+        });
+
+        typeInTextArea('  Hello   world ');
+
+        expect(getTextArea()).toHaveValue('Hello world ');
+    });
+
+    it('keeps the typed value as is when normalizeValue is not provided', () => {
+        renderTextAreaWithCharacterLimit({ value: 'Hello' });
+
+        typeInTextArea('Hello  world');
+
+        expect(getTextArea()).toHaveValue('Hello  world');
+    });
+
     describe('auto-grow functionality', () => {
         it('does not auto-grow when autoGrow is false (default)', () => {
             renderTextAreaWithCharacterLimit({ autoGrow: false });

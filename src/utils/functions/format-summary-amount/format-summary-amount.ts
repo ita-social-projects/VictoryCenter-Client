@@ -3,5 +3,5 @@ export const formatSummaryAmount = (value?: number): string => {
         return '';
     }
 
-    return Math.trunc(value).toLocaleString('uk-UA');
+    return Math.round(value).toLocaleString('uk-UA');
 };

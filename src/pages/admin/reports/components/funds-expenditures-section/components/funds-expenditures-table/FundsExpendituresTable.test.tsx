@@ -699,7 +699,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
-        it('should show USD mismatch message in the UI when amounts do not match', () => {
+        it('should recalculate UAH and show no mismatch message when USD is changed manually', () => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -707,21 +707,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
             fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
-        });
-
-        it('should clear USD mismatch message from UI when UAH amount is changed', () => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
-            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
-            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
-
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
-
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
-
+            expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('8040');
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
         });
     });
@@ -870,5 +856,15 @@ describe('FundsExpendituresTable program aggregate row', () => {
         fireEvent.click(screen.getByLabelText('Edit record 1'));
 
         expect(screen.getByLabelText('Edit program reporting year')).toBeDisabled();
+    });
+
+    it('should disable bulk delete action when row actions are disabled', () => {
+        renderTable({
+            isEditing: true,
+            isRowActionsDisabled: true,
+            selectedRecordIds: [1, 2],
+        });
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON)).toBeDisabled();
     });
 });

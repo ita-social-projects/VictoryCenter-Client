@@ -180,6 +180,7 @@ export const FundsExpendituresTable = ({
     const [isSavingProgramYear, setIsSavingProgramYear] = useState(false);
     const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
+    const isProgramYearEditing = programYearEdit !== null;
     const {
         rowEditState,
         setRowEditState,
@@ -190,7 +191,7 @@ export const FundsExpendituresTable = ({
         renderAmountEditRow,
     } = useTableRowAmountEdit<RowEditState>({
         isEditing,
-        isRowActionsDisabled,
+        isRowActionsDisabled: isRowActionsDisabled || isProgramYearEditing,
         exchangeRate,
         mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
         isAcceptButtonDisabled: (state) => isAcceptButtonDisabled(state, exchangeRate),
@@ -223,7 +224,7 @@ export const FundsExpendituresTable = ({
 
     const handleStartRowEdit = useCallback(
         (record: EnrichedRecord) => {
-            if (rowEditState || isRowActionsDisabled) {
+            if (rowEditState || programYearEdit || isRowActionsDisabled) {
                 return;
             }
 
@@ -239,7 +240,7 @@ export const FundsExpendituresTable = ({
                 usdMismatchMessage: undefined,
             });
         },
-        [isRowActionsDisabled, rowEditState, setRowEditMode],
+        [isRowActionsDisabled, programYearEdit, rowEditState, setRowEditMode],
     );
 
     const handleStartProgramYearEdit = useCallback(() => {
@@ -437,7 +438,7 @@ export const FundsExpendituresTable = ({
         [moveToTop, rowEditState, programYearEdit],
     );
 
-    const isProgramYearEditing = programYearEdit !== null;
+    const isTableEditing = isAnyRowEditing || isProgramYearEditing;
     const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
@@ -473,6 +474,7 @@ export const FundsExpendituresTable = ({
                     <Button
                         buttonStyle="secondary"
                         className={styles['delete-selected-button']}
+                        disabled={isTableEditing || isRowActionsDisabled}
                         onClick={() => onOpenBulkDelete?.()}
                     >
                         {FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON}
@@ -504,7 +506,7 @@ export const FundsExpendituresTable = ({
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
-                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                    [styles['sortable-disabled']]: isTableEditing,
                                 })}
                                 onClick={() => handleSort('type')}
                             >
@@ -515,7 +517,7 @@ export const FundsExpendituresTable = ({
                             </th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
-                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                    [styles['sortable-disabled']]: isTableEditing,
                                 })}
                                 onClick={() => handleSort('categoryName')}
                             >
@@ -526,7 +528,7 @@ export const FundsExpendituresTable = ({
                             </th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
-                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                    [styles['sortable-disabled']]: isTableEditing,
                                 })}
                                 onClick={() => handleSort('amountUah')}
                             >
@@ -537,7 +539,7 @@ export const FundsExpendituresTable = ({
                             </th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
-                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                    [styles['sortable-disabled']]: isTableEditing,
                                 })}
                                 onClick={() => handleSort('amountUsd')}
                             >
@@ -670,7 +672,7 @@ export const FundsExpendituresTable = ({
                                                     type="checkbox"
                                                     className={styles['row-checkbox']}
                                                     aria-label={`Select record ${record.id}`}
-                                                    disabled={isAnyRowEditing}
+                                                    disabled={isTableEditing}
                                                     checked={selectedIds.includes(record.id)}
                                                     onChange={() => onToggleRecordSelection?.(record.id)}
                                                 />

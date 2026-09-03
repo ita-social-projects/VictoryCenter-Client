@@ -774,6 +774,7 @@ export const FundsExpenditureSection = ({
                         )}
                         error={disclaimerError}
                         rows={3}
+                        autoGrow={true}
                         isRequired
                         className={styles['disclaimer-textarea-group']}
                     />

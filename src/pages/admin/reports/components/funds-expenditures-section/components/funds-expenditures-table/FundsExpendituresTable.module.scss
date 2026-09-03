@@ -163,6 +163,11 @@
     padding: 0 8px;
 }
 
+.actions-td {
+    width: 80px;
+    padding: 0 8px;
+}
+
 .selection-row {
     display: flex;
     align-items: center;
@@ -210,6 +215,41 @@
     width: 20px;
     height: 20px;
     transition: color 0.15s ease;
+}
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+        background-color: c.$light-blue-50;
+    }
+
+    &:active:not(:disabled) {
+        background-color: c.$grey-300;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        background-color: transparent;
+    }
 }
 
 .edit-icon-button,

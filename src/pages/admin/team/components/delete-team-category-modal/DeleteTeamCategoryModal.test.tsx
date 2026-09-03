@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteTeamCategoryModal } from './DeleteTeamCategoryModal';
 import { TeamCategory } from '@/types/admin/team-category';
@@ -126,6 +126,22 @@ const createProps = (overrides: any = {}): any => ({
 const getMockedApi = () => TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 const getMockedUseAdminClient = () => useAdminClient as jest.MockedFunction<typeof useAdminClient>;
 
+const openConfirmationAndConfirm = () => {
+    fireEvent.click(screen.getByTestId('delete-button'));
+    fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+};
+
+const getMainModal = () => screen.getAllByTestId('modal')[0];
+
+const setupSlowDelete = () => {
+    let resolvePromise!: () => void;
+    const slowPromise = new Promise<void>((resolve) => {
+        resolvePromise = resolve;
+    });
+    getMockedApi().delete.mockReturnValue(slowPromise);
+    return () => resolvePromise();
+};
+
 describe('DeleteTeamCategoryModal', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -165,9 +181,7 @@ describe('DeleteTeamCategoryModal', () => {
             const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
 
             rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
-
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(
@@ -183,6 +197,19 @@ describe('DeleteTeamCategoryModal', () => {
             ).not.toBeInTheDocument();
             const categorySelect = screen.getByTestId('category-select') as HTMLSelectElement;
             expect(categorySelect.value).toBe(mockCategoriesWithMembers[0].id.toString());
+        });
+
+        it('resets categoryToConfirm state when parent modal closes while confirmation is open and then reopens', () => {
+            const props = createProps({ categories: mockCategoriesNoMembers });
+            const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
+
+            fireEvent.click(screen.getByTestId('delete-button'));
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeInTheDocument();
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={false} />);
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.YES)).not.toBeInTheDocument();
         });
     });
 
@@ -269,30 +296,23 @@ describe('DeleteTeamCategoryModal', () => {
         });
 
         it('disables delete button during submission', async () => {
-            let resolvePromise: () => void;
-            const slowPromise = new Promise<void>((resolve) => {
-                resolvePromise = resolve;
-            });
-            getMockedApi().delete.mockReturnValue(slowPromise);
-
+            const resolveDelete = setupSlowDelete();
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
-            expect(deleteButton).toBeDisabled();
-            resolvePromise!();
+            expect(within(getMainModal()).getByTestId('delete-button')).toBeDisabled();
+            await act(async () => resolveDelete());
         });
     });
 
     describe('Deletion Workflow', () => {
-        it('calls API and triggers onConfirm when delete is successful', async () => {
+        it('calls API and triggers onConfirm when delete is confirmed in confirmation modal', async () => {
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(getMockedApi().delete).toHaveBeenCalledWith(mockClient, mockCategoriesNoMembers[0].id);
@@ -301,14 +321,13 @@ describe('DeleteTeamCategoryModal', () => {
             });
         });
 
-        it('shows error message when deletion fails', async () => {
+        it('shows error message when deletion fails after confirmation', async () => {
             getMockedApi().delete.mockRejectedValue(new Error('API Error'));
 
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 expect(
@@ -320,24 +339,41 @@ describe('DeleteTeamCategoryModal', () => {
             expect(props.onClose).not.toHaveBeenCalled();
         });
 
-        it('does not attempt deletion when category has team members', () => {
+        it('does not open confirmation modal or call API when category has team members', () => {
             const props = createProps();
             render(<DeleteTeamCategoryModal {...props} />);
 
             const deleteButton = screen.getByTestId('delete-button');
             fireEvent.click(deleteButton);
 
+            expect(
+                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM),
+            ).not.toBeInTheDocument();
             expect(getMockedApi().delete).not.toHaveBeenCalled();
             expect(props.onConfirm).not.toHaveBeenCalled();
             expect(props.onClose).not.toHaveBeenCalled();
         });
 
-        it('does not attempt deletion when no category is selected', () => {
+        it('does not open confirmation modal or call API when no category is selected', () => {
             const props = createProps({ categories: mockCategoriesEmpty });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            fireEvent.click(screen.getByTestId('delete-button'));
+
+            expect(
+                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM),
+            ).not.toBeInTheDocument();
+            expect(getMockedApi().delete).not.toHaveBeenCalled();
+            expect(props.onConfirm).not.toHaveBeenCalled();
+            expect(props.onClose).not.toHaveBeenCalled();
+        });
+
+        it('closes confirmation modal when "NO" is clicked without calling API', () => {
+            const props = createProps({ categories: mockCategoriesNoMembers });
+            render(<DeleteTeamCategoryModal {...props} />);
+
+            fireEvent.click(screen.getByTestId('delete-button'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
 
             expect(getMockedApi().delete).not.toHaveBeenCalled();
             expect(props.onConfirm).not.toHaveBeenCalled();
@@ -366,67 +402,43 @@ describe('DeleteTeamCategoryModal', () => {
             expect(props.onClose).toHaveBeenCalled();
         });
 
-        it('prevents closing during submission', async () => {
-            let resolvePromise: () => void;
-            const slowPromise = new Promise<void>((resolve) => {
-                resolvePromise = resolve;
-            });
-            getMockedApi().delete.mockReturnValue(slowPromise);
-
+        it('prevents closing main modal during submission', async () => {
+            const resolveDelete = setupSlowDelete();
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
-            const closeButton = screen.getByTestId('close-modal');
-            const cancelButton = screen.getByTestId('cancel-button');
-
-            fireEvent.click(closeButton);
-            fireEvent.click(cancelButton);
+            const mainModal = getMainModal();
+            fireEvent.click(within(mainModal).getByTestId('close-modal'));
+            fireEvent.click(within(mainModal).getByTestId('cancel-button'));
 
             expect(props.onClose).not.toHaveBeenCalled();
-            resolvePromise!();
+            await act(async () => resolveDelete());
         });
 
         it('disables cancel button during submission', async () => {
-            let resolvePromise: () => void;
-            const slowPromise = new Promise<void>((resolve) => {
-                resolvePromise = resolve;
-            });
-            getMockedApi().delete.mockReturnValue(slowPromise);
-
+            const resolveDelete = setupSlowDelete();
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
-            const cancelButton = screen.getByTestId('cancel-button');
-            expect(cancelButton).toBeDisabled();
-
-            resolvePromise!();
+            expect(within(getMainModal()).getByTestId('cancel-button')).toBeDisabled();
+            await act(async () => resolveDelete());
         });
     });
 
     describe('Select Input Properties', () => {
         it('disables select input during submission', async () => {
-            let resolvePromise: () => void;
-            const slowPromise = new Promise<void>((resolve) => {
-                resolvePromise = resolve;
-            });
-            getMockedApi().delete.mockReturnValue(slowPromise);
-
+            const resolveDelete = setupSlowDelete();
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
-
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
             const categorySelect = screen.getByTestId('category-select');
             expect(categorySelect).toBeDisabled();
-
-            resolvePromise!();
+            await act(async () => resolveDelete());
         });
     });
 
@@ -457,9 +469,7 @@ describe('DeleteTeamCategoryModal', () => {
 
             const props = createProps({ categories: mockCategoriesNoMembers });
             render(<DeleteTeamCategoryModal {...props} />);
-
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
+            openConfirmationAndConfirm();
 
             await waitFor(() => {
                 const errorContainer = document.querySelector('.team-category-modal-error-container');

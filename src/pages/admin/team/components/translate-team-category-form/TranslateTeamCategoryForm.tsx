@@ -94,7 +94,11 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
         };
 
         const handleNameBlur = () => {
-            const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+            const normalized = formState.name.trim().replace(/\s+/g, ' ');
+            if (normalized !== formState.name) {
+                setFormState((prev) => ({ ...prev, name: normalized }));
+            }
+            const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(normalized);
             setErrors((prev) => ({ ...prev, name: error }));
         };
 
@@ -103,7 +107,11 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
         };
 
         const handleDescriptionBlur = () => {
-            const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(formState.description);
+            const normalized = formState.description.trim().replace(/\s+/g, ' ');
+            if (normalized !== formState.description) {
+                setFormState((prev) => ({ ...prev, description: normalized }));
+            }
+            const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(normalized);
             setErrors((prev) => ({ ...prev, description: error }));
         };
 
@@ -138,6 +146,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
                     maxLength={TEAM_CATEGORY_VALIDATION.name.max}
                     name={'name'}
                     id={'name'}
+                    showCounterBelow={true}
                 />
 
                 <TextAreaWithCharacterLimitGroup

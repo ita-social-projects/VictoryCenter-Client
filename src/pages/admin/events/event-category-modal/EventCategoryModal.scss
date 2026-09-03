@@ -1,0 +1,50 @@
+@use '@/assets/sass/variables/colors' as *;
+
+.event-category-modal {
+    &-form {
+        overflow-y: visible;
+
+        .singleselect-options {
+            max-height: 120px;
+            overflow-y: auto;
+            scrollbar-color: $grey-800 transparent;
+
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+                border-radius: 8px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: $grey-600;
+                border-radius: 8px;
+
+                &:hover {
+                    background-color: $grey-800;
+                }
+            }
+        }
+
+        &.expandable-dropdown {
+            .singleselect-options {
+                position: absolute;
+                z-index: 100;
+            }
+
+            .input-group:has(.singleselect-options) {
+                margin-bottom: 126px;
+            }
+        }
+    }
+
+    &-error-container {
+        color: $error;
+    }
+
+    &-save-button {
+        width: 100% !important;
+    }
+}

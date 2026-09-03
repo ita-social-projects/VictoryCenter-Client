@@ -8,6 +8,7 @@ import {
     validateProgramExpenseProgram,
     validateProgramExpenseReportingYear,
 } from '@/validation/admin/reports-schema/program-expenses-record-schema/program-expenses-record-schema';
+import { normalizeFundsExpendituresAmountInput } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 
 interface ProgramExpenseFormState {
     reportingYear: string | undefined;
@@ -130,22 +131,15 @@ export const useProgramExpenseRecordForm = ({
         }
     }, [formState.programId, isOpen, programOptions, recordToEdit]);
 
-    const handleAmountChange = useCallback(
-        (value: string) => {
-            setFormState((previousState) => ({
-                ...previousState,
-                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(previousState),
-            }));
-            setUsdMismatchMessage(undefined);
-        },
-        [exchangeRate, setUsdMismatchMessage],
-    );
+    const handleAmountFieldChange = useCallback(
+        (field: 'amountUah' | 'amountUsd') => (value: string) => {
+            const normalizedValue = normalizeFundsExpendituresAmountInput(value, false, false, {
+                whitespaceOnly: true,
+            });
 
-    const handleUsdChange = useCallback(
-        (value: string) => {
             setFormState((previousState) => ({
                 ...previousState,
-                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(previousState),
+                ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change')(previousState),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -343,8 +337,7 @@ export const useProgramExpenseRecordForm = ({
         handleProgramChange,
         handleProgramInputChange,
         handleProgramBlur,
-        handleAmountChange,
-        handleUsdChange,
+        handleAmountFieldChange,
         handleAmountBlur,
         handleOpenAddConfirmation,
         handleCloseConfirmation,

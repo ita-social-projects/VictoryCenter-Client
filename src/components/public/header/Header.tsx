@@ -50,9 +50,7 @@ export const Header = () => {
 
                             <Link to={PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL}>{t('STORIES_OF_VICTORIES')}</Link>
 
-                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable" style={{ visibility: 'hidden' }}>
-                                {t('HOW_TO_SUPPORT')}
-                            </Link>
+                            <Link to={PUBLIC_ROUTES.SUPPORT_US.FULL}>{t('HOW_TO_SUPPORT')}</Link>
                         </nav>
                     </div>
 

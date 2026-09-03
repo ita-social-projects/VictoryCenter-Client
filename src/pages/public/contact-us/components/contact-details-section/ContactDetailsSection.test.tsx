@@ -2,6 +2,12 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ContactDetailsSection } from './ContactDetailsSection';
 
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+}));
+
 jest.mock(
     './contact-details-section.module.scss',
     () =>
@@ -37,7 +43,6 @@ const DEFAULT_PROPS = {
     email: 'victorycenter@gmail.com',
     phone: '+380 50 334 4448',
     address: 'Kyiv, Khreshchatyk str., 2',
-    motto: 'VICTORY STARTS WITH YOU',
     socialLinks: [{ label: 'Instagram', url: 'https://instagram.com/victorycenterua' }],
     copyEmailLabel: 'Copy email',
     copyPhoneLabel: 'Copy phone',
@@ -72,7 +77,7 @@ describe('ContactDetailsSection', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
 
             expect(onCopyEmail).toHaveBeenCalledTimes(1);
-            expect(screen.getByRole('status')).toHaveTextContent('Скопійовано');
+            expect(screen.getByRole('status')).toHaveTextContent('COPIED_GLOBAL_MESSAGE');
         });
 
         it('shows snackbar and calls callback on phone copy click', () => {
@@ -82,7 +87,7 @@ describe('ContactDetailsSection', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Copy phone' }));
 
             expect(onCopyPhone).toHaveBeenCalledTimes(1);
-            expect(screen.getByRole('status')).toHaveTextContent('Скопійовано');
+            expect(screen.getByRole('status')).toHaveTextContent('COPIED_GLOBAL_MESSAGE');
         });
 
         it('hides snackbar after 2 seconds', () => {

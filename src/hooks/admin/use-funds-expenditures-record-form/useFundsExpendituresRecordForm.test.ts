@@ -75,8 +75,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -96,33 +96,32 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.amountUsd).toBe('');
     });
 
-    it('blocks submit when UAH and USD amounts mismatch the exchange rate', () => {
+    it('recalculates UAH and enables submit when USD is changed manually', () => {
         const { result } = renderUseFundsForm();
 
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUsd')('15');
         });
 
         act(() => {
             result.current.handleAmountBlur('amountUsd');
         });
 
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-        expect(result.current.isSubmitDisabled).toBe(true);
+        expect(result.current.formState.amountUah).toBe('150');
+        expect(result.current.usdMismatchMessage).toBeUndefined();
+        expect(result.current.isSubmitDisabled).toBe(false);
     });
 
-    it('blocks handleConfirmAdd on mismatch even without a preceding USD blur', async () => {
+    it('submits successfully after USD is changed manually without a preceding blur', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUsd')('15');
         });
 
         expect(result.current.usdMismatchMessage).toBeUndefined();
@@ -131,8 +130,13 @@ describe('useFundsExpendituresRecordForm', () => {
             await result.current.handleConfirmAdd();
         });
 
-        expect(onSubmit).not.toHaveBeenCalled();
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(onSubmit).toHaveBeenCalledWith({
+            categoryId: 3,
+            reportingYear: '2026',
+            amountUah: '150',
+            amountUsd: '15',
+            type: 'income',
+        });
     });
 
     it('blocks submit and surfaces required error when reporting year is missing', async () => {
@@ -141,8 +145,8 @@ describe('useFundsExpendituresRecordForm', () => {
 
         act(() => {
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         expect(result.current.isSubmitDisabled).toBe(true);
@@ -155,26 +159,32 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
-    it('disables submit button and blocks save when USD amount does not match UAH exchange rate', async () => {
+    it('recalculates UAH and allows save when USD amount is changed with a different exchange rate', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ exchangeRate: '45.00', onSubmit });
 
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('450');
-            result.current.handleUsdChange('15');
+            result.current.handleAmountFieldChange('amountUsd')('15');
             result.current.handleAmountBlur('amountUsd');
         });
 
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-        expect(result.current.isSubmitDisabled).toBe(true);
+        expect(result.current.formState.amountUah).toBe('675');
+        expect(result.current.usdMismatchMessage).toBeUndefined();
+        expect(result.current.isSubmitDisabled).toBe(false);
 
         await act(async () => {
             await result.current.handleConfirmAdd();
         });
 
-        expect(onSubmit).not.toHaveBeenCalled();
+        expect(onSubmit).toHaveBeenCalledWith({
+            categoryId: 3,
+            reportingYear: '2026',
+            amountUah: '675',
+            amountUsd: '15',
+            type: 'income',
+        });
     });
 
     it('sets reporting year required error on blur', () => {
@@ -204,8 +214,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -228,8 +238,8 @@ describe('useFundsExpendituresRecordForm', () => {
 
         act(() => {
             result.current.handleReportingYearChange('2026');
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {
@@ -261,8 +271,8 @@ describe('useFundsExpendituresRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleCategoryChange(3);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountFieldChange('amountUah')('100');
+            result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
         await act(async () => {

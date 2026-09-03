@@ -4,16 +4,16 @@ import { Image, ImageValues } from '../common/image';
 // Enums
 
 export enum MetricPrefix {
-    None = 'None',
-    Plus = 'Plus',
-    Percent = 'Percent',
+    None = 0,
+    Plus = 1,
+    Percent = 2,
 }
 
 export enum MetricType {
-    Partners = 'Partners',
-    Programs = 'Programs',
-    Raised = 'Raised',
-    TherapyHours = 'TherapyHours',
+    Partners = 0,
+    Programs = 1,
+    Raised = 2,
+    TherapyHours = 3,
 }
 
 // Public DTOs

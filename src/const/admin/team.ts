@@ -107,19 +107,21 @@ export const TEAM_IMAGE_PLACEHOLDER = {
 
 export const TEAM_CATEGORY_VALIDATION = {
     name: {
-        min: 10,
+        min: 5,
         max: 20,
         getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.name.max} символів`,
         getDuplicateNameError: () => COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
+        getNoSpacesError: () => 'Назва не повинна містити пробіли на початку або в кінці',
     },
     description: {
-        min: 10,
+        min: 5,
         max: 200,
         getRequiredError: () => 'Опис обов’язковий',
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.description.max} символів`,
+        getNoSpacesError: () => 'Опис не повинен містити пробіли на початку або в кінці',
     },
     teamMembersCount: {
         getHasTeamMembersCountError: (count: number) => `Категорія містить ${count} членів команди`,

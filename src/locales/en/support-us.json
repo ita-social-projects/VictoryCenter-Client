@@ -1,0 +1,35 @@
+{
+  "PAGE_TITLE": {
+    "FIRST_HIGHLIGHT": "YOUR ACTION",
+    "SECOND_TEXT": "IS SOMEONE'S",
+    "SECOND_HIGHLIGHT": "SUPPORT"
+  },
+  "PAGE_DESCRIPTION": "Every donation, every letter, every kind act is a piece of a great victory. Here you'll find ways to support those who learn to live anew every day.",
+  "PARTNERS": {
+    "TITLE": "WHO CAN BECOME A PARTNER?",
+    "DESCRIPTION": {
+      "FIRST_TEXT": "Public and charitable organizations and communities of veterans and veterans' families who strive to create positive changes through hippotherapy and equine therapy",
+      "SECOND_TEXT": "Businesses and media that want to support social initiatives",
+      "THIRD_TEXT": "People whose values are close to ours"
+    }
+  },
+  "SUPPORT_INQUIRY": {
+    "TITLE": "DO YOU HAVE A QUESTION OR WANT TO JOIN US?",
+    "DESCRIPTION": {
+      "FIRST_TEXT": "We are open to dialogue. Write to us if you are looking for support, want to become a partner, volunteer, or simply find out more.",
+      "SECOND_BOLD_TEXT": "Perhaps, your letter will be the beginning of a great change — for someone, or maybe even for you."
+    },
+    "FORM": {
+      "NAME": "Enter your name",
+      "EMAIL": "Enter your email for contact",
+      "SUBJECT": "Enter the subject of your inquiry",
+      "MESSAGE": "Write your message",
+      "SUBMIT_BUTTON": "Send"
+    }
+  },
+  "DONATE": {
+    "TITLE": "TOGETHER WE CAN DO MORE",
+    "DESCRIPTION": "Your contribution is not just numbers in reports. It is saved stories, restored hearts, and new hopes. Join those who are changing lives.",
+    "SUBMIT_BUTTON": "Donate"
+  }
+}

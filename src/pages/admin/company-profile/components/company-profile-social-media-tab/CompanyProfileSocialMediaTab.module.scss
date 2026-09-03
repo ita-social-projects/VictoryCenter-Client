@@ -138,3 +138,11 @@
         fill: currentColor;
     }
 }
+
+.social-media-tab-container :global(.tooltip-popup) {
+    width: 197px;
+    height: 80px;
+    padding: 8px 12px;
+    gap: 4px;
+    line-height: 24px;
+}

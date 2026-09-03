@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useState, useEffect, useRef } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
@@ -16,6 +16,7 @@ import { EntityLocalization, LocalizationLanguage } from '@/types/common/languag
 import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import styles from './PartnerSectionForm.module.scss';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import './PartnerSectionForm.scss';
 
 export interface PartnerSectionFormValues {
@@ -66,9 +67,24 @@ const PartnerSectionComponent = ({
     translatedContent,
     disableStructuralActions = false,
 }: PartnerSectionProps) => {
+    const [partnerToDeleteLocalId, setPartnerToDeleteLocalId] = useState<string | null>(null);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
     const displayedTitle = isBaseLanguage ? value.title : (translatedContent?.title ?? '');
     const displayedDescription = isBaseLanguage ? value.description : (translatedContent?.description ?? '');
+
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (disabled && partnerToDeleteLocalId !== null && isMounted.current) {
+            setPartnerToDeleteLocalId(null);
+        }
+    }, [disabled, partnerToDeleteLocalId]);
 
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -129,30 +145,44 @@ const PartnerSectionComponent = ({
         [value, errors, onChange],
     );
 
-    const handlePartnerDelete = useCallback(
+    const handlePartnerDeleteRequest = useCallback(
         (localId: string) => {
             if (disableStructuralActions) return;
-
-            const indexToDelete = value.partners.findIndex((p) => p.localId === localId);
-            if (indexToDelete === -1) return;
-
-            const partnerToDelete = value.partners[indexToDelete];
-            const updatedDeletedIds = [...(value.deletedPartnerIds || [])];
-
-            if (partnerToDelete.partnerId) {
-                updatedDeletedIds.push(partnerToDelete.partnerId);
-            }
-
-            const newPartners = value.partners.filter((p) => p.localId !== localId);
-            const newPartnerErrors = errors.partners.filter((_, i) => i !== indexToDelete);
-
-            onChange(
-                { ...value, partners: newPartners, deletedPartnerIds: updatedDeletedIds },
-                { ...errors, partners: newPartnerErrors },
-            );
+            setPartnerToDeleteLocalId(localId);
         },
-        [value, errors, onChange, disableStructuralActions],
+        [disableStructuralActions],
     );
+
+    const handleCancelPartnerDelete = useCallback(() => {
+        setPartnerToDeleteLocalId(null);
+    }, []);
+
+    const handleConfirmPartnerDelete = useCallback(() => {
+        if (disabled || disableStructuralActions || !partnerToDeleteLocalId) return;
+
+        const indexToDelete = value.partners.findIndex((p) => p.localId === partnerToDeleteLocalId);
+        if (indexToDelete === -1) {
+            setPartnerToDeleteLocalId(null);
+            return;
+        }
+
+        const partnerToDelete = value.partners[indexToDelete];
+        const updatedDeletedIds = [...(value.deletedPartnerIds || [])];
+
+        if (partnerToDelete.partnerId) {
+            updatedDeletedIds.push(partnerToDelete.partnerId);
+        }
+
+        const newPartners = value.partners.filter((p) => p.localId !== partnerToDeleteLocalId);
+        const newPartnerErrors = errors.partners.filter((_, i) => i !== indexToDelete);
+
+        onChange(
+            { ...value, partners: newPartners, deletedPartnerIds: updatedDeletedIds },
+            { ...errors, partners: newPartnerErrors },
+        );
+
+        setPartnerToDeleteLocalId(null);
+    }, [value, errors, onChange, partnerToDeleteLocalId, disableStructuralActions, disabled]);
 
     const handleDelete = useCallback(() => {
         if (disableStructuralActions) return;
@@ -243,7 +273,7 @@ const PartnerSectionComponent = ({
                         errors={errors.partners[index] || {}}
                         disabled={disabled}
                         onValuesChange={handlePartnerChange}
-                        onDelete={handlePartnerDelete}
+                        onDelete={handlePartnerDeleteRequest}
                         language={language}
                         translatedDescription={
                             translatedContent?.partners.find((p) => p.partnerId === partner.partnerId)?.description
@@ -286,6 +316,14 @@ const PartnerSectionComponent = ({
                     </Button>
                 )}
             </div>
+
+            <ConfirmationModal
+                isOpen={partnerToDeleteLocalId !== null}
+                onClose={handleCancelPartnerDelete}
+                title={PARTNERS_TEXT.FORM.TITLE.DELETE_PARTNER}
+                onConfirm={handleConfirmPartnerDelete}
+                onCancel={handleCancelPartnerDelete}
+            />
         </div>
     );
 };

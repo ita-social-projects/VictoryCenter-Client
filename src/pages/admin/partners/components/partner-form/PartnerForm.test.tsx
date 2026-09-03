@@ -40,6 +40,17 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
             >
                 Set Error
             </button>
+            <button
+                type="button"
+                data-testid={`${id}-set-large-error`}
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    setError(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
+                }}
+                disabled={disabled}
+            >
+                Set Large Error
+            </button>
         </div>
     ),
 }));
@@ -114,6 +125,7 @@ describe('PartnerForm', () => {
     const getImageChangeButton = () => screen.getByTestId(`${imageTestId}-change`);
     const getImageRemoveButton = () => screen.getByTestId(`${imageTestId}-remove`);
     const getImageSetErrorButton = () => screen.getByTestId(`${imageTestId}-set-error`);
+    const getImageSetLargeErrorButton = () => screen.getByTestId(`${imageTestId}-set-large-error`);
     const getDeleteButton = () => screen.queryByTestId(`partner-form-delete-button-${cardHtmlId}`);
     const getDescriptionError = () => screen.queryByTestId(`${descriptionTestId}-error`);
     const getImageError = () => screen.queryByTestId('input-error');
@@ -124,6 +136,7 @@ describe('PartnerForm', () => {
     const clickImageChange = () => fireEvent.click(getImageChangeButton());
     const clickImageRemove = () => fireEvent.click(getImageRemoveButton());
     const clickImageSetError = () => fireEvent.click(getImageSetErrorButton());
+    const clickImageSetLargeError = () => fireEvent.click(getImageSetLargeErrorButton());
     const clickDelete = () => {
         const button = getDeleteButton();
         if (button) fireEvent.click(button);
@@ -229,6 +242,16 @@ describe('PartnerForm', () => {
         expect(onValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { ...defaultErrors, image: errorToSet });
     });
 
+    it('ignores ImageDimensionsTooLargeError from ImageInput', () => {
+        renderComponent({
+            errors: { ...defaultErrors, image: undefined },
+        });
+
+        clickImageSetLargeError();
+
+        expect(onValuesChange).not.toHaveBeenCalled();
+    });
+
     it('renders errors when provided', () => {
         const errors: PartnerFormErrors = {
             description: 'Description is required',
@@ -255,6 +278,7 @@ describe('PartnerForm', () => {
         expect(getImageChangeButton()).toBeDisabled();
         expect(getImageRemoveButton()).toBeDisabled();
         expect(getImageSetErrorButton()).toBeDisabled();
+        expect(getImageSetLargeErrorButton()).toBeDisabled();
         expect(getDescriptionTextarea()).toBeDisabled();
     });
 
@@ -266,6 +290,7 @@ describe('PartnerForm', () => {
         expect(getImageChangeButton()).toBeDisabled();
         expect(getImageRemoveButton()).toBeDisabled();
         expect(getImageSetErrorButton()).toBeDisabled();
+        expect(getImageSetLargeErrorButton()).toBeDisabled();
     });
 
     it('falls back to an empty description when no translation exists yet', () => {
@@ -281,6 +306,7 @@ describe('PartnerForm', () => {
         clickImageChange();
         clickImageRemove();
         clickImageSetError();
+        clickImageSetLargeError();
 
         expect(onValuesChange).not.toHaveBeenCalled();
     });

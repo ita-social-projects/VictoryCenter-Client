@@ -243,7 +243,13 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                                             [styles['row-drop-target']]:
                                                 dropTargetId === file.id && draggingId !== file.id,
                                         })}
-                                        draggable={files.length > 1 && !isDeleting && !isRenaming && !isReordering}
+                                        draggable={
+                                            files.length > 1 &&
+                                            !isDeleting &&
+                                            !isRenaming &&
+                                            !isReordering &&
+                                            editingFileId !== file.id
+                                        }
                                         onDragStart={(e) => handleDragStart(e, file.id)}
                                         onDragOver={(e) => handleDragOver(e, file.id)}
                                         onDragLeave={handleDragLeave}
@@ -374,7 +380,6 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                 onConfirm={handleDeleteConfirm}
                 onCancel={handleDeleteCancel}
                 isButtonsDisabled={isDeleting}
-                className="delete-file-confirmation-modal"
             />
         </div>
     );

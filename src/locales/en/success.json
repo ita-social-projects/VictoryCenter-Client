@@ -1,19 +1,19 @@
 {
     "SLOGAN": {
-        "FIRST_TEXT": "Від",
-        "SECOND_TEXT": "першого",
-        "THIRD_TEXT": "знайомства",
-        "FOURTH_TEXT": "до",
-        "FIFTH_TEXT": "історії",
-        "SIXTH_TEXT": "успіху"
+        "FIRST_TEXT": "From",
+        "SECOND_TEXT": "first",
+        "THIRD_TEXT": "meeting",
+        "FOURTH_TEXT": "to",
+        "FIFTH_TEXT": "success",
+        "SIXTH_TEXT": "story"
     },
     "REVIEWS": {
-        "TITLE": "Що кажуть учасники"
+        "TITLE": "What the participants say"
     },
     "ARTICLES": {
-        "READ_STORY": "Прочитати історію"
+        "READ_STORY": "Read the story"
     },
     "VIDEO_SECTION": {
-        "TITLE": "Відеовідгуки"
+        "TITLE": "Video reviews"
     }
 }

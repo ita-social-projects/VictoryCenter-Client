@@ -23,9 +23,11 @@ import { FaqPanel } from '@/pages/admin/faq/FaqPanel';
 import { HippotherapyPage } from '@/pages/public/hippotherapy-page/HippotherapyPage';
 import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
+import { EventsPageAdmin } from '@/pages/admin/events/EventsPageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
 import { ContactUsPage } from '@/pages/public/contact-us';
+import { SupportUsPage } from '@/pages/public/support-us-page/SupportUsPage';
 import { CompanyProfileContent } from '@/pages/admin/company-profile/components/company-profile-content/CompanyProfileContent';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
@@ -34,6 +36,7 @@ import { HistoryPageContent } from '@/pages/admin/history/components/history-pag
 import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
 import { MainPage } from '@/pages/public/main-page/MainPage';
 import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
+import { HippotherapyPageAdmin } from '@/pages/admin/hippotherapy-page/HippotherapyPageAdmin';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -51,6 +54,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
             <Route path={PUBLIC_ROUTES.STORIES_OF_VICTORIES.PATH} element={<StoriesOfVictoryPage />} />
             <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />
+            <Route path={PUBLIC_ROUTES.SUPPORT_US.PATH} element={<SupportUsPage />} />
             <Route path={PUBLIC_ROUTES.HISTORY.PATH} element={<HistoryPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
@@ -86,11 +90,13 @@ export const AppRouter = () => {
                             <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
                             <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
                             <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
+                            <Route path={ADMIN_ROUTES.EVENTS.PATH} element={<EventsPageAdmin />} />
                             <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
                             <Route path={ADMIN_ROUTES.PROFILE_COMPANY.PATH} element={<CompanyProfileContent />} />
                             <Route path={ADMIN_ROUTES.REPORTS.PATH} element={<ReportsPanelContent />} />
                             <Route path={ADMIN_ROUTES.HISTORY.PATH} element={<HistoryPageContent />} />
                             <Route path={ADMIN_ROUTES.MAIN.PATH} element={<MainPageContent />} />
+                            <Route path={ADMIN_ROUTES.HIPPOTHERAPY.PATH} element={<HippotherapyPageAdmin />} />
                         </Route>
                     </Route>
                 </Route>

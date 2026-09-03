@@ -108,11 +108,15 @@ export const useFundsExpendituresRecordForm = ({
         [records, transactionType],
     );
 
-    const handleAmountChange = useCallback(
-        (value: string) => {
+    const handleAmountFieldChange = useCallback(
+        (field: 'amountUah' | 'amountUsd') => (value: string) => {
+            const normalizedValue = normalizeFundsExpendituresAmountInput(value, false, false, {
+                whitespaceOnly: true,
+            });
+
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(prev),
+                ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change')(prev),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -122,17 +126,6 @@ export const useFundsExpendituresRecordForm = ({
     const handleAmountBlur = useCallback(
         (field: 'amountUah' | 'amountUsd') => handleAmountBlurBase(field, setFormState),
         [handleAmountBlurBase],
-    );
-
-    const handleUsdChange = useCallback(
-        (value: string) => {
-            setFormState((prev) => ({
-                ...prev,
-                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(prev),
-            }));
-            setUsdMismatchMessage(undefined);
-        },
-        [exchangeRate, setUsdMismatchMessage],
     );
 
     const handleSubmit = useCallback(async () => {
@@ -280,9 +273,8 @@ export const useFundsExpendituresRecordForm = ({
         handleReportingYearBlur,
         handleCategoryChange,
         handleCategoryBlur,
-        handleAmountChange,
+        handleAmountFieldChange,
         handleAmountBlur,
-        handleUsdChange,
         handleOpenAddConfirmation,
         handleConfirmAdd,
         handleCloseConfirmation,

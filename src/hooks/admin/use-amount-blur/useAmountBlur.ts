@@ -2,10 +2,6 @@ import { useCallback, useState } from 'react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
-import {
-    normalizeFundsExpendituresAmountInput,
-    validateFundsExpendituresAmount,
-} from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 
 export const getUsdMismatchMessage = (
     amountUah: string,
@@ -23,40 +19,23 @@ export const useAmountBlur = (exchangeRate: string | null, customMismatchMessage
             setFormState: React.Dispatch<React.SetStateAction<any>>,
             suppressMismatchCheck = false,
         ) => {
-            if (field === 'amountUsd') {
-                setFormState((prev: any) => {
-                    const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(prev.amountUsd, true);
-                    const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'blur');
-
-                    setUsdMismatchMessage(
-                        suppressMismatchCheck
-                            ? undefined
-                            : getUsdMismatchMessage(
-                                  prev.amountUah,
-                                  normalizedAmountUsd,
-                                  exchangeRate,
-                                  customMismatchMessage,
-                              ),
-                    );
-
-                    return {
-                        ...prev,
-                        amountUsd: normalizedAmountUsd,
-                        errors: {
-                            ...prev.errors,
-                            amountUsd: amountUsdError,
-                        },
-                    };
-                });
-                return;
-            }
-
             setFormState((prev: any) => {
                 const updated = {
                     ...prev,
                     ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur')(prev),
                 };
-                setUsdMismatchMessage(undefined);
+
+                setUsdMismatchMessage(
+                    !suppressMismatchCheck
+                        ? getUsdMismatchMessage(
+                              updated.amountUah,
+                              updated.amountUsd,
+                              exchangeRate,
+                              customMismatchMessage,
+                          )
+                        : undefined,
+                );
+
                 return updated;
             });
         },

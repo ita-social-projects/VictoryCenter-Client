@@ -104,7 +104,11 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     }, []);
 
     const handleNameBlur = useCallback(() => {
-        const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        const normalized = formState.name.trim().replace(/\s+/g, ' ');
+        if (normalized !== formState.name) {
+            setFormState((prev) => ({ ...prev, name: normalized }));
+        }
+        const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(normalized);
         setErrors((prev) => ({ ...prev, name: error }));
     }, [formState.name]);
 
@@ -114,7 +118,11 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     }, []);
 
     const handleDescriptionBlur = useCallback(() => {
-        const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(formState.description);
+        const normalized = formState.description.trim().replace(/\s+/g, ' ');
+        if (normalized !== formState.description) {
+            setFormState((prev) => ({ ...prev, description: normalized }));
+        }
+        const error = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(normalized);
         setErrors((prev) => ({ ...prev, description: error }));
     }, [formState.description]);
 
@@ -201,7 +209,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             const selected = categories.find((cat) => cat.id === category.id);
             if (selected) {
                 setSelectedCategory(selected);
-                reset({ name: selected.name, description: selected.description });
+                reset({ name: selected.name.trim(), description: selected.description.trim() });
             } else {
                 setSelectedCategory(null);
                 reset({ name: '', description: '' });
@@ -217,7 +225,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             if (categories.length > 0) {
                 const firstCategory = categories[0];
                 setSelectedCategory(firstCategory);
-                reset({ name: firstCategory.name, description: firstCategory.description });
+                reset({ name: firstCategory.name.trim(), description: firstCategory.description.trim() });
             } else {
                 setSelectedCategory(null);
                 reset({ name: '', description: '' });
@@ -305,6 +313,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                             id={getFieldId('name')}
                             maxLength={TEAM_CATEGORY_VALIDATION.name.max}
                             disabled={isSubmitting}
+                            showCounterBelow={true}
                         />
 
                         <TextAreaWithCharacterLimitGroup

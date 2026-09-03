@@ -6,9 +6,10 @@ import { EventCategoriesApi } from '@/services/api/admin/events/event-categories
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: jest.fn(() => ({})),
+    useAdminClient: jest.fn(),
 }));
 
 jest.mock('@/services/api/admin/events/event-categories-api', () => ({
@@ -96,6 +97,7 @@ describe('DeleteEventCategoryModal', () => {
 
     const onClose = jest.fn();
     const onConfirm = jest.fn();
+    const client = {};
 
     const renderModal = () => {
         render(
@@ -105,6 +107,7 @@ describe('DeleteEventCategoryModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (useAdminClient as jest.Mock).mockReturnValue(client);
     });
 
     it('renders delete modal with category select and action buttons', () => {
@@ -230,7 +233,7 @@ describe('DeleteEventCategoryModal', () => {
             expect(EventCategoriesApi.delete).toHaveBeenCalledTimes(1);
         });
 
-        expect(EventCategoriesApi.delete).toHaveBeenCalledWith(undefined, 1);
+        expect(EventCategoriesApi.delete).toHaveBeenCalledWith(client, 1);
         expect(onConfirm).toHaveBeenCalledTimes(1);
         expect(onConfirm).toHaveBeenCalledWith(1);
         expect(onClose).toHaveBeenCalledTimes(1);

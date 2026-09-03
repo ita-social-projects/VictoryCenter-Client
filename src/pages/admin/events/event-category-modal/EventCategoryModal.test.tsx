@@ -227,8 +227,10 @@ describe('EventCategoryModal', () => {
         });
 
         it('submits form directly on Save click in Add mode', async () => {
-            const newCategory: EventCategoryCreate = {
+            const newCategory: EventCategoryDto = {
+                id: 3,
                 name: 'New Category',
+                relatedEventNewsCount: 0,
             };
 
             (EventCategoriesApi.create as jest.Mock).mockResolvedValue(newCategory);
@@ -341,7 +343,11 @@ describe('EventCategoryModal', () => {
         });
 
         it('shows save confirmation modal and submits on confirm in Edit mode', async () => {
-            const updatedCategory = { id: 1, name: 'Updated Category' };
+            const updatedCategory: EventCategoryDto = {
+                id: 1,
+                name: 'Updated Category',
+                relatedEventNewsCount: 0,
+            };
             (EventCategoriesApi.update as jest.Mock).mockResolvedValue(updatedCategory);
 
             render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} />);

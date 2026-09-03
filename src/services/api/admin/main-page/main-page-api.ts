@@ -71,7 +71,7 @@ export const MainPageApi = {
         id: number,
         dto: UpdateSingleMetricDto,
     ): Promise<UpdateMetricResult> => {
-        const response = await client.patch<UpdateMetricResult>(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${id}`, dto);
+        const response = await client.put<UpdateMetricResult>(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${id}`, dto);
         return response.data;
     },
 

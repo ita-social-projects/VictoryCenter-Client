@@ -4,11 +4,12 @@ import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
+import { EventModal } from '../event-modal/EventModal';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
     categories: EventCategoryDto[];
-
+    currentCategory: EventCategoryDto | null;
     onAddCategory(category: EventCategoryDto): void;
     onUpdateCategory(category: EventCategoryDto): void;
     onDeleteCategory(categoryId: number): void;
@@ -17,6 +18,7 @@ export interface EventsPageModalsProps {
 export const EventsPageModals = ({
     modalsStateControl,
     categories,
+    currentCategory,
     onAddCategory,
     onUpdateCategory,
     onDeleteCategory,
@@ -25,6 +27,12 @@ export const EventsPageModals = ({
 
     return (
         <>
+            <EventModal
+                isOpen={modalState.isAddModalOpen}
+                onClose={closeModalActions.closeAddItemModal}
+                currentCategory={currentCategory}
+            />
+
             <EventCategoryModal
                 mode={ModalMode.Add}
                 isOpen={modalState.isAddCategoryModalOpen}

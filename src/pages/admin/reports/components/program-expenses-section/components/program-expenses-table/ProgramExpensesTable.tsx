@@ -57,9 +57,6 @@ interface ProgramExpenseRowEditState {
     usdMismatchMessage?: string;
 }
 
-const READ_ONLY_TABLE_COLUMNS_COUNT = 5;
-const EDITING_TABLE_COLUMNS_COUNT = 7;
-
 const isAcceptButtonDisabled = (
     rowEditState: ProgramExpenseRowEditState | null,
     exchangeRate?: string | null,
@@ -113,7 +110,12 @@ export const ProgramExpensesTable = ({
     const selectedVisibleRecordIds = visibleRecordIds.filter((id) => selectedRecordIds.includes(id));
     const areAllVisibleRecordsSelected = records.length > 0 && selectedVisibleRecordIds.length === records.length;
     const hasSelectedVisibleRecords = selectedVisibleRecordIds.length > 0;
-    const tableColumnsCount = isEditing ? EDITING_TABLE_COLUMNS_COUNT : READ_ONLY_TABLE_COLUMNS_COUNT;
+
+    const showCheckboxColumn = isEditing && !hasNoRecords;
+    const showProgramColumn = !hasNoRecords;
+
+    const tableColumnsCount = 4 + (showCheckboxColumn ? 1 : 0) + (showProgramColumn ? 1 : 0) + (isEditing ? 1 : 0);
+
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
 
     const {
@@ -326,17 +328,18 @@ export const ProgramExpensesTable = ({
             >
                 <table className={styles.table}>
                     <colgroup>
-                        {isEditing && <col className={styles['column-checkbox']} />}
+                        {showCheckboxColumn && <col className={styles['column-checkbox']} />}
                         <col className={styles['column-year']} />
                         <col className={styles['column-type']} />
-                        <col className={styles['column-program']} />
+                        {showProgramColumn && <col className={styles['column-program']} />}
                         <col className={styles['column-amount']} />
                         <col className={styles['column-amount']} />
                         {isEditing && <col className={styles['column-actions']} />}
                     </colgroup>
+
                     <thead>
                         <tr>
-                            {isEditing && (
+                            {showCheckboxColumn && (
                                 <th className={cn(styles.th, styles['checkbox-th'])}>
                                     <input
                                         ref={headerCheckboxRef}
@@ -349,11 +352,19 @@ export const ProgramExpensesTable = ({
                                     />
                                 </th>
                             )}
+
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
+
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</th>
-                            <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM}</th>
+
+                            {showProgramColumn && (
+                                <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM}</th>
+                            )}
+
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</th>
+
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</th>
+
                             {isEditing && (
                                 <th className={cn(styles.th, styles['actions-th'])}>
                                     {PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS}
@@ -361,6 +372,7 @@ export const ProgramExpensesTable = ({
                             )}
                         </tr>
                     </thead>
+
                     <tbody>
                         {hasNoRecords ? (
                             <ProgramExpensesEmptyState
@@ -372,6 +384,7 @@ export const ProgramExpensesTable = ({
                         ) : (
                             records.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
+
                                 return (
                                     <tr key={record.id} className={styles.tr}>
                                         {isEditing && (
@@ -386,12 +399,15 @@ export const ProgramExpensesTable = ({
                                                 />
                                             </td>
                                         )}
+
                                         <td className={styles.td}>{record.reportingYear}</td>
+
                                         <td className={styles.td}>
                                             <span className={styles['type-chip']}>
                                                 {PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL}
                                             </span>
                                         </td>
+
                                         <td className={cn(styles.td, { [styles['category-edit-td']]: isEditedRow })}>
                                             {isEditedRow ? (
                                                 <div
@@ -412,6 +428,7 @@ export const ProgramExpensesTable = ({
                                                             value={undefined}
                                                             name={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
                                                         />
+
                                                         {programs.map((program) => (
                                                             <Select.Option
                                                                 key={program.id}
@@ -420,6 +437,7 @@ export const ProgramExpensesTable = ({
                                                             />
                                                         ))}
                                                     </Select>
+
                                                     {rowEditState.errors.programId && (
                                                         <p className={styles['category-edit-error']}>
                                                             {rowEditState.errors.programId}
@@ -430,6 +448,7 @@ export const ProgramExpensesTable = ({
                                                 record.programName
                                             )}
                                         </td>
+
                                         {renderAmountEditRow(
                                             record,
                                             () => handleAcceptRowEdit(record),
@@ -443,6 +462,7 @@ export const ProgramExpensesTable = ({
                     </tbody>
                 </table>
             </div>
+
             <button
                 type="button"
                 className={cn(styles['to-top-button'], {

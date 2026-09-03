@@ -143,6 +143,24 @@ describe('MainStatisticsSection', () => {
         expect(screen.getByText(/грн/)).toBeInTheDocument();
     });
 
+    it('formats numeric enum values from the API with configured suffixes and currency', () => {
+        const stats = makeStatistics({
+            metrics: [
+                makeMetric(1, 20, 'партнерств', 0 as MetricType, 1 as MetricPrefix),
+                makeMetric(2, 1249854, 'зібрано', 2 as MetricType, 0 as MetricPrefix),
+            ],
+        });
+
+        render(<MainStatisticsSection impactStatistics={stats} />);
+
+        act(() => {
+            (globalThis as any).__triggerVisible();
+        });
+
+        expect(screen.getByText('20+')).toBeInTheDocument();
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
+    });
+
     it('uses localized metric name when available for current language', () => {
         const stats = makeStatistics({
             metrics: [

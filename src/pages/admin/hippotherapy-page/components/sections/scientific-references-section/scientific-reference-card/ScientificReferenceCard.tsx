@@ -21,6 +21,7 @@ export interface ScientificReferenceCardProps {
     disabled?: boolean;
     isExpanded: boolean;
     onToggleExpand: (localId: string) => void;
+    onDelete: (localId: string) => void;
     onNameChange: (localId: string, value: string) => void;
     onUrlChange: (localId: string, value: string) => void;
     onNameBlur: (localId: string) => void;
@@ -38,6 +39,7 @@ export const ScientificReferenceCard = ({
     disabled,
     isExpanded,
     onToggleExpand,
+    onDelete,
     onNameChange,
     onUrlChange,
     onNameBlur,
@@ -54,7 +56,6 @@ export const ScientificReferenceCard = ({
 
     return (
         <div ref={cardRef} className="scientific-reference-card">
-            {/* Delete is disabled for now — placeholders only, no functionality yet. */}
             <div className="scientific-reference-card-top-row">
                 <button
                     type="button"
@@ -72,6 +73,7 @@ export const ScientificReferenceCard = ({
                         aria-label="Delete reference"
                         DefaultIcon={ACTION_ICONS.delete.default}
                         FilledIcon={ACTION_ICONS.delete.hover}
+                        onClick={() => onDelete(localId)}
                         disabled={disabled}
                     />
                 )}

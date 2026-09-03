@@ -220,6 +220,7 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     FundsExpendituresTable: ({
         records,
         isEditing,
+        programAggregateRow,
         selectedRecordIds = [],
         eligibleRecordIds = [],
         onRecordSave,
@@ -232,7 +233,12 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     }: any) => {
         const { FUNDS_EXPENDITURES_TEXT: FET } = require('@/const/admin/reports');
         return (
-            <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
+            <div
+                data-testid="funds-table"
+                data-record-count={records.length}
+                data-editing={String(isEditing ?? false)}
+                data-has-aggregate-row={String(Boolean(programAggregateRow))}
+            >
                 <input type="checkbox" aria-label="Select all records" onClick={() => onSelectAllToggle?.(true)} />
                 <button
                     data-testid="select-row-1"
@@ -1548,5 +1554,34 @@ describe('FundsExpenditureSection fetch handler delegation', () => {
 
         expect(mockProgramExpensesSummaryGet).toHaveBeenCalledWith(stableAdminClient, {});
         expect(result).toEqual({ totalAmountUah: 500, totalAmountUsd: 200 });
+    });
+});
+
+describe('FundsExpenditureSection aggregate row visibility', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('should show aggregate row for unfiltered and expense views, but hide for income view', () => {
+        render(<FundsExpenditureSection />);
+        const table = screen.getByTestId('funds-table');
+
+        expect(table).toHaveAttribute('data-has-aggregate-row', 'true');
+
+        fireEvent.click(screen.getByTestId('filter-expense'));
+        expect(table).toHaveAttribute('data-has-aggregate-row', 'true');
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+        expect(table).toHaveAttribute('data-has-aggregate-row', 'false');
+    });
+
+    it('should hide aggregate row for income view in edit mode', () => {
+        render(<FundsExpenditureSection isEditing />);
+        const table = screen.getByTestId('funds-table');
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+        expect(table).toHaveAttribute('data-has-aggregate-row', 'false');
     });
 });

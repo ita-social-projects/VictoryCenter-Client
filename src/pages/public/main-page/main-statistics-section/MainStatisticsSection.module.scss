@@ -36,43 +36,82 @@
 
 .content-block {
     background-color: c.$light-blue-300;
-    padding: 40px 16px 32px;
+    padding: 120px 16px 85px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 60px;
 
-    @media (min-width: 768px) {
-        padding: 48px 32px 40px;
+    @media (min-width: 560px) {
+        padding: 120px 63px 68px;
     }
 
-    @media (min-width: 1024px) {
-        padding: 56px 56px 48px;
+    @media (min-width: 768px) {
+        padding: 180px 54px 40px;
     }
 
     @media (min-width: 1440px) {
-        padding: 64px 168px 56px;
+        padding: 150px 56px 105px;
     }
 }
 
 .title {
-    @include type.h2-bold-uppercase;
+    @include type.h3-display-extrabold-uppercase;
     color: c.$white;
     text-align: center;
 
+    @media (min-width: 560px) {
+        @include type.h2-extrabold-uppercase;
+    }
+
     @media (min-width: 768px) {
-        @include type.h1-bold-uppercase;
+        @include type.h1-extrabold-uppercase;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.h1-display-extrabold-uppercase;
     }
 }
 
 .metrics-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 24px;
 
-    @media (min-width: 768px) {
-        flex-direction: row;
+     @media (min-width: 560px) {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 24px;
+        row-gap: 40px;
+
+        .metric:nth-child(3),
+        .metric:nth-child(4) {
+            grid-column: 1 / -1;
+        }
+    }
+
+     @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 32px;
+        row-gap: 40px;
+
+        .metric:nth-child(3) {
+            grid-column: auto;
+        }
+
+        .metric:nth-child(4) {
+            grid-column: 1 / -1;
+        }
+    }
+
+     @media (min-width: 1440px) {
+        grid-template-columns: repeat(4, max-content);
         justify-content: space-between;
-        gap: 0;
+        column-gap: 24px;
+        row-gap: 0;
+
+        .metric:nth-child(3),
+        .metric:nth-child(4) {
+            grid-column: auto;
+        }
     }
 }
 
@@ -82,25 +121,36 @@
     align-items: center;
     text-align: center;
     gap: 4px;
-
-    @media (min-width: 768px) {
-        align-items: flex-start;
-        text-align: left;
-    }
 }
 
 .metric-value {
     @include type.h3-bold;
     color: c.$blue-700;
     display: block;
+    white-space: nowrap;
+
+    @media (min-width: 560px) {
+        @include type.h2-bold;
+    }
 
     @media (min-width: 768px) {
         @include type.h2-bold;
     }
+    @media (min-width: 1440px) {
+        @include type.h2-bold
+    }
 }
 
 .metric-name {
-    @include type.body-1-regular;
+    @include type.body-2-regular;
     color: c.$blue-700;
     display: block;
+
+    @media (min-width: 568px) {
+        @include type.body-1-regular;
+    }
+
+    @media (min-width: 768px) {
+        @include type.subtitle-2-medium;
+    }
 }

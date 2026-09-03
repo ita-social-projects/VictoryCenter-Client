@@ -30,22 +30,24 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
 }));
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
-    AdminPanelToolbar: ({ placeholder, AddItemButtonText }: AdminPanelToolbarProps<any>) => (
+    AdminPanelToolbar: ({ placeholder, AddItemButtonText, onAddItem }: AdminPanelToolbarProps<any>) => (
         <div data-testid="events-toolbar">
             <span>{placeholder}</span>
-            <span>{AddItemButtonText}</span>
+            <button onClick={onAddItem}>{AddItemButtonText}</button>
         </div>
     ),
 }));
 
 const mockOpenAddCategoryModal = jest.fn();
 const mockOpenEditCategoryModal = jest.fn();
+const mockOpenAddItemModal = jest.fn();
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => ({
         openModalActions: {
             openAddCategoryModal: mockOpenAddCategoryModal,
             openEditCategoryModal: mockOpenEditCategoryModal,
+            openAddItemModal: mockOpenAddItemModal,
         },
     }),
 }));
@@ -127,6 +129,7 @@ describe('EventsPageAdmin', () => {
         mockedEventCategoriesApi.getAll.mockResolvedValue([]);
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
+        mockOpenAddItemModal.mockClear();
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
         mockOnDeleteCategory.mockClear();
@@ -212,6 +215,20 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
         expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
+    });
+
+    it('opens add event modal when add event button is clicked', async () => {
+        const user = userEvent.setup();
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
+
+        await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
+
+        expect(mockOpenAddItemModal).toHaveBeenCalledTimes(1);
     });
 
     it('adds a new category to the categories list', async () => {

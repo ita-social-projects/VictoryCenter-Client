@@ -392,7 +392,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
-        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        RECORD_DELETE_FAILED_RETRY: 'Помилка при видаленні запису. Спробуйте ще раз',
         AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     BULK: {

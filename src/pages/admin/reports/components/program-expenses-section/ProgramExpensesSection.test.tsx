@@ -578,6 +578,7 @@ describe('ProgramExpensesSection', () => {
             expect(mockAddToast).toHaveBeenCalledWith(
                 PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
                 'error',
+                5000,
             );
             expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
         });

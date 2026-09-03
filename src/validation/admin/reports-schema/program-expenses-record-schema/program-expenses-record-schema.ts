@@ -46,17 +46,22 @@ export const validateProgramExpenseProgram = ({
     }
 
     if (programId === undefined) {
-        return PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(trimmedProgramName);
+        const nameValidationError = PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(trimmedProgramName);
+        if (nameValidationError) {
+            return nameValidationError;
+        }
     }
 
     const hasDuplicate = records.some((item) => {
         if (item.id === recordId) return false;
 
-        const isSameId = item.programId === programId;
+        const isSameId = programId !== undefined && item.programId === programId;
         const isSameName =
+            Boolean(trimmedProgramName) &&
             item.programName.trim().replace(/\s+/g, ' ').toLowerCase() === trimmedProgramName.toLowerCase();
 
         return isSameId || isSameName;
     });
+
     return hasDuplicate ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE : undefined;
 };

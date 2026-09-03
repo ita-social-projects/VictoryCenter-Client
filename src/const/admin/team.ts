@@ -109,7 +109,7 @@ export const TEAM_CATEGORY_VALIDATION = {
     name: {
         min: 5,
         max: 20,
-        getRequiredError: () => 'Назва обов’язкова',
+        getRequiredError: () => "Поле обов'язкове",
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.name.max} символів`,
         getDuplicateNameError: () => COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
@@ -118,7 +118,7 @@ export const TEAM_CATEGORY_VALIDATION = {
     description: {
         min: 5,
         max: 200,
-        getRequiredError: () => 'Опис обов’язковий',
+        getRequiredError: () => "Поле обов'язкове",
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.description.max} символів`,
         getNoSpacesError: () => 'Опис не повинен містити пробіли на початку або в кінці',

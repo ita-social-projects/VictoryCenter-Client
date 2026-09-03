@@ -55,13 +55,16 @@ export const CategoryCombobox = ({
         }
     };
 
-    const normalizedQuery = inputValue.trim().toLowerCase();
+    const normalizedQuery = inputValue.trim().replace(/\s+/g, ' ').toLowerCase();
 
     const filteredOptions = useMemo(
         () =>
             normalizedQuery === ''
                 ? options
-                : options.filter((option) => option.name.toLowerCase().includes(normalizedQuery)),
+                : options.filter((option) => {
+                      const normalizedOptionName = option.name.trim().replace(/\s+/g, ' ').toLowerCase();
+                      return normalizedOptionName.includes(normalizedQuery);
+                  }),
         [options, normalizedQuery],
     );
 

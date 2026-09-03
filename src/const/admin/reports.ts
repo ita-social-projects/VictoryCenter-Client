@@ -366,7 +366,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Така категорія вже додана, Оберіть іншу категорію',
+        PROGRAM_UNIQUE: 'Така категорія вже додана. Оберіть іншу категорію',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',

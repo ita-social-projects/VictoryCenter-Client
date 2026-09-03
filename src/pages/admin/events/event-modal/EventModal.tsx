@@ -4,7 +4,7 @@ import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { useCallback, useState, useEffect } from 'react';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import styles from './EventModal.module.scss';
 import { Button } from '@/components/admin/button/Button';
@@ -25,7 +25,7 @@ type EventFormErrorState = Partial<Record<keyof EventFormValues, string>>;
 export type EventModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    currentCategory: EventCategory | null;
+    currentCategory: EventCategoryDto | null;
 };
 
 const defaultFormState: EventFormValues = {

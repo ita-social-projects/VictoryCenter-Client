@@ -37,9 +37,10 @@ describe('EventsPageModals', () => {
         },
     ];
 
-    const currentCategory: EventCategory | null = {
+    const currentCategory: EventCategoryDto | null = {
         id: 1,
         name: 'Category 1',
+        relatedEventNewsCount: 0,
     };
 
     const closeAddCategoryModal = jest.fn();
@@ -169,6 +170,7 @@ describe('EventsPageModals', () => {
                 currentCategory={currentCategory}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
             />,
         );
 

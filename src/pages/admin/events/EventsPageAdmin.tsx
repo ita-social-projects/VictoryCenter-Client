@@ -90,12 +90,12 @@ export const EventsPageAdmin = () => {
     }, [fetchCategories]);
 
     const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-      setCategories((prev) => [...prev, newCategory]);
+        setCategories((prev) => [...prev, newCategory]);
     }, []);
 
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
-    }, [openModalActions]);     
+    }, [openModalActions]);
 
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {

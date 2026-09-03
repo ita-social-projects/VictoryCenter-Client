@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { EventModal } from './EventModal';
-import { EventCategory } from '@/types/admin/event-category';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
@@ -41,9 +41,10 @@ jest.mock(
     }),
 );
 
-const currentCategory: EventCategory | null = {
+const currentCategory: EventCategoryDto | null = {
     id: 1,
     name: 'Category 1',
+    relatedEventNewsCount: 0,
 };
 
 const defaultProps = {

@@ -216,6 +216,20 @@ describe('MainPageApi (Admin)', () => {
         });
     });
 
+    describe('updateMetric()', () => {
+        it('should call PUT to the correct metric endpoint and return the response data', async () => {
+            const metricId = 42;
+            const dto = { value: 100 };
+            const responseData = { wasModified: true, updatedFields: ['Value'] };
+            mockClient.put.mockResolvedValueOnce({ data: responseData });
+
+            const result = await MainPageApi.updateMetric(mockClient, metricId, dto);
+
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${metricId}`, dto);
+            expect(result).toEqual(responseData);
+        });
+    });
+
     describe('reorderMetrics()', () => {
         it('should call PUT to correct reorder endpoint', async () => {
             const dto: ReorderMetricsDto = { statisticId: 1, orderedIds: [3, 2, 1] };

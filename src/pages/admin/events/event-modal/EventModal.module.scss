@@ -2,7 +2,7 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .modal {
-    padding: 40px 30px 44px 30px !important;
+    padding: 40px 30px 44px 30px;
 }
 
 .container {
@@ -20,6 +20,7 @@
 }
 
 .category-chip {
+    @include type.small-text-medium;
     align-self: flex-start;
     box-sizing: border-box;
     display: inline-flex;
@@ -30,14 +31,13 @@
     border-radius: 20px;
     background: c.$blue-25;
     color: c.$blue-500;
-    @include type.small-text-medium;
     vertical-align: middle;
     margin-bottom: 4px;
 }
 
 .modal-title {
-    margin: 0;
     @include type.h4-regular;
+    margin: 0;
     text-align: center;
     vertical-align: middle;
     color: c.$blue-900;
@@ -70,8 +70,8 @@
 }
 
 .link-section-title {
-    margin: 0;
     @include type.body-2-regular;
+    margin: 0;
     color: c.$blue-900;
     margin-bottom: 6px;
     margin-left: 12px;
@@ -94,7 +94,7 @@
     margin-left: 35px;
 }
 
-.button {
+.action-button {
     height: 40px !important;
     width: 241px !important;
     font-size: 16px;

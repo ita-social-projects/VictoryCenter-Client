@@ -175,10 +175,15 @@ export const EventModal = (props: EventModalProps) => {
 
                 <Modal.Actions>
                     <div className={styles['buttons-wrapper']}>
-                        <Button type="button" buttonStyle="secondary" disabled={true} className={styles['button']}>
+                        <Button
+                            type="button"
+                            buttonStyle="secondary"
+                            disabled={true}
+                            className={styles['action-button']}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                         </Button>
-                        <Button type="button" buttonStyle="primary" disabled={true} className={styles['button']}>
+                        <Button type="button" buttonStyle="primary" disabled={true} className={styles['action-button']}>
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>

@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { EventCategoryCreate, EventCategoryDto } from '@/types/admin/event-category';
+import { EventCategoryCreate, EventCategoryDto, EventCategoryUpdate } from '@/types/admin/event-category';
 import { EventCategoriesApi } from './event-categories-api';
 
 describe('EventCategoriesApi', () => {
@@ -53,7 +53,11 @@ describe('EventCategoriesApi', () => {
         });
 
         it('returns created event category from response', async () => {
-            const category: EventCategoryDto = {
+            const category: EventCategoryCreate = {
+                name: 'Category 1',
+            };
+
+            const response: EventCategoryDto = {
                 id: 1,
                 name: 'Category 1',
                 relatedEventNewsCount: 0,
@@ -61,22 +65,21 @@ describe('EventCategoriesApi', () => {
 
             const client = {
                 post: jest.fn().mockResolvedValue({
-                    data: category,
+                    data: response,
                 }),
             } as unknown as AxiosInstance;
 
             const result = await EventCategoriesApi.create(client, category);
 
-            expect(result).toEqual(category);
+            expect(result).toEqual(response);
         });
     });
 
     describe('update', () => {
         it('calls event category endpoint with category data', async () => {
-            const category: EventCategoryDto = {
+            const category: EventCategoryUpdate = {
                 id: 1,
                 name: 'Updated Category',
-                relatedEventNewsCount: 0,
             };
 
             const client = {
@@ -91,7 +94,12 @@ describe('EventCategoriesApi', () => {
         });
 
         it('returns updated event category from response', async () => {
-            const category: EventCategoryDto = {
+            const category: EventCategoryUpdate = {
+                id: 1,
+                name: 'Updated Category',
+            };
+
+            const response: EventCategoryDto = {
                 id: 1,
                 name: 'Updated Category',
                 relatedEventNewsCount: 0,
@@ -99,13 +107,13 @@ describe('EventCategoriesApi', () => {
 
             const client = {
                 put: jest.fn().mockResolvedValue({
-                    data: category,
+                    data: response,
                 }),
             } as unknown as AxiosInstance;
 
             const result = await EventCategoriesApi.update(client, category);
 
-            expect(result).toEqual(category);
+            expect(result).toEqual(response);
         });
 
         it('throws an error when category id is missing', async () => {

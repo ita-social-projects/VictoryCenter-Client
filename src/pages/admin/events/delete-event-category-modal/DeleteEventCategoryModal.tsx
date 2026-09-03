@@ -7,8 +7,8 @@ import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-s
 import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { Button } from '@/components/admin/button/Button';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { DeleteEventCategoryConfirmModal } from './DeleteEventCategoryConfirmModal';
 import { HintBox } from '@/components/admin/hint-box/HintBox';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
 export interface DeleteEventCategoryModalProps {
     isOpen: boolean;
@@ -141,11 +141,13 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
                     </Button>
                 </Modal.Actions>
             </Modal>
-            <DeleteEventCategoryConfirmModal
+            <ConfirmationModal
                 isOpen={!!categoryToConfirm}
                 onClose={handleConfirmClose}
+                onCancel={handleConfirmClose}
                 onConfirm={handleConfirmDelete}
-                isSubmitting={isSubmitting}
+                title={COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM}
+                isButtonsDisabled={isSubmitting}
             />
         </>
     );

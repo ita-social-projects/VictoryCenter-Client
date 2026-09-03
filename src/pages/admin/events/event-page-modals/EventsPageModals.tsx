@@ -3,7 +3,6 @@ import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsSt
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
-import { DeleteEventCategoryConfirmModal } from '../delete-event-category-modal/DeleteEventCategoryConfirmModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 
 export interface EventsPageModalsProps {

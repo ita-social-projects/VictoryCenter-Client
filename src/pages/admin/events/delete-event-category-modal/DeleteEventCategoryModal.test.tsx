@@ -51,25 +51,30 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
     ),
 }));
 
-jest.mock('./DeleteEventCategoryConfirmModal', () => ({
-    DeleteEventCategoryConfirmModal: ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
         isOpen,
-        isSubmitting,
+        isButtonsDisabled,
         onClose,
+        onCancel,
         onConfirm,
     }: {
         isOpen: boolean;
-        isSubmitting: boolean;
+        isButtonsDisabled: boolean;
         onClose: () => void;
+        onCancel: () => void;
         onConfirm: () => void;
     }) =>
         isOpen ? (
-            <div data-testid="delete-confirm-modal">
-                <button onClick={onConfirm} disabled={isSubmitting}>
+            <div data-testid="confirmation-modal">
+                <button onClick={onConfirm} disabled={isButtonsDisabled}>
                     Confirm delete
                 </button>
-                <button onClick={onClose} disabled={isSubmitting}>
-                    Close confirmation
+                <button onClick={onCancel} disabled={isButtonsDisabled}>
+                    Cancel
+                </button>
+                <button onClick={onClose} disabled={isButtonsDisabled}>
+                    Close
                 </button>
             </div>
         ) : null,
@@ -181,7 +186,7 @@ describe('DeleteEventCategoryModal', () => {
             }),
         );
 
-        expect(screen.getByTestId('delete-confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
     });
 
     it('closes confirmation modal when confirmation is cancelled', async () => {
@@ -197,11 +202,11 @@ describe('DeleteEventCategoryModal', () => {
             }),
         );
 
-        expect(screen.getByTestId('delete-confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', { name: 'Close confirmation' }));
+        await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-        expect(screen.queryByTestId('delete-confirm-modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
     });
 
     it('successfully deletes selected category', async () => {
@@ -229,7 +234,7 @@ describe('DeleteEventCategoryModal', () => {
         expect(onConfirm).toHaveBeenCalledTimes(1);
         expect(onConfirm).toHaveBeenCalledWith(1);
         expect(onClose).toHaveBeenCalledTimes(1);
-        expect(screen.queryByTestId('delete-confirm-modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
     });
 
     it('shows error message when category deletion fails', async () => {
@@ -255,7 +260,7 @@ describe('DeleteEventCategoryModal', () => {
 
         expect(onConfirm).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
-        expect(screen.queryByTestId('delete-confirm-modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
     });
 
     it('disables controls while deletion is submitting', async () => {

@@ -220,7 +220,7 @@ export const ReportAnalytics = () => {
                 onTranslateCategory={handleTranslateCategory}
             />
 
-            {isFundsEditing && activeTab.id !== 'pdf-files' && (
+            {isFundsEditing && activeTab.id === 'income-expenses' && (
                 <div className={styles['section-footer']}>
                     <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancelClick}>
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}

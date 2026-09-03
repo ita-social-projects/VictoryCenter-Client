@@ -472,9 +472,13 @@ describe('FundsExpenditureSection', () => {
 
             expect(addSpy).toHaveBeenCalledWith('program-expenses-updated', expect.any(Function));
 
-            const attachedCallback = addSpy.mock.calls.find(
-                (call) => call[0] === 'program-expenses-updated',
-            )?.[1] as EventListener;
+            const attachedCallback = addSpy.mock.calls.find((call) => call[0] === 'program-expenses-updated')?.[1] as
+                | EventListener
+                | undefined;
+
+            if (!attachedCallback) {
+                throw new Error('Event listener not attached');
+            }
 
             expect(attachedCallback).toBeDefined();
 

@@ -759,6 +759,8 @@ describe('ProgramExpensesSection', () => {
                 });
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
                 expect(mockRefetch).toHaveBeenCalled();
+
+                expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
                 expect(dispatchEventSpy).toHaveBeenCalledWith(
                     expect.objectContaining({ type: 'program-expenses-updated' }),
                 );

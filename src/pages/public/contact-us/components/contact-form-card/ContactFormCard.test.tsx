@@ -230,7 +230,7 @@ describe('ContactFormCard', () => {
                 });
             });
 
-            expect(await screen.findByText('Ваш запит надіслано успішно. Очікуйте на відповідь')).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.submitSuccess')).toBeInTheDocument();
         });
 
         it('shows error toast if submission fails', async () => {
@@ -241,7 +241,7 @@ describe('ContactFormCard', () => {
 
             fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
 
-            expect(await screen.findByText('Сталася помилка. Спробуйте пізніше')).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.submitError')).toBeInTheDocument();
         });
     });
 });

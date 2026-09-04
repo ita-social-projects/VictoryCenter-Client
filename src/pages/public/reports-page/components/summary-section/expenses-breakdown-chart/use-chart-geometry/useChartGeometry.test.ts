@@ -36,14 +36,15 @@ interface Point {
     x: number;
     y: number;
 }
-
 type Anchor = 'start' | 'middle' | 'end';
-
 type MockPath = {
     getBBox: jest.Mock;
     getTotalLength: jest.Mock;
     getPointAtLength: jest.Mock;
 };
+type ChartProps = { itemsLength: number; isDesktop: boolean; percents: number[] };
+const MOBILE_LABEL = { width: 30, height: 16, padding: 4, overflow: 20, viewBox: 300 };
+const DESKTOP_LABEL = { width: 40, height: 20, padding: 3, overflow: 25, viewBox: 400 };
 
 function createCircularMockPath(options: {
     center: Point;
@@ -54,16 +55,13 @@ function createCircularMockPath(options: {
     const { center, radius, startAngleDeg, endAngleDeg } = options;
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const totalLength = radius * Math.abs(toRad(endAngleDeg - startAngleDeg));
-
     const pointAtT = (t: number): Point => {
         const angle = toRad(startAngleDeg + (endAngleDeg - startAngleDeg) * t);
         return { x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle) };
     };
-
     const samples = Array.from({ length: 21 }, (_, i) => pointAtT(i / 20));
     const xs = samples.map((p) => p.x);
     const ys = samples.map((p) => p.y);
-
     return {
         getBBox: jest.fn(() => ({
             x: Math.min(...xs),
@@ -98,6 +96,34 @@ const renderChartGeometry = (itemsLength: number, isDesktop: boolean, percents: 
         initialProps: { itemsLength, isDesktop, percents },
     });
 
+function setupWithRefs(
+    initial: ChartProps,
+    refs: { paths?: (MockPath | null)[]; texts?: (ReturnType<typeof createMockText> | null)[] },
+    after?: ChartProps,
+) {
+    const { result, rerender } = renderChartGeometry(initial.itemsLength, initial.isDesktop, initial.percents);
+    attachRefs(result, refs);
+    rerender(
+        after ?? { itemsLength: initial.itemsLength, isDesktop: initial.isDesktop, percents: [...initial.percents] },
+    );
+    return { result, rerender };
+}
+
+/** Mutates the hook's refs inside `act`, without triggering a rerender. */
+function attachRefs(
+    result: ReturnType<typeof renderChartGeometry>['result'],
+    refs: { paths?: (MockPath | null)[]; texts?: (ReturnType<typeof createMockText> | null)[] },
+) {
+    act(() => {
+        if (refs.paths) result.current.pathRefs.current = refs.paths as any;
+        if (refs.texts) result.current.textRefs.current = refs.texts as any;
+    });
+}
+
+function makeCircularRing(radius = 100, startAngleDeg = 0, endAngleDeg = 180) {
+    return createCircularMockPath({ center: { x: 0, y: 0 }, radius, startAngleDeg, endAngleDeg });
+}
+
 function boxXForAnchor(anchorX: number, width: number, anchor: Anchor): number {
     if (anchor === 'start') return anchorX;
     if (anchor === 'end') return anchorX - width;
@@ -122,33 +148,43 @@ function boxesOverlap(a: ReturnType<typeof boxOf>, b: ReturnType<typeof boxOf>, 
     );
 }
 
+function expectWithinViewBox(
+    position: { x: number; y: number; anchor: Anchor },
+    size: typeof MOBILE_LABEL | typeof DESKTOP_LABEL,
+) {
+    const box = boxOf(position, size.width, size.height);
+    expect(box.x).toBeGreaterThanOrEqual(0 - size.overflow);
+    expect(box.y).toBeGreaterThanOrEqual(0 - size.overflow);
+    expect(box.x + box.width).toBeLessThanOrEqual(size.viewBox + size.overflow);
+    expect(box.y + box.height).toBeLessThanOrEqual(size.viewBox + size.overflow);
+}
+
 describe('useChartGeometry', () => {
     describe('basic contract', () => {
         let path: MockPath;
-
         beforeEach(() => {
-            path = createCircularMockPath({ center: { x: 0, y: 0 }, radius: 100, startAngleDeg: 0, endAngleDeg: 180 });
+            path = makeCircularRing();
         });
 
         it('returns empty positions until pathRefs are attached', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [null];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [null] },
+                {
+                    itemsLength: 1,
+                    isDesktop: false,
+                    percents: [50],
+                },
+            );
             expect(result.current.positions).toEqual([]);
         });
 
         it('computes one LabelResult per item, each with a position and an arcPoint', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [path as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [path] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
             expect(result.current.positions).toHaveLength(1);
             expect(result.current.positions[0]).toHaveProperty('position');
             expect(result.current.positions[0]).toHaveProperty('arcPoint');
@@ -156,64 +192,46 @@ describe('useChartGeometry', () => {
         });
 
         it('respects itemsLength when more paths are attached than requested', () => {
-            const path2 = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 120,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [path as any, path2 as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const path2 = makeCircularRing(120);
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [path, path2] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
             expect(result.current.positions).toHaveLength(1);
         });
 
         it('recalculates positions when itemsLength changes', () => {
-            const path2 = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 120,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [path as any, path2 as any];
-            });
-            rerender({ itemsLength: 2, isDesktop: true, percents: [50, 50] });
-
+            const path2 = makeCircularRing(120);
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [path, path2] },
+                { itemsLength: 2, isDesktop: true, percents: [50, 50] },
+            );
             expect(result.current.positions).toHaveLength(2);
         });
 
         it('reports the exact point on the arc (arcPoint) independent of label placement', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [0]);
-
-            act(() => {
-                result.current.pathRefs.current = [path as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [0] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [0] },
+                { paths: [path] },
+                { itemsLength: 1, isDesktop: false, percents: [0] },
+            );
             expect(result.current.positions[0].arcPoint.x).toBeCloseTo(100, 1);
             expect(result.current.positions[0].arcPoint.y).toBeCloseTo(0, 1);
         });
     });
 
     describe('textAnchor selection and exact placement when there is no collision', () => {
-        const makeRing = () =>
-            createCircularMockPath({ center: { x: 0, y: 0 }, radius: 100, startAngleDeg: 0, endAngleDeg: 180 });
+        const setupRing = (percent: number) =>
+            setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [percent] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [percent] },
+            );
 
         it('anchors "start" for a point on the right side of the shared center', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [0]);
-
-            act(() => {
-                result.current.pathRefs.current = [makeRing() as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [0] });
-
+            const { result } = setupRing(0);
             const { position } = result.current.positions[0];
             expect(position.anchor).toBe('start');
             expect(position.x).toBeCloseTo(108.9, 0);
@@ -221,13 +239,7 @@ describe('useChartGeometry', () => {
         });
 
         it('anchors "middle" for a point roughly above the shared center', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [makeRing() as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result } = setupRing(50);
             const { position } = result.current.positions[0];
             expect(position.anchor).toBe('middle');
             expect(position.x).toBeCloseTo(0, 0);
@@ -235,34 +247,17 @@ describe('useChartGeometry', () => {
         });
 
         it('anchors "end" for a point on the left side of the shared center', () => {
-            const { result, rerender } = renderChartGeometry(1, true, [100]);
-
-            act(() => {
-                result.current.pathRefs.current = [makeRing() as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [100] });
-
-            const { position } = result.current.positions[0];
-            expect(position.anchor).toBe('end');
+            const { result } = setupRing(100);
+            expect(result.current.positions[0].position.anchor).toBe('end');
         });
 
         it('builds a collision box that grows in the direction implied by textAnchor, not centered', () => {
-            const { result: startResult, rerender: rerenderStart } = renderChartGeometry(1, true, [0]);
-            act(() => {
-                startResult.current.pathRefs.current = [makeRing() as any];
-            });
-            rerenderStart({ itemsLength: 1, isDesktop: false, percents: [0] });
-            const startPos = startResult.current.positions[0].position;
-            const startBox = boxOf(startPos, 30, 16);
+            const startPos = setupRing(0).result.current.positions[0].position;
+            const startBox = boxOf(startPos, MOBILE_LABEL.width, MOBILE_LABEL.height);
             expect(startBox.x).toBeCloseTo(startPos.x, 1);
 
-            const { result: endResult, rerender: rerenderEnd } = renderChartGeometry(1, true, [100]);
-            act(() => {
-                endResult.current.pathRefs.current = [makeRing() as any];
-            });
-            rerenderEnd({ itemsLength: 1, isDesktop: false, percents: [100] });
-            const endPos = endResult.current.positions[0].position;
-            const endBox = boxOf(endPos, 30, 16);
+            const endPos = setupRing(100).result.current.positions[0].position;
+            const endBox = boxOf(endPos, MOBILE_LABEL.width, MOBILE_LABEL.height);
             expect(endBox.x + endBox.width).toBeCloseTo(endPos.x, 1);
         });
     });
@@ -273,22 +268,8 @@ describe('useChartGeometry', () => {
                 bbox: { x: 100, y: 100, width: 100, height: 100 },
                 point: { x: -100, y: 380 },
             });
-
-            const { result, rerender } = renderChartGeometry(1, false, [100]);
-            act(() => {
-                result.current.pathRefs.current = [mock as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [100] });
-
-            const { x, y, anchor } = result.current.positions[0].position;
-            const width = 30;
-            const height = 16;
-            const box = boxOf({ x, y, anchor }, width, height);
-
-            expect(box.x).toBeGreaterThanOrEqual(0 - 20);
-            expect(box.y).toBeGreaterThanOrEqual(0 - 20);
-            expect(box.x + box.width).toBeLessThanOrEqual(300 + 20);
-            expect(box.y + box.height).toBeLessThanOrEqual(300 + 20);
+            const { result } = setupWithRefs({ itemsLength: 1, isDesktop: false, percents: [100] }, { paths: [mock] });
+            expectWithinViewBox(result.current.positions[0].position, MOBILE_LABEL);
         });
     });
 
@@ -302,45 +283,22 @@ describe('useChartGeometry', () => {
                 bbox: { x: 0, y: 0, width: 0, height: 0 },
                 point: { x: 160, y: 175 },
             });
-
-            const { result, rerender } = renderChartGeometry(2, true, [45, 50]);
-            act(() => {
-                result.current.pathRefs.current = [pathA as any, pathB as any];
-            });
-            rerender({ itemsLength: 2, isDesktop: true, percents: [45, 50] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 2, isDesktop: true, percents: [45, 50] },
+                { paths: [pathA, pathB] },
+            );
             expect(result.current.positions).toHaveLength(2);
-
-            const width = 40;
-            const height = 20;
-            const collisionPadding = 3;
-
-            const boxA = boxOf(result.current.positions[0].position, width, height);
-            const boxB = boxOf(result.current.positions[1].position, width, height);
-
-            expect(boxesOverlap(boxA, boxB, collisionPadding)).toBe(false);
+            const boxA = boxOf(result.current.positions[0].position, DESKTOP_LABEL.width, DESKTOP_LABEL.height);
+            const boxB = boxOf(result.current.positions[1].position, DESKTOP_LABEL.width, DESKTOP_LABEL.height);
+            expect(boxesOverlap(boxA, boxB, DESKTOP_LABEL.padding)).toBe(false);
         });
 
         it('does not resolve labels that are already far apart into unnecessary movement', () => {
-            const ringA = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 80,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const ringB = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 80,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-
-            const { result, rerender } = renderChartGeometry(2, true, [0, 100]);
-            act(() => {
-                result.current.pathRefs.current = [ringA as any, ringB as any];
-            });
-            rerender({ itemsLength: 2, isDesktop: false, percents: [0, 100] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 2, isDesktop: true, percents: [0, 100] },
+                { paths: [makeCircularRing(80), makeCircularRing(80)] },
+                { itemsLength: 2, isDesktop: false, percents: [0, 100] },
+            );
             const [first, second] = result.current.positions;
             expect(first.position.anchor).toBe('start');
             expect(second.position.anchor).toBe('end');
@@ -349,22 +307,13 @@ describe('useChartGeometry', () => {
 
     describe('arc avoidance', () => {
         it('does not place a label on top of the visible portion of its own arc', () => {
-            const ring = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-            act(() => {
-                result.current.pathRefs.current = [ring as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
             const { position } = result.current.positions[0];
-            const box = boxOf(position, 30, 16);
-
+            const box = boxOf(position, MOBILE_LABEL.width, MOBILE_LABEL.height);
             const minArcDist = 2;
             for (let deg = 0; deg <= 90; deg += 5) {
                 const rad = (deg * Math.PI) / 180;
@@ -378,110 +327,58 @@ describe('useChartGeometry', () => {
 
     describe('measure pass (real text size integration)', () => {
         it('uses fallback dimensions before any <text> bbox is available', () => {
-            const ring = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [ring as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
             expect(result.current.positions[0].position.x).toBeCloseTo(0, 0);
             expect(result.current.positions[0].position.y).toBeCloseTo(110, 0);
         });
 
         it('re-lays out the label once real <text> bbox sizes become available', () => {
-            const ring = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [ring as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const { result, rerender } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
             const fallbackY = result.current.positions[0].position.y;
-
-            act(() => {
-                result.current.textRefs.current = [createMockText({ x: 0, y: 0, width: 60, height: 24 }) as any];
-            });
+            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 60, height: 24 })] });
             rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
             const measuredY = result.current.positions[0].position.y;
-
             expect(measuredY).not.toBeCloseTo(fallbackY, 0);
         });
 
         it('stabilizes after real sizes are measured and does not keep re-measuring indefinitely', () => {
-            const ring = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const stablePercents = [50];
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [ring as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
+            const stableProps: ChartProps = { itemsLength: 1, isDesktop: false, percents: [50] };
+            const { result, rerender } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                stableProps,
+            );
             const mockText = createMockText({ x: 0, y: 0, width: 60, height: 24 });
-            act(() => {
-                result.current.textRefs.current = [mockText as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: stablePercents });
+            attachRefs(result, { texts: [mockText] });
+            rerender(stableProps);
 
             const callsAfterFirstMeasure = mockText.getBBox.mock.calls.length;
             const positionAfterFirstMeasure = result.current.positions[0].position;
-
             for (let i = 0; i < 5; i++) {
-                rerender({ itemsLength: 1, isDesktop: false, percents: stablePercents });
+                rerender(stableProps);
             }
-
             expect(result.current.positions[0].position).toEqual(positionAfterFirstMeasure);
             expect(mockText.getBBox.mock.calls.length - callsAfterFirstMeasure).toBeLessThanOrEqual(1);
         });
 
         it('falls back again when percents change and stale measured sizes no longer apply', () => {
-            const ringInitial = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            const { result, rerender } = renderChartGeometry(1, true, [50]);
-
-            act(() => {
-                result.current.pathRefs.current = [ringInitial as any];
-            });
+            const { result, rerender } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
+            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 60, height: 24 })] });
             rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
 
-            act(() => {
-                result.current.textRefs.current = [createMockText({ x: 0, y: 0, width: 60, height: 24 }) as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
-
-            const ringUpdated = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 100,
-                startAngleDeg: 0,
-                endAngleDeg: 180,
-            });
-            act(() => {
-                result.current.pathRefs.current = [ringUpdated as any];
-                result.current.textRefs.current = [null as any];
-            });
+            attachRefs(result, { paths: [makeCircularRing()], texts: [null] });
             rerender({ itemsLength: 1, isDesktop: false, percents: [70] });
 
             expect(result.current.positions[0].position).toBeDefined();
@@ -493,28 +390,12 @@ describe('useChartGeometry', () => {
 
     describe('desktop vs mobile config', () => {
         it('uses the desktop viewBox/layout when isDesktop is true', () => {
-            const ring = createCircularMockPath({
-                center: { x: 0, y: 0 },
-                radius: 150,
-                startAngleDeg: -80,
-                endAngleDeg: 80,
-            });
-
-            const { result, rerender } = renderChartGeometry(1, false, [90]);
-            act(() => {
-                result.current.pathRefs.current = [ring as any];
-            });
-            rerender({ itemsLength: 1, isDesktop: true, percents: [90] });
-
-            const { x, y, anchor } = result.current.positions[0].position;
-            const width = 40;
-            const height = 20;
-            const box = boxOf({ x, y, anchor }, width, height);
-
-            expect(box.x).toBeGreaterThanOrEqual(0 - 25);
-            expect(box.y).toBeGreaterThanOrEqual(0 - 25);
-            expect(box.x + box.width).toBeLessThanOrEqual(400 + 25);
-            expect(box.y + box.height).toBeLessThanOrEqual(400 + 25);
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: false, percents: [90] },
+                { paths: [makeCircularRing(150, -80, 80)] },
+                { itemsLength: 1, isDesktop: true, percents: [90] },
+            );
+            expectWithinViewBox(result.current.positions[0].position, DESKTOP_LABEL);
         });
     });
 });

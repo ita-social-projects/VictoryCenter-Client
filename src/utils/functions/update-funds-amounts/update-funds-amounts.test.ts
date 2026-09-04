@@ -215,6 +215,63 @@ describe('updateFundsAmounts', () => {
         });
     });
 
+    describe('allowReverseConversion option', () => {
+        it('does not touch amountUah when amountUsd changes and allowReverseConversion is false', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('5');
+            mockValidateFundsExpendituresAmount.mockReturnValue(undefined);
+
+            const updater = updateFundsAmounts('amountUsd', '5', '33.5', 'change', {
+                allowReverseConversion: false,
+            });
+            const result = updater(initialState);
+
+            expect(result.amountUsd).toBe('5');
+            expect(result.amountUah).toBe('100');
+            expect(result.errors.amountUah).toBeUndefined();
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+        });
+
+        it('does not clear amountUah when amountUsd is emptied and allowReverseConversion is false', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('');
+            mockValidateFundsExpendituresAmount.mockReturnValue(undefined);
+
+            const updater = updateFundsAmounts('amountUsd', '', '33.5', 'change', {
+                allowReverseConversion: false,
+            });
+            const result = updater(initialState);
+
+            expect(result.amountUsd).toBe('');
+            expect(result.amountUah).toBe('100');
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+        });
+
+        it('still converts amountUah to amountUsd when allowReverseConversion is false', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('100');
+            mockValidateFundsExpendituresAmount.mockReturnValueOnce(undefined).mockReturnValueOnce(undefined);
+            mockGetConvertedAmount.mockReturnValue('3');
+
+            const updater = updateFundsAmounts('amountUah', '100', '33.5', 'change', {
+                allowReverseConversion: false,
+            });
+            const result = updater(initialState);
+
+            expect(result.amountUah).toBe('100');
+            expect(result.amountUsd).toBe('3');
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', '33.5', 'uahToUsd');
+        });
+
+        it('defaults to bidirectional conversion when the option is omitted', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('3.5');
+            mockValidateFundsExpendituresAmount.mockReturnValueOnce(undefined).mockReturnValueOnce(undefined);
+            mockGetConvertedAmount.mockReturnValue('117,25');
+
+            const updater = updateFundsAmounts('amountUsd', '3.5', '33.5', 'change');
+            const result = updater(initialState);
+
+            expect(result.amountUah).toBe('117,25');
+        });
+    });
+
     describe('State preservation', () => {
         it('should preserve previous state when updating', () => {
             const customState: FundsAmountsState = {

@@ -123,23 +123,35 @@ describe('FeedbackComponent', () => {
     });
 
     it('calls onEdit with item and stops propagation when edit button is clicked', () => {
-        renderComponent({ item: mockHistoryItem });
+        const parentClickMock = jest.fn();
+        render(
+            <div onClick={parentClickMock}>
+                <FeedbackComponent item={mockHistoryItem} onEdit={onEditMock} onDelete={onDeleteMock} />
+            </div>,
+        );
 
         const editBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtn);
 
         expect(onEditMock).toHaveBeenCalledTimes(1);
         expect(onEditMock).toHaveBeenCalledWith(mockHistoryItem);
+        expect(parentClickMock).not.toHaveBeenCalled();
     });
 
     it('calls onDelete with item and stops propagation when delete button is clicked', () => {
-        renderComponent({ item: mockHistoryItem });
+        const parentClickMock = jest.fn();
+        render(
+            <div onClick={parentClickMock}>
+                <FeedbackComponent item={mockHistoryItem} onEdit={onEditMock} onDelete={onDeleteMock} />
+            </div>,
+        );
 
         const deleteBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtn);
 
         expect(onDeleteMock).toHaveBeenCalledTimes(1);
         expect(onDeleteMock).toHaveBeenCalledWith(mockHistoryItem);
+        expect(parentClickMock).not.toHaveBeenCalled();
     });
 
     it('does not throw when clicking buttons without onEdit or onDelete handlers provided', () => {

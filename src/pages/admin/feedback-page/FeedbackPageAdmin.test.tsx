@@ -362,17 +362,23 @@ describe('FeedbackPageAdmin', () => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
+        mockFeedbackApi.fetchHistory.mockClear();
         const triggerSearchBtn = screen.getByTestId('toolbar-fetch-search');
         fireEvent.click(triggerSearchBtn);
 
-        expect(mockFeedbackApi.fetchHistory).toHaveBeenCalled();
+        expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(1);
 
         // Switch to Reviews and trigger search
         const reviewsTab = screen.getByText(FEEDBACK_TEXT.TABS.REVIEWS);
         fireEvent.click(reviewsTab);
 
+        await waitFor(() => {
+            expect(screen.getByText('Учасник 10')).toBeInTheDocument();
+        });
+        mockFeedbackApi.fetchReviews.mockClear();
+
         fireEvent.click(triggerSearchBtn);
-        expect(mockFeedbackApi.fetchReviews).toHaveBeenCalled();
+        expect(mockFeedbackApi.fetchReviews).toHaveBeenCalledTimes(1);
 
         // Switch to Videos and trigger search
         const videosTab = screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS);
@@ -381,9 +387,10 @@ describe('FeedbackPageAdmin', () => {
         await waitFor(() => {
             expect(screen.getByText('Відео 20')).toBeInTheDocument();
         });
+        mockFeedbackApi.fetchVideos.mockClear();
 
         fireEvent.click(triggerSearchBtn);
-        expect(mockFeedbackApi.fetchVideos).toHaveBeenCalled();
+        expect(mockFeedbackApi.fetchVideos).toHaveBeenCalledTimes(1);
     });
 
     it('should trigger fetchCategoryItems when onLoadMore is called', async () => {

@@ -1,0 +1,82 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/fonts';
+
+.feedback {
+    &-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    &-profile {
+        display: flex;
+        gap: 1rem;
+        width: 33%;
+        align-items: center;
+        height: 100%;
+
+        .feedback-icon,
+        img {
+            width: 3.75rem;
+            height: 3.75rem;
+            border-radius: 100%;
+            margin: 0.25rem;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        &-data {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            p {
+                margin: 0.25rem 0 0 0;
+                font-family: fonts.$mulish-regular-font;
+                font-size: 18px;
+                color: colors.$blue-900;
+                overflow-wrap: anywhere;
+                word-break: normal;
+            }
+        }
+    }
+
+    &-position {
+        text-align: start;
+        width: 33%;
+
+        p {
+            margin: 0;
+            font-family: fonts.$mulish-regular-font;
+            font-size: 18px;
+            color: colors.$blue-900;
+            padding-right: 2.5rem;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+    }
+
+    &-controls {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 40%;
+    }
+
+    &-actions {
+        width: 12.5rem;
+        height: 1.5rem;
+        display: flex;
+        justify-content: end;
+        gap: 0.625rem;
+
+        button {
+            border: none;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    }
+}

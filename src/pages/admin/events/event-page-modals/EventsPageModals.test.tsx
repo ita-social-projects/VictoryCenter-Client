@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
@@ -19,6 +19,10 @@ jest.mock('../delete-event-category-modal/DeleteEventCategoryModal', () => ({
 
 jest.mock('../event-modal/EventModal', () => ({
     EventModal: jest.fn(() => <div data-testid="event-modal" />),
+}));
+
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
+    ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
@@ -219,5 +223,20 @@ describe('EventsPageModals', () => {
                 currentCategory,
             }),
         );
+    });
+
+    it('renders toast container', () => {
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl()}
+                categories={categories}
+                currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
+            />,
+        );
+
+        expect(screen.getByTestId('toast-container')).toBeInTheDocument();
     });
 });

@@ -3,13 +3,19 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DeleteEventCategoryModal } from './DeleteEventCategoryModal';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
+import { ToastType } from '@/types/admin/toast';
+import { EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: jest.fn(),
 }));
 
 jest.mock('@/services/api/admin/events/event-categories-api', () => ({
@@ -97,6 +103,7 @@ describe('DeleteEventCategoryModal', () => {
 
     const onClose = jest.fn();
     const onConfirm = jest.fn();
+    const addToast = jest.fn();
     const client = {};
 
     const renderModal = () => {
@@ -107,7 +114,12 @@ describe('DeleteEventCategoryModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+
         (useAdminClient as jest.Mock).mockReturnValue(client);
+
+        (useToast as jest.Mock).mockReturnValue({
+            addToast,
+        });
     });
 
     it('renders delete modal with category select and action buttons', () => {
@@ -240,7 +252,7 @@ describe('DeleteEventCategoryModal', () => {
         expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
     });
 
-    it('shows error message when category deletion fails', async () => {
+    it('shows error toast when category deletion fails', async () => {
         const user = userEvent.setup();
 
         (EventCategoriesApi.delete as jest.Mock).mockRejectedValue(new Error('Delete failed'));
@@ -257,9 +269,13 @@ describe('DeleteEventCategoryModal', () => {
 
         await user.click(screen.getByRole('button', { name: 'Confirm delete' }));
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(
-            COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY,
-        );
+        await waitFor(() => {
+            expect(addToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        });
 
         expect(onConfirm).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();

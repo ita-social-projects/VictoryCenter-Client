@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { HintBox } from '@/components/admin/hint-box/HintBox';
 import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { ToastType } from '@/types/admin/toast';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 
@@ -22,8 +24,8 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
     const client = useAdminClient();
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto>();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState('');
     const [categoryToConfirm, setCategoryToConfirm] = useState<EventCategoryDto | null>(null);
+    const { addToast } = useToast();
 
     const handleClose = () => {
         if (isSubmitting || !!categoryToConfirm) {
@@ -31,7 +33,6 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
         }
 
         setSelectedCategory(undefined);
-        setError('');
         onClose();
     };
 
@@ -57,15 +58,12 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
         setCategoryToConfirm(null);
     };
 
-    const errorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
     const handleConfirmDelete = async () => {
         if (isSubmitting || !selectedCategory) {
             return;
         }
 
         try {
-            setError('');
             setIsSubmitting(true);
             if (selectedCategory.relatedEventNewsCount > 0) {
                 return;
@@ -77,26 +75,17 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
             setCategoryToConfirm(null);
             onClose();
         } catch {
-            setError(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
             setCategoryToConfirm(null);
 
-            if (errorTimeoutRef.current) {
-                clearTimeout(errorTimeoutRef.current);
-            }
-
-            errorTimeoutRef.current = setTimeout(() => setError(''), EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+            addToast(
+                COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
         } finally {
             setIsSubmitting(false);
         }
     };
-
-    useEffect(() => {
-        return () => {
-            if (errorTimeoutRef.current) {
-                clearTimeout(errorTimeoutRef.current);
-            }
-        };
-    }, []);
 
     const hasRelatedRecords = () => selectedCategory && selectedCategory.relatedEventNewsCount > 0;
 
@@ -125,11 +114,6 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
                                 )}
                                 text={EVENT_CATEGORY_VALIDATION.eventItemsCount.getRelocationOrRemovalHint()}
                             />
-                        )}
-                        {error && (
-                            <div role="alert" className="event-category-modal-error-container">
-                                {error}
-                            </div>
                         )}
                     </div>
                 </Modal.Content>

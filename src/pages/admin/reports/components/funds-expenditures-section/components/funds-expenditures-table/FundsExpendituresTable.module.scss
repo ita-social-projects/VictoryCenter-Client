@@ -21,7 +21,8 @@
 
 .table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .th {
@@ -31,6 +32,10 @@
     line-height: 24px;
     color: rgba(c.$graphite-black, 0.88);
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: z-index.admin(sticky-table-header);
+    background-color: c.$light-blue-25;
 
     &.sortable {
         cursor: pointer;
@@ -46,7 +51,7 @@
         opacity: 0.6;
 
         &:hover {
-            background-color: transparent;
+            background-color: c.$light-blue-25;
         }
     }
 }
@@ -58,23 +63,23 @@
 }
 
 .tr {
-    background-color: c.$white;
-    border: 1px solid c.$grey-400;
+    height: 65px;
+    background: c.$white;
 
     &:hover {
-        background-color: c.$light-blue-50;
+        background: c.$light-blue-50;
     }
 }
 
 .td {
     @include type.subtitle-2-medium;
-    padding: 13px 20px;
-    font-weight: 400;
-    line-height: 24px;
-    color: c.$graphite-black;
-    vertical-align: middle;
-    height: 72px;
     box-sizing: border-box;
+    height: 72px;
+    padding: 13px 20px;
+    vertical-align: middle;
+    color: c.$graphite-black;
+    white-space: nowrap;
+    border-top: 1px solid c.$grey-500;
 }
 
 .type-chip {

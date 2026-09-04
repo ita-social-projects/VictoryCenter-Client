@@ -1,12 +1,12 @@
-import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
-import { ModalMode } from '@/types/admin/common';
-import { EventCategoryDto } from '@/types/admin/event-category';
-import { EventsNews } from '@/types/admin/events-news';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { ModalMode } from '@/types/admin/common';
+import { EventsNews } from '@/types/admin/events-news';
 
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),

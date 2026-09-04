@@ -1,12 +1,12 @@
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
 import { DeleteEventCategoryModal } from './DeleteEventCategoryModal';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
-import { EventCategoryDto } from '@/types/admin/event-category';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),

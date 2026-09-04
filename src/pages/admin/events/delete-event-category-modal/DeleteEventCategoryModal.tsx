@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { EventCategoryDto } from '@/types/admin/event-category';
 import { Modal } from '@/components/common/modal/Modal';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
-import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
-import { Button } from '@/components/admin/button/Button';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { HintBox } from '@/components/admin/hint-box/HintBox';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { HintBox } from '@/components/admin/hint-box/HintBox';
+import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
+import { Button } from '@/components/admin/button/Button';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 
 export interface DeleteEventCategoryModalProps {
     isOpen: boolean;

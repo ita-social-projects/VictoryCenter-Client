@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { EventModal } from './EventModal';
+import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,

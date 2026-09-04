@@ -1,17 +1,17 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import { ModalMode } from '@/types/admin/common';
-import { EventCategoryUpdate, EventCategoryDto, EventCategoryCreate } from '@/types/admin/event-category';
 import { Modal } from '@/components/common/modal/Modal';
 import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import './EventCategoryModal.scss';
-import { EVENT_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-schema/event-category-schema';
-import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventCategoryUpdate, EventCategoryDto, EventCategoryCreate } from '@/types/admin/event-category';
+import { ModalMode } from '@/types/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
+import { EVENT_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-schema/event-category-schema';
+import './EventCategoryModal.scss';
 
 interface EventCategoryFormValues {
     name: string;

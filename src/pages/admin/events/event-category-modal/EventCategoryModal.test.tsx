@@ -1,11 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventCategoryModal } from './EventCategoryModal';
-import { ModalMode } from '@/types/admin/common';
-import { EventCategoryDto, EventCategoryCreate, EventCategoryUpdate } from '@/types/admin/event-category';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
+import { ModalMode } from '@/types/admin/common';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockValidateName = jest.fn();
 

@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { EventCategoryCreate, EventCategoryDto, EventCategoryUpdate } from '@/types/admin/event-category';
 import { EventCategoriesApi } from './event-categories-api';
+import { EventCategoryCreate, EventCategoryDto, EventCategoryUpdate } from '@/types/admin/event-category';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 describe('EventCategoriesApi', () => {
     describe('getAll', () => {

@@ -1,6 +1,6 @@
-import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { EventCategoryUpdate, EventCategoryCreate, EventCategoryDto } from '@/types/admin/event-category';
 import { AxiosInstance } from 'axios';
+import { EventCategoryUpdate, EventCategoryCreate, EventCategoryDto } from '@/types/admin/event-category';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const EventCategoriesApi = {
     getAll: async (client: AxiosInstance): Promise<EventCategoryDto[]> => {

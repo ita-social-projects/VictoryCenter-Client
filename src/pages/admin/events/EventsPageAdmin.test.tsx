@@ -1,14 +1,14 @@
+import '@testing-library/jest-dom';
+import { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { EVENTS_TEXT } from '@/const/admin/events';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { act } from 'react';
+import { EVENTS_TEXT } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),

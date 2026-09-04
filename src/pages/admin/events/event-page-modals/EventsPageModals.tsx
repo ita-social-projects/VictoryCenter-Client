@@ -1,10 +1,10 @@
-import { EventsNews } from '@/types/admin/events-news';
+import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
+import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
+import { EventModal } from '../event-modal/EventModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { EventsNews } from '@/types/admin/events-news';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
-import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
-import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
-import { EventModal } from '../event-modal/EventModal';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;

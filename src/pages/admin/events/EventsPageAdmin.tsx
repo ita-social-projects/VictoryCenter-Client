@@ -1,20 +1,20 @@
 import { useCallback, useState, useMemo, useEffect } from 'react';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { EventsApi } from '@/services/api/admin/events/events-api';
-import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
-import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
-import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { EVENTS_TEXT } from '@/const/admin/events';
-import './EventsPageAdmin.scss';
-import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { EventsPageModals } from './event-page-modals/EventsPageModals';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { EventsApi } from '@/services/api/admin/events/events-api';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
-import { EventsPageModals } from './event-page-modals/EventsPageModals';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EVENTS_TEXT } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import './EventsPageAdmin.scss';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();

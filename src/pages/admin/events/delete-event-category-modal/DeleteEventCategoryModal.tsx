@@ -31,6 +31,7 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
         }
 
         setSelectedCategory(undefined);
+        setError('');
         onClose();
     };
 

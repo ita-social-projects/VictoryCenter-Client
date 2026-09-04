@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
+import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventCategoryDto } from '@/types/admin/event-category';
@@ -21,6 +22,7 @@ jest.mock('../event-modal/EventModal', () => ({
 }));
 
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
+const mockedDeleteEventCategoryModal = DeleteEventCategoryModal as jest.Mock;
 const mockedEventModal = EventModal as jest.Mock;
 
 describe('EventsPageModals', () => {
@@ -46,6 +48,7 @@ describe('EventsPageModals', () => {
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
     const closeAddItemModal = jest.fn();
+    const closeDeleteCategoryModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
@@ -54,17 +57,20 @@ describe('EventsPageModals', () => {
         isAddCategoryModalOpen = false,
         isEditCategoryModalOpen = false,
         isAddModalOpen = false,
+        isDeleteCategoryModalOpen = false,
     ): UseModalsStateResult<EventsNews> =>
         ({
             modalState: {
                 isAddCategoryModalOpen,
                 isEditCategoryModalOpen,
                 isAddModalOpen,
+                isDeleteCategoryModalOpen,
             },
             closeModalActions: {
                 closeAddCategoryModal,
                 closeEditCategoryModal,
                 closeAddItemModal,
+                closeDeleteCategoryModal,
             },
         }) as unknown as UseModalsStateResult<EventsNews>;
 
@@ -125,6 +131,29 @@ describe('EventsPageModals', () => {
         );
     });
 
+    it('passes isOpen, onClose and onConfirm to delete category modal', () => {
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, false, false, true)}
+                categories={categories}
+                currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
+            />,
+        );
+
+        const deleteModalProps = mockedDeleteEventCategoryModal.mock.calls[0][0];
+
+        expect(deleteModalProps).toEqual(
+            expect.objectContaining({
+                isOpen: true,
+                onClose: closeDeleteCategoryModal,
+                onConfirm: onDeleteCategory,
+            }),
+        );
+    });
+
     it('passes false as isOpen when all modals are closed', () => {
         render(
             <EventsPageModals
@@ -139,6 +168,7 @@ describe('EventsPageModals', () => {
 
         const addModalProps = getModalPropsByMode(ModalMode.Add);
         const editModalProps = getModalPropsByMode(ModalMode.Edit);
+        const deleteModalProps = mockedDeleteEventCategoryModal.mock.calls[0][0];
         const eventModalProps = mockedEventModal.mock.calls[0][0];
 
         expect(addModalProps).toEqual(
@@ -151,6 +181,12 @@ describe('EventsPageModals', () => {
         expect(editModalProps).toEqual(
             expect.objectContaining({
                 mode: ModalMode.Edit,
+                isOpen: false,
+            }),
+        );
+
+        expect(deleteModalProps).toEqual(
+            expect.objectContaining({
                 isOpen: false,
             }),
         );

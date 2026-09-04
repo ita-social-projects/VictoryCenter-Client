@@ -261,7 +261,11 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div ref={turnstileRef} />
 
-                <button type="submit" className={styles['contact-form-submit']} disabled={!turnstileToken}>
+                <button
+                    type="submit"
+                    className={styles['contact-form-submit']}
+                    disabled={!turnstileToken || Object.keys(errors).length > 0}
+                >
                     {submitLabel}
                 </button>
             </form>

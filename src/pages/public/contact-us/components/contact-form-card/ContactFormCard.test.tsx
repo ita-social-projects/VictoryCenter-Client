@@ -1,31 +1,28 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContactFormCard } from './ContactFormCard';
 import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { useTurnstile } from '@/hooks/public/use-turnstile';
+import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
 
 jest.mock('@/hooks/public/use-turnstile', () => ({
-    useTurnstile: () => ({
-        token: 'mock-token',
-        containerRef: { current: null },
-        reset: jest.fn(),
-    }),
+    useTurnstile: jest.fn(),
 }));
 
 jest.mock('@/services/api/public/contact-us/contact-us-api', () => ({
     submitContactUsForm: jest.fn(),
 }));
 
-jest.mock(
-    './contact-form-card.module.scss',
-    () =>
-        new Proxy(
-            {},
-            {
-                get: (_, key) => key,
-            },
-        ),
-);
+jest.mock('./ContactFormCard.module.scss', () => ({
+    __esModule: true,
+    default: new Proxy(
+        {},
+        {
+            get: (_, key) => key,
+        },
+    ),
+}));
 
 const DEFAULT_PROPS = {
     isPopup: false,
@@ -37,9 +34,35 @@ const DEFAULT_PROPS = {
     submitLabel: 'Надіслати',
 };
 
-const renderForm = () => render(<ContactFormCard {...DEFAULT_PROPS} />);
+const renderForm = () => render(<ContactFormCard { ...DEFAULT_PROPS } />);
 
 describe('ContactFormCard', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        (useTurnstile as jest.Mock).mockReturnValue({
+            token: 'mock-token',
+            containerRef: { current: null },
+            reset: jest.fn(),
+        });
+    });
+
+    describe('Styles and isPopup prop', () => {
+        it('applies popup class when isPopup is true', () => {
+            render(<ContactFormCard { ...DEFAULT_PROPS } isPopup = { true} />);
+            const form = screen.getByRole('form', { name: 'Contact form' });
+
+            expect(form).toHaveClass('contact-form-card--popup');
+        });
+
+        it('does not apply popup class when isPopup is false', () => {
+            render(<ContactFormCard { ...DEFAULT_PROPS } isPopup = { false} />);
+            const form = screen.getByRole('form', { name: 'Contact form' });
+
+            expect(form).not.toHaveClass('contact-form-card--popup');
+        });
+    });
+
     it('renders all placeholders and submit label', () => {
         renderForm();
 
@@ -152,6 +175,72 @@ describe('ContactFormCard', () => {
             submitForm();
 
             expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('Turnstile behavior', () => {
+        it('disables submit button if turnstileToken is not present', () => {
+            (useTurnstile as jest.Mock).mockReturnValue({
+                token: null,
+                containerRef: { current: null },
+                reset: jest.fn(),
+            });
+
+            renderForm();
+            const submitButton = screen.getByRole('button', { name: 'Надіслати' });
+
+            expect(submitButton).toBeDisabled();
+        });
+
+        it('enables submit button if turnstileToken is present', () => {
+            renderForm();
+            const submitButton = screen.getByRole('button', { name: 'Надіслати' });
+
+            expect(submitButton).not.toBeDisabled();
+        });
+    });
+
+    describe('Form Submission', () => {
+        const fillValidForm = async () => {
+            await userEvent.type(screen.getByPlaceholderText("Ваше ім'я"), 'Іван');
+            await userEvent.type(screen.getByPlaceholderText('E-mail'), 'ivan@example.com');
+            await userEvent.type(screen.getByPlaceholderText('Тема звернення'), 'Важливе питання');
+            await userEvent.type(
+                screen.getByPlaceholderText('Напишіть ваше повідомлення'),
+                'Це тестове повідомлення достатньої довжини.',
+            );
+        };
+
+        it('submits form successfully and shows success toast', async () => {
+            (submitContactUsForm as jest.Mock).mockResolvedValueOnce(undefined);
+
+            renderForm();
+            await fillValidForm();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+            await waitFor(() => {
+                expect(submitContactUsForm).toHaveBeenCalledWith({
+                    captchaResponseToken: 'mock-token',
+                    fromName: 'Іван',
+                    fromEmail: 'ivan@example.com',
+                    subject: 'Важливе питання',
+                    message: 'Це тестове повідомлення достатньої довжини.',
+                });
+            });
+
+            expect(await screen.findByText('Ваш запит надіслано успішно. Очікуйте на відповідь')).toBeInTheDocument();
+        });
+
+        it('shows error toast if submission fails', async () => {
+            (submitContactUsForm as jest.Mock).mockRejectedValueOnce(new Error('API Error'));
+
+            renderForm();
+            await fillValidForm();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+            expect(await screen.findByText('Сталася помилка. Спробуйте пізніше')).toBeInTheDocument();
         });
     });
 });

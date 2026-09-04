@@ -5,6 +5,7 @@ import { RichTextInput, RichTextInputProps } from './RichTextInput';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes } from 'lexical';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@lexical/react/LexicalComposer', () => {
     const MockLexicalComposer = ({ children, initialConfig }: any) => {
@@ -57,6 +58,7 @@ jest.mock('@lexical/html', () => ({
 jest.mock('lexical', () => ({
     $getRoot: jest.fn(() => ({ clear: jest.fn() })),
     $insertNodes: jest.fn(),
+    $setSelection: jest.fn(),
     $getSelection: jest.fn(),
     $isRangeSelection: jest.fn(() => false),
     $createLineBreakNode: jest.fn(),
@@ -202,7 +204,7 @@ describe('RichTextInput', () => {
 
         it('uses default placeholder when not provided', () => {
             renderRichTextInput();
-            expect(screen.getByText('Enter text...')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.ENTER_TEXT_PLACEHOLDER)).toBeInTheDocument();
         });
     });
 

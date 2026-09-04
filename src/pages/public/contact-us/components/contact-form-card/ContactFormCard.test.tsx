@@ -2,9 +2,18 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContactFormCard } from './ContactFormCard';
-import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
 import { useTurnstile } from '@/hooks/public/use-turnstile';
 import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
+import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+        },
+    }),
+}));
 
 jest.mock('@/hooks/public/use-turnstile', () => ({
     useTurnstile: jest.fn(),
@@ -75,14 +84,13 @@ describe('ContactFormCard', () => {
     });
 
     describe('Subject field', () => {
-        it('shows warn hint when subject reaches WARN_AT characters', async () => {
+        it('shows info hint when subject reaches INFO_AT characters', async () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT));
 
-            const remaining = CONTACT_FORM_LIMITS.SUBJECT.MAX - CONTACT_FORM_LIMITS.SUBJECT.INFO_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(remaining))).toBeInTheDocument();
+            expect(screen.getByText('contactForm.charactersRemaining')).toBeInTheDocument();
         });
 
         it('shows limit-reached message when subject hits MAX characters', async () => {
@@ -91,7 +99,7 @@ describe('ContactFormCard', () => {
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MAX));
 
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).toBeInTheDocument();
+            expect(screen.getByText('contactForm.limitReached')).toBeInTheDocument();
         });
 
         it('shows min-length error on blur when subject < MIN characters', async () => {
@@ -101,35 +109,28 @@ describe('ContactFormCard', () => {
             fireEvent.change(subjectInput, { target: { value: 'ab' } });
             fireEvent.blur(subjectInput);
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.SUBJECT.MIN_ERROR)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.subjectMinLengthError')).toBeInTheDocument();
         });
 
-        it('does not show hint below WARN_AT characters', async () => {
+        it('does not show hint below INFO_AT characters', async () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
 
             await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT - 1));
 
-            expect(screen.queryByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).not.toBeInTheDocument();
-            expect(
-                screen.queryByText(
-                    CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(
-                        CONTACT_FORM_LIMITS.SUBJECT.MAX - (CONTACT_FORM_LIMITS.SUBJECT.INFO_AT - 1),
-                    ),
-                ),
-            ).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.limitReached')).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.charactersRemaining')).not.toBeInTheDocument();
         });
     });
 
     describe('Message field', () => {
-        it('shows warn hint when message reaches WARN_AT characters', () => {
+        it('shows warn hint when message reaches INFO_AT characters', () => {
             renderForm();
             const messageTextarea = screen.getByPlaceholderText('Напишіть ваше повідомлення');
 
             fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.INFO_AT) } });
 
-            const remaining = CONTACT_FORM_LIMITS.MESSAGE.MAX - CONTACT_FORM_LIMITS.MESSAGE.INFO_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getInfoMessage(remaining))).toBeInTheDocument();
+            expect(screen.getByText('contactForm.charactersRemaining')).toBeInTheDocument();
         });
 
         it('shows limit-reached message when message hits MAX characters', () => {
@@ -138,7 +139,7 @@ describe('ContactFormCard', () => {
 
             fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX) } });
 
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED)).toBeInTheDocument();
+            expect(screen.getByText('contactForm.limitReached')).toBeInTheDocument();
         });
 
         it('shows min-length error on blur when message < MIN characters', async () => {
@@ -148,7 +149,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(messageTextarea, { target: { value: 'short' } });
             fireEvent.blur(messageTextarea);
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.MESSAGE.MIN_ERROR)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.messageMinLengthError')).toBeInTheDocument();
         });
     });
 
@@ -166,7 +167,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: invalidEmail } });
             submitForm();
 
-            expect(await screen.findByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).toBeInTheDocument();
+            expect(await screen.findByText('contactForm.emailInvalid')).toBeInTheDocument();
         });
 
         it('does not show error for valid email', async () => {
@@ -174,7 +175,7 @@ describe('ContactFormCard', () => {
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'user@mail.com' } });
             submitForm();
 
-            expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+            expect(screen.queryByText('contactForm.emailInvalid')).not.toBeInTheDocument();
         });
     });
 

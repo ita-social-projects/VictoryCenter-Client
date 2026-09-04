@@ -11,5 +11,5 @@ export const getProgramReportingYearOptions = (selectedYear?: number | null): st
         options.add(String(selectedYear));
     }
 
-    return Array.from(options).sort((a, b) => Number(b) - Number(a));
+    return Array.from(options).sort((a, b) => Number(a) - Number(b));
 };

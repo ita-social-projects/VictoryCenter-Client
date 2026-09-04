@@ -34,4 +34,38 @@ describe('getConvertedAmount', () => {
         expect(getConvertedAmount('   ', '40')).toBeNull();
         expect(getConvertedAmount('abc', '40')).toBeNull();
     });
+
+    it('defaults to uahToUsd direction when direction is omitted', () => {
+        expect(getConvertedAmount('100', '3')).toBe(getConvertedAmount('100', '3', 'uahToUsd'));
+    });
+
+    describe('usdToUah direction', () => {
+        it('returns UAH when converting from USD', () => {
+            expect(getConvertedAmount('100', '42', 'usdToUah')).toBe('4200');
+        });
+
+        it('returns null when exchange rate is empty', () => {
+            expect(getConvertedAmount('100', '', 'usdToUah')).toBeNull();
+        });
+
+        it('returns null when exchange rate is zero', () => {
+            expect(getConvertedAmount('100', '0', 'usdToUah')).toBeNull();
+        });
+
+        it('rounds to two decimals', () => {
+            expect(getConvertedAmount('33,335', '2', 'usdToUah')).toBe('66,67');
+        });
+
+        it('returns null for empty or invalid source amount', () => {
+            expect(getConvertedAmount('', '40', 'usdToUah')).toBeNull();
+            expect(getConvertedAmount('   ', '40', 'usdToUah')).toBeNull();
+            expect(getConvertedAmount('abc', '40', 'usdToUah')).toBeNull();
+        });
+
+        it('round-trips a uahToUsd conversion back to the original UAH amount', () => {
+            const usd = getConvertedAmount('11904,76', '42', 'uahToUsd');
+            expect(usd).toBe('283,45');
+            expect(getConvertedAmount(usd as string, '42', 'usdToUah')).toBe('11904,9');
+        });
+    });
 });

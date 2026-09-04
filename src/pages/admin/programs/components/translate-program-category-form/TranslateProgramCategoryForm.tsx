@@ -57,18 +57,18 @@ export const TranslateProgramCategoryForm = forwardRef<
 >(
     (
         {
+            initialData = null,
             onSubmit,
             categories,
-            initialData = null,
             formDisabled,
-            onCategoryChange,
             onValidationChange,
             onDirtyChange,
             selectedCategory,
+            onCategoryChange,
         }: TranslateProgramCategoryFormProps,
         ref,
     ) => {
-        const { formState, setFormState, errors, setErrors, isSubmitting, isDirty } = useFormManager<
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateProgramCategoryFormValues,
             TranslateProgramCategoryFormErrorState
         >({
@@ -80,21 +80,21 @@ export const TranslateProgramCategoryForm = forwardRef<
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        // Supports both controlled usage (parent passes selectedCategory, e.g. TranslateProgramCategoryModal)
-        // and standalone/uncontrolled usage (prop omitted entirely) by falling back to local state only in the
-        // latter case; when controlled, activeCategory always reflects the prop, never the local fallback.
         const [localSelectedCategory, setLocalSelectedCategory] = useState<ProgramCategory | null>(null);
         const activeCategory = selectedCategory !== undefined ? selectedCategory : localSelectedCategory;
 
         useEffect(() => {
-            onDirtyChange?.(isDirty());
-        }, [formState, isDirty, onDirtyChange]);
+            const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData ?? DEFAULT_FORM_STATE);
+            onDirtyChange?.(isDirty);
+        }, [formState, initialData, onDirtyChange]);
 
         const handleCategoryChange = (category: ProgramCategory | null) => {
-            setLocalSelectedCategory(category);
-            setFormState((prev) => ({ ...prev, categoryId: category?.id ?? null }));
-            setErrors((prev) => ({ ...prev, name: undefined }));
+            if (selectedCategory === undefined) {
+                setLocalSelectedCategory(category);
+            }
             onCategoryChange?.(category);
+            setFormState({ categoryId: category?.id ?? null, name: '' });
+            setErrors({ name: undefined });
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

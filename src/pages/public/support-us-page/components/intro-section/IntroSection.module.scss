@@ -1,0 +1,35 @@
+@use '@/assets/sass/mixins/utilits.mixins' as utils;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.intro-section {
+    overflow-x: hidden;
+}
+
+.title {
+    @include utils.yellow-blue-text;
+}
+
+.highlight-yellow,
+.highlight-blue {
+    @include utils.text-highlight;
+}
+
+.highlight-yellow {
+    @include utils.yellow-bg-text;
+}
+
+.highlight-blue {
+    @include utils.blue-bg-text;
+}
+
+.additional-info {
+    @include type.subtitle-2-medium;
+
+    max-width: 470px;
+    margin: 0 auto;
+    text-align: center;
+
+    p {
+        margin: 0;
+    }
+}

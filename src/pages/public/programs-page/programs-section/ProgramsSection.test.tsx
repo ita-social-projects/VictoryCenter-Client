@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { mockPrograms } from '@/utils/mock-data/public/programs-page';
 import programsPageUk from '@/locales/uk/programs.json';
 
@@ -10,8 +11,15 @@ jest.mock('@/components/public/program-card/ProgramCard', () => ({
 
 jest.mock('@/services/api/public/programs/programs-api');
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/hooks/common/use-locale/useLocale');
+
+const mockUseLocale = useLocale as jest.Mock;
 
 describe('ProgramsSection', () => {
+    beforeEach(() => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'uk' });
+    });
+
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -44,6 +52,40 @@ describe('ProgramsSection', () => {
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
         expect(screen.getByText(programsPageUk['PROGRAMS_ALL'])).toBeInTheDocument();
+    });
+
+    it('renders the selected language for program categories', async () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: {
+                ...mockPrograms,
+                programsCategories: [
+                    {
+                        id: 1,
+                        name: 'Категорія 1',
+                        localizations: [
+                            {
+                                localizationInfoDto: { id: 2, code: 'en' },
+                                name: 'Category 1',
+                                translationStatus: 1,
+                            },
+                        ],
+                    },
+                ],
+                programsData: [
+                    {
+                        ...mockPrograms.programsData[0],
+                        categories: [{ id: 1, name: 'Категорія 1' }],
+                    },
+                ],
+            },
+            isLoading: false,
+            error: null,
+        });
+
+        render(<ProgramsSection />);
+
+        expect(screen.getByText('Category 1')).toBeInTheDocument();
     });
 
     it('filters programs by category', async () => {

@@ -1,0 +1,66 @@
+@use '@/assets/sass/variables/colors';
+
+.hippovention-center-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    &-image-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    &-image {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 40px;
+        border-radius: 12px;
+        overflow: hidden;
+        min-height: 500px;
+    }
+
+    &-overlay {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        max-width: 549px;
+        padding: 32px;
+
+        &--top {
+            padding-bottom: 0;
+        }
+
+        &--bottom {
+            padding-top: 0;
+        }
+    }
+
+    &-pros {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    &-title,
+    &-description {
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    &-error {
+        color: colors.$error;
+        font-size: 14px;
+    }
+}

@@ -3,7 +3,13 @@ import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-nu
 
 const roundToTwoDecimals = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
-export const getConvertedAmount = (value: string, exchangeRate: string | null | undefined): string | null => {
+export type AmountConversionDirection = 'uahToUsd' | 'usdToUah';
+
+export const getConvertedAmount = (
+    value: string,
+    exchangeRate: string | null | undefined,
+    direction: AmountConversionDirection = 'uahToUsd',
+): string | null => {
     const parsedExchangeRate = parseAmount(exchangeRate ?? '');
     if (parsedExchangeRate <= 0) {
         return null;
@@ -15,7 +21,8 @@ export const getConvertedAmount = (value: string, exchangeRate: string | null | 
     }
 
     const parsedCurrentAmount = parseAmount(value);
-    const convertedAmount = parsedCurrentAmount / parsedExchangeRate;
+    const convertedAmount =
+        direction === 'uahToUsd' ? parsedCurrentAmount / parsedExchangeRate : parsedCurrentAmount * parsedExchangeRate;
 
     const roundedConvertedAmount = roundToTwoDecimals(convertedAmount);
 

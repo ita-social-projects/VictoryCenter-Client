@@ -39,17 +39,29 @@ export const validateProgramExpenseProgram = ({
     records,
     trigger = 'change',
 }: ValidateProgramExpenseProgramParams): string | undefined => {
-    const trimmedProgramName = programName.trim();
+    const trimmedProgramName = programName.trim().replace(/\s+/g, ' ');
 
     if (programId === undefined && trimmedProgramName === '') {
         return trigger === 'blur' ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined;
     }
 
     if (programId === undefined) {
-        return PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(trimmedProgramName);
+        const nameValidationError = PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(trimmedProgramName);
+        if (nameValidationError) {
+            return nameValidationError;
+        }
     }
 
-    const hasDuplicate = records.some((item) => item.id !== recordId && item.programId === programId);
+    const hasDuplicate = records.some((item) => {
+        if (item.id === recordId) return false;
+
+        const isSameId = programId !== undefined && item.programId === programId;
+        const isSameName =
+            Boolean(trimmedProgramName) &&
+            item.programName.trim().replace(/\s+/g, ' ').toLowerCase() === trimmedProgramName.toLowerCase();
+
+        return isSameId || isSameName;
+    });
 
     return hasDuplicate ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE : undefined;
 };

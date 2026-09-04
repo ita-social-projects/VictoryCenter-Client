@@ -1,0 +1,37 @@
+@use '@/assets/sass/variables/colors';
+
+.hippotherapy-gallery-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    &-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    &-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 360px;
+
+        &:nth-child(even) {
+            margin-top: 100px;
+        }
+    }
+
+    &-card-image {
+        position: relative;
+        width: 100%;
+        min-height: 430px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    &-error {
+        color: colors.$error;
+        font-size: 14px;
+    }
+}

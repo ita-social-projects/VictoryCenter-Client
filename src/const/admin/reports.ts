@@ -181,7 +181,7 @@ export const PDF_SECTION_LOCALIZATION_VALIDATION = {
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
-    DISCLAIMER_LABEL: 'Дісклеймер/ENG',
+    DISCLAIMER_LABEL: 'Дисклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
     MESSAGE: {
         RECORD_CREATED_SUCCESSFULLY: 'Запис додано успішно',
@@ -366,7 +366,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Така категорія вже додана, Оберіть іншу категорію',
+        PROGRAM_UNIQUE: 'Така категорія вже додана. Оберіть іншу категорію',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',
@@ -392,7 +392,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
-        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        RECORD_DELETE_FAILED_RETRY: 'Помилка при видаленні запису. Спробуйте ще раз',
         AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     BULK: {

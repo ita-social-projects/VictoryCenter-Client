@@ -99,8 +99,11 @@ export const ProgramExpensesSection = ({
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
             setSelectedRecordIds([]);
+            refetchReadOnlyData(true).catch(() => {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, ToastType.Error);
+            });
         }
-    }, [isEditing]);
+    }, [isEditing, refetchReadOnlyData, addToast]);
 
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {
@@ -241,7 +244,7 @@ export const ProgramExpensesSection = ({
                 // Refetch error handled by useDataFetch
             }
         } catch {
-            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error, 5000);
         } finally {
             setIsDeletingRecord(false);
             setRecordToDelete(null);

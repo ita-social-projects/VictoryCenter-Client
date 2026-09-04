@@ -11,6 +11,7 @@ export const COMMON_TEXT_ADMIN = {
         WHO_WE_ARE: 'Хто ми',
         EVENTS: 'Новини і події',
         PARTNERS: 'Партнери',
+        HIPPOTHERAPY: 'Іпотерапія',
     },
 
     ALT: {
@@ -22,6 +23,7 @@ export const COMMON_TEXT_ADMIN = {
         UPLOAD_IMAGE: 'Upload image',
         DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
         ADD_FILE_HERE: 'Додайте файл сюди',
+        ENTER_TEXT_PLACEHOLDER: 'Введіть текст...',
         getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
     },
 
@@ -65,6 +67,7 @@ export const COMMON_TEXT_ADMIN = {
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
         UPDATES_SUCCESSFULLY_PUBLISHED: 'Зміни успішно опубліковані',
         FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
+        FAIL_TO_FETCH_DATA: 'Виникла помилка під час завантаження даних',
         TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
         TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
     },

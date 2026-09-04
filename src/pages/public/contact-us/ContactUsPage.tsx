@@ -51,11 +51,10 @@ export const ContactUsPage: React.FC = () => {
     const fallback = useMemo(() => {
         return {
             address: data?.contacts?.address ?? '',
-            motto: data?.contacts?.motto ?? '',
         };
     }, [data]);
 
-    const { address, motto } = useGetLocalization(localizations, fallback);
+    const { address } = useGetLocalization(localizations, fallback);
 
     if (isLoading) {
         return (
@@ -76,7 +75,6 @@ export const ContactUsPage: React.FC = () => {
                     email={CONTACT_US_PAGE_DATA.contacts.email}
                     phone={CONTACT_US_PAGE_DATA.contacts.phone}
                     address={address}
-                    motto={motto}
                     socialLinks={CONTACT_US_PAGE_DATA.socialLinks}
                     copyEmailLabel={t('copyEmailAria')}
                     copyPhoneLabel={t('copyPhoneAria')}
@@ -84,12 +82,12 @@ export const ContactUsPage: React.FC = () => {
                     onCopyPhone={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.phone)}
                 />
                 <ContactFormCard
-                    title={CONTACT_US_PAGE_DATA.formLabel}
-                    namePlaceholder={CONTACT_US_PAGE_DATA.namePlaceholder}
-                    emailPlaceholder={CONTACT_US_PAGE_DATA.emailPlaceholder}
-                    subjectPlaceholder={CONTACT_US_PAGE_DATA.subjectPlaceholder}
-                    messagePlaceholder={CONTACT_US_PAGE_DATA.messagePlaceholder}
-                    submitLabel={CONTACT_US_PAGE_DATA.submitButton}
+                    title={t('formLabel')}
+                    namePlaceholder={t('namePlaceholder')}
+                    emailPlaceholder={t('emailPlaceholder')}
+                    subjectPlaceholder={t('subjectPlaceholder')}
+                    messagePlaceholder={t('messagePlaceholder')}
+                    submitLabel={t('submitButton')}
                 />
             </div>
         </section>

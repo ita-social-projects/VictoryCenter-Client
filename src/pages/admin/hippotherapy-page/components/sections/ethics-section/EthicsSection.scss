@@ -1,0 +1,65 @@
+@use '@/assets/sass/variables/colors';
+
+.hippotherapy-ethics-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    &-image-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    &-image {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        min-height: 448px;
+    }
+
+    &-overlay {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 24px;
+        height: 100%;
+        padding: 32px;
+        pointer-events: none;
+    }
+
+    &-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 416px;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        pointer-events: auto;
+    }
+
+    &-principles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    &-principle {
+        flex: 1 1 192px;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        pointer-events: auto;
+    }
+
+    &-error {
+        color: colors.$error;
+        font-size: 14px;
+    }
+}

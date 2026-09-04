@@ -14,6 +14,12 @@ const convertUahToUsd = (uah: number, rate: number) => {
     return rounded % 1 === 0 ? String(rounded) : String(rounded).replace('.', ',');
 };
 
+const convertUsdToUah = (usd: number, rate: number) => {
+    const converted = usd * rate;
+    const rounded = Number.parseFloat(converted.toFixed(2));
+    return rounded % 1 === 0 ? String(rounded) : String(rounded).replace('.', ',');
+};
+
 jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
     updateFundsAmounts:
         (field: 'amountUah' | 'amountUsd', value: string, exchangeRate: string | null, trigger: 'change' | 'blur') =>
@@ -24,10 +30,14 @@ jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => (
             let nextAmountUah = field === 'amountUah' ? value : state.amountUah;
             let nextAmountUsd = field === 'amountUsd' ? value : state.amountUsd;
 
-            const canConvert = field === 'amountUah' && rate !== null && !Number.isNaN(numericValue);
+            const canConvert = rate !== null && !Number.isNaN(numericValue);
 
-            if (canConvert) {
+            if (canConvert && field === 'amountUah') {
                 nextAmountUsd = convertUahToUsd(numericValue, rate);
+            }
+
+            if (canConvert && field === 'amountUsd') {
+                nextAmountUah = convertUsdToUah(numericValue, rate);
             }
 
             const errors: Record<string, string | undefined> = {
@@ -157,6 +167,37 @@ describe('useFundsAmountEdit', () => {
 
             expect(next.amountUsd).toBe('1190,48');
         });
+
+        it('should recalculate UAH when USD amount changes with a valid exchange rate', () => {
+            const setEditState = jest.fn();
+            const { result } = renderHook(() =>
+                useFundsAmountEdit({ exchangeRate: '40', mismatchMessage: MISMATCH_MESSAGE, setEditState }),
+            );
+
+            act(() => {
+                result.current.handleAmountChange(1, 'amountUsd', '8 000');
+            });
+
+            const next = applyUpdater(setEditState, makeState());
+
+            expect(next.amountUah).toBe('320000');
+        });
+
+        it('should not recalculate UAH when exchange rate is null', () => {
+            const setEditState = jest.fn();
+            const { result } = renderHook(() =>
+                useFundsAmountEdit({ exchangeRate: null, mismatchMessage: MISMATCH_MESSAGE, setEditState }),
+            );
+
+            act(() => {
+                result.current.handleAmountChange(1, 'amountUsd', '8 000');
+            });
+
+            const prev = makeState({ amountUah: '7 265' });
+            const next = applyUpdater(setEditState, prev);
+
+            expect(next.amountUah).toBe('7 265');
+        });
     });
 
     describe('handleAmountBlur', () => {
@@ -206,6 +247,21 @@ describe('useFundsAmountEdit', () => {
             const next = applyUpdater(setEditState, makeState());
 
             expect(next.usdMismatchMessage).toBeUndefined();
+        });
+
+        it('should recalculate UAH when USD amount is blurred', () => {
+            const setEditState = jest.fn();
+            const { result } = renderHook(() =>
+                useFundsAmountEdit({ exchangeRate: '42', mismatchMessage: MISMATCH_MESSAGE, setEditState }),
+            );
+
+            act(() => {
+                result.current.handleAmountBlur(1, 'amountUsd');
+            });
+
+            const next = applyUpdater(setEditState, makeState({ amountUah: '7 265', amountUsd: '4 200' }));
+
+            expect(next.amountUah).toBe('176400');
         });
 
         it('should clear usdMismatchMessage on UAH blur', () => {

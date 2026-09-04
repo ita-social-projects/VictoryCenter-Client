@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { contactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
-import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { createContactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
+import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
 import { useTurnstile } from '@/hooks/public/use-turnstile';
 import { submitContactUsForm } from '@/services/api/public/contact-us/contact-us-api';
 import { ToastItem } from '@/components/admin/toast/toast-item/ToastItem';
 import { Toast, ToastType } from '@/types/admin/toast';
 import styles from './ContactFormCard.module.scss';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
@@ -22,30 +24,19 @@ interface ContactFormCardProps {
     submitLabel: string;
 }
 
-type HintResult = { text: string; type: 'info' } | null;
-
-const getSubjectHint = (length: number): HintResult => {
-    if (length >= CONTACT_FORM_LIMITS.SUBJECT.MAX) {
-        return { text: CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED, type: 'info' };
+const getCharacterLimitHint = (
+    length: number,
+    maxLength: number,
+    infoAt: number,
+    t: TFunction<'contactUsPage', undefined>,
+): string | null => {
+    if (length >= maxLength) {
+        return t('contactForm.limitReached');
     }
-    if (length >= CONTACT_FORM_LIMITS.SUBJECT.INFO_AT) {
-        return {
-            text: CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(CONTACT_FORM_LIMITS.SUBJECT.MAX - length),
-            type: 'info',
-        };
-    }
-    return null;
-};
-
-const getMessageHint = (length: number): HintResult => {
-    if (length >= CONTACT_FORM_LIMITS.MESSAGE.MAX) {
-        return { text: CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED, type: 'info' };
-    }
-    if (length >= CONTACT_FORM_LIMITS.MESSAGE.INFO_AT) {
-        return {
-            text: CONTACT_FORM_MESSAGES.MESSAGE.getInfoMessage(CONTACT_FORM_LIMITS.MESSAGE.MAX - length),
-            type: 'info',
-        };
+    if (length >= infoAt) {
+        return t('contactForm.charactersRemaining', {
+            count: maxLength - length,
+        });
     }
     return null;
 };
@@ -59,18 +50,34 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     messagePlaceholder,
     submitLabel,
 }) => {
+    const { t, i18n } = useTranslation('contactUsPage');
+
+    const contactFormSchema = useMemo(() => createContactFormSchema(t), [t]);
+
     const {
         register,
         handleSubmit,
         watch,
         reset,
         clearErrors,
+        trigger,
         formState: { errors },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
         mode: 'onBlur',
         reValidateMode: 'onBlur',
     });
+
+    const errorsRef = useRef(errors);
+    errorsRef.current = errors;
+
+    useEffect(() => {
+        const fieldsWithErrors = Object.keys(errorsRef.current) as (keyof ContactFormData)[];
+
+        if (fieldsWithErrors.length > 0) {
+            trigger(fieldsWithErrors);
+        }
+    }, [i18n.language, trigger]);
 
     const {
         token: turnstileToken,
@@ -91,8 +98,18 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     const subjectValue = watch('subject') ?? '';
     const messageValue = watch('message') ?? '';
 
-    const subjectHint = getSubjectHint(subjectValue.length);
-    const messageHint = getMessageHint(messageValue.length);
+    const subjectHint = getCharacterLimitHint(
+        subjectValue.length,
+        CONTACT_FORM_LIMITS.SUBJECT.MAX,
+        CONTACT_FORM_LIMITS.SUBJECT.INFO_AT,
+        t,
+    );
+    const messageHint = getCharacterLimitHint(
+        messageValue.length,
+        CONTACT_FORM_LIMITS.MESSAGE.MAX,
+        CONTACT_FORM_LIMITS.MESSAGE.INFO_AT,
+        t,
+    );
 
     const onSubmit = async (data: ContactFormData) => {
         if (!turnstileToken) return;
@@ -108,9 +125,9 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
             reset();
             resetTurnstile();
-            showToast('Ваш запит надіслано успішно. Очікуйте на відповідь', ToastType.Success, 5000);
-        } catch (error) {
-            showToast('Сталася помилка. Спробуйте пізніше', ToastType.Error, 3000);
+            showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
+        } catch {
+            showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }
     };
 
@@ -202,7 +219,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                     )}
                     {!errors.subject && subjectHint && (
                         <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
-                            {subjectHint.text}
+                            {subjectHint}
                         </span>
                     )}
                 </div>
@@ -237,7 +254,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                     )}
                     {!errors.message && messageHint && (
                         <span className={styles['contact-form-message--info']} role="status" aria-live="polite">
-                            {messageHint.text}
+                            {messageHint}
                         </span>
                     )}
                 </div>

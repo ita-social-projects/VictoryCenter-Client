@@ -401,14 +401,21 @@ export const FundsExpenditureSection = ({
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
-    const programAggregateRow = useMemo<ProgramAggregateRow>(() => {
+    const programAggregateRow = useMemo<ProgramAggregateRow | null>(() => {
+        const shouldHideProgramAggregateRow =
+            (selectedType !== undefined && selectedType !== 'expense') || selectedCategoryId !== undefined;
+
+        if (shouldHideProgramAggregateRow) {
+            return null;
+        }
+
         return {
             reportingYear: String(programYearValue),
             categoryName: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL,
             amountUah: formatNumberDecimalComma(programSummary.totalAmountUah),
             amountUsd: formatNumberDecimalComma(programSummary.totalAmountUsd),
         };
-    }, [programSummary, programYearValue]);
+    }, [programSummary, programYearValue, selectedType, selectedCategoryId]);
 
     const handleProgramYearSave = useCallback(
         async (reportingYear: string): Promise<boolean> => {
@@ -760,6 +767,7 @@ export const FundsExpenditureSection = ({
                         )}
                         error={disclaimerError}
                         rows={3}
+                        autoGrow={true}
                         isRequired
                         className={styles['disclaimer-textarea-group']}
                     />

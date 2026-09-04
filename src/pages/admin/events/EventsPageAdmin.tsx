@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { UI_CONFIG } from '@/const/admin/common';
+import { useCallback, useState, useMemo, useEffect } from 'react';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventsApi } from '@/services/api/admin/events/events-api';
@@ -9,10 +9,20 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import './EventsPageAdmin.scss';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { EventCategory } from '@/types/admin/event-category';
+import { EventsNews } from '@/types/admin/events-news';
+import { EventsPageModals } from './event-page-modals/EventsPageModals';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
+    const [categories, setCategories] = useState<EventCategory[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
+    const modalsStateControl = useModalsState<EventsNews>();
+    const { openModalActions } = modalsStateControl;
 
     const client = useAdminClient();
 
@@ -41,6 +51,62 @@ export const EventsPageAdmin = () => {
         setStatusFilter(status);
     }, []);
 
+    // Category handlers
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
+
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+        ],
+        [],
+    );
+
+    // Category CRUD handlers
+    const fetchCategories = useCallback(async () => {
+        try {
+            const fetchedCategories = await EventCategoriesApi.getAll(client);
+
+            setCategories(fetchedCategories);
+        } catch {
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+        }
+    }, [client, setErrorState]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
+
+    const handleAddEvent = useCallback(() => {
+        openModalActions.openAddItemModal();
+    }, [openModalActions]);
+
+    const handleAddCategory = useCallback((newCategory: EventCategory) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
+
+    const handleUpdateCategory = useCallback(
+        (updatedCategory: EventCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+
+            if (selectedCategory?.id === updatedCategory.id) {
+                setSelectedCategory(updatedCategory);
+            }
+        },
+        [selectedCategory?.id],
+    );
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -52,7 +118,7 @@ export const EventsPageAdmin = () => {
                     onSearchClear={() => null}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={() => null}
+                    onAddItem={handleAddEvent}
                     AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
                     onSuggestionSelect={() => null}
                     languages={allLanguages}
@@ -62,8 +128,26 @@ export const EventsPageAdmin = () => {
                 />
             </div>
             <div className="events-page-list-container">
+                <CategoryBar<EventCategory>
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={setSelectedCategory}
+                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryKey={(category) => category.id}
+                    displayContextMenuButton={true}
+                    contextMenuOptions={categoryBarContextMenuOptions}
+                    onContextMenuOptionSelected={onContextMenuOptionSelected}
+                />
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>
+
+            <EventsPageModals
+                modalsStateControl={modalsStateControl}
+                categories={categories}
+                currentCategory={selectedCategory}
+                onAddCategory={handleAddCategory}
+                onUpdateCategory={handleUpdateCategory}
+            />
         </div>
     );
 };

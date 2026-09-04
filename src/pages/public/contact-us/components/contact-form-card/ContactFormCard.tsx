@@ -28,9 +28,9 @@ const getSubjectHint = (length: number): HintResult => {
     if (length >= CONTACT_FORM_LIMITS.SUBJECT.MAX) {
         return { text: CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED, type: 'info' };
     }
-    if (length >= CONTACT_FORM_LIMITS.SUBJECT.WARN_AT) {
+    if (length >= CONTACT_FORM_LIMITS.SUBJECT.INFO_AT) {
         return {
-            text: CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(CONTACT_FORM_LIMITS.SUBJECT.MAX - length),
+            text: CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(CONTACT_FORM_LIMITS.SUBJECT.MAX - length),
             type: 'info',
         };
     }
@@ -41,9 +41,9 @@ const getMessageHint = (length: number): HintResult => {
     if (length >= CONTACT_FORM_LIMITS.MESSAGE.MAX) {
         return { text: CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED, type: 'info' };
     }
-    if (length >= CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) {
+    if (length >= CONTACT_FORM_LIMITS.MESSAGE.INFO_AT) {
         return {
-            text: CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(CONTACT_FORM_LIMITS.MESSAGE.MAX - length),
+            text: CONTACT_FORM_MESSAGES.MESSAGE.getInfoMessage(CONTACT_FORM_LIMITS.MESSAGE.MAX - length),
             type: 'info',
         };
     }

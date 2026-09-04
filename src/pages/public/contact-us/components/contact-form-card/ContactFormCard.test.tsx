@@ -79,10 +79,10 @@ describe('ContactFormCard', () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
 
-            await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
+            await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT));
 
-            const remaining = CONTACT_FORM_LIMITS.SUBJECT.MAX - CONTACT_FORM_LIMITS.SUBJECT.WARN_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(remaining))).toBeInTheDocument();
+            const remaining = CONTACT_FORM_LIMITS.SUBJECT.MAX - CONTACT_FORM_LIMITS.SUBJECT.INFO_AT;
+            expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(remaining))).toBeInTheDocument();
         });
 
         it('shows limit-reached message when subject hits MAX characters', async () => {
@@ -108,13 +108,13 @@ describe('ContactFormCard', () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
 
-            await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT - 1));
+            await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT - 1));
 
             expect(screen.queryByText(CONTACT_FORM_MESSAGES.SUBJECT.LIMIT_REACHED)).not.toBeInTheDocument();
             expect(
                 screen.queryByText(
-                    CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(
-                        CONTACT_FORM_LIMITS.SUBJECT.MAX - (CONTACT_FORM_LIMITS.SUBJECT.WARN_AT - 1),
+                    CONTACT_FORM_MESSAGES.SUBJECT.getInfoMessage(
+                        CONTACT_FORM_LIMITS.SUBJECT.MAX - (CONTACT_FORM_LIMITS.SUBJECT.INFO_AT - 1),
                     ),
                 ),
             ).not.toBeInTheDocument();
@@ -126,10 +126,10 @@ describe('ContactFormCard', () => {
             renderForm();
             const messageTextarea = screen.getByPlaceholderText('Напишіть ваше повідомлення');
 
-            fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) } });
+            fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.INFO_AT) } });
 
-            const remaining = CONTACT_FORM_LIMITS.MESSAGE.MAX - CONTACT_FORM_LIMITS.MESSAGE.WARN_AT;
-            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(remaining))).toBeInTheDocument();
+            const remaining = CONTACT_FORM_LIMITS.MESSAGE.MAX - CONTACT_FORM_LIMITS.MESSAGE.INFO_AT;
+            expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getInfoMessage(remaining))).toBeInTheDocument();
         });
 
         it('shows limit-reached message when message hits MAX characters', () => {

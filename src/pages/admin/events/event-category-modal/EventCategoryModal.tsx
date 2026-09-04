@@ -265,7 +265,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
                                 getOptionId={(category) => category.id}
                                 getOptionName={(category) => category.name}
                                 onChange={handleCategoryChange}
-                                placeholder={EVENT_CATEGORY_TEXT.FORM.SELECT_CATEGORY_PLACEHOLDER}
+                                placeholder={COMMON_TEXT_ADMIN.FILTER.CATEGORY.SELECT_CATEGORY}
                                 value={selectedCategory || undefined}
                                 disabled={isSubmitting}
                             />

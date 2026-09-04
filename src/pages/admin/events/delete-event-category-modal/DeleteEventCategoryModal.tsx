@@ -112,7 +112,7 @@ export const DeleteEventCategoryModal = ({ isOpen, categories, onClose, onConfir
                             options={categories}
                             getOptionId={(cat) => cat.id}
                             getOptionName={(cat) => cat.name}
-                            placeholder={EVENT_CATEGORY_TEXT.FORM.SELECT_CATEGORY_PLACEHOLDER}
+                            placeholder={COMMON_TEXT_ADMIN.FILTER.CATEGORY.SELECT_CATEGORY}
                             onChange={handleCategoryChange}
                             disabled={isSubmitting}
                             value={selectedCategory}

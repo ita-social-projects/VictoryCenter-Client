@@ -12,10 +12,11 @@ interface ContactFormPopUpProps {
 }
 
 export const ContactFormPopUp: React.FC<ContactFormPopUpProps> = ({ isOpen, onClose }) => {
-    const overlayRef = useRef<HTMLDivElement>(null);
     const isMouseDownOnOverlay = useRef(false);
 
     useEffect(() => {
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 onClose();
@@ -26,24 +27,24 @@ export const ContactFormPopUp: React.FC<ContactFormPopUpProps> = ({ isOpen, onCl
             document.body.style.overflow = 'hidden';
             document.addEventListener('keydown', handleGlobalKeyDown);
         } else {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = originalStyle;
             document.removeEventListener('keydown', handleGlobalKeyDown);
         }
 
         return () => {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = originalStyle;
             document.removeEventListener('keydown', handleGlobalKeyDown);
         };
     }, [isOpen, onClose]);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === overlayRef.current) {
+        if (e.target === e.currentTarget) {
             isMouseDownOnOverlay.current = true;
         }
     };
 
     const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (isMouseDownOnOverlay.current && e.target === overlayRef.current) {
+        if (isMouseDownOnOverlay.current && e.target === e.currentTarget) {
             onClose();
         }
         isMouseDownOnOverlay.current = false;
@@ -54,7 +55,6 @@ export const ContactFormPopUp: React.FC<ContactFormPopUpProps> = ({ isOpen, onCl
     const modalContent = (
         <div
             className={styles.overlay}
-            ref={overlayRef}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             data-testid="popup-overlay"

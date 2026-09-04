@@ -221,13 +221,18 @@ export const useProgramExpenseRecordForm = ({
     );
 
     const handleProgramBlur = useCallback(() => {
-        setFormState((previousState) => ({
-            ...previousState,
-            errors: {
-                ...previousState.errors,
-                programId: getProgramError(previousState.programId, previousState.programInputValue, 'blur'),
-            },
-        }));
+        setFormState((previousState) => {
+            const normalizedInputValue = previousState.programInputValue.trim().replace(/\s+/g, ' ');
+
+            return {
+                ...previousState,
+                programInputValue: normalizedInputValue,
+                errors: {
+                    ...previousState.errors,
+                    programId: getProgramError(previousState.programId, normalizedInputValue, 'blur'),
+                },
+            };
+        });
     }, [getProgramError]);
 
     const isEditModeDirty = () => {

@@ -6,7 +6,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateNodesFromDOM } from '@lexical/html';
-import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
+import { $getRoot, $insertNodes, LexicalEditor, $setSelection } from 'lexical';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './RichTextInput.module.scss';
@@ -103,6 +103,7 @@ export const RichTextInput = ({
                     const root = $getRoot();
                     root.clear();
                     $insertNodes(nodes);
+                    $setSelection(null);
                 }
             },
         }),

@@ -58,6 +58,7 @@ jest.mock('@lexical/html', () => ({
 jest.mock('lexical', () => ({
     $getRoot: jest.fn(() => ({ clear: jest.fn() })),
     $insertNodes: jest.fn(),
+    $setSelection: jest.fn(),
     $getSelection: jest.fn(),
     $isRangeSelection: jest.fn(() => false),
     $createLineBreakNode: jest.fn(),

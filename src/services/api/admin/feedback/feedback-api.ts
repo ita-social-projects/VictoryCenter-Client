@@ -1,11 +1,15 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto, FeedbackReviewDto } from '@/types/admin/feedback';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const FeedbackApi = {
-    fetchHistory: async (_client: AxiosInstance): Promise<PaginationResult<FeedbackHistoryDto>> => {
+    fetchHistory: async (
+        _client: AxiosInstance,
+        _params?: { status?: VisibilityStatus; language?: string; translationStatus?: TranslationStatusFilter },
+    ): Promise<PaginationResult<FeedbackHistoryDto>> => {
         await mockDelay(500);
         const data: FeedbackHistoryDto[] = Array.from({ length: 5 }).map((_, i) => ({
             id: i + 1,
@@ -17,7 +21,10 @@ export const FeedbackApi = {
         }));
         return { items: data, totalItemsCount: data.length };
     },
-    fetchReviews: async (_client: AxiosInstance): Promise<PaginationResult<FeedbackReviewDto>> => {
+    fetchReviews: async (
+        _client: AxiosInstance,
+        _params?: { status?: VisibilityStatus; language?: string; translationStatus?: TranslationStatusFilter },
+    ): Promise<PaginationResult<FeedbackReviewDto>> => {
         await mockDelay(500);
         const data: FeedbackReviewDto[] = Array.from({ length: 5 }).map((_, i) => ({
             id: i + 1,
@@ -28,7 +35,10 @@ export const FeedbackApi = {
         }));
         return { items: data, totalItemsCount: data.length };
     },
-    fetchVideos: async (_client: AxiosInstance): Promise<PaginationResult<any>> => {
+    fetchVideos: async (
+        _client: AxiosInstance,
+        _params?: { status?: VisibilityStatus; language?: string; translationStatus?: TranslationStatusFilter },
+    ): Promise<PaginationResult<any>> => {
         await mockDelay(500);
         const data = Array.from({ length: 5 }).map((_, i) => ({
             id: i + 1,
@@ -38,5 +48,9 @@ export const FeedbackApi = {
             priority: i,
         }));
         return { items: data, totalItemsCount: data.length };
+    },
+    reorderFeedback: async (_client: AxiosInstance, _category: string, _orderedIds: number[]): Promise<void> => {
+        await mockDelay(500);
+        // Mock successful reorder
     },
 };

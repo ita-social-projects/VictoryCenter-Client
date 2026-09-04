@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, useEffect } from 'react';
+import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -11,6 +11,9 @@ import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import './FeedbackPageAdmin.scss';
 
 export const FeedbackPageAdmin = () => {
@@ -22,9 +25,16 @@ export const FeedbackPageAdmin = () => {
     const [hasMore, setHasMore] = useState<boolean>(false);
 
     const client = useAdminClient();
+    const { addToast } = useToast();
 
     const setErrorState = useCallback((message: string, type: string) => setError({ message, type }), []);
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
+    const {
+        allLanguages,
+        selectedLanguage,
+        translationStatusFilter,
+        onLanguageChange,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({
         setErrorState: setErrorState as any,
     });
 
@@ -32,6 +42,10 @@ export const FeedbackPageAdmin = () => {
         () => FEEDBACK_CATEGORIES.find((c) => c.id === activeCategory) || FEEDBACK_CATEGORIES[0],
         [activeCategory],
     );
+
+    const handleNotImplemented = useCallback(() => {
+        addToast('Функція не реалізована', ToastType.Info);
+    }, [addToast]);
 
     const searchPlaceholder = useMemo(() => {
         switch (activeCategory) {
@@ -46,41 +60,61 @@ export const FeedbackPageAdmin = () => {
         }
     }, [activeCategory]);
 
+    const latestRequestId = useRef<number>(0);
+
     const fetchCategoryItems = useCallback(
         async (category: FeedbackCategory) => {
+            const requestId = ++latestRequestId.current;
             try {
                 setIsLoading(true);
                 setError({ message: null, type: null });
 
+                const params = {
+                    status: statusFilter,
+                    language: selectedLanguage?.code,
+                    translationStatus: translationStatusFilter,
+                };
+
                 let result: PaginationResult<FeedbackListItem>;
                 if (category === FeedbackCategory.HISTORY) {
-                    result = await FeedbackApi.fetchHistory(client);
+                    result = await FeedbackApi.fetchHistory(client, params);
                 } else if (category === FeedbackCategory.REVIEWS) {
-                    result = await FeedbackApi.fetchReviews(client);
+                    result = await FeedbackApi.fetchReviews(client, params);
                 } else {
-                    result = await FeedbackApi.fetchVideos(client);
+                    result = await FeedbackApi.fetchVideos(client, params);
                 }
+
+                if (requestId !== latestRequestId.current) return;
 
                 setItems(result.items);
                 setHasMore(false);
             } catch {
+                if (requestId !== latestRequestId.current) return;
                 setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_FETCH_ITEMS, type: 'fetch' });
             } finally {
-                setIsLoading(false);
+                if (requestId === latestRequestId.current) {
+                    setIsLoading(false);
+                }
             }
         },
-        [client],
+        [client, statusFilter, selectedLanguage, translationStatusFilter],
     );
 
     useEffect(() => {
+        setItems([]);
         fetchCategoryItems(activeCategory);
     }, [activeCategory, fetchCategoryItems]);
 
     const getFeedbackSearchItems = useCallback(async (): Promise<PaginationResult<any>> => {
-        if (activeCategory === FeedbackCategory.HISTORY) return FeedbackApi.fetchHistory(client);
-        if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client);
-        return FeedbackApi.fetchVideos(client);
-    }, [client, activeCategory]);
+        const params = {
+            status: statusFilter,
+            language: selectedLanguage?.code,
+            translationStatus: translationStatusFilter,
+        };
+        if (activeCategory === FeedbackCategory.HISTORY) return FeedbackApi.fetchHistory(client, params);
+        if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client, params);
+        return FeedbackApi.fetchVideos(client, params);
+    }, [client, activeCategory, statusFilter, selectedLanguage, translationStatusFilter]);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -90,9 +124,18 @@ export const FeedbackPageAdmin = () => {
         setActiveCategory(category.id);
     }, []);
 
-    const handleEntitiesReordered = useCallback((reorderedItems: FeedbackListItem[]) => {
-        setItems(reorderedItems);
-    }, []);
+    const handleEntitiesReordered = useCallback(
+        async (reorderedItems: FeedbackListItem[]) => {
+            setItems(reorderedItems);
+            try {
+                const orderedIds = reorderedItems.map((item) => item.id);
+                await FeedbackApi.reorderFeedback(client, activeCategory, orderedIds);
+            } catch {
+                setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER || 'Failed to reorder', type: 'reorder' });
+            }
+        },
+        [client, activeCategory],
+    );
 
     const renderFeedbackItem = useCallback(
         (item: FeedbackListItem) => (
@@ -106,8 +149,8 @@ export const FeedbackPageAdmin = () => {
                         key={i.id}
                         item={i}
                         showPhoto={activeCategory === FeedbackCategory.HISTORY}
-                        onEdit={() => null}
-                        onDelete={() => null}
+                        onEdit={handleNotImplemented}
+                        onDelete={handleNotImplemented}
                     />
                 )}
                 entities={items}
@@ -115,7 +158,7 @@ export const FeedbackPageAdmin = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [items, activeCategory, handleEntitiesReordered],
+        [items, activeCategory, handleEntitiesReordered, handleNotImplemented],
     );
 
     return (
@@ -129,7 +172,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={() => null}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={() => null}
+                    onAddItem={handleNotImplemented}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={() => null}
                     languages={allLanguages}
@@ -167,6 +210,7 @@ export const FeedbackPageAdmin = () => {
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>
+            <ToastContainer />
         </div>
     );
 };

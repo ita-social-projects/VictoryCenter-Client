@@ -23,11 +23,15 @@ export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }:
         setImgError(false);
     }, [imageUrl]);
 
-    const handleEdit = () => {
+    const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
         onEdit?.(item);
     };
 
-    const handleDelete = () => {
+    const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
         onDelete?.(item);
     };
 

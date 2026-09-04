@@ -255,6 +255,7 @@
 }
 
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -268,10 +269,10 @@
 }
 
 .to-top-button {
+    position: absolute;
+    right: 28px;
+    bottom: 20px;
     display: inline-flex;
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: 28px;
     align-items: center;
     justify-content: center;
     width: 60px;
@@ -299,8 +300,15 @@
 }
 
 .loading-more-container {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 15px 0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background-color: rgba(c.$white, 0.9);
+    pointer-events: none;
 }

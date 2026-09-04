@@ -7,7 +7,8 @@ jest.mock('react-i18next', () => ({
         t: (key: string) => {
             const translations: Record<string, string> = {
                 PROGRAM_PROMPT: 'Не впевнені, яка програма підійде саме вам?',
-                TEXT_US: 'Напишіть нам — ми разом підберемо те, що найкраще відповідає вашим потребам або потребам вашої дитини.',
+                TEXT_US:
+                    'Напишіть нам — ми разом підберемо те, що найкраще відповідає вашим потребам або потребам вашої дитини.',
                 CONTACT: 'Звʼязатись з нами',
             };
             return translations[key] || key;
@@ -18,10 +19,10 @@ jest.mock('react-i18next', () => ({
 jest.mock('./contact-form-pop-up/ContactFormPopUp', () => ({
     ContactFormPopUp: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
         isOpen ? (
-            <div data-testid= "mock-popup" >
-            <button onClick={ onClose } > Close Mock Popup </button>
-</div>
-) : null,
+            <div data-testid="mock-popup">
+                <button onClick={onClose}> Close Mock Popup </button>
+            </div>
+        ) : null,
 }));
 
 describe('ContactSection', () => {

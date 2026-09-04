@@ -43,7 +43,7 @@ const DEFAULT_PROPS = {
     submitLabel: 'Надіслати',
 };
 
-const renderForm = () => render(<ContactFormCard { ...DEFAULT_PROPS } />);
+const renderForm = () => render(<ContactFormCard {...DEFAULT_PROPS} />);
 
 describe('ContactFormCard', () => {
     beforeEach(() => {
@@ -58,14 +58,14 @@ describe('ContactFormCard', () => {
 
     describe('Styles and isPopup prop', () => {
         it('applies popup class when isPopup is true', () => {
-            render(<ContactFormCard { ...DEFAULT_PROPS } isPopup = { true} />);
+            render(<ContactFormCard {...DEFAULT_PROPS} isPopup={true} />);
             const form = screen.getByRole('form', { name: 'Contact form' });
 
             expect(form).toHaveClass('contact-form-card--popup');
         });
 
         it('does not apply popup class when isPopup is false', () => {
-            render(<ContactFormCard { ...DEFAULT_PROPS } isPopup = { false} />);
+            render(<ContactFormCard {...DEFAULT_PROPS} isPopup={false} />);
             const form = screen.getByRole('form', { name: 'Contact form' });
 
             expect(form).not.toHaveClass('contact-form-card--popup');

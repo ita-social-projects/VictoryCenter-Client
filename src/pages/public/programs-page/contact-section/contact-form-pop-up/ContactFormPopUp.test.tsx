@@ -13,7 +13,7 @@ jest.mock('@/pages/public/contact-us/components/contact-form-card/ContactFormCar
 
 jest.mock('react-focus-lock', () => ({
     __esModule: true,
-    default: ({ children }: { children: React.ReactNode }) => <div>{ children } </div>
+    default: ({ children }: { children: React.ReactNode }) => <div>{children} </div>,
 }));
 
 describe('ContactFormPopUp Component', () => {
@@ -25,13 +25,13 @@ describe('ContactFormPopUp Component', () => {
     });
 
     it('does not render the component when isOpen is false', () => {
-        const { container } = render(<ContactFormPopUp isOpen={ false} onClose = { mockOnClose } />);
+        const { container } = render(<ContactFormPopUp isOpen={false} onClose={mockOnClose} />);
         expect(screen.queryByTestId('popup-overlay')).not.toBeInTheDocument();
         expect(container).toBeEmptyDOMElement();
     });
 
     it('renders the popup and its content when isOpen is true', () => {
-        render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
 
         expect(screen.getByTestId('popup-overlay')).toBeInTheDocument();
         expect(screen.getByTestId('cross-icon')).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('ContactFormPopUp Component', () => {
     });
 
     it('calls onClose when the close button is clicked', () => {
-        render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
 
         const closeBtn = screen.getByRole('button', { name: /закрити форму/i, hidden: true });
         fireEvent.click(closeBtn);
@@ -51,7 +51,7 @@ describe('ContactFormPopUp Component', () => {
     });
 
     it('calls onClose when the Escape key is pressed', () => {
-        render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
 
         fireEvent.keyDown(document, { key: 'Escape' });
 
@@ -59,7 +59,7 @@ describe('ContactFormPopUp Component', () => {
     });
 
     it('does not call onClose when other keys are pressed', () => {
-        render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
 
         fireEvent.keyDown(document, { key: 'Enter' });
 
@@ -67,13 +67,13 @@ describe('ContactFormPopUp Component', () => {
     });
 
     it('toggles body overflow hidden/auto on open and close', () => {
-        const { rerender, unmount } = render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        const { rerender, unmount } = render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
         expect(document.body.style.overflow).toBe('hidden');
 
-        rerender(<ContactFormPopUp isOpen={ false} onClose = { mockOnClose } />);
+        rerender(<ContactFormPopUp isOpen={false} onClose={mockOnClose} />);
         expect(document.body.style.overflow).toBe('auto');
 
-        rerender(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+        rerender(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
         expect(document.body.style.overflow).toBe('hidden');
 
         unmount();
@@ -82,7 +82,7 @@ describe('ContactFormPopUp Component', () => {
 
     describe('Overlay click closure', () => {
         it('calls onClose if mousedown and mouseup occur on the overlay', () => {
-            render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+            render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
             const overlay = screen.getByTestId('popup-overlay');
 
             fireEvent.mouseDown(overlay);
@@ -92,7 +92,7 @@ describe('ContactFormPopUp Component', () => {
         });
 
         it('does not call onClose if mousedown is on content and mouseup is on overlay (e.g., text selection)', () => {
-            render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+            render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
             const overlay = screen.getByTestId('popup-overlay');
             const popupContent = screen.getByRole('presentation', { hidden: true });
 
@@ -103,7 +103,7 @@ describe('ContactFormPopUp Component', () => {
         });
 
         it('does not call onClose when clicking inside the modal content', () => {
-            render(<ContactFormPopUp isOpen={ true} onClose = { mockOnClose } />);
+            render(<ContactFormPopUp isOpen={true} onClose={mockOnClose} />);
             const popupContent = screen.getByRole('presentation', { hidden: true });
 
             fireEvent.click(popupContent);

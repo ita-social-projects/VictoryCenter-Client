@@ -309,6 +309,20 @@ export const FundsExpenditureSection = ({
     }, [registerRefetchSettingsCallback, refetchSettings]);
 
     useEffect(() => {
+        const handleProgramExpensesUpdate = (event: Event) => {
+            if (event instanceof CustomEvent && event.detail?.source === 'ProgramExpensesSection') {
+                refetchProgramSummary()?.catch(() => {});
+            }
+        };
+
+        window.addEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
+
+        return () => {
+            window.removeEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
+        };
+    }, [refetchProgramSummary]);
+
+    useEffect(() => {
         setRecordsState(allRecords);
     }, [allRecords]);
 

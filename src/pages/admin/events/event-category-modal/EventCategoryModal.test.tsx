@@ -1,11 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventCategoryModal } from './EventCategoryModal';
-import { ModalMode } from '@/types/admin/common';
-import { EventCategory } from '@/types/admin/event-category';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
+import { ModalMode } from '@/types/admin/common';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockValidateName = jest.fn();
 
@@ -37,7 +37,7 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
             value={value?.id ?? ''}
             disabled={disabled}
             onChange={(e) => {
-                const selected = options.find((category: EventCategory) => category.id === Number(e.target.value));
+                const selected = options.find((category: EventCategoryDto) => category.id === Number(e.target.value));
 
                 if (selected) {
                     onChange(selected);
@@ -46,7 +46,7 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
         >
             <option value="">{placeholder}</option>
 
-            {options.map((category: EventCategory) => (
+            {options.map((category: EventCategoryDto) => (
                 <option key={category.id} value={category.id}>
                     {category.name}
                 </option>
@@ -80,14 +80,16 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: require('@/utils/test-mocks/events-modals-mocks').MockConfirmationModal,
 }));
 
-const categories: EventCategory[] = [
+const categories: EventCategoryDto[] = [
     {
         id: 1,
         name: 'Category 1',
+        relatedEventNewsCount: 0,
     },
     {
         id: 2,
         name: 'Category 2',
+        relatedEventNewsCount: 0,
     },
 ];
 
@@ -189,9 +191,10 @@ describe('EventCategoryModal', () => {
         });
 
         it('submits form directly on Save click in Add mode', async () => {
-            const newCategory: EventCategory = {
-                id: 1,
+            const newCategory: EventCategoryDto = {
+                id: 3,
                 name: 'New Category',
+                relatedEventNewsCount: 0,
             };
 
             (EventCategoriesApi.create as jest.Mock).mockResolvedValue(newCategory);
@@ -304,7 +307,11 @@ describe('EventCategoryModal', () => {
         });
 
         it('shows save confirmation modal and submits on confirm in Edit mode', async () => {
-            const updatedCategory = { id: 1, name: 'Updated Category' };
+            const updatedCategory: EventCategoryDto = {
+                id: 1,
+                name: 'Updated Category',
+                relatedEventNewsCount: 0,
+            };
             (EventCategoriesApi.update as jest.Mock).mockResolvedValue(updatedCategory);
 
             render(<EventCategoryModal {...defaultProps} mode={ModalMode.Edit} />);

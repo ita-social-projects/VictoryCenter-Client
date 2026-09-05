@@ -1,26 +1,26 @@
 import { useCallback, useState, useMemo, useEffect } from 'react';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { EventsApi } from '@/services/api/admin/events/events-api';
-import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
-import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
-import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { EVENTS_TEXT } from '@/const/admin/events';
-import './EventsPageAdmin.scss';
-import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
-import { EventCategory } from '@/types/admin/event-category';
-import { EventsNews } from '@/types/admin/events-news';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { EventsNews } from '@/types/admin/events-news';
+import { EVENTS_TEXT } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import './EventsPageAdmin.scss';
 
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-    const [categories, setCategories] = useState<EventCategory[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<EventCategory | null>(null);
+    const [categories, setCategories] = useState<EventCategoryDto[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
     const modalsStateControl = useModalsState<EventsNews>();
     const { openModalActions } = modalsStateControl;
 
@@ -58,6 +58,8 @@ export const EventsPageAdmin = () => {
                 openModalActions.openAddCategoryModal();
             } else if (id === 'edit') {
                 openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
             }
         },
         [openModalActions],
@@ -67,6 +69,7 @@ export const EventsPageAdmin = () => {
         () => [
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
         ],
         [],
     );
@@ -86,22 +89,33 @@ export const EventsPageAdmin = () => {
         fetchCategories();
     }, [fetchCategories]);
 
+    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
+
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
 
-    const handleAddCategory = useCallback((newCategory: EventCategory) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
-
     const handleUpdateCategory = useCallback(
-        (updatedCategory: EventCategory) => {
+        (updatedCategory: EventCategoryDto) => {
             setCategories((prevCategories) =>
                 prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
             );
 
             if (selectedCategory?.id === updatedCategory.id) {
                 setSelectedCategory(updatedCategory);
+            }
+        },
+        [selectedCategory?.id],
+    );
+
+    const handleDeleteCategory = useCallback(
+        (categoryToDeleteId: number) => {
+            setCategories((prevCategories) => prevCategories.filter((category) => category.id !== categoryToDeleteId));
+
+            if (selectedCategory?.id === categoryToDeleteId) {
+                setSelectedCategory(null);
             }
         },
         [selectedCategory?.id],
@@ -128,7 +142,7 @@ export const EventsPageAdmin = () => {
                 />
             </div>
             <div className="events-page-list-container">
-                <CategoryBar<EventCategory>
+                <CategoryBar<EventCategoryDto>
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={setSelectedCategory}
@@ -147,6 +161,7 @@ export const EventsPageAdmin = () => {
                 currentCategory={selectedCategory}
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
+                onDeleteCategory={handleDeleteCategory}
             />
         </div>
     );

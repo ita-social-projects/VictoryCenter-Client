@@ -28,6 +28,10 @@ export const EVENT_CATEGORY_VALIDATION = {
         getMaxError: () => `Не більше ${EVENT_CATEGORY_VALIDATION.name.max} символів.`,
         getRequiredError: () => 'Назва обов’язкова',
     },
+    eventItemsCount: {
+        getHasEventNewsCountError: (count: number) => `Категорія використовується, ${count} записи`,
+        getRelocationOrRemovalHint: () => 'Видаліть або замініть їх',
+    },
 };
 
 export const EVENT_CATEGORY_TEXT = {
@@ -37,7 +41,6 @@ export const EVENT_CATEGORY_TEXT = {
             CATEGORY: 'Категорія',
         },
         NAME_PLACEHOLDER: 'Введіть назву категорії',
-        SELECT_CATEGORY_PLACEHOLDER: 'Виберіть категорію',
     },
 };
 

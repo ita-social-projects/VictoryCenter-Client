@@ -1,16 +1,19 @@
-import { EventsNews } from '@/types/admin/events-news';
-import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
-import { EventCategory } from '@/types/admin/event-category';
-import { ModalMode } from '@/types/admin/common';
+import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { EventsNews } from '@/types/admin/events-news';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { ModalMode } from '@/types/admin/common';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventsNews>;
-    categories: EventCategory[];
-    currentCategory: EventCategory | null;
-    onAddCategory(category: EventCategory): void;
-    onUpdateCategory(category: EventCategory): void;
+    categories: EventCategoryDto[];
+    currentCategory: EventCategoryDto | null;
+    onAddCategory(category: EventCategoryDto): void;
+    onUpdateCategory(category: EventCategoryDto): void;
+    onDeleteCategory(categoryId: number): void;
 }
 
 export const EventsPageModals = ({
@@ -19,6 +22,7 @@ export const EventsPageModals = ({
     currentCategory,
     onAddCategory,
     onUpdateCategory,
+    onDeleteCategory,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
@@ -45,6 +49,14 @@ export const EventsPageModals = ({
                 categories={categories}
                 onUpdateCategory={onUpdateCategory}
             />
+
+            <DeleteEventCategoryModal
+                isOpen={modalState.isDeleteCategoryModalOpen}
+                categories={categories}
+                onClose={closeModalActions.closeDeleteCategoryModal}
+                onConfirm={onDeleteCategory}
+            />
+            <ToastContainer />
         </>
     );
 };

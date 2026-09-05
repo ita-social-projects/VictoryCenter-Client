@@ -215,6 +215,37 @@ describe('updateFundsAmounts', () => {
         });
     });
 
+    describe('allowReverseConversion option', () => {
+        it('does not touch amountUah when amountUsd changes and allowReverseConversion is false', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('5');
+            mockValidateFundsExpendituresAmount.mockReturnValue(undefined);
+
+            const updater = updateFundsAmounts('amountUsd', '5', '33.5', 'change', {
+                allowReverseConversion: false,
+            });
+            const result = updater(initialState);
+
+            expect(result.amountUsd).toBe('5');
+            expect(result.amountUah).toBe('100');
+            expect(result.errors.amountUah).toBeUndefined();
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+        });
+
+        it('does not clear amountUah when amountUsd is emptied and allowReverseConversion is false', () => {
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('');
+            mockValidateFundsExpendituresAmount.mockReturnValue(undefined);
+
+            const updater = updateFundsAmounts('amountUsd', '', '33.5', 'change', {
+                allowReverseConversion: false,
+            });
+            const result = updater(initialState);
+
+            expect(result.amountUsd).toBe('');
+            expect(result.amountUah).toBe('100');
+            expect(mockGetConvertedAmount).not.toHaveBeenCalled();
+        });
+    });
+
     describe('State preservation', () => {
         it('should preserve previous state when updating', () => {
             const customState: FundsAmountsState = {

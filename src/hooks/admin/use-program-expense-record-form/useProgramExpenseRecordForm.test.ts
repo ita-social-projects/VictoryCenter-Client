@@ -81,29 +81,25 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.isSubmitDisabled).toBe(false);
     });
 
-    it('submits successfully after USD is changed manually without a preceding blur', async () => {
+    it('blocks submit when USD is changed manually without a preceding blur and does not match UAH', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseProgramExpenseForm({ onSubmit });
 
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
+            result.current.handleAmountFieldChange('amountUah')('400');
             result.current.handleAmountFieldChange('amountUsd')('999');
         });
 
-        expect(result.current.usdMismatchMessage).toBeUndefined();
+        expect(result.current.formState.amountUah).toBe('400');
 
         await act(async () => {
             await result.current.handleSave();
         });
 
-        expect(onSubmit).toHaveBeenCalledWith({
-            programId: 2,
-            programName: 'Program B',
-            reportingYear: '2026',
-            amountUah: '39960',
-            amountUsd: '999',
-        });
+        expect(onSubmit).not.toHaveBeenCalled();
+        expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
     });
 
     it('validates amountUah max digits on change', () => {
@@ -259,14 +255,14 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.amountUsd).toBe('2,5');
     });
 
-    it('automatically converts USD to UAH when USD amount is entered', () => {
+    it('does not convert USD to UAH when USD amount is entered', () => {
         const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
 
         act(() => {
             result.current.handleAmountFieldChange('amountUsd')('2,5');
         });
 
-        expect(result.current.formState.amountUah).toBe('100');
+        expect(result.current.formState.amountUah).toBe('');
     });
 
     it('matches typed text with multiple inner spaces to an existing program option', () => {
@@ -349,8 +345,9 @@ describe('useProgramExpenseRecordForm', () => {
             });
         });
 
-        it('recalculates UAH and allows saving a legacy record once its amounts are actively edited', () => {
-            const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40' });
+        it('does not recalculate UAH when a legacy record USD amount is actively edited, and surfaces a mismatch until corrected', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40', onSubmit });
 
             act(() => {
                 result.current.handleAmountFieldChange('amountUsd')('15');
@@ -360,9 +357,31 @@ describe('useProgramExpenseRecordForm', () => {
                 result.current.handleAmountBlur('amountUsd');
             });
 
-            expect(result.current.formState.amountUah).toBe('600');
+            expect(result.current.formState.amountUah).toBe('400');
+            expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+            expect(result.current.isSubmitDisabled).toBe(true);
+
+            act(() => {
+                result.current.handleAmountFieldChange('amountUsd')('10');
+                result.current.handleAmountBlur('amountUsd');
+                result.current.handleReportingYearChange('2026');
+            });
+
+            expect(result.current.formState.amountUah).toBe('400');
             expect(result.current.usdMismatchMessage).toBeUndefined();
             expect(result.current.isSubmitDisabled).toBe(false);
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(onSubmit).toHaveBeenCalledWith({
+                programId: 1,
+                programName: 'Program A',
+                reportingYear: '2026',
+                amountUah: '400',
+                amountUsd: '10',
+            });
         });
 
         it('does not trigger program unique validation error when choosing its own program ID', () => {

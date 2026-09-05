@@ -1,0 +1,91 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.donate-block {
+    position: relative;
+    min-height: 80vh;
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .fallback-image,
+    video {
+        height: 100%;
+        min-height: 80vh;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        pointer-events: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(1, 1, 1, 0) 20%, rgba(1, 1, 1, 0.8) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .donate-info {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        flex: 1;
+        text-align: center;
+        padding: 48px 0px;
+        gap: clamp(144px, 42vh, 280px);
+
+        @media (min-width: 768px) {
+            padding: 70px 0px;
+        }
+
+        .donate-title {
+            @include type.h2-bold-uppercase;
+            color: white;
+            width: 50%;
+            padding: 0px 32px;
+        }
+
+        .donate-button {
+            width: 100%;
+            padding: 0px clamp(20px, 10vw, 450px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 32px;
+
+            h4 {
+                @include type.body-2-medium;
+                text-align: center;
+                color: white;
+                max-width: 560px;
+            }
+
+            button,
+            a {
+                @include type.body-2-medium;
+                border: none;
+                width: 132px;
+                height: 40px;
+                gap: 8px;
+                padding: 8px 24px;
+                background: colors.$yellow-500;
+                vertical-align: middle;
+                color: colors.$blue-900;
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
+        }
+    }
+}

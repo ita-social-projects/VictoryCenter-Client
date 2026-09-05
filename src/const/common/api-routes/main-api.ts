@@ -82,6 +82,10 @@ export const API_ROUTES = {
         BASE: 'HippotherapyPage',
         PUBLIC: 'HippotherapyPage',
     },
+    FEEDBACK_PAGE: {
+        BASE: 'FeedbackPage',
+        PUBLIC: 'FeedbackPage',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },

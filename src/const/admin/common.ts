@@ -12,6 +12,7 @@ export const COMMON_TEXT_ADMIN = {
         EVENTS: 'Новини і події',
         PARTNERS: 'Партнери',
         HIPPOTHERAPY: 'Іпотерапія',
+        FEEDBACK: 'Історії успіху',
     },
 
     ALT: {
@@ -155,6 +156,7 @@ export const UI_CONFIG = {
             PROGRAMS: 90,
             EVENTS: 90,
             TEAM_MEMBERS: 50,
+            FEEDBACK: 90,
         },
     },
 };

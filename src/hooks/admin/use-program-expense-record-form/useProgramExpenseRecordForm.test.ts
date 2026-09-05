@@ -280,6 +280,23 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.errors.programId).toBeUndefined();
     });
 
+    it('normalizes programInputValue on blur (trims and collapses extra spaces)', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('   Program   B   ');
+        });
+
+        expect(result.current.formState.programInputValue).toBe('   Program   B   ');
+
+        act(() => {
+            result.current.handleProgramBlur();
+        });
+
+        expect(result.current.formState.programInputValue).toBe('Program B');
+        expect(result.current.formState.programId).toBe(2);
+    });
+
     describe('edit mode', () => {
         const recordToEdit: ProgramExpensesRecord = {
             id: 1,

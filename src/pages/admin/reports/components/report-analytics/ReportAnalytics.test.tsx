@@ -73,6 +73,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onCountsChange,
         onDataChange,
         registerSaveCallback,
+        onRowEditModeChange,
     }: {
         isEditing?: boolean;
         draftExchangeRate?: string | null;
@@ -89,6 +90,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onCountsChange?: (counts: any) => void;
         onDataChange?: () => void;
         registerSaveCallback?: (cb: () => Promise<boolean>) => void;
+        onRowEditModeChange?: (isRowEditMode: boolean) => void;
     }) => (
         <div
             data-testid="funds-expenditure-section"
@@ -159,6 +161,9 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
                 }}
             >
                 Set Fail Save
+            </button>
+            <button type="button" data-testid="start-row-edit" onClick={() => onRowEditModeChange?.(true)}>
+                Start row edit
             </button>
         </div>
     ),
@@ -567,6 +572,34 @@ describe('ReportAnalytics', () => {
             await waitFor(() => {
                 expect(mockAddToast).toHaveBeenCalledWith('Не вдалося відмінити зміни', 'error');
             });
+        });
+
+        it('should keep sub-tabs blocked while a row is being edited', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES));
+
+            expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
+        });
+
+        it('should unblock sub-tabs after cancelling edit mode while a row was being edited (#3799)', async () => {
+            mockCancelRecords.mockResolvedValueOnce({});
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+
+            await waitFor(() => {
+                expect(mockCancelRecords).toHaveBeenCalled();
+            });
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES));
+
+            expect(screen.getByTestId('pdf-files-section')).toBeInTheDocument();
         });
     });
 });

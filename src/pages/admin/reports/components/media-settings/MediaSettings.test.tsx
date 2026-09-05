@@ -10,6 +10,7 @@ import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ToastType } from '@/types/admin/toast';
 import { ReportsMediaBlockProps } from '../block-component/ReportsMediaBlock';
 import { fetchDefaultImageAsImageValues } from '@/utils/functions/fetch-default-image/fetch-default-image';
+import { formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
@@ -45,6 +46,7 @@ jest.mock('../block-component/ReportsMediaBlock', () => ({
 
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/services/api/admin/reports/reports-api');
+jest.mock('@/services/api/public/reports/reports-api');
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 jest.mock('@/utils/functions/fetch-default-image/fetch-default-image');
@@ -75,6 +77,8 @@ const mockedReportsApi = ReportsApi as jest.Mocked<typeof ReportsApi>;
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 const mockedUseToast = useToast as jest.Mock;
 const mockedFetchDefaultImage = fetchDefaultImageAsImageValues as jest.Mock;
+
+const MOCK_PUBLIC_COLLECTED_TOTAL_UAH = 668999.78;
 
 describe('MediaSettings', () => {
     const mockRefetch = jest.fn();
@@ -114,6 +118,20 @@ describe('MediaSettings', () => {
         return { ...view, ref };
     };
 
+    const mockDataFetch = (
+        mediaOverrides: Record<string, unknown> = {},
+        collectedTotalOverrides: Record<string, unknown> = {},
+    ) => {
+        mockedUseDataFetch.mockImplementation((params: any) => {
+            const isCollectedTotalFetch = typeof params?.initialData === 'number';
+            const base = { isLoading: false, error: null, refetch: mockRefetch, setData: mockSetData };
+
+            return isCollectedTotalFetch
+                ? { ...base, data: MOCK_PUBLIC_COLLECTED_TOTAL_UAH, ...collectedTotalOverrides }
+                : { ...base, data: defaultMediaSettingsData, ...mediaOverrides };
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         collectedFundsBlockProps = null;
@@ -121,13 +139,7 @@ describe('MediaSettings', () => {
 
         mockedUseAdminClient.mockReturnValue('mock-client');
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
-        mockedUseDataFetch.mockReturnValue({
-            data: defaultMediaSettingsData,
-            isLoading: false,
-            error: null,
-            refetch: mockRefetch,
-            setData: mockSetData,
-        });
+        mockDataFetch();
         mockedFetchDefaultImage.mockResolvedValue({
             base64: 'data:image/jpeg;base64,defaultImage',
             mimeType: 'image/jpeg',
@@ -136,13 +148,7 @@ describe('MediaSettings', () => {
 
     describe('Loading and Edge states', () => {
         it('should render loader when data is loading', () => {
-            mockedUseDataFetch.mockReturnValue({
-                data: null,
-                isLoading: true,
-                error: null,
-                refetch: mockRefetch,
-                setData: mockSetData,
-            });
+            mockDataFetch({ data: null, isLoading: true });
 
             renderComponent();
 
@@ -150,13 +156,7 @@ describe('MediaSettings', () => {
         });
 
         it('should handle null data gracefully', () => {
-            mockedUseDataFetch.mockReturnValue({
-                data: null,
-                isLoading: false,
-                error: null,
-                refetch: mockRefetch,
-                setData: mockSetData,
-            });
+            mockDataFetch({ data: null });
 
             renderComponent();
             expect(screen.queryByTestId('inline-loader')).not.toBeInTheDocument();
@@ -165,13 +165,7 @@ describe('MediaSettings', () => {
 
     describe('Error state', () => {
         it('should render error message and retry button when fetch fails', () => {
-            mockedUseDataFetch.mockReturnValue({
-                data: null,
-                isLoading: false,
-                error: new Error('Failed to load'),
-                refetch: mockRefetch,
-                setData: mockSetData,
-            });
+            mockDataFetch({ data: null, error: new Error('Failed to load') });
 
             renderComponent();
 
@@ -185,11 +179,28 @@ describe('MediaSettings', () => {
 
             expect(collectedFundsBlockProps).not.toBeNull();
             expect(collectedFundsBlockProps!.values.title).toBe('Зібрано коштів');
-            expect(collectedFundsBlockProps!.values.totalAmount).toBe(0);
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(
+                formatCollectedAmount(MOCK_PUBLIC_COLLECTED_TOTAL_UAH),
+            );
 
             expect(changedLivesBlockProps).not.toBeNull();
             expect(changedLivesBlockProps!.values.title).toBe('Змінено життів');
             expect(changedLivesBlockProps!.values.totalAmount).toBe(56);
+        });
+
+        it('should display the collected funds total exactly as the public reports page does', () => {
+            renderComponent();
+
+            expect(collectedFundsBlockProps!.isValueEditable).toBe(false);
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(formatCollectedAmount(668999.78));
+        });
+
+        it('should show 0 for collected funds when nothing is published yet', () => {
+            mockDataFetch({}, { data: 0 });
+
+            renderComponent();
+
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(formatCollectedAmount(0));
         });
     });
 
@@ -251,15 +262,11 @@ describe('MediaSettings', () => {
 
         it('should fetch default image if no image or imageId is provided', async () => {
             mockedReportsApi.updateMediaSettings.mockResolvedValue(defaultMediaSettingsData as any);
-            mockedUseDataFetch.mockReturnValue({
+            mockDataFetch({
                 data: {
                     collectedFunds: { title: '1', titleEn: '2', image: null, imageId: null },
                     changedLives: { title: '3', titleEn: '4', changedLives: 5, image: null, imageId: null },
                 },
-                isLoading: false,
-                error: null,
-                refetch: mockRefetch,
-                setData: mockSetData,
             });
 
             const { ref } = renderComponent();

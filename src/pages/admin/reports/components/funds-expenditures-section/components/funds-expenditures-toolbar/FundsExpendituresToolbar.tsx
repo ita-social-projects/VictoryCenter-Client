@@ -73,7 +73,7 @@ export const FundsExpendituresToolbar = ({
                             }
                         }}
                         placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                        className={cn(styles['filter-select'], {
+                        className={cn(styles['filter-select'], styles['category-filter-select'], {
                             [styles['filter-select-disabled']]: controlsDisabled,
                         })}
                         optionClassName={styles['filter-option']}

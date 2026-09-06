@@ -6,7 +6,7 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { FeedbackCategory, FeedbackCategoryItem, FeedbackListItem } from '@/types/admin/feedback';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
-import { FEEDBACK_CATEGORIES, FEEDBACK_TEXT } from '@/const/admin/feedback';
+import { FEEDBACK_CATEGORIES, FEEDBACK_PAGINATION_LIMIT, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
@@ -34,6 +34,7 @@ export const FeedbackPageAdmin = () => {
         translationStatusFilter,
         onLanguageChange,
         onTranslationStatusFilterChange,
+        retryFetchLanguages,
     } = useLocalizationToolkit({
         setErrorState: setErrorState as any,
     });
@@ -63,16 +64,18 @@ export const FeedbackPageAdmin = () => {
     const latestRequestId = useRef<number>(0);
 
     const fetchCategoryItems = useCallback(
-        async (category: FeedbackCategory) => {
+        async (category: FeedbackCategory, skip = 0) => {
             const requestId = ++latestRequestId.current;
             try {
-                setIsLoading(true);
+                if (skip === 0) setIsLoading(true);
                 setError({ message: null, type: null });
 
                 const params = {
                     status: statusFilter,
                     language: selectedLanguage?.code,
                     translationStatus: translationStatusFilter,
+                    skip,
+                    take: FEEDBACK_PAGINATION_LIMIT,
                 };
 
                 let result: PaginationResult<FeedbackListItem>;
@@ -86,8 +89,8 @@ export const FeedbackPageAdmin = () => {
 
                 if (requestId !== latestRequestId.current) return;
 
-                setItems(result.items);
-                setHasMore(false);
+                setItems((prev) => (skip === 0 ? result.items : [...prev, ...result.items]));
+                setHasMore(skip + result.items.length < result.totalItemsCount);
             } catch {
                 if (requestId !== latestRequestId.current) return;
                 setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_FETCH_ITEMS, type: 'fetch' });
@@ -105,16 +108,22 @@ export const FeedbackPageAdmin = () => {
         fetchCategoryItems(activeCategory);
     }, [activeCategory, fetchCategoryItems]);
 
-    const getFeedbackSearchItems = useCallback(async (): Promise<PaginationResult<any>> => {
-        const params = {
-            status: statusFilter,
-            language: selectedLanguage?.code,
-            translationStatus: translationStatusFilter,
-        };
-        if (activeCategory === FeedbackCategory.HISTORY) return FeedbackApi.fetchHistory(client, params);
-        if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client, params);
-        return FeedbackApi.fetchVideos(client, params);
-    }, [client, activeCategory, statusFilter, selectedLanguage, translationStatusFilter]);
+    const getFeedbackSearchItems = useCallback(
+        async (searchTerm: string, requestOptions?: any): Promise<PaginationResult<any>> => {
+            const params = {
+                status: statusFilter,
+                language: selectedLanguage?.code,
+                translationStatus: translationStatusFilter,
+                searchTerm,
+                skip: requestOptions?.skip,
+                take: requestOptions?.take,
+            };
+            if (activeCategory === FeedbackCategory.HISTORY) return FeedbackApi.fetchHistory(client, params);
+            if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client, params);
+            return FeedbackApi.fetchVideos(client, params);
+        },
+        [client, activeCategory, statusFilter, selectedLanguage, translationStatusFilter],
+    );
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -195,7 +204,17 @@ export const FeedbackPageAdmin = () => {
                 {error.message && (
                     <div className="feedback-page-error-container" data-testid="feedback-error-container">
                         <span>{error.message}</span>
-                        <button onClick={() => fetchCategoryItems(activeCategory)} type="button" className="retry-link">
+                        <button
+                            onClick={() => {
+                                if (error.type === 'languages') {
+                                    retryFetchLanguages();
+                                } else {
+                                    fetchCategoryItems(activeCategory);
+                                }
+                            }}
+                            type="button"
+                            className="retry-link"
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
                     </div>
@@ -204,7 +223,7 @@ export const FeedbackPageAdmin = () => {
                 <InfiniteScrollList<FeedbackListItem>
                     items={items}
                     renderItem={renderFeedbackItem}
-                    onLoadMore={() => fetchCategoryItems(activeCategory)}
+                    onLoadMore={() => fetchCategoryItems(activeCategory, items.length)}
                     hasMore={hasMore}
                     isLoading={isLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}

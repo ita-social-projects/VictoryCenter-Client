@@ -1,13 +1,14 @@
 @use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
 
 .feedback-page {
     &-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 3.375rem;
+        gap: 54px;
         height: 100vh;
         width: 100%;
-        padding: 2.5rem;
+        padding: 40px;
         box-sizing: border-box;
         overflow: hidden;
     }
@@ -24,7 +25,7 @@
         flex-direction: column;
 
         .infinite-scroll-list-container {
-            margin-bottom: 6.375rem;
+            margin-bottom: 102px;
         }
     }
 
@@ -39,9 +40,7 @@
         justify-content: flex-start;
         align-items: center;
         color: colors.$error;
-        font-weight: 400;
-        font-size: 1rem;
-        line-height: 20px;
+        @include typography.body-2-regular;
         margin-top: 10px;
         margin-bottom: 10px;
 
@@ -49,14 +48,14 @@
             background: none;
             border: none;
             padding: 0;
-            font-size: 16px;
+            @include typography.body-2-regular;
             color: colors.$blue-900;
             text-decoration: underline;
             text-decoration-color: colors.$blue-900;
             cursor: pointer;
 
             &:hover {
-                font-weight: 600;
+                @include typography.body-2-semibold;
             }
         }
     }

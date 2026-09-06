@@ -15,9 +15,9 @@ export interface FeedbackComponentProps {
 
 export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }: FeedbackComponentProps) => {
     const [imgError, setImgError] = useState(false);
-    const title = item.title || item.authorName || '';
-    const description = item.story || item.text || item.videoUrl || '';
-    const imageUrl = item.image && 'url' in item.image ? item.image.url : null;
+    const title = ('title' in item ? item.title : item.authorName) || '';
+    const description = ('story' in item ? item.story : 'text' in item ? item.text : item.videoUrl) || '';
+    const imageUrl = 'image' in item && item.image && 'url' in item.image ? item.image.url : null;
 
     useEffect(() => {
         setImgError(false);

@@ -48,4 +48,12 @@ export interface FeedbackCategoryItem {
     name: string;
 }
 
-export type FeedbackListItem = FeedbackHistoryDto | FeedbackReviewDto | any;
+export interface FeedbackVideoDto {
+    id: number;
+    title: string;
+    videoUrl: string;
+    status: VisibilityStatus;
+    priority: number;
+}
+
+export type FeedbackListItem = FeedbackHistoryDto | FeedbackReviewDto | FeedbackVideoDto;

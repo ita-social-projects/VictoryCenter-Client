@@ -31,3 +31,5 @@ export const FEEDBACK_CATEGORIES: FeedbackCategoryItem[] = [
     { id: FeedbackCategory.REVIEWS, name: FEEDBACK_TEXT.TABS.REVIEWS },
     { id: FeedbackCategory.VIDEOS, name: FEEDBACK_TEXT.TABS.VIDEOS },
 ];
+
+export const FEEDBACK_PAGINATION_LIMIT = 7;

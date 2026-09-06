@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors';
-@use '@/assets/sass/variables/fonts';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
 
 .feedback {
     &-item {
@@ -11,17 +11,17 @@
 
     &-profile {
         display: flex;
-        gap: 1rem;
+        gap: 16px;
         width: 33%;
         align-items: center;
         height: 100%;
 
         .feedback-icon,
         img {
-            width: 3.75rem;
-            height: 3.75rem;
+            width: 60px;
+            height: 60px;
             border-radius: 100%;
-            margin: 0.25rem;
+            margin: 4px;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -34,9 +34,8 @@
             justify-content: center;
 
             p {
-                margin: 0.25rem 0 0 0;
-                font-family: fonts.$mulish-regular-font;
-                font-size: 18px;
+                margin: 4px 0 0 0;
+                @include typography.body-1-regular;
                 color: colors.$blue-900;
                 overflow-wrap: anywhere;
                 word-break: normal;
@@ -50,10 +49,9 @@
 
         p {
             margin: 0;
-            font-family: fonts.$mulish-regular-font;
-            font-size: 18px;
+            @include typography.body-1-regular;
             color: colors.$blue-900;
-            padding-right: 2.5rem;
+            padding-right: 40px;
             overflow-wrap: anywhere;
             word-break: normal;
         }
@@ -67,16 +65,16 @@
     }
 
     &-actions {
-        width: 12.5rem;
-        height: 1.5rem;
+        width: 200px;
+        height: 24px;
         display: flex;
         justify-content: end;
-        gap: 0.625rem;
+        gap: 10px;
 
         button {
             border: none;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 24px;
+            height: 24px;
         }
     }
 }

@@ -345,6 +345,72 @@ describe('FeedbackPageAdmin', () => {
         });
     });
 
+    it('should retry reordering with preserved category and orderedIds when retry button is clicked', async () => {
+        mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder failure'));
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reorderBtn = screen.getByTestId('trigger-reorder-1');
+        fireEvent.click(reorderBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
+        });
+
+        mockFeedbackApi.fetchHistory.mockClear();
+        mockFeedbackApi.reorderFeedback.mockClear();
+        mockFeedbackApi.reorderFeedback.mockResolvedValueOnce(undefined);
+
+        const retryBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+        fireEvent.click(retryBtn);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.reorderFeedback).toHaveBeenCalledWith(
+                mockAdminClient,
+                FeedbackCategory.HISTORY,
+                [2, 1],
+            );
+            expect(mockFeedbackApi.fetchHistory).not.toHaveBeenCalled();
+            expect(screen.queryByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).not.toBeInTheDocument();
+        });
+    });
+
+    it('should keep error message if reorder retry fails again', async () => {
+        mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder failure'));
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reorderBtn = screen.getByTestId('trigger-reorder-1');
+        fireEvent.click(reorderBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
+        });
+
+        mockFeedbackApi.reorderFeedback.mockClear();
+        mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder retry failure'));
+
+        const retryBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+        fireEvent.click(retryBtn);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.reorderFeedback).toHaveBeenCalledWith(
+                mockAdminClient,
+                FeedbackCategory.HISTORY,
+                [2, 1],
+            );
+            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
+        });
+    });
+
     it('should guard against race conditions when switching categories quickly', async () => {
         let resolveHistoryPromise: (val: any) => void;
         const delayedHistoryPromise = new Promise((resolve) => {

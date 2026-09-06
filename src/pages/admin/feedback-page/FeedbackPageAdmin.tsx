@@ -25,7 +25,15 @@ const SEARCH_PLACEHOLDERS: Record<FeedbackCategory, string> = {
 
 export const FeedbackPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
-    const [error, setError] = useState<{ message: string | null; type: string | null }>({ message: null, type: null });
+    const [error, setError] = useState<{
+        message: string | null;
+        type: string | null;
+        reorderData?: {
+            category: FeedbackCategory;
+            orderedIds: number[];
+            previousItems?: FeedbackListItem[];
+        };
+    }>({ message: null, type: null });
     const [activeCategory, setActiveCategory] = useState<FeedbackCategory>(FeedbackCategory.HISTORY);
     const [items, setItems] = useState<FeedbackListItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -157,16 +165,46 @@ export const FeedbackPageAdmin = () => {
     const handleEntitiesReordered = useCallback(
         async (reorderedItems: FeedbackListItem[]) => {
             if (selectedSearchItem) return;
+            const previousItems = items;
             setItems(reorderedItems);
+            const orderedIds = reorderedItems.map((item) => item.id);
             try {
-                const orderedIds = reorderedItems.map((item) => item.id);
+                setError({ message: null, type: null });
                 await FeedbackApi.reorderFeedback(client, activeCategory, orderedIds);
             } catch {
-                setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER, type: 'reorder' });
+                setError({
+                    message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER,
+                    type: 'reorder',
+                    reorderData: {
+                        category: activeCategory,
+                        orderedIds,
+                        previousItems,
+                    },
+                });
             }
         },
-        [client, activeCategory, selectedSearchItem],
+        [client, activeCategory, selectedSearchItem, items],
     );
+
+    const handleRetry = useCallback(async () => {
+        if (error.type === 'languages') {
+            retryFetchLanguages();
+        } else if (error.type === 'reorder' && error.reorderData) {
+            const { category, orderedIds } = error.reorderData;
+            setError({ message: null, type: null });
+            try {
+                await FeedbackApi.reorderFeedback(client, category, orderedIds);
+            } catch {
+                setError({
+                    message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER,
+                    type: 'reorder',
+                    reorderData: error.reorderData,
+                });
+            }
+        } else {
+            fetchCategoryItems(activeCategory);
+        }
+    }, [error, retryFetchLanguages, client, activeCategory, fetchCategoryItems]);
 
     const itemsToRender = useMemo(() => {
         if (selectedSearchItem) {
@@ -239,17 +277,7 @@ export const FeedbackPageAdmin = () => {
                 {error.message && (
                     <div className="feedback-page-error-container" data-testid="feedback-error-container">
                         <span>{error.message}</span>
-                        <button
-                            onClick={() => {
-                                if (error.type === 'languages') {
-                                    retryFetchLanguages();
-                                } else {
-                                    fetchCategoryItems(activeCategory);
-                                }
-                            }}
-                            type="button"
-                            className="retry-link"
-                        >
+                        <button onClick={handleRetry} type="button" className="retry-link">
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
                     </div>

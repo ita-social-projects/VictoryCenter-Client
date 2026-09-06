@@ -22,7 +22,8 @@
 
 .table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .column-checkbox {
@@ -55,6 +56,10 @@
     text-align: left;
     color: rgba(c.$graphite-black, 0.88);
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: z-index.admin(sticky-table-header);
+    background-color: c.$light-blue-25;
 }
 
 .checkbox-th,
@@ -73,7 +78,6 @@
 .tr {
     height: 65px;
     background: c.$white;
-    border-top: 1px solid c.$grey-500;
 
     &:hover {
         background: c.$light-blue-50;
@@ -88,6 +92,7 @@
     vertical-align: middle;
     color: c.$graphite-black;
     white-space: nowrap;
+    border-top: 1px solid c.$grey-500;
 }
 
 .type-chip {

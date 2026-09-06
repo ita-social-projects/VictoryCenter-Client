@@ -328,7 +328,7 @@ describe('FeedbackPageAdmin', () => {
         expect(mockFeedbackApi.reorderFeedback).toHaveBeenCalledWith(mockAdminClient, FeedbackCategory.HISTORY, [2, 1]);
     });
 
-    it('should display error message if reordering fails', async () => {
+    const setupReorderFailure = async () => {
         mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder failure'));
 
         render(<FeedbackPageAdmin />);
@@ -343,23 +343,14 @@ describe('FeedbackPageAdmin', () => {
         await waitFor(() => {
             expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
         });
+    };
+
+    it('should display error message if reordering fails', async () => {
+        await setupReorderFailure();
     });
 
     it('should retry reordering with preserved category and orderedIds when retry button is clicked', async () => {
-        mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder failure'));
-
-        render(<FeedbackPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Історія 1')).toBeInTheDocument();
-        });
-
-        const reorderBtn = screen.getByTestId('trigger-reorder-1');
-        fireEvent.click(reorderBtn);
-
-        await waitFor(() => {
-            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
-        });
+        await setupReorderFailure();
 
         mockFeedbackApi.fetchHistory.mockClear();
         mockFeedbackApi.reorderFeedback.mockClear();
@@ -380,20 +371,7 @@ describe('FeedbackPageAdmin', () => {
     });
 
     it('should keep error message if reorder retry fails again', async () => {
-        mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder failure'));
-
-        render(<FeedbackPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Історія 1')).toBeInTheDocument();
-        });
-
-        const reorderBtn = screen.getByTestId('trigger-reorder-1');
-        fireEvent.click(reorderBtn);
-
-        await waitFor(() => {
-            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER)).toBeInTheDocument();
-        });
+        await setupReorderFailure();
 
         mockFeedbackApi.reorderFeedback.mockClear();
         mockFeedbackApi.reorderFeedback.mockRejectedValueOnce(new Error('Reorder retry failure'));

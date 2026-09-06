@@ -44,8 +44,26 @@ const attachReferenceLocalIds = (
 ): HippotherapyScientificReference[] =>
     scientificReferences.map((reference) => ({ ...reference, localId: crypto.randomUUID() }));
 
+const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
+    ...value,
+    imageId: value.image && 'id' in value.image ? value.image.id : (value.imageId ?? null),
+});
+
 const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => ({
     ...dto,
+    introSection: withImageId(dto.introSection),
+    quoteSection: withImageId(dto.quoteSection),
+    hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
+    advantagesSection: {
+        ...dto.advantagesSection,
+        cards: dto.advantagesSection.cards.map((card) => withImageId(card)),
+    },
+    anotherQuoteSection: withImageId(dto.anotherQuoteSection),
+    participantsSection: {
+        ...dto.participantsSection,
+        cards: dto.participantsSection.cards.map((card) => withImageId(card)),
+    },
+    ethicsSection: withImageId(dto.ethicsSection),
     scientificReferencesSection: {
         ...dto.scientificReferencesSection,
         scientificReferences: attachReferenceLocalIds(dto.scientificReferencesSection.scientificReferences),

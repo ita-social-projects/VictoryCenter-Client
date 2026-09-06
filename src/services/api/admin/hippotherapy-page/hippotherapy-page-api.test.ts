@@ -81,6 +81,22 @@ describe('HippotherapyPageApi', () => {
                 { id: 1, name: 'Citation', url: 'https://example.com/citation', localId: expect.any(String) },
             ]);
         });
+
+        it('derives imageId from the image returned by the API', async () => {
+            const mockDto = buildDto();
+            mockDto.introSection.image = { id: 42, url: 'https://example.com/intro.png', mimeType: 'image/png' };
+            mockDto.advantagesSection.cards[0].image = {
+                id: 43,
+                url: 'https://example.com/card.png',
+                mimeType: 'image/png',
+            };
+            mockClient.get.mockResolvedValue({ data: mockDto });
+
+            const result = await HippotherapyPageApi.get(mockClient);
+
+            expect(result.introSection.imageId).toBe(42);
+            expect(result.advantagesSection.cards[0].imageId).toBe(43);
+        });
     });
 
     describe('update', () => {
@@ -174,6 +190,22 @@ describe('HippotherapyPageApi', () => {
                 }),
             );
             expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 7);
+        });
+
+        it('sends the stored imageId when the image has not changed', async () => {
+            const content = buildContent();
+            content.introSection.image = { id: 42, url: 'https://example.com/intro.png', mimeType: 'image/png' };
+            content.introSection.imageId = 42;
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({ finalImageId: 42, imageIdToDelete: null });
+            mockClient.put.mockResolvedValue({ data: buildDto() });
+
+            await HippotherapyPageApi.update(mockClient, content);
+
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, content.introSection.image, 42);
+            expect(mockClient.put).toHaveBeenCalledWith(
+                API_ROUTES.HIPPOTHERAPY_PAGE.BASE,
+                expect.objectContaining({ introSection: expect.objectContaining({ imageId: 42 }) }),
+            );
         });
     });
 });

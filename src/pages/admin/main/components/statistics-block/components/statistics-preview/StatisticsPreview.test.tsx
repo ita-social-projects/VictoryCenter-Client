@@ -1,8 +1,8 @@
 import { Metric } from '@/types/admin/main-page';
-import { metricEngagement, metricPartners } from '@/utils/test-mocks/statistics-block-mocks';
+import { metricEngagement, metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { StatisticsPreview } from './StatisticsPreview';
+import { StatisticsPreview } from '@/pages/admin/main/components/statistics-block/components/statistics-preview/StatisticsPreview';
 
 const metrics: Metric[] = [metricPartners, metricEngagement];
 
@@ -25,6 +25,31 @@ describe('StatisticsPreview', () => {
         render(<StatisticsPreview language="EN" onLanguageChange={() => {}} metrics={metrics} hiddenMetricIds={[]} />);
 
         expect(screen.getByText('50%')).toBeInTheDocument();
+    });
+
+    it.each([
+        [1234600, '1234600', '1 234 600 грн', '$1 234 600'],
+        [5000000.5, '125000.75', '5 000 000,5 грн', '$125 000.75'],
+        [0, '0', '0 грн', '$0'],
+    ])('formats raised funds with currency when switching languages (%s UAH)', (value, usdValue, uaText, enText) => {
+        const raisedMetric: Metric = {
+            ...metricRaised,
+            value,
+            localizations: metricRaised.localizations.map((localization) => ({ ...localization, value: usdValue })),
+        };
+        const props = {
+            onLanguageChange: jest.fn(),
+            metrics: [raisedMetric],
+            hiddenMetricIds: [],
+        };
+        const { rerender } = render(<StatisticsPreview {...props} language="UA" />);
+
+        expect(screen.getByText(uaText)).toBeInTheDocument();
+
+        rerender(<StatisticsPreview {...props} language="EN" />);
+
+        expect(screen.getByText(enText)).toBeInTheDocument();
+        expect(screen.queryByText(uaText)).not.toBeInTheDocument();
     });
 
     it('switches language when tab is clicked', () => {

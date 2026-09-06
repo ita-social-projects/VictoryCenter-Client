@@ -238,7 +238,10 @@ describe('HippotherapyPageContent', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() =>
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info),
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                ToastType.Info,
+            ),
         );
         expect(mockedHippotherapyPageApi.update).toHaveBeenCalledWith(
             mockClient,
@@ -322,8 +325,12 @@ describe('HippotherapyPageContent', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() =>
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info),
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                ToastType.Info,
+            ),
         );
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).not.toBeInTheDocument();
         expect(mockedHippotherapyPageApi.update).toHaveBeenCalledWith(
             mockClient,
             expect.objectContaining({ introSection: expect.objectContaining({ title: 'Edited intro title' }) }),

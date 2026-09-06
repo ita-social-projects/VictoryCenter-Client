@@ -3,6 +3,7 @@ import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { FeedbackCategory, FeedbackCategoryItem, FeedbackListItem } from '@/types/admin/feedback';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
@@ -16,6 +17,12 @@ import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import './FeedbackPageAdmin.scss';
 
+const SEARCH_PLACEHOLDERS: Record<FeedbackCategory, string> = {
+    [FeedbackCategory.HISTORY]: FEEDBACK_TEXT.PLACEHOLDER.SEARCH_HISTORY,
+    [FeedbackCategory.REVIEWS]: FEEDBACK_TEXT.PLACEHOLDER.SEARCH_REVIEWS,
+    [FeedbackCategory.VIDEOS]: FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS,
+};
+
 export const FeedbackPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<{ message: string | null; type: string | null }>({ message: null, type: null });
@@ -23,6 +30,7 @@ export const FeedbackPageAdmin = () => {
     const [items, setItems] = useState<FeedbackListItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(false);
+    const [selectedSearchItem, setSelectedSearchItem] = useState<FeedbackListItem | null>(null);
 
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -48,23 +56,14 @@ export const FeedbackPageAdmin = () => {
         addToast('Функція не реалізована', ToastType.Info);
     }, [addToast]);
 
-    const searchPlaceholder = useMemo(() => {
-        switch (activeCategory) {
-            case FeedbackCategory.HISTORY:
-                return FEEDBACK_TEXT.PLACEHOLDER.SEARCH_HISTORY;
-            case FeedbackCategory.REVIEWS:
-                return FEEDBACK_TEXT.PLACEHOLDER.SEARCH_REVIEWS;
-            case FeedbackCategory.VIDEOS:
-                return FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS;
-            default:
-                return FEEDBACK_TEXT.PLACEHOLDER.SEARCH_HISTORY;
-        }
-    }, [activeCategory]);
+    const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
     const latestRequestId = useRef<number>(0);
 
     const fetchCategoryItems = useCallback(
         async (category: FeedbackCategory, skip = 0) => {
+            if (selectedSearchItem) return;
+
             const requestId = ++latestRequestId.current;
             try {
                 if (skip === 0) setIsLoading(true);
@@ -100,23 +99,30 @@ export const FeedbackPageAdmin = () => {
                 }
             }
         },
-        [client, statusFilter, selectedLanguage, translationStatusFilter],
+        [client, statusFilter, selectedLanguage, translationStatusFilter, selectedSearchItem],
     );
 
     useEffect(() => {
-        setItems([]);
-        fetchCategoryItems(activeCategory);
-    }, [activeCategory, fetchCategoryItems]);
+        if (!selectedSearchItem) {
+            setItems([]);
+            fetchCategoryItems(activeCategory);
+        }
+    }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
 
     const getFeedbackSearchItems = useCallback(
-        async (searchTerm: string, requestOptions?: any): Promise<PaginationResult<any>> => {
+        async (
+            searchTerm: string,
+            requestOptions?: PaginationRequestParams & { skip?: number; take?: number },
+        ): Promise<PaginationResult<any>> => {
+            const skip = requestOptions?.skip ?? requestOptions?.offset ?? 0;
+            const take = requestOptions?.take ?? requestOptions?.limit ?? FEEDBACK_PAGINATION_LIMIT;
             const params = {
                 status: statusFilter,
                 language: selectedLanguage?.code,
                 translationStatus: translationStatusFilter,
                 searchTerm,
-                skip: requestOptions?.skip,
-                take: requestOptions?.take,
+                skip,
+                take,
             };
             if (activeCategory === FeedbackCategory.HISTORY) return FeedbackApi.fetchHistory(client, params);
             if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client, params);
@@ -131,20 +137,48 @@ export const FeedbackPageAdmin = () => {
 
     const handleCategorySelect = useCallback((category: FeedbackCategoryItem) => {
         setActiveCategory(category.id);
+        setSelectedSearchItem(null);
     }, []);
+
+    const handleSearchItemSelect = useCallback((key: string | number, item: FeedbackListItem) => {
+        setSelectedSearchItem(item);
+        setStatusFilter(undefined);
+    }, []);
+
+    const handleSearchClearSelection = useCallback(() => {
+        const wasSelected = selectedSearchItem !== null;
+        setSelectedSearchItem(null);
+        setStatusFilter(undefined);
+        if (!wasSelected) {
+            fetchCategoryItems(activeCategory);
+        }
+    }, [selectedSearchItem, activeCategory, fetchCategoryItems]);
 
     const handleEntitiesReordered = useCallback(
         async (reorderedItems: FeedbackListItem[]) => {
+            if (selectedSearchItem) return;
             setItems(reorderedItems);
             try {
                 const orderedIds = reorderedItems.map((item) => item.id);
                 await FeedbackApi.reorderFeedback(client, activeCategory, orderedIds);
             } catch {
-                setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER || 'Failed to reorder', type: 'reorder' });
+                setError({ message: FEEDBACK_TEXT.MESSAGE.FAIL_TO_REORDER, type: 'reorder' });
             }
         },
-        [client, activeCategory],
+        [client, activeCategory, selectedSearchItem],
     );
+
+    const itemsToRender = useMemo(() => {
+        if (selectedSearchItem) {
+            return [selectedSearchItem];
+        }
+        return items;
+    }, [selectedSearchItem, items]);
+
+    const hasMoreToShow = useMemo(() => {
+        if (selectedSearchItem) return false;
+        return hasMore;
+    }, [selectedSearchItem, hasMore]);
 
     const renderFeedbackItem = useCallback(
         (item: FeedbackListItem) => (
@@ -162,12 +196,12 @@ export const FeedbackPageAdmin = () => {
                         onDelete={handleNotImplemented}
                     />
                 )}
-                entities={items}
+                entities={itemsToRender}
                 idSelector={(i) => i.id}
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [items, activeCategory, handleEntitiesReordered, handleNotImplemented],
+        [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented],
     );
 
     return (
@@ -178,16 +212,17 @@ export const FeedbackPageAdmin = () => {
                     getSearchItemLabel={(item) => item.title || item.authorName || ''}
                     fetchSearchItems={getFeedbackSearchItems}
                     placeholder={searchPlaceholder}
-                    onSearchClear={() => null}
+                    onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleNotImplemented}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
-                    onSuggestionSelect={() => null}
+                    onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FEEDBACK}
+                    searchPageSize={FEEDBACK_PAGINATION_LIMIT}
                 />
             </div>
 
@@ -221,10 +256,10 @@ export const FeedbackPageAdmin = () => {
                 )}
 
                 <InfiniteScrollList<FeedbackListItem>
-                    items={items}
+                    items={itemsToRender}
                     renderItem={renderFeedbackItem}
                     onLoadMore={() => fetchCategoryItems(activeCategory, items.length)}
-                    hasMore={hasMore}
+                    hasMore={hasMoreToShow}
                     isLoading={isLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />

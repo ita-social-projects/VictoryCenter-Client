@@ -23,6 +23,9 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => mockAdminClient,
 }));
 
+let mockLocalizationToolkitProps: any = null;
+const mockRetryFetchLanguages = jest.fn();
+
 let mockLocalizationValues = {
     allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
     selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
@@ -32,7 +35,13 @@ let mockLocalizationValues = {
 };
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
-    useLocalizationToolkit: () => mockLocalizationValues,
+    useLocalizationToolkit: (props: any) => {
+        mockLocalizationToolkitProps = props;
+        return {
+            ...mockLocalizationValues,
+            retryFetchLanguages: mockRetryFetchLanguages,
+        };
+    },
 }));
 
 const mockAddToast = jest.fn();
@@ -60,8 +69,6 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         getSearchItemLabel?.({ id: 1, title: 'Item Title' });
         getSearchItemLabel?.({ id: 2, authorName: 'Author Name' });
         getSearchItemLabel?.({ id: 3 });
-        onSearchClear?.();
-        onSuggestionSelect?.();
 
         return (
             <div data-testid="feedback-toolbar">
@@ -72,8 +79,20 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 <button data-testid="toolbar-filter-published" onClick={() => onStatusFilterChange?.(1)}>
                     Filter Published
                 </button>
-                <button data-testid="toolbar-fetch-search" onClick={() => fetchSearchItems?.()}>
+                <button
+                    data-testid="toolbar-fetch-search"
+                    onClick={() => fetchSearchItems?.('search', { offset: 7, limit: 7 })}
+                >
                     Trigger Search
+                </button>
+                <button data-testid="toolbar-clear-search" onClick={() => onSearchClear?.()}>
+                    Clear Search
+                </button>
+                <button
+                    data-testid="toolbar-select-suggestion"
+                    onClick={() => onSuggestionSelect?.(1, { id: 1, title: 'Test Item', status: 1 })}
+                >
+                    Select Suggestion
                 </button>
             </div>
         );
@@ -394,6 +413,21 @@ describe('FeedbackPageAdmin', () => {
     });
 
     it('should trigger fetchCategoryItems when onLoadMore is called', async () => {
+        mockFeedbackApi.fetchHistory.mockResolvedValueOnce(mockHistoryData);
+        mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
+            items: [
+                {
+                    id: 3,
+                    title: 'Історія 3',
+                    story: 'Опис історії 3',
+                    image: null,
+                    status: VisibilityStatus.Published,
+                    priority: 2,
+                },
+            ],
+            totalItemsCount: 3,
+        });
+
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -403,6 +437,69 @@ describe('FeedbackPageAdmin', () => {
         const loadMoreBtn = screen.getByTestId('load-more-btn');
         fireEvent.click(loadMoreBtn);
 
-        expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(2);
+        await waitFor(() => {
+            expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(2);
+            expect(screen.getByText('Історія 3')).toBeInTheDocument();
+        });
+    });
+
+    it('should retry fetching languages when retry button is clicked after language error', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        act(() => {
+            mockLocalizationToolkitProps.setErrorState('Languages error', 'languages');
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Languages error')).toBeInTheDocument();
+        });
+
+        const retryBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+        fireEvent.click(retryBtn);
+
+        expect(mockRetryFetchLanguages).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle selecting a search suggestion and clearing it', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const selectSuggestionBtn = screen.getByTestId('toolbar-select-suggestion');
+        fireEvent.click(selectSuggestionBtn);
+
+        await waitFor(() => {
+            // "Test Item" comes from the mock suggestion
+            expect(screen.getByText('Test Item')).toBeInTheDocument();
+        });
+
+        const clearSearchBtn = screen.getByTestId('toolbar-clear-search');
+        fireEvent.click(clearSearchBtn);
+
+        await waitFor(() => {
+            // It should fetch history again and show "Історія 1"
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+    });
+
+    it('should keep or refresh items when clearing search without prior suggestion selection', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const clearSearchBtn = screen.getByTestId('toolbar-clear-search');
+        fireEvent.click(clearSearchBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
     });
 });

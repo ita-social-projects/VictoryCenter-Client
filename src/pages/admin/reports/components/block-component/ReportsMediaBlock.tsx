@@ -7,7 +7,6 @@ import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
-import './ReportsMediaBlock.scss';
 
 export interface ReportsMediaBlockValues {
     title: string;
@@ -189,7 +188,7 @@ export const ReportsMediaBlock = ({
                         <ImageInput
                             variant="partnerBanner"
                             label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(imageWidth, imageHeight)}
+                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(imageHeight, imageWidth)}
                             value={values.image}
                             onChange={handleImageChange}
                             setError={handleImageErrorInternal}

@@ -45,6 +45,12 @@ export const EVENT_CATEGORY_TEXT = {
 };
 
 export const EVENT_VALIDATION = {
+    image: {
+        cropWidth: 650,
+        cropHeight: 360,
+        minWidth: 650,
+        minHeight: 360,
+    },
     title: {
         max: 60,
     },

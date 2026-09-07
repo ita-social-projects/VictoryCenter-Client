@@ -41,6 +41,28 @@ jest.mock(
     }),
 );
 
+jest.mock('@/components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ onChange, setError }: any) => (
+        <div data-testid="image-input">
+            <button
+                type="button"
+                data-testid="upload-valid-image"
+                onClick={() => onChange({ url: 'test-image.jpg' })}
+            >
+                Upload Image
+            </button>
+            <button
+                type="button"
+                data-testid="trigger-image-error"
+                onClick={() => setError('Фото не більше 5 Mb')}
+            >
+                Trigger Error
+            </button>
+        </div>
+    ),
+    getImageSrc: (image: any) => (typeof image === 'string' ? image : image?.url || ''),
+}));
+
 const currentCategory: EventCategoryDto | null = {
     id: 1,
     name: 'Category 1',
@@ -182,6 +204,53 @@ describe('EventModal', () => {
             );
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_UKR })).toHaveValue('');
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_ENG })).toHaveValue('');
+        });
+    });
+
+    describe('image handling', () => {
+        it('renders image section label and upload component initially', () => {
+            render(<EventModal {...defaultProps} />);
+
+            expect(screen.getByText(EVENTS_TEXT.FORM.LABEL.IMAGE)).toBeInTheDocument();
+            expect(screen.getByTestId('image-input')).toBeInTheDocument();
+            expect(screen.queryByTestId('event-image-preview')).not.toBeInTheDocument();
+        });
+
+        it('renders image preview when an image is selected', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+
+            expect(screen.getByTestId('event-image-preview')).toBeInTheDocument();
+            expect(screen.getByTestId('event-image-preview')).toHaveAttribute('src', 'test-image.jpg');
+            expect(screen.queryByTestId('image-input')).not.toBeInTheDocument();
+        });
+
+        it('displays error message when image validation fails', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByTestId('trigger-image-error'));
+
+            expect(screen.getByText('Фото не більше 5 Mb')).toBeInTheDocument();
+        });
+
+        it('clears image error when a valid image is selected', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByTestId('trigger-image-error'));
+            expect(screen.getByText('Фото не більше 5 Mb')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+            expect(screen.queryByText('Фото не більше 5 Mb')).not.toBeInTheDocument();
+        });
+
+        it('shows confirmation modal on close when image was added (isDirty state)', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+            fireEvent.click(screen.getByTestId('modal-close'));
+
+            expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         });
     });
 });

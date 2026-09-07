@@ -242,7 +242,7 @@ export const HippotherapyPageContent = () => {
             const result = await HippotherapyPageApi.update(client, draftContent);
             setFetchedContent(result);
             setDraftContent(result);
-            addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Info);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
         } finally {

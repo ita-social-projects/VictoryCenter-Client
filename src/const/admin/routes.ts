@@ -52,4 +52,8 @@ export const ADMIN_ROUTES = {
         PATH: 'hippotherapy',
         FULL: '/admin-panel/hippotherapy',
     },
+    FEEDBACK: {
+        PATH: 'feedback',
+        FULL: '/admin-panel/feedback',
+    },
 };

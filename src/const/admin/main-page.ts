@@ -23,6 +23,8 @@ export const MAIN_PAGE_TEXT = {
             TITLE_EN_LABEL: 'Заголовок (ENG)',
             PREVIEW_TITLE: 'PREVIEW МЕТРИК',
             METRICS_TITLE: 'МЕТРИКИ',
+            CURRENCY_UAH: 'грн',
+            CURRENCY_USD: '$',
             LANG: {
                 UKR: 'UKR',
                 ENG: 'ENG',

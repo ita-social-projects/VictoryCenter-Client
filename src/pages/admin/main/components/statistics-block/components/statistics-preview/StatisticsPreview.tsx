@@ -1,5 +1,5 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric } from '@/types/admin/main-page';
+import { Metric, MetricType } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import styles from './StatisticsPreview.module.scss';
 
@@ -36,12 +36,23 @@ export const StatisticsPreview = ({ language, onLanguageChange, metrics, hiddenM
             </div>
 
             <div className={styles.panel}>
-                {visibleMetrics.map((metric) => (
-                    <div key={metric.id ?? metric.name} className={styles.metric}>
-                        <p className={styles.value}>{formatMetricValue(metric, language)}</p>
-                        <p className={styles.label}>{getMetricName(metric, language)}</p>
-                    </div>
-                ))}
+                {visibleMetrics.map((metric) => {
+                    let value = formatMetricValue(metric, language);
+
+                    if (metric.type === MetricType.Raised) {
+                        value =
+                            language === 'UA'
+                                ? `${value} ${MAIN_PAGE_TEXT.BLOCKS.STATISTICS.CURRENCY_UAH}`
+                                : `${MAIN_PAGE_TEXT.BLOCKS.STATISTICS.CURRENCY_USD}${value.replace(/,/g, ' ')}`;
+                    }
+
+                    return (
+                        <div key={metric.id ?? metric.name} className={styles.metric}>
+                            <p className={styles.value}>{value}</p>
+                            <p className={styles.label}>{getMetricName(metric, language)}</p>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

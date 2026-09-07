@@ -37,6 +37,26 @@ const mockedUseMediaQuery = useMediaQuery as jest.Mock;
 const mockedUseChartGeometry = useChartGeometry as jest.Mock;
 
 const defaultFormatAmount = (amount: number) => `${amount.toLocaleString('uk-UA')} грн`;
+const mockPositions = [
+    {
+        position: { x: 100, y: 100, anchor: 'middle' as const },
+        arcPoint: { x: 50, y: 50 },
+        leaderLine: [
+            { x: 50, y: 50 },
+            { x: 50, y: 100 },
+            { x: 100, y: 100 },
+        ],
+    },
+    {
+        position: { x: 200, y: 200, anchor: 'middle' as const },
+        arcPoint: { x: 150, y: 150 },
+        leaderLine: [
+            { x: 150, y: 150 },
+            { x: 150, y: 200 },
+            { x: 200, y: 200 },
+        ],
+    },
+];
 
 describe('ChartGraphic', () => {
     const items = [
@@ -47,10 +67,8 @@ describe('ChartGraphic', () => {
     beforeEach(() => {
         mockedUseChartGeometry.mockReturnValue({
             pathRefs: { current: [] },
-            positions: [
-                { x: 100, y: 100 },
-                { x: 200, y: 200 },
-            ],
+            textRefs: { current: [] },
+            positions: mockPositions,
         });
     });
 
@@ -60,54 +78,53 @@ describe('ChartGraphic', () => {
 
     it('renders desktop config when media query matches', () => {
         mockedUseMediaQuery.mockReturnValue(true);
-
         render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
-
         const svg = document.querySelector('svg');
-
         expect(svg).toHaveAttribute('viewBox', '0 0 400 400');
     });
 
     it('renders mobile config when media query does not match', () => {
         mockedUseMediaQuery.mockReturnValue(false);
-
         render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
-
         const svg = document.querySelector('svg');
-
         expect(svg).toHaveAttribute('viewBox', '0 0 200 200');
     });
 
     it('renders correct number of paths', () => {
         mockedUseMediaQuery.mockReturnValue(true);
-
         render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
-
         const paths = document.querySelectorAll('path');
-
         expect(paths).toHaveLength(2);
     });
 
     it('renders labels with formatted percent and amount', () => {
         mockedUseMediaQuery.mockReturnValue(true);
-
         const spyFormatAmount = jest.fn(defaultFormatAmount);
-
         render(<ChartGraphic items={items} formatAmount={spyFormatAmount} />);
 
         expect(screen.getByText('25.0%')).toBeInTheDocument();
         expect(screen.getByText('75.0%')).toBeInTheDocument();
-
         expect(spyFormatAmount).toHaveBeenCalledWith(1000);
         expect(spyFormatAmount).toHaveBeenCalledWith(3000);
     });
 
     it('does not render label if position is missing', () => {
         mockedUseMediaQuery.mockReturnValue(true);
-
         mockedUseChartGeometry.mockReturnValue({
             pathRefs: { current: [] },
-            positions: [undefined, { x: 200, y: 200 }],
+            textRefs: { current: [] },
+            positions: [
+                undefined,
+                {
+                    position: { x: 200, y: 200, anchor: 'middle' as const },
+                    arcPoint: { x: 150, y: 150 },
+                    leaderLine: [
+                        { x: 150, y: 150 },
+                        { x: 150, y: 200 },
+                        { x: 200, y: 200 },
+                    ],
+                },
+            ],
         });
 
         render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
@@ -118,9 +135,7 @@ describe('ChartGraphic', () => {
 
     it('calls useChartGeometry with correct arguments', () => {
         mockedUseMediaQuery.mockReturnValue(true);
-
         render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
-
         expect(mockedUseChartGeometry).toHaveBeenCalledWith(items.length, true, [25, 75]);
     });
 });

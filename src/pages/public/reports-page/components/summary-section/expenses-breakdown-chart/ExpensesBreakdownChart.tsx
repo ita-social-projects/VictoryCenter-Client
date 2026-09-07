@@ -12,7 +12,10 @@ interface ExpensesBreakdownChartProps {
 
 export const ExpensesBreakdownChart = ({ items, formatAmount }: ExpensesBreakdownChartProps) => {
     const { t } = useTranslation('reportsPage');
-    const normalizedItems = useMemo(() => items.toReversed(), [items]);
+    const normalizedItems = useMemo(
+        () => items.toSorted((a, b) => b.amount - a.amount || b.percent - a.percent),
+        [items],
+    );
 
     return (
         <div className={styles.container}>

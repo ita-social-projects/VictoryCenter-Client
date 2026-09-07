@@ -13,7 +13,7 @@ interface ChartGraphicProps {
 export const ChartGraphic = ({ items, formatAmount }: ChartGraphicProps) => {
     const isDesktop = useMediaQuery('(min-width: 1440px)');
     const percents = React.useMemo(() => items.map((i) => i.percent), [items]);
-    const { pathRefs, positions } = useChartGeometry(items.length, isDesktop, percents);
+    const { pathRefs, textRefs, positions } = useChartGeometry(items.length, isDesktop, percents);
     const config = isDesktop ? CHART_CONFIG.desktop : CHART_CONFIG.mobile;
 
     return (
@@ -40,9 +40,17 @@ export const ChartGraphic = ({ items, formatAmount }: ChartGraphicProps) => {
                                 strokeDasharray={`${item.percent} 100`}
                             />
                             {positions[index] && (
-                                <text x={positions[index].x} y={positions[index].y} className={styles.label}>
+                                <text
+                                    ref={(el) => {
+                                        textRefs.current[index] = el;
+                                    }}
+                                    x={positions[index].position.x}
+                                    y={positions[index].position.y}
+                                    textAnchor={positions[index].position.anchor}
+                                    className={styles.label}
+                                >
                                     <tspan className={styles.percent}>{item.percent.toFixed(1)}%</tspan>
-                                    <tspan x={positions[index].x} dy="1.2em" className={styles.amount}>
+                                    <tspan x={positions[index].position.x} dy="1.2em" className={styles.amount}>
                                         {formatAmount(item.amount)}
                                     </tspan>
                                 </text>

@@ -44,18 +44,10 @@ jest.mock(
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, setError }: any) => (
         <div data-testid="image-input">
-            <button
-                type="button"
-                data-testid="upload-valid-image"
-                onClick={() => onChange({ url: 'test-image.jpg' })}
-            >
+            <button type="button" data-testid="upload-valid-image" onClick={() => onChange({ url: 'test-image.jpg' })}>
                 Upload Image
             </button>
-            <button
-                type="button"
-                data-testid="trigger-image-error"
-                onClick={() => setError('Фото не більше 5 Mb')}
-            >
+            <button type="button" data-testid="trigger-image-error" onClick={() => setError('Фото не більше 5 Mb')}>
                 Trigger Error
             </button>
         </div>

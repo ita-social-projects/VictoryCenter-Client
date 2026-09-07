@@ -33,7 +33,7 @@ export const CHART_CONFIG = {
 
 export const LABEL_LAYOUT = {
     mobile: {
-        baseGap: 20,
+        baseGap: 15,
         collisionPadding: 4,
         arcPadding: 3,
         overflow: { left: 8, right: 70, top: 10, bottom: 0 },
@@ -44,7 +44,7 @@ export const LABEL_LAYOUT = {
         maxSteps: 90,
     },
     desktop: {
-        baseGap: 35,
+        baseGap: 25,
         collisionPadding: 6,
         arcPadding: 4,
         overflow: { left: 15, right: 130, top: 15, bottom: 0 },

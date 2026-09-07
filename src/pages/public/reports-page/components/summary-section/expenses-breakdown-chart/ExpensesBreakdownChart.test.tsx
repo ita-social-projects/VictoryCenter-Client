@@ -29,13 +29,47 @@ describe('ExpensesBreakdownChart', () => {
         expect(screen.getByRole('heading', { level: 3, name: /основні витрати/i })).toBeInTheDocument();
     });
 
-    it('passes reversed items to child components', () => {
-        render(<ExpensesBreakdownChart items={mockItems} formatAmount={mockFormatAmount} />);
+    it('passes items sorted by amount descending to child components (where source and reversed orders differ)', () => {
+        const items: ExpenseItem[] = [
+            { label: 'mid', amount: 300, percent: 0.3 },
+            { label: 'low', amount: 100, percent: 0.1 },
+            { label: 'high', amount: 500, percent: 0.5 },
+        ];
 
-        const expectedOrder = 'Operational Expenses,Admin Expenses';
+        render(<ExpensesBreakdownChart items={items} formatAmount={mockFormatAmount} />);
+
+        const expectedOrder = 'high,mid,low';
 
         expect(screen.getByTestId('chart-graphic')).toHaveTextContent(expectedOrder);
         expect(screen.getByTestId('chart-legend')).toHaveTextContent(expectedOrder);
+    });
+
+    it('breaks equal amounts by percent descending', () => {
+        const items: ExpenseItem[] = [
+            { label: 'small', amount: 100, percent: 0.05 },
+            { label: 'big', amount: 100, percent: 0.07 },
+            { label: 'tiny', amount: 100, percent: 0.01 },
+        ];
+
+        render(<ExpensesBreakdownChart items={items} formatAmount={mockFormatAmount} />);
+
+        const expectedOrder = 'big,small,tiny';
+
+        expect(screen.getByTestId('chart-graphic')).toHaveTextContent(expectedOrder);
+        expect(screen.getByTestId('chart-legend')).toHaveTextContent(expectedOrder);
+    });
+
+    it('does not mutate the incoming items array', () => {
+        const items: ExpenseItem[] = [
+            { label: 'mid', amount: 300, percent: 0.3 },
+            { label: 'low', amount: 100, percent: 0.1 },
+            { label: 'high', amount: 500, percent: 0.5 },
+        ];
+        const originalOrder = 'mid,low,high';
+
+        render(<ExpensesBreakdownChart items={items} formatAmount={mockFormatAmount} />);
+
+        expect(items.map((i) => i.label).join(',')).toBe(originalOrder);
     });
 
     it('renders correctly with empty items', () => {

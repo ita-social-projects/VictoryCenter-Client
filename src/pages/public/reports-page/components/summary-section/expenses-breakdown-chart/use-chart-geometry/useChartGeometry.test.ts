@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useChartGeometry } from './useChartGeometry';
+import { useChartGeometry, FALLBACK_BASELINE_RATIO } from './useChartGeometry';
 
 jest.mock('../chart-graphic/chart.config', () => ({
     CHART_CONFIG: {
@@ -91,6 +91,14 @@ function createMockText(bbox: { x: number; y: number; width: number; height: num
     return { getBBox: jest.fn(() => bbox) };
 }
 
+/** mock whose <text y> (first baseline) is observable, like in a real DOM */
+function createMockTextWithBaseline(bbox: { x: number; y: number; width: number; height: number }, baseline: number) {
+    return {
+        getBBox: jest.fn(() => bbox),
+        y: { baseVal: { numberOfItems: 1, getItem: () => ({ value: baseline }) } },
+    };
+}
+
 const renderChartGeometry = (itemsLength: number, isDesktop: boolean, percents: number[]) =>
     renderHook(({ itemsLength, isDesktop, percents }) => useChartGeometry(itemsLength, isDesktop, percents), {
         initialProps: { itemsLength, isDesktop, percents },
@@ -109,7 +117,6 @@ function setupWithRefs(
     return { result, rerender };
 }
 
-/** Mutates the hook's refs inside `act`, without triggering a rerender. */
 function attachRefs(
     result: ReturnType<typeof renderChartGeometry>['result'],
     refs: { paths?: (MockPath | null)[]; texts?: (ReturnType<typeof createMockText> | null)[] },
@@ -130,10 +137,11 @@ function boxXForAnchor(anchorX: number, width: number, anchor: Anchor): number {
     return anchorX - width / 2;
 }
 
+/** position.y is the first-line baseline → box top = y - baselineOffset */
 function boxOf(position: { x: number; y: number; anchor: Anchor }, width: number, height: number) {
     return {
         x: boxXForAnchor(position.x, width, position.anchor),
-        y: position.y - height / 2,
+        y: position.y - height * FALLBACK_BASELINE_RATIO,
         width,
         height,
     };
@@ -170,11 +178,7 @@ describe('useChartGeometry', () => {
             const { result } = setupWithRefs(
                 { itemsLength: 1, isDesktop: true, percents: [50] },
                 { paths: [null] },
-                {
-                    itemsLength: 1,
-                    isDesktop: false,
-                    percents: [50],
-                },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
             );
             expect(result.current.positions).toEqual([]);
         });
@@ -222,6 +226,34 @@ describe('useChartGeometry', () => {
         });
     });
 
+    describe('shared center recovery (circle fit, not bbox average)', () => {
+        it('aims the outward normal at the true circle center for asymmetric spans', () => {
+            const { result } = setupWithRefs(
+                { itemsLength: 1, isDesktop: false, percents: [25] },
+                {
+                    paths: [
+                        createCircularMockPath({
+                            center: { x: 150, y: 150 },
+                            radius: 100,
+                            startAngleDeg: -90,
+                            endAngleDeg: 90,
+                        }),
+                    ],
+                },
+            );
+            const n = Math.SQRT1_2;
+            const anchorX = 150 + n * 110;
+            const anchorY = 150 - n * 110;
+            const { position } = result.current.positions[0];
+            expect(position.anchor).toBe('start');
+            expect(position.x).toBeCloseTo(anchorX, 0);
+            expect(position.y).toBeCloseTo(
+                anchorY - MOBILE_LABEL.height / 2 + MOBILE_LABEL.height * FALLBACK_BASELINE_RATIO,
+                0,
+            );
+        });
+    });
+
     describe('textAnchor selection and exact placement when there is no collision', () => {
         const setupRing = (percent: number) =>
             setupWithRefs(
@@ -234,8 +266,8 @@ describe('useChartGeometry', () => {
             const { result } = setupRing(0);
             const { position } = result.current.positions[0];
             expect(position.anchor).toBe('start');
-            expect(position.x).toBeCloseTo(108.9, 0);
-            expect(position.y).toBeCloseTo(-4.5, 0);
+            expect(position.x).toBeCloseTo(110, 0);
+            expect(position.y).toBeCloseTo(-2.4, 0); // boxTop(-8) + 16 * 0.35
         });
 
         it('anchors "middle" for a point roughly above the shared center', () => {
@@ -243,7 +275,7 @@ describe('useChartGeometry', () => {
             const { position } = result.current.positions[0];
             expect(position.anchor).toBe('middle');
             expect(position.x).toBeCloseTo(0, 0);
-            expect(position.y).toBeCloseTo(110, 0);
+            expect(position.y).toBeCloseTo(107.6, 0); // boxTop(102) + 16 * 0.35
         });
 
         it('anchors "end" for a point on the left side of the shared center', () => {
@@ -333,7 +365,7 @@ describe('useChartGeometry', () => {
                 { itemsLength: 1, isDesktop: false, percents: [50] },
             );
             expect(result.current.positions[0].position.x).toBeCloseTo(0, 0);
-            expect(result.current.positions[0].position.y).toBeCloseTo(110, 0);
+            expect(result.current.positions[0].position.y).toBeCloseTo(107.6, 0);
         });
 
         it('re-lays out the label once real <text> bbox sizes become available', () => {
@@ -343,25 +375,46 @@ describe('useChartGeometry', () => {
                 { itemsLength: 1, isDesktop: false, percents: [50] },
             );
             const fallbackY = result.current.positions[0].position.y;
-            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 60, height: 24 })] });
+
+            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 30, height: 24 })] });
             rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
+
             const measuredY = result.current.positions[0].position.y;
             expect(measuredY).not.toBeCloseTo(fallbackY, 0);
         });
 
-        it('stabilizes after real sizes are measured and does not keep re-measuring indefinitely', () => {
-            const stableProps: ChartProps = { itemsLength: 1, isDesktop: false, percents: [50] };
+        it('emits first-line baseline using the measured bbox-top offset', () => {
             const { result, rerender } = setupWithRefs(
                 { itemsLength: 1, isDesktop: true, percents: [50] },
                 { paths: [makeCircularRing()] },
-                stableProps,
+                { itemsLength: 1, isDesktop: false, percents: [50] },
             );
-            const mockText = createMockText({ x: 0, y: 0, width: 60, height: 24 });
+
+            attachRefs(result, {
+                texts: [createMockTextWithBaseline({ x: 0, y: 0, width: 30, height: 10 }, 5) as any],
+            });
+
+            rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
+
+            expect(result.current.positions[0].position.y).toBeCloseTo(110, 1);
+        });
+
+        it('stabilizes after real sizes are measured and does not keep re-measuring indefinitely', () => {
+            const { result, rerender } = setupWithRefs(
+                { itemsLength: 1, isDesktop: true, percents: [50] },
+                { paths: [makeCircularRing()] },
+                { itemsLength: 1, isDesktop: false, percents: [50] },
+            );
+
+            const mockText = createMockText({ x: 0, y: 0, width: 30, height: 10 });
             attachRefs(result, { texts: [mockText] });
+
+            const stableProps: ChartProps = { itemsLength: 1, isDesktop: false, percents: [50] };
             rerender(stableProps);
 
             const callsAfterFirstMeasure = mockText.getBBox.mock.calls.length;
             const positionAfterFirstMeasure = result.current.positions[0].position;
+
             for (let i = 0; i < 5; i++) {
                 rerender(stableProps);
             }
@@ -375,7 +428,8 @@ describe('useChartGeometry', () => {
                 { paths: [makeCircularRing()] },
                 { itemsLength: 1, isDesktop: false, percents: [50] },
             );
-            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 60, height: 24 })] });
+
+            attachRefs(result, { texts: [createMockText({ x: 0, y: 0, width: 30, height: 24 })] });
             rerender({ itemsLength: 1, isDesktop: false, percents: [50] });
 
             attachRefs(result, { paths: [makeCircularRing()], texts: [null] });

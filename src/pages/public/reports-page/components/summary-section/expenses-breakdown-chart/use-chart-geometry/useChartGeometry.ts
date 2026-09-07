@@ -22,14 +22,15 @@ interface Bounds {
     maxY: number;
 }
 
-interface LabelSize {
+interface MeasuredLabel {
     width: number;
     height: number;
+    baselineOffset: number | null;
 }
 
 interface MeasuredSizes {
     signature: string;
-    sizes: (LabelSize | null)[];
+    sizes: (MeasuredLabel | null)[];
 }
 
 interface RoughLabel {
@@ -40,6 +41,7 @@ interface RoughLabel {
     y: number;
     width: number;
     height: number;
+    baselineOffset: number;
     anchor: 'start' | 'middle' | 'end';
 }
 
@@ -54,6 +56,7 @@ interface PlacedLabel {
 const EPS = 0.0001;
 const ARC_SAMPLE_STEP = 4;
 const SIZE_TOLERANCE = 0.5;
+export const FALLBACK_BASELINE_RATIO = 0.35;
 
 function normalize(vx: number, vy: number): Point {
     const len = Math.hypot(vx, vy);
@@ -85,7 +88,34 @@ function getViewBounds(isDesktop: boolean): Bounds {
     return { minX, minY, maxX: minX + w, maxY: minY + h };
 }
 
-function getCenter(paths: SVGPathElement[]): Point {
+function circumcenter(a: Point, b: Point, c: Point): Point | null {
+    const d = 2 * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+    if (Math.abs(d) < EPS) return null;
+    const a2 = a.x * a.x + a.y * a.y;
+    const b2 = b.x * b.x + b.y * b.y;
+    const c2 = c.x * c.x + c.y * c.y;
+    const ux = (a2 * (b.y - c.y) + b2 * (c.y - a.y) + c2 * (a.y - b.y)) / d;
+    const uy = (a2 * (c.x - b.x) + b2 * (a.x - c.x) + c2 * (b.x - a.x)) / d;
+    if (!Number.isFinite(ux) || !Number.isFinite(uy)) return null;
+    const r = Math.hypot(a.x - ux, a.y - uy);
+    if (!Number.isFinite(r) || r < EPS) return null;
+    return { x: ux, y: uy };
+}
+
+function getArcCircleCenter(paths: SVGPathElement[]): Point {
+    const fitted: Point[] = [];
+    for (const p of paths) {
+        const total = p.getTotalLength();
+        if (total <= EPS) continue;
+        const cc = circumcenter(p.getPointAtLength(0), p.getPointAtLength(total / 2), p.getPointAtLength(total));
+        if (cc) fitted.push(cc);
+    }
+    if (fitted.length > 0) {
+        return fitted.reduce((acc, c) => ({ x: acc.x + c.x / fitted.length, y: acc.y + c.y / fitted.length }), {
+            x: 0,
+            y: 0,
+        });
+    }
     const centers = paths.map((p) => {
         const b = p.getBBox();
         return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
@@ -96,13 +126,28 @@ function getCenter(paths: SVGPathElement[]): Point {
     });
 }
 
-function sameSizes(a: (LabelSize | null)[], b: (LabelSize | null)[]): boolean {
+function readBaselineOffset(el: SVGTextElement, bb: { y: number; height: number }): number | null {
+    const list = el?.y?.baseVal;
+    if (!list || list.numberOfItems < 1) return null;
+    const baseline = list.getItem(0).value;
+    if (!Number.isFinite(baseline)) return null;
+    const offset = baseline - bb.y;
+    return offset > 0 && offset < bb.height ? offset : null;
+}
+
+function sameSizes(a: (MeasuredLabel | null)[], b: (MeasuredLabel | null)[]): boolean {
     if (a.length !== b.length) return false;
     return a.every((s, i) => {
         const n = b[i];
         if (!s && !n) return true;
         if (!s || !n) return false;
-        return Math.abs(s.width - n.width) < SIZE_TOLERANCE && Math.abs(s.height - n.height) < SIZE_TOLERANCE;
+        const offEqual =
+            s.baselineOffset === null
+                ? n.baselineOffset === null
+                : n.baselineOffset !== null && Math.abs(s.baselineOffset - n.baselineOffset) < SIZE_TOLERANCE;
+        return (
+            Math.abs(s.width - n.width) < SIZE_TOLERANCE && Math.abs(s.height - n.height) < SIZE_TOLERANCE && offEqual
+        );
     });
 }
 
@@ -118,10 +163,15 @@ export function useChartGeometry(itemsLength: number, isDesktop: boolean, percen
     useLayoutEffect(() => {
         if (positions.length === 0) return;
 
-        const sizes: (LabelSize | null)[] = [];
+        const sizes: (MeasuredLabel | null)[] = [];
         for (let i = 0; i < positions.length; i++) {
-            const bb = textRefs.current[i]?.getBBox();
-            sizes.push(bb && bb.width > 0 && bb.height > 0 ? { width: bb.width, height: bb.height } : null);
+            const el = textRefs.current[i];
+            const bb = el?.getBBox();
+            if (el && bb && bb.width > 0 && bb.height > 0) {
+                sizes.push({ width: bb.width, height: bb.height, baselineOffset: readBaselineOffset(el, bb) });
+            } else {
+                sizes.push(null);
+            }
         }
         if (sizes.every((s) => !s)) return;
 
@@ -138,7 +188,7 @@ export function useChartGeometry(itemsLength: number, isDesktop: boolean, percen
         const config = isDesktop ? CHART_CONFIG.desktop : CHART_CONFIG.mobile;
         const layout = isDesktop ? LABEL_LAYOUT.desktop : LABEL_LAYOUT.mobile;
         const bounds = getViewBounds(isDesktop);
-        const center = getCenter(paths);
+        const center = getArcCircleCenter(paths);
         const strokeHalf = config.strokeWidth / 2;
         const sizes = measured && measured.signature === signature ? measured.sizes : null;
 
@@ -175,9 +225,10 @@ export function useChartGeometry(itemsLength: number, isDesktop: boolean, percen
             const anchorY = center.y + normal.y * anchorRadius;
 
             const anchor = textAnchorFor(normal.x);
-            const size = sizes?.[index] ?? null;
-            const width = size ? size.width : layout.fallbackWidth;
-            const height = size ? size.height : layout.fallbackHeight;
+            const measuredItem = sizes?.[index] ?? null;
+            const width = measuredItem ? measuredItem.width : layout.fallbackWidth;
+            const height = measuredItem ? measuredItem.height : layout.fallbackHeight;
+            const baselineOffset = measuredItem?.baselineOffset ?? height * FALLBACK_BASELINE_RATIO;
 
             return {
                 originalIndex: index,
@@ -187,6 +238,7 @@ export function useChartGeometry(itemsLength: number, isDesktop: boolean, percen
                 y: anchorY - height / 2,
                 width,
                 height,
+                baselineOffset,
                 anchor,
             };
         });
@@ -284,7 +336,7 @@ export function useChartGeometry(itemsLength: number, isDesktop: boolean, percen
             finalResults[label.originalIndex] = {
                 position: {
                     x: anchorXForBox(currentX, label.width, label.anchor),
-                    y: currentY + label.height / 2,
+                    y: currentY + label.baselineOffset,
                     anchor: label.anchor,
                 },
                 arcPoint: { x: label.arcX, y: label.arcY },

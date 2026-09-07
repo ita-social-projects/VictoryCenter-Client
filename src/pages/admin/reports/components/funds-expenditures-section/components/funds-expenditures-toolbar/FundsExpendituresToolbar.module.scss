@@ -135,6 +135,13 @@
         }
     }
 
+    :global(.select-head .empty) {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     :global(.select-options) {
         top: 42px;
         min-width: 204px;
@@ -142,6 +149,17 @@
         border-radius: 6px;
         box-shadow: 0 5px 8px rgba(c.$black, 0.2);
         padding: 6px 10px;
+    }
+}
+
+.category-filter-select {
+    :global(.select-head) {
+        box-sizing: border-box;
+        width: 362px;
+    }
+
+    :global(.select-options) {
+        min-width: 362px;
     }
 }
 

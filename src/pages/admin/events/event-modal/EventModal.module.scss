@@ -99,6 +99,7 @@
         p:first-of-type,
         span:first-of-type {
             @include type.small-text-regular;
+
             color: c.$blue-900;
             text-align: center;
             margin: 0;
@@ -107,6 +108,7 @@
         p:last-of-type,
         span:last-of-type {
             @include type.body-2-regular;
+
             color: c.$blue-900;
             text-align: center;
             margin: 0;

@@ -3,8 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { EventModal } from './EventModal';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { EVENTS_TEXT } from '@/const/admin/events';
+import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
@@ -42,17 +43,31 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError }: any) => (
+    ImageInput: ({ onChange, setError }: Pick<ImageInputProps, 'onChange' | 'setError'>) => (
         <div data-testid="image-input">
-            <button type="button" data-testid="upload-valid-image" onClick={() => onChange({ url: 'test-image.jpg' })}>
+            <button
+                type="button"
+                data-testid="upload-valid-image"
+                onClick={() => onChange({ base64: 'test-base64-data', mimeType: 'image/png' })}
+            >
                 Upload Image
             </button>
-            <button type="button" data-testid="trigger-image-error" onClick={() => setError('Фото не більше 5 Mb')}>
+            <button
+                type="button"
+                data-testid="trigger-image-error"
+                onClick={() => setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))}
+            >
                 Trigger Error
             </button>
         </div>
     ),
-    getImageSrc: (image: any) => (typeof image === 'string' ? image : image?.url || ''),
+    getImageSrc: (image: any) => {
+        if (!image) return '';
+        if (typeof image === 'string') return image;
+        if ('url' in image && image.url) return image.url;
+        if ('base64' in image) return `data:${image.mimeType};base64,${image.base64}`;
+        return '';
+    },
 }));
 
 const currentCategory: EventCategoryDto | null = {
@@ -214,7 +229,10 @@ describe('EventModal', () => {
             fireEvent.click(screen.getByTestId('upload-valid-image'));
 
             expect(screen.getByTestId('event-image-preview')).toBeInTheDocument();
-            expect(screen.getByTestId('event-image-preview')).toHaveAttribute('src', 'test-image.jpg');
+            expect(screen.getByTestId('event-image-preview')).toHaveAttribute(
+                'src',
+                'data:image/png;base64,test-base64-data',
+            );
             expect(screen.queryByTestId('image-input')).not.toBeInTheDocument();
         });
 
@@ -223,17 +241,23 @@ describe('EventModal', () => {
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
 
-            expect(screen.getByText('Фото не більше 5 Mb')).toBeInTheDocument();
+            expect(
+                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+            ).toBeInTheDocument();
         });
 
         it('clears image error when a valid image is selected', () => {
             render(<EventModal {...defaultProps} />);
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
-            expect(screen.getByText('Фото не більше 5 Mb')).toBeInTheDocument();
+            expect(
+                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+            ).toBeInTheDocument();
 
             fireEvent.click(screen.getByTestId('upload-valid-image'));
-            expect(screen.queryByText('Фото не більше 5 Mb')).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+            ).not.toBeInTheDocument();
         });
 
         it('shows confirmation modal on close when image was added (isDirty state)', () => {

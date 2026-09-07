@@ -14,6 +14,7 @@ import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
 
 interface EventFormValues {
     title: string;
@@ -43,6 +44,26 @@ const defaultFormState: EventFormValues = {
     linkEng: '',
 };
 
+const mapEventImageError = (error: string | null): string | undefined => {
+    if (!error) return undefined;
+
+    if (error === BASE_IMAGE_VALIDATION.getFormatError()) {
+        return EVENT_VALIDATION.image.getFormatError();
+    }
+
+    if (error === BASE_IMAGE_VALIDATION.getSizeError(EVENT_VALIDATION.image.maxSizeMB)) {
+        return EVENT_VALIDATION.image.getSizeError(EVENT_VALIDATION.image.maxSizeMB);
+    }
+
+    if (error === BASE_IMAGE_VALIDATION.ImageDimensionsTooSmallError) {
+        return EVENT_VALIDATION.image.getDimensionTooSmallError
+            ? EVENT_VALIDATION.image.getDimensionTooSmallError()
+            : error;
+    }
+
+    return error;
+};
+
 export const EventModal = (props: EventModalProps) => {
     const { isOpen, onClose, currentCategory } = props;
 
@@ -68,7 +89,10 @@ export const EventModal = (props: EventModalProps) => {
     };
 
     const handleImageError = useCallback((error: string | null) => {
-        setErrors((prev) => ({ ...prev, image: error ?? undefined }));
+        setErrors((prev) => ({
+            ...prev,
+            image: mapEventImageError(error),
+        }));
     }, []);
 
     const handleClose = useCallback(() => {
@@ -180,8 +204,12 @@ export const EventModal = (props: EventModalProps) => {
                                                 cropHeight={EVENT_VALIDATION.image.cropHeight}
                                                 minWidth={EVENT_VALIDATION.image.minWidth}
                                                 minHeight={EVENT_VALIDATION.image.minHeight}
+                                                maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
                                                 label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(360, 650)}
+                                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                                    EVENT_VALIDATION.image.cropHeight,
+                                                    EVENT_VALIDATION.image.cropWidth,
+                                                )}
                                             />
                                         )}
                                     </div>

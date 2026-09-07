@@ -5,13 +5,14 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { FeedbackCategory, FeedbackCategoryItem, FeedbackListItem } from '@/types/admin/feedback';
+import { FeedbackCategory, FeedbackCategoryItem, FeedbackHistoryDto, FeedbackListItem } from '@/types/admin/feedback';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FEEDBACK_CATEGORIES, FEEDBACK_PAGINATION_LIMIT, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
+import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -63,6 +64,30 @@ export const FeedbackPageAdmin = () => {
     const handleNotImplemented = useCallback(() => {
         addToast('Функція не реалізована', ToastType.Info);
     }, [addToast]);
+
+    const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
+
+    const handleDeleteClick = useCallback(
+        (item: FeedbackListItem) => {
+            if (activeCategory === FeedbackCategory.HISTORY) {
+                setHistoryToDelete(item as FeedbackHistoryDto);
+            } else {
+                handleNotImplemented();
+            }
+        },
+        [activeCategory, handleNotImplemented],
+    );
+
+    const handleDeleteHistoryConfirm = useCallback(
+        (deletedHistory: FeedbackHistoryDto) => {
+            setItems((prev) => prev.filter((item) => item.id !== deletedHistory.id));
+            if (selectedSearchItem && selectedSearchItem.id === deletedHistory.id) {
+                setSelectedSearchItem(null);
+            }
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
+        },
+        [selectedSearchItem, addToast],
+    );
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -231,7 +256,7 @@ export const FeedbackPageAdmin = () => {
                         item={i}
                         showPhoto={activeCategory === FeedbackCategory.HISTORY}
                         onEdit={handleNotImplemented}
-                        onDelete={handleNotImplemented}
+                        onDelete={handleDeleteClick}
                     />
                 )}
                 entities={itemsToRender}
@@ -239,7 +264,7 @@ export const FeedbackPageAdmin = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented],
+        [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented, handleDeleteClick],
     );
 
     return (
@@ -292,6 +317,13 @@ export const FeedbackPageAdmin = () => {
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>
+
+            <DeleteFeedbackHistoryModal
+                isOpen={!!historyToDelete}
+                onClose={() => setHistoryToDelete(null)}
+                historyToDelete={historyToDelete}
+                onDeleteHistory={handleDeleteHistoryConfirm}
+            />
             <ToastContainer />
         </div>
     );

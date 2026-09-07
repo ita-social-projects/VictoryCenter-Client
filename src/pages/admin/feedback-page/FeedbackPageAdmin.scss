@@ -30,6 +30,7 @@
     }
 
     &-error-container {
+        @include typography.body-2-regular;
         flex-shrink: 0;
         padding: 16px;
         text-align: center;
@@ -40,15 +41,14 @@
         justify-content: flex-start;
         align-items: center;
         color: colors.$error;
-        @include typography.body-2-regular;
         margin-top: 10px;
         margin-bottom: 10px;
 
         .retry-link {
+            @include typography.body-2-regular;
             background: none;
             border: none;
             padding: 0;
-            @include typography.body-2-regular;
             color: colors.$blue-900;
             text-decoration: underline;
             text-decoration-color: colors.$blue-900;

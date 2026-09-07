@@ -34,8 +34,8 @@
             justify-content: center;
 
             p {
-                margin: 4px 0 0 0;
                 @include typography.body-1-regular;
+                margin: 4px 0 0 0;
                 color: colors.$blue-900;
                 overflow-wrap: anywhere;
                 word-break: normal;
@@ -48,8 +48,8 @@
         width: 33%;
 
         p {
-            margin: 0;
             @include typography.body-1-regular;
+            margin: 0;
             color: colors.$blue-900;
             padding-right: 40px;
             overflow-wrap: anywhere;

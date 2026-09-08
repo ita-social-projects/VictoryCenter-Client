@@ -74,4 +74,11 @@ describe('mapHippotherapyPageToAbout', () => {
             { text: 'Reference name', url: 'https://example.com/reference' },
         ]);
     });
+
+    it('ignores an author that only contains empty html', () => {
+        const dto = buildDto();
+        dto.quoteSection.authorName = '<p><br></p>';
+
+        expect(mapHippotherapyPageToAbout(dto).quoteSection.text).toBe('Quote text');
+    });
 });

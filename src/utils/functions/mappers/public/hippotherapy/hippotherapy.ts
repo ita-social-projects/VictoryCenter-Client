@@ -13,7 +13,7 @@ const getImageUrl = (value: HippotherapyImageValue): string =>
     value.image && 'url' in value.image ? value.image.url : '';
 
 const toQuote = (section: HippotherapyQuoteContent): Quote => ({
-    text: section.authorName ? `${section.quoteText}<br /><br />${section.authorName}` : section.quoteText,
+    text: toPlain(section.authorName) ? `${section.quoteText}<br /><br />${section.authorName}` : section.quoteText,
     imgURL: getImageUrl(section),
 });
 

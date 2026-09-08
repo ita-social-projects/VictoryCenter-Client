@@ -6,7 +6,7 @@ export const HippoventionCenter = ({ title, imgURL, imgAlternativeText, pros, te
     return (
         <section className={styles['hippovention-center']}>
             <img
-                src={imgURL ?? hippoventionCenterImg}
+                src={imgURL || hippoventionCenterImg}
                 className={styles.image}
                 alt={imgAlternativeText ?? 'Група людей на конях'}
             />

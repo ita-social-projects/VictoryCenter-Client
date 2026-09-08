@@ -68,7 +68,7 @@ export const SingleImageRight = ({
         >
             {mode === SectionMode.Edit ? (
                 <>
-                    <div className={baseStyles['left-section']}>
+                    <div data-section-text className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
@@ -134,7 +134,7 @@ export const SingleImageRight = ({
                 </>
             ) : (
                 <>
-                    <div className={baseStyles['left-section']}>
+                    <div data-section-text className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
                             <h2 className={baseStyles.title}>{title}</h2>
                         </div>

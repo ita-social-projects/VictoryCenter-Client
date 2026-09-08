@@ -62,6 +62,7 @@ export const TitleDescriptionSection = ({
 
     return (
         <div
+            data-section-text
             className={cn(
                 baseStyles.container,
                 {

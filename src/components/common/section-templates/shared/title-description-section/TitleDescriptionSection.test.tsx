@@ -168,6 +168,15 @@ describe('TitleDescriptionSection', () => {
         jest.clearAllMocks();
     });
 
+    it.each([SectionMode.View, SectionMode.Edit, SectionMode.Template])(
+        'marks its root element with data-section-text in %s mode',
+        (mode) => {
+            const { container } = renderComponent({ mode });
+
+            expect(container.firstElementChild).toHaveAttribute('data-section-text');
+        },
+    );
+
     it('calls useSectionValidation with callbacks, template, and flags', () => {
         const onTitleChange = jest.fn();
         const onDescriptionChange = jest.fn();

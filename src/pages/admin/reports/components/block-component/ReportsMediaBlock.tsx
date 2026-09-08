@@ -205,6 +205,7 @@ export const ReportsMediaBlock = ({
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat',
                             }}
+                            deleteConfirmationText={REPORTS_TEXT.DELETE_IMAGE.TITLE}
                         />
                         <div className={styles['image-error']}>
                             <InputError error={imageError} />

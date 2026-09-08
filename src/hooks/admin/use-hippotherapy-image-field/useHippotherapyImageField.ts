@@ -21,7 +21,7 @@ export const useHippotherapyImageField = <T extends HippotherapyImageValue>({
     };
 
     const handleImageChange = (image: ImageValues | null) => {
-        onChange({ ...value, image } as T);
+        onChange({ ...value, image, imageId: image ? value.imageId : null } as T);
     };
 
     return { imageError, handleImageErrorChange, handleImageChange };

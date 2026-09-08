@@ -27,7 +27,7 @@ describe('DonateSection', () => {
         );
 
         expect(screen.getByRole('heading', { level: 2, name: 'DONATE.TITLE' })).toBeInTheDocument();
-        expect(screen.getByRole('heading', { level: 4, name: 'DONATE.DESCRIPTION' })).toBeInTheDocument();
+        expect(screen.getByText('DONATE.DESCRIPTION')).toBeInTheDocument();
 
         const donateLink = screen.getByRole('link', { name: 'DONATE.SUBMIT_BUTTON' });
 

@@ -8,20 +8,16 @@ import styles from './DonateSection.module.scss';
 
 export const DonateSection: React.FC = () => {
     const { t } = useTranslation('supportUsPage');
-    const [isVideoUnavailable, setIsVideoUnavailable] = React.useState(false);
 
     return (
         <div className={styles['donate-block']}>
-            <img className={styles['fallback-image']} src={fallbackImage} alt="" aria-hidden="true" />
-            {!isVideoUnavailable && (
-                <video autoPlay muted loop playsInline aria-hidden="true" onError={() => setIsVideoUnavailable(true)}>
-                    <source src={background} type="video/webm" />
-                </video>
-            )}
+            <video autoPlay muted loop playsInline aria-hidden="true" poster={fallbackImage}>
+                <source src={background} type="video/webm" />
+            </video>
             <div className={styles['donate-info']}>
                 <h2 className={styles['donate-title']}>{t('DONATE.TITLE')}</h2>
                 <div className={styles['donate-button']}>
-                    <h4>{t('DONATE.DESCRIPTION')}</h4>
+                    <p>{t('DONATE.DESCRIPTION')}</p>
                     <Button
                         href={PUBLIC_ROUTES.DONATE.FULL}
                         variant="primary-light"

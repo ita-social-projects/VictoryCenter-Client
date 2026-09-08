@@ -24,6 +24,10 @@ jest.mock('./components/contact-section/ContactSection', () => ({
     ContactSection: () => <section data-testid="contact-section" />,
 }));
 
+jest.mock('./components/donate-section/DonateSection', () => ({
+    DonateSection: () => <section data-testid="donate-section" />,
+}));
+
 describe('SupportUsPage', () => {
     it('renders the intro section', () => {
         render(<SupportUsPage />);
@@ -64,5 +68,12 @@ describe('SupportUsPage', () => {
 
         const main = screen.getByRole('main');
         expect(main).toContainElement(screen.getByTestId('contact-section'));
+    });
+
+    it('renders the donate section inside the main landmark', () => {
+        render(<SupportUsPage />);
+
+        const main = screen.getByRole('main');
+        expect(main).toContainElement(screen.getByTestId('donate-section'));
     });
 });

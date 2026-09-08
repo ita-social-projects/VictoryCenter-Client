@@ -7,13 +7,7 @@ import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/imag
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({
-        isOpen,
-        onConfirm,
-        onCancel,
-        onClose,
-        title,
-    }: any) => {
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
         if (!isOpen) return null;
 
         return (
@@ -273,9 +267,7 @@ describe('ImageInput', () => {
 
         fireEvent.click(screen.getByTestId('remove-photo-button'));
 
-        expect(screen.getByTestId('confirmation-text')).toHaveTextContent(
-            deleteConfirmationText,
-        );
+        expect(screen.getByTestId('confirmation-text')).toHaveTextContent(deleteConfirmationText);
     });
 
     it('shows format error and does not call onChange for invalid file format', async () => {

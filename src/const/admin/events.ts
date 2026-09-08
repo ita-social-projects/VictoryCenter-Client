@@ -45,6 +45,17 @@ export const EVENT_CATEGORY_TEXT = {
 };
 
 export const EVENT_VALIDATION = {
+    image: {
+        cropWidth: 650,
+        cropHeight: 360,
+        minWidth: 650,
+        minHeight: 360,
+        maxSizeMB: 5,
+        allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
+        getSizeError: (maxSizeMB: number) => `Фото не більше ${maxSizeMB} Mb`,
+        getDimensionTooSmallError: () => 'Розмір зображення менший за рекомендований',
+    },
     title: {
         max: 60,
     },

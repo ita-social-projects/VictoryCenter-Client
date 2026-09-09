@@ -8,12 +8,15 @@ describe('IntroSection', () => {
         expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
     });
 
-    test('should render three title spans with the highlight classes on the first and last', () => {
+    test('should render title spans with the highlight classes on the first and last, and keep the second line together', () => {
         const { container } = render(<IntroSection />);
         const spans = container.querySelectorAll('h1 span');
-        expect(spans.length).toEqual(3);
+        expect(spans.length).toEqual(4);
         expect(spans[0]).toHaveClass('highlight-yellow');
-        expect(spans[2]).toHaveClass('highlight-blue');
+        expect(spans[spans.length - 1]).toHaveClass('highlight-blue');
+
+        const secondLine = container.querySelector('h1 span:nth-child(3)');
+        expect(secondLine).toContainElement(spans[spans.length - 1] as HTMLElement);
     });
 
     test('should render a non-empty description paragraph', () => {

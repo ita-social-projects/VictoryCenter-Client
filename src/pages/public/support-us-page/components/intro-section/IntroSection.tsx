@@ -10,8 +10,10 @@ export const IntroSection: React.FC = () => {
             <h1 className={styles.title}>
                 <span className={styles['highlight-yellow']}>{t('PAGE_TITLE.FIRST_HIGHLIGHT')}</span>
                 <br />
-                <span>{t('PAGE_TITLE.SECOND_TEXT')}</span>
-                <span className={styles['highlight-blue']}>{t('PAGE_TITLE.SECOND_HIGHLIGHT')}</span>
+                <span className={styles['second-line']}>
+                    <span>{t('PAGE_TITLE.SECOND_TEXT')}</span>{' '}
+                    <span className={styles['highlight-blue']}>{t('PAGE_TITLE.SECOND_HIGHLIGHT')}</span>
+                </span>
             </h1>
             <div className={styles['additional-info']}>
                 <p>{t('PAGE_DESCRIPTION')}</p>

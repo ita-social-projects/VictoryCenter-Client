@@ -3,10 +3,45 @@
 
 .intro-section {
     overflow-x: hidden;
+    padding-top: 104px;
+
+    @media (min-width: 560px) {
+        padding-top: 66px;
+    }
+
+    @media (min-width: 768px) {
+        padding-top: 130px;
+    }
+
+    @media (min-width: 1440px) {
+        padding-top: 52px;
+    }
 }
 
 .title {
     @include utils.yellow-blue-text;
+
+    margin-bottom: 172px;
+
+    @media (max-width: 559px) {
+        font-size: 36px;
+    }
+
+    @media (min-width: 560px) {
+        margin-bottom: 142px;
+    }
+
+    @media (min-width: 768px) {
+        margin-bottom: 152px;
+    }
+
+    @media (min-width: 1440px) {
+        margin-bottom: 120px;
+    }
+}
+
+.second-line {
+    white-space: nowrap;
 }
 
 .highlight-yellow,
@@ -23,11 +58,19 @@
 }
 
 .additional-info {
-    @include type.subtitle-2-medium;
+    @include type.body-2-regular;
 
-    max-width: 470px;
+    max-width: 336px;
     margin: 0 auto;
     text-align: center;
+
+    @media (min-width: 560px) {
+        max-width: 432px;
+    }
+
+    @media (min-width: 768px) {
+        @include type.body-1-medium;
+    }
 
     p {
         margin: 0;

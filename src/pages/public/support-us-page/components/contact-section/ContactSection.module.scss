@@ -6,19 +6,39 @@
 .root {
     overflow: hidden;
     display: flex;
-    justify-content: space-between;
-    align-items: start;
-    gap: 128px;
-    padding: 120px 168px 164px;
+    flex-direction: column;
+    gap: 40px;
+    padding: 24px 16px;
+
+    @media (min-width: 560px) {
+        padding: 24px 24px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 40px 32px;
+        gap: 56px;
+    }
+
+    @media (min-width: 1440px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: start;
+        gap: 128px;
+        padding: 120px 168px 164px;
+    }
 }
 
 .content {
     min-width: 0;
-    flex: 1;
+
+    @media (min-width: 1440px) {
+        flex: 1;
+    }
 }
 
 .title {
     @include utils.yellow-blue-text;
+
     margin: 0 0 24px;
     text-align: left;
     max-width: 480px;
@@ -26,9 +46,12 @@
 
 .form-container {
     z-index: 2;
-    flex: 0 0 550px;
-    margin-top: -24px;
-    margin-left: -50px;
+
+    @media (min-width: 1440px) {
+        flex: 0 0 550px;
+        margin-top: -24px;
+        margin-left: -50px;
+    }
 }
 
 .form {
@@ -38,8 +61,20 @@
     border-bottom: 1px solid c.$grey-500;
     display: flex;
     flex-direction: column;
-    gap: 29px;
-    padding: 40px;
+    gap: 48px;
+    padding: 48px 24px 24px;
+
+    @media (min-width: 560px) {
+        width: 433px;
+        margin: 0 auto;
+        padding: 48px 32px 32px;
+        gap: 64px;
+    }
+
+    @media (min-width: 1440px) {
+        width: 544px;
+        padding: 64px 48px 48px;
+    }
 }
 
 .field-wrapper {
@@ -159,15 +194,35 @@
 .description {
     @include type.body-1-regular;
 
-    margin-top: 114px;
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-top: 48px;
     text-align: left;
     max-width: 480px;
+
+    @media (min-width: 560px) and (max-width: 767px) {
+        width: 433px;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 40px;
+    }
+
+    @media (min-width: 768px) and (max-width: 1439px) {
+        padding-left: 25px;
+    }
+
+    @media (min-width: 1440px) {
+        margin-top: 114px;
+        margin-left: 16px;
+        margin-right: 16px;
+    }
 }
 
 .bold-description {
     font-weight: t.$fw-bold;
     margin-top: 24px;
     max-width: 360px;
+
+    @media (min-width: 560px) and (max-width: 767px) {
+        max-width: 433px;
+        margin-bottom: 72px;
+    }
 }

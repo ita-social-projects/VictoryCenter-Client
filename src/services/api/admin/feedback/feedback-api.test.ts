@@ -11,6 +11,14 @@ describe('FeedbackApi', () => {
         priority: i,
     }));
 
+    const mockReviewsList = Array.from({ length: 21 }).map((_, i) => ({
+        id: i + 1,
+        authorName: `Учасник ${i + 1}`,
+        text: `Текст відгуку ${i + 1}`,
+        status: VisibilityStatus.Published,
+        priority: i,
+    }));
+
     const mockClient = {
         get: jest.fn(),
         delete: jest.fn(),
@@ -89,47 +97,46 @@ describe('FeedbackApi', () => {
     });
 
     describe('fetchReviews', () => {
-        it('should fetch reviews with default pagination when no params provided', async () => {
-            const promise = FeedbackApi.fetchReviews(mockClient);
-            jest.advanceTimersByTime(500);
-            const result = await promise;
+        beforeEach(() => {
+            mockClient.get.mockResolvedValue({
+                data: { items: mockReviewsList, totalItemsCount: mockReviewsList.length },
+            });
+        });
 
+        it('should fetch reviews with default pagination when no params provided', async () => {
+            const result = await FeedbackApi.fetchReviews(mockClient);
+
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackReviews');
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].authorName).toBe('Учасник 1');
         });
 
         it('should fetch reviews with custom take and skip', async () => {
-            const promise = FeedbackApi.fetchReviews(mockClient, {
+            const result = await FeedbackApi.fetchReviews(mockClient, {
                 take: 3,
                 skip: 5,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(3);
             expect(result.items[0].id).toBe(6);
         });
 
         it('should fetch reviews with offset and limit and filter by searchTerm', async () => {
-            const promise = FeedbackApi.fetchReviews(mockClient, {
+            const result = await FeedbackApi.fetchReviews(mockClient, {
                 searchTerm: 'Учасник 1',
                 offset: 7,
                 limit: 7,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.totalItemsCount).toBe(11);
             expect(result.items.length).toBe(4);
         });
 
         it('should return empty items when skip is greater than total items', async () => {
-            const promise = FeedbackApi.fetchReviews(mockClient, {
+            const result = await FeedbackApi.fetchReviews(mockClient, {
                 skip: 25,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(0);
         });

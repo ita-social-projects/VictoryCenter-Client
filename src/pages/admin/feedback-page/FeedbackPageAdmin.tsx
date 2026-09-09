@@ -16,6 +16,7 @@ import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { Button } from '@/components/admin/button/Button';
 import './FeedbackPageAdmin.scss';
 
 const SEARCH_PLACEHOLDERS: Record<FeedbackCategory, string> = {
@@ -270,6 +271,8 @@ export const FeedbackPageAdmin = () => {
         [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented, handleDeleteClick],
     );
 
+    const isFilteredView = Boolean(selectedSearchItem) || statusFilter !== undefined;
+
     return (
         <div className="feedback-page-wrapper" data-testid="feedback-page-content">
             <div className="feedback-page-toolbar-container">
@@ -317,7 +320,16 @@ export const FeedbackPageAdmin = () => {
                     onLoadMore={() => fetchCategoryItems(activeCategory, items.length)}
                     hasMore={hasMoreToShow}
                     isLoading={isLoading}
-                    emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
+                    emptyStateMessage={
+                        isFilteredView ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : FEEDBACK_TEXT.LIST.NO_MATERIALS
+                    }
+                    emptyStateAction={
+                        !isFilteredView ? (
+                            <Button buttonStyle="secondary" onClick={handleNotImplemented}>
+                                {FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
+                            </Button>
+                        ) : undefined
+                    }
                 />
             </div>
 

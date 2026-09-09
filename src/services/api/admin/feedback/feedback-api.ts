@@ -54,20 +54,11 @@ export const FeedbackApi = {
         await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
     },
     fetchReviews: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackReviewDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackReviewDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            authorName: `Учасник ${i + 1}`,
-            text: `Текст відгуку ${i + 1}`,
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.authorName);
+        const response = await client.get<PaginationResult<FeedbackReviewDto>>(API_ROUTES.FEEDBACK_REVIEWS.BASE);
+        return filterAndPaginate(response.data.items, params, (item) => item.authorName);
     },
     fetchVideos: async (
         _client: AxiosInstance,

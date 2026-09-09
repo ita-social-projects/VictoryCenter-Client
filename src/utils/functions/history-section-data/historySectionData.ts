@@ -31,6 +31,7 @@ export const getHistorySectionData = (section: HistorySectionDto): HistorySectio
         (content) => content.image ?? null,
     );
 
+    // Pad with nulls up to the template's image count so each index maps to a fixed template slot.
     const expectedImageCount = getExpectedHistoryImageCount(section);
     while (images.length < expectedImageCount) {
         images.push(null);

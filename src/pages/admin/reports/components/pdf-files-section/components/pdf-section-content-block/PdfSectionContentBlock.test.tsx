@@ -1,7 +1,7 @@
 import { render, screen, waitFor, getDefaultNormalizer } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PdfSectionContentBlock } from './PdfSectionContentBlock';
-import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
+import { PDF_FILES_SECTION_TEXT, PDF_FILES_SECTION_VALIDATION } from '@/const/admin/reports';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -175,6 +175,7 @@ describe('PdfSectionContentBlock', () => {
 
         it('should normalize consecutive spaces in title while typing', async () => {
             const utils = await renderAndEnterEditMode();
+            const expectedLength = 'Test multiple spaces'.length;
 
             const titleInput = screen.getByLabelText(/заголовок/i);
 
@@ -182,10 +183,15 @@ describe('PdfSectionContentBlock', () => {
             await utils.type(titleInput, 'Test  multiple   spaces');
 
             expect(titleInput).toHaveValue('Test multiple spaces');
+
+            const counter = document.getElementById('pdf-section-title-character-count');
+
+            expect(counter).toHaveTextContent(`${expectedLength}/${PDF_FILES_SECTION_VALIDATION.title.max}`);
         });
 
         it('should normalize consecutive spaces in description while typing', async () => {
             const utils = await renderAndEnterEditMode();
+            const expectedLength = 'Test multiple spaces'.length;
 
             const descriptionInput = screen.getByLabelText(/опис/i);
 
@@ -193,6 +199,10 @@ describe('PdfSectionContentBlock', () => {
             await utils.type(descriptionInput, 'Test  multiple   spaces');
 
             expect(descriptionInput).toHaveValue('Test multiple spaces');
+
+            const counter = document.getElementById('pdf-section-description-character-count');
+
+            expect(counter).toHaveTextContent(`${expectedLength}/${PDF_FILES_SECTION_VALIDATION.description.max}`);
         });
     });
 

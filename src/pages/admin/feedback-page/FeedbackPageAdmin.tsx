@@ -24,6 +24,9 @@ const SEARCH_PLACEHOLDERS: Record<FeedbackCategory, string> = {
     [FeedbackCategory.VIDEOS]: FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS,
 };
 
+export const isFeedbackHistory = (item: FeedbackListItem): item is FeedbackHistoryDto =>
+    typeof item === 'object' && item !== null && 'story' in item;
+
 export const FeedbackPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<{
@@ -69,8 +72,8 @@ export const FeedbackPageAdmin = () => {
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
-            if (activeCategory === FeedbackCategory.HISTORY) {
-                setHistoryToDelete(item as FeedbackHistoryDto);
+            if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
+                setHistoryToDelete(item);
             } else {
                 handleNotImplemented();
             }
@@ -81,7 +84,7 @@ export const FeedbackPageAdmin = () => {
     const handleDeleteHistoryConfirm = useCallback(
         (deletedHistory: FeedbackHistoryDto) => {
             setItems((prev) => prev.filter((item) => item.id !== deletedHistory.id));
-            if (selectedSearchItem && selectedSearchItem.id === deletedHistory.id) {
+            if (selectedSearchItem?.id === deletedHistory.id) {
                 setSelectedSearchItem(null);
             }
             addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);

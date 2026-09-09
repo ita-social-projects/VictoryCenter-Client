@@ -1,6 +1,6 @@
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FeedbackPageAdmin } from './FeedbackPageAdmin';
+import { FeedbackPageAdmin, isFeedbackHistory } from './FeedbackPageAdmin';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
@@ -316,6 +316,56 @@ describe('FeedbackPageAdmin', () => {
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should call addToast and not open modal when item in history tab is not a valid FeedbackHistoryDto', async () => {
+        mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
+            items: [
+                {
+                    id: 99,
+                    title: 'Invalid History',
+                    status: VisibilityStatus.Published,
+                    priority: 0,
+                } as any,
+            ],
+            totalItemsCount: 1,
+        });
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Invalid History')).toBeInTheDocument();
+        });
+
+        const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
+        fireEvent.click(deleteBtns[0]);
+
+        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.queryByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
+    });
+
+    it('isFeedbackHistory correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackHistory({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackHistory({
+                id: 2,
+                authorName: 'A',
+                text: 'Txt',
+                priority: 0,
+                status: VisibilityStatus.Published,
+            }),
+        ).toBe(false);
+        expect(isFeedbackHistory(null as any)).toBe(false);
+        expect(isFeedbackHistory(undefined as any)).toBe(false);
     });
 
     it('should refetch items when status filter changes', async () => {

@@ -99,8 +99,10 @@ describe('DeleteFeedbackHistoryModal', () => {
         });
     });
 
-    it('shows error message when delete API fails', async () => {
-        (FeedbackApi.deleteHistory as jest.Mock).mockRejectedValue(new Error('Delete error'));
+    it('shows error message and logs to console when delete API fails', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const error = new Error('Delete error');
+        (FeedbackApi.deleteHistory as jest.Mock).mockRejectedValue(error);
 
         render(
             <DeleteFeedbackHistoryModal
@@ -117,8 +119,11 @@ describe('DeleteFeedbackHistoryModal', () => {
             expect(screen.getByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.FAIL_TO_DELETE)).toBeInTheDocument();
         });
 
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to delete feedback history:', error);
         expect(onDeleteHistory).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
     });
 
     it('does nothing when confirming without historyToDelete', async () => {

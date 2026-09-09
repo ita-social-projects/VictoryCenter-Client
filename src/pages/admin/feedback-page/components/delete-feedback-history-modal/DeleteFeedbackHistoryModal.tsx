@@ -35,7 +35,9 @@ export const DeleteFeedbackHistoryModal = ({
             await FeedbackApi.deleteHistory(client, historyToDelete.id);
             onDeleteHistory(historyToDelete);
             onClose();
-        } catch {
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to delete feedback history:', error);
             setError(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.FAIL_TO_DELETE);
         } finally {
             setIsSubmitting(false);

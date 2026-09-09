@@ -307,6 +307,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY: 'Категорія',
             AMOUNT_UAH: 'Сума UAH',
             AMOUNT_USD: 'Сума USD',
+            ACTIONS: 'Дії',
         },
         TYPE_LABELS: {
             INCOME: 'Надходження',

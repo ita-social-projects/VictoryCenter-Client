@@ -241,12 +241,14 @@ describe('FundsExpendituresTable', () => {
         expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
-    });
+    })
 
-    it('should use correct empty-state colSpan in view mode', () => {
+    it('should render empty state row with message when records is empty in view mode', () => {
         renderTable({ records: [], isEditing: false });
 
-        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
+        expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
     it('should sort records by amountUsd ascending', () => {

@@ -1,25 +1,25 @@
 import React, { useCallback, useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import { Modal } from '@/components/common/modal/Modal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { EventCategoryDto } from '@/types/admin/event-category';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
-import styles from './EventModal.module.scss';
 import { ImageInput, getImageSrc } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { ImageValues } from '@/types/common/image';
+import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
+import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import styles from './EventModal.module.scss';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
-import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
-import { useForm, Controller } from 'react-hook-form';
-import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ImageValues } from '@/types/common/image';
 
 export type EventModalProps = {
     isOpen: boolean;
@@ -72,7 +72,7 @@ export const EventModal = (props: EventModalProps) => {
     } = useForm<EventFormValues>({
         resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
         defaultValues: defaultFormState,
-        mode: 'onBlur',
+        mode: 'onTouched',
         context: { isPublishing },
     });
 

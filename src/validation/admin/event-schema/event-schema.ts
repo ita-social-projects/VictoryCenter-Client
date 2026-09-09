@@ -41,7 +41,11 @@ export const EventValidationSchema = Yup.object({
 
     publishDate: Yup.string().nullable().notRequired(),
 
-    image: Yup.mixed<Image | ImageValues>().nullable().notRequired(),
+    image: Yup.mixed<Image | ImageValues>()
+        .nullable()
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing ? schema.required(EVENT_VALIDATION.image.getRequiredError()) : schema.notRequired(),
+        ),
 });
 
 export type EventFormValues = Yup.InferType<typeof EventValidationSchema>;

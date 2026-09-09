@@ -57,6 +57,7 @@ export const EVENT_VALIDATION = {
         getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
         getSizeError: (maxSizeMB: number) => `Фото не більше ${maxSizeMB} Mb`,
         getDimensionTooSmallError: () => 'Розмір зображення менший за рекомендований',
+        getRequiredError: () => getGenericRequiredError(),
     },
     title: {
         min: 10,

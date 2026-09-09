@@ -4,7 +4,10 @@ import {
     PDF_SECTION_FIELD_VALIDATORS,
     PdfSectionFormData,
 } from '@/validation/admin/reports-schema/pdf-section-schema/pdf-section-schema';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import {
+    getNormalizedInputText,
+    getNormalizedInputTextWhileTyping,
+} from '@/utils/functions/formatters/text-formatters';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ToastType } from '@/types/admin/toast';
@@ -64,7 +67,9 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     const handleEditClick = useCallback(() => setIsEditMode(true), []);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prev) => ({ ...prev, title: e.target.value }));
+        const normalized = getNormalizedInputTextWhileTyping(e.target.value);
+
+        setFormData((prev) => ({ ...prev, title: normalized }));
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -186,6 +191,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
                             isRequired
                             rows={2}
                             disabled={isSaving}
+                            normalizeValue={getNormalizedInputTextWhileTyping}
                         />
                         <div className={styles['edit-actions']}>
                             <Button

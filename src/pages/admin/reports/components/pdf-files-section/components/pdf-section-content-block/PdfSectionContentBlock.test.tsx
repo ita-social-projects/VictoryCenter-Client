@@ -172,6 +172,28 @@ describe('PdfSectionContentBlock', () => {
             await renderAndEnterEditMode();
             expect(screen.getAllByText(/\//).length).toBeGreaterThan(0);
         });
+
+        it('should normalize consecutive spaces in title while typing', async () => {
+            const user = await renderAndEnterEditMode();
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Test  multiple   spaces');
+
+            expect(titleInput).toHaveValue('Test multiple spaces');
+        });
+
+        it('should normalize consecutive spaces in description while typing', async () => {
+            const user = await renderAndEnterEditMode();
+
+            const descriptionInput = screen.getByLabelText(/опис/i);
+
+            await user.clear(descriptionInput);
+            await user.type(descriptionInput, 'Test  multiple   spaces');
+
+            expect(descriptionInput).toHaveValue('Test multiple spaces');
+        });
     });
 
     describe('Confirmation Modal', () => {

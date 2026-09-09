@@ -70,116 +70,42 @@
     display: flex;
     flex-direction: column;
 
-    label,
-    span {
+    label {
         margin-bottom: 6px;
     }
 }
 
-.image-wrapper {
+.custom-image-input {
     width: 162px;
-
-    > div {
-        border-radius: 8px;
-        padding: 24px 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        transition:
-            background-color 0.2s ease,
-            border-color 0.2s ease;
-
-        &:hover {
-            background-color: c.$grey-150;
-            border-color: c.$grey-900;
-        }
-
-        p:first-of-type,
-        span:first-of-type {
-            @include type.small-text-regular;
-
-            color: c.$blue-900;
-            text-align: center;
-            margin: 0;
-        }
-
-        p:last-of-type,
-        span:last-of-type {
-            @include type.body-2-regular;
-
-            color: c.$blue-900;
-            text-align: center;
-            margin: 0;
-        }
-    }
-}
-
-.image-preview {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+    height: 168px;
+    padding: 16px 12px;
+    border: 1px solid c.$grey-700;
     border-radius: 8px;
 
-    &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-color: c.$white;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        z-index: z.admin('image-input-hover-overlay');
+    div[class*="image-placeholder"] {
+        border: none;
     }
 
-    &:hover {
-        &::after {
-            opacity: 0.5;
-        }
-
-        .preview-overlay {
-            opacity: 1;
-            pointer-events: auto;
-        }
+    svg[class*="placeholder-icon"] {
+        width: 68px;
+        height: 68px;
+        color: c.$grey-700;
+        margin-bottom: 4px;
     }
-}
 
-.preview-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    span[class*="placeholder-text-primary"] {
+        @include type.small-text-regular;
 
-.preview-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: z.admin('image-input-action-buttons');
-}
+        color: c.$black;
+        line-height: 1.2;
+    }
 
-.disabled-action-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: none;
-    border-radius: 8px;
-    background-color: c.$grey-900;
-    color: c.$grey-50;
-    cursor: not-allowed;
+    span[class*="placeholder-text-secondary"] {
+        @include type.body-2-regular;
+
+        color: c.$black;
+        line-height: 1.2;
+    }
 }
 
 .link-section-title {

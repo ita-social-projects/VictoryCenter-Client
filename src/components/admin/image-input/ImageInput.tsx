@@ -38,6 +38,7 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
+    className?: string;
     cropHeight?: number;
     cropWidth?: number;
     minHeight?: number;
@@ -58,6 +59,7 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
+    className,
     cropHeight = 1080,
     cropWidth = 1920,
     minHeight = 1080,
@@ -201,7 +203,7 @@ export const ImageInput = ({
 
     return (
         <div
-            className={cn(styles.container, {
+            className={cn(styles.container, className, {
                 [styles['container-focused']]: isFocused && !disabled,
                 [styles['container-disabled']]: disabled,
             })}

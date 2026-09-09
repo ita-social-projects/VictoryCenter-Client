@@ -9,11 +9,9 @@ import { EventCategoryDto } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
 import styles from './EventModal.module.scss';
-import { ImageInput, getImageSrc } from '@/components/admin/image-input/ImageInput';
+import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
-import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
 
 interface EventFormValues {
@@ -164,54 +162,25 @@ export const EventModal = (props: EventModalProps) => {
                                 <div className={styles['image-section']}>
                                     <InputLabel htmlFor="event-image" text={EVENTS_TEXT.FORM.LABEL.IMAGE} isRequired />
                                     <div className={styles['image-wrapper']}>
-                                        {formState.image ? (
-                                            <div className={styles['image-preview']}>
-                                                <img
-                                                    src={getImageSrc(formState.image)}
-                                                    alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                                                    className={styles['preview-image']}
-                                                    data-testid="event-image-preview"
-                                                />
-                                                <div className={styles['preview-overlay']}>
-                                                    <button
-                                                        type="button"
-                                                        disabled
-                                                        className={styles['disabled-action-icon']}
-                                                        aria-label="Delete image"
-                                                    >
-                                                        <DeleteIcon />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        disabled
-                                                        className={styles['disabled-action-icon']}
-                                                        aria-label="Crop image"
-                                                    >
-                                                        <CropIcon />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <ImageInput
-                                                value={formState.image}
-                                                onChange={handleImageChange}
-                                                setError={handleImageError}
-                                                id="event-image"
-                                                name="image"
-                                                variant="whoWeAre"
-                                                enableCrop={false}
-                                                cropWidth={EVENT_VALIDATION.image.cropWidth}
-                                                cropHeight={EVENT_VALIDATION.image.cropHeight}
-                                                minWidth={EVENT_VALIDATION.image.minWidth}
-                                                minHeight={EVENT_VALIDATION.image.minHeight}
-                                                maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
-                                                label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                                    EVENT_VALIDATION.image.cropHeight,
-                                                    EVENT_VALIDATION.image.cropWidth,
-                                                )}
-                                            />
-                                        )}
+                                        <ImageInput
+                                            value={formState.image}
+                                            onChange={handleImageChange}
+                                            setError={handleImageError}
+                                            id="event-image"
+                                            name="image"
+                                            variant="default"
+                                            className={styles['custom-image-input']}
+                                            cropWidth={EVENT_VALIDATION.image.cropWidth}
+                                            cropHeight={EVENT_VALIDATION.image.cropHeight}
+                                            minWidth={EVENT_VALIDATION.image.minWidth}
+                                            minHeight={EVENT_VALIDATION.image.minHeight}
+                                            maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
+                                            label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                                EVENT_VALIDATION.image.cropHeight,
+                                                EVENT_VALIDATION.image.cropWidth,
+                                            )}
+                                        />
                                     </div>
                                     <InputError error={errors.image} />
                                 </div>

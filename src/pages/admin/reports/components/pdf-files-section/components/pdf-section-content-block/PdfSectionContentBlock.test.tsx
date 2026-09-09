@@ -174,23 +174,23 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should normalize consecutive spaces in title while typing', async () => {
-            const userUtils = await renderAndEnterEditMode();
+            const utils = await renderAndEnterEditMode();
 
             const titleInput = screen.getByLabelText(/заголовок/i);
 
-            await userUtils.clear(titleInput);
-            await userUtils.type(titleInput, 'Test  multiple   spaces');
+            await utils.clear(titleInput);
+            await utils.type(titleInput, 'Test  multiple   spaces');
 
             expect(titleInput).toHaveValue('Test multiple spaces');
         });
 
         it('should normalize consecutive spaces in description while typing', async () => {
-            const userUtils = await renderAndEnterEditMode();
+            const utils = await renderAndEnterEditMode();
 
             const descriptionInput = screen.getByLabelText(/опис/i);
 
-            await userUtils.clear(descriptionInput);
-            await userUtils.type(descriptionInput, 'Test  multiple   spaces');
+            await utils.clear(descriptionInput);
+            await utils.type(descriptionInput, 'Test  multiple   spaces');
 
             expect(descriptionInput).toHaveValue('Test multiple spaces');
         });

@@ -162,10 +162,10 @@ describe('ProgramExpensesToolbar', () => {
         expect(defaultProps.onProgramChange).toHaveBeenCalledWith([]);
     });
 
-    it('should render singular program placeholder and add button in edit mode', () => {
+    it('should render plural program placeholder and singular add button in edit mode', () => {
         render(<ProgramExpensesToolbar {...defaultProps} isEditing />);
 
-        expect(screen.getAllByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).not.toHaveLength(0);
+        expect(screen.getAllByText(PROGRAM_EXPENSES_TEXT.FILTER.PROGRAMS_PLACEHOLDER)).not.toHaveLength(0);
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
     });
 

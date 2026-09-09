@@ -251,12 +251,28 @@ describe('FeedbackPageAdmin', () => {
         expect(screen.getByTestId('toolbar-placeholder')).toHaveTextContent(FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS);
     });
 
-    it('should call addToast when Add button in toolbar is clicked', async () => {
+    it('should open AddFeedbackHistoryModal when Add button in toolbar is clicked in History tab', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
+
+        const addBtn = screen.getByTestId('toolbar-add-button');
+        fireEvent.click(addBtn);
+
+        expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+    });
+
+    it('should call addToast when Add button in toolbar is clicked in non-history tab', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
+        fireEvent.click(reviewsTab);
 
         const addBtn = screen.getByTestId('toolbar-add-button');
         fireEvent.click(addBtn);

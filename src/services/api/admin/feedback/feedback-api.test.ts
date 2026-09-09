@@ -88,6 +88,24 @@ describe('FeedbackApi', () => {
         });
     });
 
+    describe('createHistory', () => {
+        it('should post new history and return response data', async () => {
+            const newHistoryPayload = {
+                title: 'Нова історія',
+                story: 'Текст нової історії',
+                imageId: 5,
+                status: VisibilityStatus.Published,
+            };
+            const mockResponse = { id: 99, ...newHistoryPayload, image: null, priority: 0 };
+            mockClient.post = jest.fn().mockResolvedValue({ data: mockResponse });
+
+            const result = await FeedbackApi.createHistory(mockClient, newHistoryPayload);
+
+            expect(mockClient.post).toHaveBeenCalledWith('FeedbackHistories', newHistoryPayload);
+            expect(result).toEqual(mockResponse);
+        });
+    });
+
     describe('fetchReviews', () => {
         it('should fetch reviews with default pagination when no params provided', async () => {
             const promise = FeedbackApi.fetchReviews(mockClient);

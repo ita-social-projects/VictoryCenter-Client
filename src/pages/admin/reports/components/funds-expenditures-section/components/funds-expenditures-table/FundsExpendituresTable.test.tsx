@@ -223,11 +223,16 @@ describe('FundsExpendituresTable', () => {
         expect(onDeleteRecord).toHaveBeenCalledWith(MOCK_RECORDS[0]);
     });
 
-    it('should render nothing when records is empty in view mode', () => {
+    it('should use correct empty-state colSpan in edit mode', () => {
+        renderTable({ records: [], isEditing: true });
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '7');
+    });
+
+    it('should use correct empty-state colSpan in view mode', () => {
         renderTable({ records: [], isEditing: false });
 
-        expect(screen.queryByTestId('funds-table-empty-cell')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('not-found')).not.toBeInTheDocument();
+        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
     });
 
     it('should render empty state row with message when records is empty in edit mode', () => {
@@ -238,10 +243,10 @@ describe('FundsExpendituresTable', () => {
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
-    it('should use correct empty-state colSpan in edit mode', () => {
-        renderTable({ records: [], isEditing: true });
+    it('should use correct empty-state colSpan in view mode', () => {
+        renderTable({ records: [], isEditing: false });
 
-        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '7');
+        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
     });
 
     it('should sort records by amountUsd ascending', () => {

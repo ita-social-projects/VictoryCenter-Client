@@ -21,27 +21,23 @@
 .title {
     @include utils.yellow-blue-text;
 
+    font-size: 36px;
     margin-bottom: 172px;
 
-    @media (max-width: 559px) {
-        font-size: 36px;
-    }
-
     @media (min-width: 560px) {
+        font-size: 48px;
         margin-bottom: 142px;
     }
 
     @media (min-width: 768px) {
+        font-size: 64px;
         margin-bottom: 152px;
     }
 
     @media (min-width: 1440px) {
+        font-size: 96px;
         margin-bottom: 120px;
     }
-}
-
-.second-line {
-    white-space: nowrap;
 }
 
 .highlight-yellow,

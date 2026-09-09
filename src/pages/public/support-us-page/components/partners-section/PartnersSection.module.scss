@@ -55,7 +55,7 @@ $swiper-image-height: 360px;
 }
 
 .swiper-slide {
-    width: 352px;
+    width: min(352px, calc(100vw - 32px));
 }
 
 .left {

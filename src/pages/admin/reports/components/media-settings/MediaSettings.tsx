@@ -132,8 +132,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         const {
             data: mediaSettingsData,
-            isLoading,
-            error: fetchError,
+            isLoading: isMediaSettingsLoading,
+            error: mediaSettingsError,
             refetch,
         } = useDataFetch<ReportsMediaSettings>({
             initialData: {
@@ -156,19 +156,42 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             }
         }, []);
 
-        const { data: publicCollectedTotalUah } = useDataFetch<number>({
+        const {
+            data: publicCollectedTotalUah,
+            isLoading: isPublicCollectedTotalLoading,
+            error: publicCollectedTotalError,
+            refetch: refetchPublicCollectedTotal,
+        } = useDataFetch<number>({
             initialData: 0,
             fetchHandler: fetchPublicCollectedTotalHandler,
             autoFetchDependencies: [isActive],
         });
 
+        const publicCollectedTotalLoadedRef = useRef(false);
         useEffect(() => {
-            if (!fetchError) return;
-            if (axios.isCancel?.(fetchError) || fetchError.name === 'CanceledError' || fetchError.name === 'AbortError')
-                return;
+            if (!isPublicCollectedTotalLoading && !publicCollectedTotalError) {
+                publicCollectedTotalLoadedRef.current = true;
+            }
+        }, [isPublicCollectedTotalLoading, publicCollectedTotalError]);
+
+        const isLoading =
+            isMediaSettingsLoading || (isPublicCollectedTotalLoading && !publicCollectedTotalLoadedRef.current);
+
+        const fetchError =
+            mediaSettingsError ?? (publicCollectedTotalLoadedRef.current ? null : publicCollectedTotalError);
+
+        useEffect(() => {
+            const error = mediaSettingsError ?? publicCollectedTotalError;
+            if (!error) return;
+            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') return;
 
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS, ToastType.Error);
-        }, [fetchError, addToast]);
+        }, [mediaSettingsError, publicCollectedTotalError, addToast]);
+
+        const handleRetry = useCallback(() => {
+            if (mediaSettingsError) refetch();
+            if (publicCollectedTotalError) refetchPublicCollectedTotal();
+        }, [mediaSettingsError, publicCollectedTotalError, refetch, refetchPublicCollectedTotal]);
 
         const initialData = useMemo(() => syncValuesFromData(mediaSettingsData), [mediaSettingsData]);
 
@@ -325,7 +348,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 {fetchError && !isLoading && (
                     <div className={styles.error}>
                         <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                        <Button onClick={() => refetch()} buttonStyle="primary" className={styles['error-button']}>
+                        <Button onClick={handleRetry} buttonStyle="primary" className={styles['error-button']}>
                             {REPORTS_TEXT.BUTTON.TRY_AGAIN}
                         </Button>
                     </div>

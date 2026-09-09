@@ -171,6 +171,46 @@ describe('MediaSettings', () => {
 
             expect(screen.getByText(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS)).toBeInTheDocument();
         });
+
+        it('should show the error screen instead of a "0" total when the public collected total fetch fails', () => {
+            mockDataFetch({}, { data: 0, error: new Error('Server error') });
+
+            renderComponent();
+
+            expect(screen.getByText(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS)).toBeInTheDocument();
+            expect(collectedFundsBlockProps).toBeNull();
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS, ToastType.Error);
+        });
+
+        it('should retry the failed public collected total fetch when the retry button is clicked', () => {
+            mockDataFetch({}, { data: 0, error: new Error('Server error') });
+
+            renderComponent();
+
+            act(() => {
+                screen.getByText(REPORTS_TEXT.BUTTON.TRY_AGAIN).click();
+            });
+
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+
+        it('should keep showing the last successful total when a later public collected total fetch fails', () => {
+            mockDataFetch();
+            const { rerender, ref } = renderComponent();
+
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(
+                formatCollectedAmount(MOCK_PUBLIC_COLLECTED_TOTAL_UAH),
+            );
+
+            mockDataFetch({}, { data: MOCK_PUBLIC_COLLECTED_TOTAL_UAH, error: new Error('Server error') });
+            rerender(<MediaSettings ref={ref} {...defaultProps} />);
+
+            expect(screen.queryByText(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS)).not.toBeInTheDocument();
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(
+                formatCollectedAmount(MOCK_PUBLIC_COLLECTED_TOTAL_UAH),
+            );
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS, ToastType.Error);
+        });
     });
 
     describe('Success state', () => {

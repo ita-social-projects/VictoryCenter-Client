@@ -54,13 +54,7 @@ jest.mock('@/components/admin/image-input/ImageInput', () => {
     return {
         ImageInput: ({ value, onChange, setError }: Pick<ImageInputProps, 'value' | 'onChange' | 'setError'>) => (
             <div data-testid="image-input">
-                {value && (
-                    <img
-                        data-testid="event-image-preview"
-                        src={getImageSrc(value)}
-                        alt="preview"
-                    />
-                )}
+                {value && <img data-testid="event-image-preview" src={getImageSrc(value)} alt="preview" />}
                 <button
                     type="button"
                     data-testid="upload-valid-image"
@@ -71,7 +65,9 @@ jest.mock('@/components/admin/image-input/ImageInput', () => {
                 <button
                     type="button"
                     data-testid="trigger-image-error"
-                    onClick={() => setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))}
+                    onClick={() =>
+                        setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))
+                    }
                 >
                     Trigger Error
                 </button>

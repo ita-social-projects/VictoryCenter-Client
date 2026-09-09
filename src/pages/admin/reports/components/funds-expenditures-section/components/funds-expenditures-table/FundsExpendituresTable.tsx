@@ -139,20 +139,20 @@ const isAcceptButtonDisabled = (rowEditState: RowEditState | null, exchangeRate?
     const normalizedOriginalUah = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true);
     const normalizedOriginalUsd = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true);
 
+    const isAmountsUnchanged =
+        normalizedAmountUah === normalizedOriginalUah && normalizedAmountUsd === normalizedOriginalUsd;
+
     const hasErrors =
         rowEditState.categoryId === undefined ||
         Boolean(rowEditState.errors.category) ||
         Boolean(rowEditState.errors.amountUah) ||
         Boolean(rowEditState.errors.amountUsd) ||
-        Boolean(rowEditState.usdMismatchMessage) ||
-        isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate);
+        (!isAmountsUnchanged && Boolean(rowEditState.usdMismatchMessage)) ||
+        (!isAmountsUnchanged && isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate));
 
     const amountsEmpty = normalizedAmountUah === '' || normalizedAmountUsd === '';
 
-    const noChanges =
-        rowEditState.categoryId === rowEditState.originalCategoryId &&
-        normalizedAmountUah === normalizedOriginalUah &&
-        normalizedAmountUsd === normalizedOriginalUsd;
+    const noChanges = rowEditState.categoryId === rowEditState.originalCategoryId && isAmountsUnchanged;
 
     return hasErrors || amountsEmpty || noChanges;
 };

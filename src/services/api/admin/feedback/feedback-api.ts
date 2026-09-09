@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -43,21 +44,14 @@ const filterAndPaginate = <T extends { status: VisibilityStatus }>(
 
 export const FeedbackApi = {
     fetchHistory: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackHistoryDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackHistoryDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            title: `Історія ${i + 1}`,
-            story: `Текст історії ${i + 1}`,
-            image: null,
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.title);
+        const response = await client.get<FeedbackHistoryDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
+        return filterAndPaginate(response.data, params, (item) => item.title);
+    },
+    deleteHistory: async (client: AxiosInstance, id: number): Promise<void> => {
+        await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
     },
     fetchReviews: async (
         _client: AxiosInstance,

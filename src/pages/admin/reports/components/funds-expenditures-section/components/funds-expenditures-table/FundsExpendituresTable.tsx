@@ -644,7 +644,7 @@ export const FundsExpendituresTable = ({
                                 )}
                             </tr>
                         )}
-                        {sortedRecords.length === 0 && isEditing && !programAggregateRow ? (
+                        {sortedRecords.length === 0 && !programAggregateRow ? (
                             <tr>
                                 <td
                                     colSpan={colSpan}

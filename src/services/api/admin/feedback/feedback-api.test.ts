@@ -22,6 +22,7 @@ describe('FeedbackApi', () => {
     const mockClient = {
         get: jest.fn(),
         delete: jest.fn(),
+        put: jest.fn(),
     } as any;
 
     beforeEach(() => {
@@ -29,6 +30,7 @@ describe('FeedbackApi', () => {
         jest.clearAllMocks();
         mockClient.get.mockResolvedValue({ data: mockHistoryList });
         mockClient.delete.mockResolvedValue({ data: undefined });
+        mockClient.put.mockResolvedValue({ data: undefined });
     });
 
     afterEach(() => {
@@ -191,10 +193,22 @@ describe('FeedbackApi', () => {
     });
 
     describe('reorderFeedback', () => {
-        it('should resolve reorderFeedback after delay', async () => {
-            const promise = FeedbackApi.reorderFeedback(mockClient, 'history', [1, 2, 3]);
-            jest.advanceTimersByTime(500);
-            await expect(promise).resolves.toBeUndefined();
+        it('should send reorder request for histories', async () => {
+            await FeedbackApi.reorderFeedback(mockClient, 'history', [1, 2, 3]);
+
+            expect(mockClient.put).toHaveBeenCalledWith('FeedbackHistories/reorder', { orderedIds: [1, 2, 3] });
+        });
+
+        it('should send reorder request for reviews', async () => {
+            await FeedbackApi.reorderFeedback(mockClient, 'reviews', [5, 4]);
+
+            expect(mockClient.put).toHaveBeenCalledWith('FeedbackReviews/reorder', { orderedIds: [5, 4] });
+        });
+
+        it('should send reorder request for videos', async () => {
+            await FeedbackApi.reorderFeedback(mockClient, 'videos', [7, 8]);
+
+            expect(mockClient.put).toHaveBeenCalledWith('VideoReviews/reorder', { orderedIds: [7, 8] });
         });
     });
 });

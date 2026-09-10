@@ -80,6 +80,7 @@ export const FeedbackApi = {
         const routes: Record<string, string> = {
             [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
             [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
+            [FeedbackCategory.VIDEOS]: API_ROUTES.VIDEO_REVIEWS.BASE,
         };
 
         await client.put(`${routes[category]}/reorder`, { orderedIds });

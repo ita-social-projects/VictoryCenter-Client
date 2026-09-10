@@ -16,7 +16,8 @@ import { renderHistorySection } from '@/utils/functions/render-history-section';
 import { getHistorySectionData, getOrderedHistoryContentsByType } from '@/utils/functions/history-section-data';
 import styles from './TranslateHistoryModal.module.scss';
 
-const IMAGE_FIRST_TEMPLATES = new Set<SectionTemplate>([SectionTemplate.SingleImageTop]);
+// Templates whose UA layout puts the image above the text (all others render it below).
+export const IMAGE_FIRST_TEMPLATES = new Set<SectionTemplate>([SectionTemplate.SingleImageTop]);
 
 const getInitialData = (section: HistorySectionDto, languageId?: number): TranslateHistorySectionFormValues | null => {
     if (!languageId) return null;

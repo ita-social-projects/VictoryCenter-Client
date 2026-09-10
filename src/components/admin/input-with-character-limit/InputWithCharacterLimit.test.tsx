@@ -232,6 +232,7 @@ describe('InputWithCharacterLimit', () => {
 
     it('normalises the typed value when normalizeValue is provided', () => {
         const onChange = jest.fn();
+        const normalizeValue = (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '');
 
         const { rerender } = render(
             <InputWithCharacterLimit
@@ -244,11 +245,11 @@ describe('InputWithCharacterLimit', () => {
                             {...defaultProps}
                             value={e.target.value}
                             onChange={onChange}
-                            normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
+                            normalizeValue={normalizeValue}
                         />,
                     );
                 }}
-                normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
+                normalizeValue={normalizeValue}
             />,
         );
 

@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
+import { FeedbackCategory, FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
@@ -76,8 +76,12 @@ export const FeedbackApi = {
 
         return filterAndPaginate(allItems, _params, (item) => item.title);
     },
-    reorderFeedback: async (_client: AxiosInstance, _category: string, _orderedIds: number[]): Promise<void> => {
-        await mockDelay(500);
-        // Mock successful reorder
+    reorderFeedback: async (client: AxiosInstance, category: string, orderedIds: number[]): Promise<void> => {
+        const routes: Record<string, string> = {
+            [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
+            [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
+        };
+
+        await client.put(`${routes[category]}/reorder`, { orderedIds });
     },
 };

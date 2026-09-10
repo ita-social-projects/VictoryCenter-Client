@@ -80,14 +80,6 @@ export const FeedbackPageAdmin = () => {
         }
     }, [activeCategory, handleNotImplemented]);
 
-    const handleAddHistorySuccess = useCallback(
-        (newHistory: FeedbackHistoryDto) => {
-            setItems((prev) => [newHistory, ...prev]);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
-        },
-        [addToast],
-    );
-
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
             if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
@@ -162,6 +154,30 @@ export const FeedbackPageAdmin = () => {
             fetchCategoryItems(activeCategory);
         }
     }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
+
+    const handleAddHistorySuccess = useCallback(
+        (newHistory: FeedbackHistoryDto) => {
+            setSelectedSearchItem(null);
+            const passesStatusFilter = statusFilter === undefined || newHistory.status === statusFilter;
+
+            if (passesStatusFilter) {
+                setItems((prev) => {
+                    const exists = prev.some((item) => item.id === newHistory.id);
+                    if (exists) return prev;
+                    if (!hasMore) {
+                        return [...prev, newHistory];
+                    }
+                    return prev;
+                });
+                if (hasMore) {
+                    setHasMore(true);
+                }
+            }
+
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
+        },
+        [statusFilter, hasMore, addToast],
+    );
 
     const getFeedbackSearchItems = useCallback(
         async (

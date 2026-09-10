@@ -1,5 +1,6 @@
 import { act, render, screen, fireEvent, createEvent } from '@testing-library/react';
 import { InputWithCharacterLimit, InputWithCharacterLimitProps } from './InputWithCharacterLimit';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 
 describe('InputWithCharacterLimit', () => {
     const defaultProps: InputWithCharacterLimitProps = {
@@ -232,7 +233,6 @@ describe('InputWithCharacterLimit', () => {
 
     it('normalises the typed value when normalizeValue is provided', () => {
         const onChange = jest.fn();
-        const normalizeValue = (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '');
 
         const { rerender } = render(
             <InputWithCharacterLimit
@@ -245,11 +245,11 @@ describe('InputWithCharacterLimit', () => {
                             {...defaultProps}
                             value={e.target.value}
                             onChange={onChange}
-                            normalizeValue={normalizeValue}
+                            normalizeValue={getNormalizedInputTextWhileTyping}
                         />,
                     );
                 }}
-                normalizeValue={normalizeValue}
+                normalizeValue={getNormalizedInputTextWhileTyping}
             />,
         );
 
@@ -279,5 +279,43 @@ describe('InputWithCharacterLimit', () => {
         });
 
         expect(getInput()).toHaveValue('Hello  world');
+    });
+
+    it('keeps the correct caret position when deleting text during normalization', () => {
+        const { rerender } = render(
+            <InputWithCharacterLimit
+                {...defaultProps}
+                value="test   test   test"
+                normalizeValue={getNormalizedInputTextWhileTyping}
+                onChange={(e) => {
+                    rerender(
+                        <InputWithCharacterLimit
+                            {...defaultProps}
+                            value={e.target.value}
+                            onChange={defaultProps.onChange}
+                            normalizeValue={getNormalizedInputTextWhileTyping}
+                        />,
+                    );
+                }}
+            />,
+        );
+
+        const input = getInput() as HTMLInputElement;
+
+        // Caret is at the end of the second "test".
+        input.setSelectionRange(11, 11);
+
+        // Simulate deleting the second "test".
+        fireEvent.change(input, {
+            target: {
+                value: 'test      test',
+                selectionStart: 7,
+                selectionEnd: 7,
+            },
+        });
+
+        expect(input).toHaveValue('test test');
+        expect(input.selectionStart).toBe(5);
+        expect(input.selectionEnd).toBe(5);
     });
 });

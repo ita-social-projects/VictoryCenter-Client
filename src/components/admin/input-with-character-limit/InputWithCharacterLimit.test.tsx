@@ -229,4 +229,45 @@ describe('InputWithCharacterLimit', () => {
 
         expect(input.value).toBe(cappedValue);
     });
+
+    it('normalises the typed value when normalizeValue is provided', async () => {
+        const { rerender } = renderInputWithCharacterLimit({
+            value: '',
+            normalizeValue: (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, ''),
+        });
+
+        await act(async () => {
+            fireEvent.change(getInput(), {
+                target: { value: '  Hello   world ' },
+            });
+
+            rerender(
+                <InputWithCharacterLimit
+                    {...defaultProps}
+                    value="Hello world "
+                    normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
+                />,
+            );
+
+            await Promise.resolve();
+        });
+
+        expect(getInput()).toHaveValue('Hello world ');
+    });
+
+    it('keeps the typed value as is when normalizeValue is not provided', async () => {
+        const { rerender } = renderInputWithCharacterLimit({ value: '' });
+
+        await act(async () => {
+            fireEvent.change(getInput(), {
+                target: { value: 'Hello  world' },
+            });
+
+            rerender(<InputWithCharacterLimit {...defaultProps} value="Hello  world" />);
+
+            await Promise.resolve();
+        });
+
+        expect(getInput()).toHaveValue('Hello  world');
+    });
 });

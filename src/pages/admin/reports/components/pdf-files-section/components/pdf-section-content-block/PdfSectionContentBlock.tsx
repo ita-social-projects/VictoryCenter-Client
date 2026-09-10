@@ -67,9 +67,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     const handleEditClick = useCallback(() => setIsEditMode(true), []);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const normalized = getNormalizedInputTextWhileTyping(e.target.value);
-
-        setFormData((prev) => ({ ...prev, title: normalized }));
+        setFormData((prev) => ({ ...prev, title: e.target.value }));
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -176,6 +174,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
                             error={errors.title}
                             isRequired
                             disabled={isSaving}
+                            normalizeValue={getNormalizedInputTextWhileTyping}
                         />
                         <TextAreaWithCharacterLimitGroup
                             id="pdf-section-description"

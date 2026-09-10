@@ -75,39 +75,6 @@
     }
 }
 
-.custom-image-input {
-    width: 162px;
-    height: 168px;
-    padding: 16px 12px;
-    border: 1px solid c.$grey-700;
-    border-radius: 8px;
-
-    div[class*="image-placeholder"] {
-        border: none;
-    }
-
-    svg[class*="placeholder-icon"] {
-        width: 68px;
-        height: 68px;
-        color: c.$grey-700;
-        margin-bottom: 4px;
-    }
-
-    span[class*="placeholder-text-primary"] {
-        @include type.small-text-regular;
-
-        color: c.$black;
-        line-height: 1.2;
-    }
-
-    span[class*="placeholder-text-secondary"] {
-        @include type.body-2-regular;
-
-        color: c.$black;
-        line-height: 1.2;
-    }
-}
-
 .link-section-title {
     @include type.body-2-regular;
     margin: 0;

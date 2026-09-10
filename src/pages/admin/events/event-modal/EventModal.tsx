@@ -161,27 +161,24 @@ export const EventModal = (props: EventModalProps) => {
                                 <div className={styles['date-placeholder']}></div>
                                 <div className={styles['image-section']}>
                                     <InputLabel htmlFor="event-image" text={EVENTS_TEXT.FORM.LABEL.IMAGE} isRequired />
-                                    <div className={styles['image-wrapper']}>
-                                        <ImageInput
-                                            value={formState.image}
-                                            onChange={handleImageChange}
-                                            setError={handleImageError}
-                                            id="event-image"
-                                            name="image"
-                                            variant="default"
-                                            className={styles['custom-image-input']}
-                                            cropWidth={EVENT_VALIDATION.image.cropWidth}
-                                            cropHeight={EVENT_VALIDATION.image.cropHeight}
-                                            minWidth={EVENT_VALIDATION.image.minWidth}
-                                            minHeight={EVENT_VALIDATION.image.minHeight}
-                                            maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
-                                            label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                                EVENT_VALIDATION.image.cropHeight,
-                                                EVENT_VALIDATION.image.cropWidth,
-                                            )}
-                                        />
-                                    </div>
+                                    <ImageInput
+                                        value={formState.image}
+                                        onChange={handleImageChange}
+                                        setError={handleImageError}
+                                        id="event-image"
+                                        name="image"
+                                        variant="event"
+                                        cropWidth={EVENT_VALIDATION.image.cropWidth}
+                                        cropHeight={EVENT_VALIDATION.image.cropHeight}
+                                        minWidth={EVENT_VALIDATION.image.minWidth}
+                                        minHeight={EVENT_VALIDATION.image.minHeight}
+                                        maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
+                                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                            EVENT_VALIDATION.image.cropHeight,
+                                            EVENT_VALIDATION.image.cropWidth,
+                                        )}
+                                    />
                                     <InputError error={errors.image} />
                                 </div>
                             </div>

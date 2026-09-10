@@ -212,12 +212,18 @@ export const PdfFilesSection = () => {
             try {
                 const pdfBlob = await PdfReportsApi.fetchById(client, file.id);
                 const blobUrl = URL.createObjectURL(pdfBlob);
-                const openedWindow = window.open(blobUrl, '_blank');
-                if (openedWindow) {
-                    setTimeout(() => {
-                        URL.revokeObjectURL(blobUrl);
-                    }, 1500);
-                }
+
+                const link = document.createElement('a');
+                link.href = blobUrl;
+
+                const fileName = file.name.toLowerCase().endsWith('.pdf') ? file.name : `${file.name}.pdf`;
+
+                link.setAttribute('download', fileName);
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);
             }

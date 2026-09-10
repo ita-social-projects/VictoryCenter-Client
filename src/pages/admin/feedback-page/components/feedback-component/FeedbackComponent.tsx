@@ -15,8 +15,9 @@ export interface FeedbackComponentProps {
 
 export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }: FeedbackComponentProps) => {
     const [imgError, setImgError] = useState(false);
+    const isVideo = 'link' in item;
     const title = ('title' in item ? item.title : item.authorName) || '';
-    const description = ('story' in item ? item.story : 'text' in item ? item.text : item.videoUrl) || '';
+    const description = ('story' in item ? item.story : 'text' in item ? item.text : isVideo ? item.link : '') || '';
     const imageUrl = 'image' in item && item.image && 'url' in item.image ? item.image.url : null;
 
     useEffect(() => {
@@ -44,13 +45,19 @@ export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }:
                     ) : (
                         <img src={imageUrl} alt={title} onError={() => setImgError(true)} />
                     ))}
-                <div className="feedback-profile-data">
+                <div className={`feedback-profile-data${isVideo ? ' feedback-truncate' : ''}`}>
                     <p>{title}</p>
                 </div>
             </div>
 
-            <div className="feedback-position">
-                <p>{description}</p>
+            <div className={`feedback-position${isVideo ? ' feedback-truncate' : ''}`}>
+                {isVideo ? (
+                    <a href={description} target="_blank" rel="noreferrer">
+                        {description}
+                    </a>
+                ) : (
+                    <p>{description}</p>
+                )}
             </div>
 
             <div className="feedback-controls">

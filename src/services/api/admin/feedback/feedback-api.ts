@@ -70,20 +70,11 @@ export const FeedbackApi = {
         return filterAndPaginate(allItems, _params, (item) => item.authorName);
     },
     fetchVideos: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackVideoDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackVideoDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            title: `Відео ${i + 1}`,
-            videoUrl: 'https://example.com/video',
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.title);
+        const response = await client.get<FeedbackVideoDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE);
+        return filterAndPaginate(response.data, params, (item) => item.title);
     },
     reorderFeedback: async (_client: AxiosInstance, _category: string, _orderedIds: number[]): Promise<void> => {
         await mockDelay(500);

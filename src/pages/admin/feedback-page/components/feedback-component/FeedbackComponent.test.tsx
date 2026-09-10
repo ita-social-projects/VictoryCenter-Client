@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { FeedbackComponent, FeedbackComponentProps } from './FeedbackComponent';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { VisibilityStatus } from '@/types/admin/common';
-import { FeedbackHistoryDto, FeedbackReviewDto } from '@/types/admin/feedback';
+import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
 
 jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -24,6 +24,14 @@ const mockReviewItem: FeedbackReviewDto = {
     text: 'Чудовий центр реабілітації!',
     status: VisibilityStatus.Published,
     priority: 1,
+};
+
+const mockVideoItem: FeedbackVideoDto = {
+    id: 3,
+    title: 'Відео відгук',
+    link: 'https://www.youtube.com/watch?v=abc123',
+    status: VisibilityStatus.Published,
+    priority: 2,
 };
 
 describe('FeedbackComponent', () => {
@@ -50,6 +58,17 @@ describe('FeedbackComponent', () => {
 
         expect(screen.getByText('Олена Петренко')).toBeInTheDocument();
         expect(screen.getByText('Чудовий центр реабілітації!')).toBeInTheDocument();
+    });
+
+    it('renders video item title and a clickable link that opens in a new tab', () => {
+        renderComponent({ item: mockVideoItem });
+
+        expect(screen.getByText('Відео відгук')).toBeInTheDocument();
+
+        const link = screen.getByRole('link', { name: mockVideoItem.link });
+        expect(link).toHaveAttribute('href', mockVideoItem.link);
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noreferrer');
     });
 
     it('renders empty string fallbacks when title/authorName and description fields are missing', () => {

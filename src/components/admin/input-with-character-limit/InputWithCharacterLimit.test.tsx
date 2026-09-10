@@ -230,42 +230,51 @@ describe('InputWithCharacterLimit', () => {
         expect(input.value).toBe(cappedValue);
     });
 
-    it('normalises the typed value when normalizeValue is provided', async () => {
-        const { rerender } = renderInputWithCharacterLimit({
-            value: '',
-            normalizeValue: (text: string) => text.replace(/ +/g, ' ').replace(/^ +/, ''),
-        });
+    it('normalises the typed value when normalizeValue is provided', () => {
+        const onChange = jest.fn();
 
-        await act(async () => {
-            fireEvent.change(getInput(), {
-                target: { value: '  Hello   world ' },
-            });
+        const { rerender } = render(
+            <InputWithCharacterLimit
+                {...defaultProps}
+                value=""
+                onChange={(e) => {
+                    onChange(e);
+                    rerender(
+                        <InputWithCharacterLimit
+                            {...defaultProps}
+                            value={e.target.value}
+                            onChange={onChange}
+                            normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
+                        />,
+                    );
+                }}
+                normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
+            />,
+        );
 
-            rerender(
-                <InputWithCharacterLimit
-                    {...defaultProps}
-                    value="Hello world "
-                    normalizeValue={(text: string) => text.replace(/ +/g, ' ').replace(/^ +/, '')}
-                />,
-            );
-
-            await Promise.resolve();
+        fireEvent.change(getInput(), {
+            target: { value: '  Hello   world ' },
         });
 
         expect(getInput()).toHaveValue('Hello world ');
     });
 
-    it('keeps the typed value as is when normalizeValue is not provided', async () => {
-        const { rerender } = renderInputWithCharacterLimit({ value: '' });
+    it('keeps the typed value as is when normalizeValue is not provided', () => {
+        const onChange = jest.fn();
 
-        await act(async () => {
-            fireEvent.change(getInput(), {
-                target: { value: 'Hello  world' },
-            });
+        const { rerender } = render(
+            <InputWithCharacterLimit
+                {...defaultProps}
+                value=""
+                onChange={(e) => {
+                    onChange(e);
+                    rerender(<InputWithCharacterLimit {...defaultProps} value={e.target.value} onChange={onChange} />);
+                }}
+            />,
+        );
 
-            rerender(<InputWithCharacterLimit {...defaultProps} value="Hello  world" />);
-
-            await Promise.resolve();
+        fireEvent.change(getInput(), {
+            target: { value: 'Hello  world' },
         });
 
         expect(getInput()).toHaveValue('Hello  world');

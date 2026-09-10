@@ -13,11 +13,18 @@ export interface FeedbackComponentProps {
     onDelete?: (item: FeedbackListItem) => void;
 }
 
+const getFeedbackDescription = (item: FeedbackListItem): string => {
+    if ('story' in item) return item.story;
+    if ('text' in item) return item.text;
+    if ('link' in item) return item.link;
+    return '';
+};
+
 export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }: FeedbackComponentProps) => {
     const [imgError, setImgError] = useState(false);
     const isVideo = 'link' in item;
     const title = ('title' in item ? item.title : item.authorName) || '';
-    const description = ('story' in item ? item.story : 'text' in item ? item.text : isVideo ? item.link : '') || '';
+    const description = getFeedbackDescription(item) || '';
     const imageUrl = 'image' in item && item.image && 'url' in item.image ? item.image.url : null;
 
     useEffect(() => {

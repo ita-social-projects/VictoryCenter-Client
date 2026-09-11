@@ -66,14 +66,17 @@ export const PdfReportsApi = {
         return `${API_ROUTES.BASE}/${API_ROUTES.PDF_REPORTS.BASE}/${id}/file`;
     },
 
-    openPreviewInNewTab: async (client: AxiosInstance, id: number): Promise<void> => {
+    openPreviewInNewTab: async (client: AxiosInstance, id: number, fileName: string): Promise<void> => {
         try {
             const response = await client.post<string>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}/preview-ticket`);
             const ticket = response.data;
 
-            const baseUrl = client.defaults.baseURL?.replace(/\/$/, '') || '';
+            // 2. Format and encode the filename for the URL
+            const fullFileName = fileName.toLowerCase().endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+            const safeFileName = encodeURIComponent(fullFileName);
 
-            const previewUrl = `${baseUrl}/${API_ROUTES.PDF_REPORTS.BASE}/preview?ticket=${ticket}`;
+            const baseUrl = client.defaults.baseURL?.replace(/\/$/, '') || '';
+            const previewUrl = `${baseUrl}/${API_ROUTES.PDF_REPORTS.BASE}/preview/${safeFileName}?ticket=${ticket}`;
 
             window.open(previewUrl, '_blank');
         } catch (error) {

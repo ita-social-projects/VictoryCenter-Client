@@ -210,7 +210,7 @@ export const PdfFilesSection = () => {
     const handleViewFile = useCallback(
         async (file: PdfReportDto) => {
             try {
-                await PdfReportsApi.openPreviewInNewTab(client, file.id);
+                await PdfReportsApi.openPreviewInNewTab(client, file.id, file.name);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);
             }

@@ -350,6 +350,142 @@ describe('TranslateHistoryModal', () => {
             expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
         });
 
+        it('orders preview images by their `order` field, not by the contents array order', () => {
+            const scrambledSection: HistorySectionDto[] = [
+                {
+                    id: 5,
+                    template: 2,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 52,
+                            sectionId: 5,
+                            contentType: ContentType.Image,
+                            order: 3,
+                            image: { id: 2, url: 'second-image', mimeType: 'image/jpeg' },
+                            localizations: [],
+                        },
+                        {
+                            id: 50,
+                            sectionId: 5,
+                            contentType: ContentType.Title,
+                            title: 'UA Title',
+                            order: 0,
+                            localizations: [],
+                        },
+                        {
+                            id: 51,
+                            sectionId: 5,
+                            contentType: ContentType.Image,
+                            order: 2,
+                            image: { id: 1, url: 'first-image', mimeType: 'image/jpeg' },
+                            localizations: [],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={scrambledSection}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            const previewImages = screen.getAllByAltText(/section \d+$/i);
+            expect(previewImages.map((img) => img.getAttribute('src'))).toEqual(['first-image', 'second-image']);
+        });
+
+        it('renders the images preview after the translation form for bottom-image templates', () => {
+            const bottomImageSection: HistorySectionDto[] = [
+                {
+                    id: 6,
+                    template: 5,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 60,
+                            sectionId: 6,
+                            contentType: ContentType.Title,
+                            title: 'UA Title',
+                            order: 0,
+                            localizations: [],
+                        },
+                        {
+                            id: 61,
+                            sectionId: 6,
+                            contentType: ContentType.Image,
+                            order: 2,
+                            image: { id: 1, url: 'bottom-image', mimeType: 'image/jpeg' },
+                            localizations: [],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={bottomImageSection}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            const form = screen.getByTestId('translate-history-section-form');
+            const preview = screen.getByTestId('history-section-images-preview');
+
+            expect(form.compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+            expect(preview.querySelector('[data-section-text]')).toBeInTheDocument();
+        });
+
+        it('renders the images preview before the translation form for top-image templates', () => {
+            const topImageSection: HistorySectionDto[] = [
+                {
+                    id: 7,
+                    template: 6,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 70,
+                            sectionId: 7,
+                            contentType: ContentType.Title,
+                            title: 'UA Title',
+                            order: 0,
+                            localizations: [],
+                        },
+                        {
+                            id: 71,
+                            sectionId: 7,
+                            contentType: ContentType.Image,
+                            order: 2,
+                            image: { id: 1, url: 'top-image', mimeType: 'image/jpeg' },
+                            localizations: [],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={topImageSection}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            const form = screen.getByTestId('translate-history-section-form');
+            const preview = screen.getByTestId('history-section-images-preview');
+
+            expect(form.compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+        });
+
         it('renders a section row when section has image content', () => {
             const sectionWithImage: HistorySectionDto[] = [
                 {

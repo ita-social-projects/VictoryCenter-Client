@@ -71,6 +71,7 @@ export const COMMON_TEXT_ADMIN = {
         FAIL_TO_FETCH_DATA: 'Виникла помилка під час завантаження даних',
         TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
         TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
+        NAVIGATION_BLOCKED: 'Завершіть звіт перед переходом на іншу сторінку',
     },
 
     BUTTON: {

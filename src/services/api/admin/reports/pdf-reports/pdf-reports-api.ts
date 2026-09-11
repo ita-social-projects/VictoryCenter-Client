@@ -65,4 +65,20 @@ export const PdfReportsApi = {
     getPublicFileUrl: (id: number): string => {
         return `${API_ROUTES.BASE}/${API_ROUTES.PDF_REPORTS.BASE}/${id}/file`;
     },
+
+    openPreviewInNewTab: async (client: AxiosInstance, id: number): Promise<void> => {
+        try {
+            const response = await client.post<string>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}/preview-ticket`);
+            const ticket = response.data;
+
+            const baseUrl = client.defaults.baseURL?.replace(/\/$/, '') || '';
+
+            const previewUrl = `${baseUrl}/${API_ROUTES.PDF_REPORTS.BASE}/preview?ticket=${ticket}`;
+
+            window.open(previewUrl, '_blank');
+        } catch (error) {
+            console.error('Failed to generate preview ticket', error);
+            throw error;
+        }
+    },
 };

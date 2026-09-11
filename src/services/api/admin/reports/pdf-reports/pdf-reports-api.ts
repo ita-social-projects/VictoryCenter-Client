@@ -80,7 +80,6 @@ export const PdfReportsApi = {
 
             window.open(previewUrl, '_blank');
         } catch (error) {
-            console.error('Failed to generate preview ticket', error);
             throw error;
         }
     },

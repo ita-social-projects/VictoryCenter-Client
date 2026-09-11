@@ -37,6 +37,9 @@ export const REPORTS_TEXT = {
             PDF_FILES: 'PDF Файли',
         },
     },
+    DELETE_IMAGE: {
+        TITLE: 'Видалити фото?',
+    },
 };
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {

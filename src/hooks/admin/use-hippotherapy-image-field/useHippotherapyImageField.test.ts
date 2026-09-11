@@ -25,7 +25,19 @@ describe('useHippotherapyImageField', () => {
         expect(onChange).toHaveBeenCalledWith({ ...initialValue, image });
     });
 
-    it('keeps the other fields when the image changes', () => {
+    it('keeps the stored imageId when the image is replaced', () => {
+        const valueWithId = { ...initialValue, imageId: 42 };
+        const { result } = renderHook(() => useHippotherapyImageField({ value: valueWithId, onChange }));
+        const image = { base64: 'new-data', mimeType: 'image/png' };
+
+        act(() => {
+            result.current.handleImageChange(image);
+        });
+
+        expect(onChange).toHaveBeenCalledWith({ image, imageId: 42 });
+    });
+
+    it('clears the imageId when the image is removed', () => {
         const valueWithId = { ...initialValue, imageId: 42 };
         const { result } = renderHook(() => useHippotherapyImageField({ value: valueWithId, onChange }));
 
@@ -33,7 +45,7 @@ describe('useHippotherapyImageField', () => {
             result.current.handleImageChange(null);
         });
 
-        expect(onChange).toHaveBeenCalledWith({ image: null, imageId: 42 });
+        expect(onChange).toHaveBeenCalledWith({ image: null, imageId: null });
     });
 
     it('sets the image error and reports it to the optional callback', () => {

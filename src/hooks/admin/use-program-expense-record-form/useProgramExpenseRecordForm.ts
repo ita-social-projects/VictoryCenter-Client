@@ -139,7 +139,9 @@ export const useProgramExpenseRecordForm = ({
 
             setFormState((previousState) => ({
                 ...previousState,
-                ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change')(previousState),
+                ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change', {
+                    allowReverseConversion: false,
+                })(previousState),
             }));
             setUsdMismatchMessage(undefined);
         },

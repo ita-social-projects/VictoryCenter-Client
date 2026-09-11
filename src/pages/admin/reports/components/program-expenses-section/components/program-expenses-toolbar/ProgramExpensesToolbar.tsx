@@ -47,9 +47,7 @@ export const ProgramExpensesToolbar = ({
 }: ProgramExpensesToolbarProps) => {
     const selectedPrograms = programs.filter((program) => selectedProgramIds.includes(program.id));
     const programOptions = [ALL_PROGRAMS_FILTER_OPTION, ...programs];
-    const placeholder = isEditing
-        ? PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM
-        : PROGRAM_EXPENSES_TEXT.FILTER.PROGRAMS_PLACEHOLDER;
+    const placeholder = PROGRAM_EXPENSES_TEXT.FILTER.PROGRAMS_PLACEHOLDER;
 
     const handleProgramChange = (selectedOptions: ProgramExpensesProgram[]) => {
         if (selectedOptions.some(isAllProgramsFilterOption)) {

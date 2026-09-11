@@ -44,6 +44,7 @@ export interface ImageInputProps {
     minWidth?: number;
     maxSizeMB?: number;
     enableCrop?: boolean;
+    deleteConfirmationText?: string;
 }
 
 export const ImageInput = ({
@@ -64,6 +65,7 @@ export const ImageInput = ({
     minWidth = 1920,
     maxSizeMB = 5,
     enableCrop = true,
+    deleteConfirmationText,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
@@ -287,7 +289,7 @@ export const ImageInput = ({
             <ConfirmationModal
                 isOpen={showConfirmModal}
                 isButtonsDisabled={false}
-                title={COMMON_IMAGE_TEXT.DELETE.TITLE}
+                title={deleteConfirmationText ?? COMMON_IMAGE_TEXT.DELETE.TITLE}
                 onConfirm={handleRemove}
                 onCancel={() => setShowConfirmModal(false)}
                 onClose={() => setShowConfirmModal(false)}

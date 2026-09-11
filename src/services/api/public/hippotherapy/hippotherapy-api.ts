@@ -1,19 +1,12 @@
-import { hippotherapyMock } from '@/utils/mock-data/public/hippotherapy';
+import { axiosInstance } from '@/services/api/axios';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { HippotherapyPageContentDto } from '@/types/admin/hippotherapy-page';
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
+import { mapHippotherapyPageToAbout } from '@/utils/functions/mappers/public/hippotherapy/hippotherapy';
 
 export const HippotherapyApi = {
     get: async (): Promise<HippotherapyAbout> => {
-        // const response = await axiosInstance.get(`${API_ROUTES. .PUBLIC}`);
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const success = true;
-
-                if (success) {
-                    resolve(hippotherapyMock);
-                } else {
-                    reject(new Error('Failed to fetch hippotherapy data'));
-                }
-            }, 1000);
-        });
+        const response = await axiosInstance.get<HippotherapyPageContentDto>(API_ROUTES.HIPPOTHERAPY_PAGE.PUBLIC);
+        return mapHippotherapyPageToAbout(response.data);
     },
 };

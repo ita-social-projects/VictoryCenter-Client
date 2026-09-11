@@ -81,7 +81,24 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onDataChange,
         registerSaveCallback,
         onRowEditModeChange,
-    }: any) => (
+    }: {
+        isEditing?: boolean;
+        draftExchangeRate?: string | null;
+        onEditModeChange?: (isEditing: boolean) => void;
+        onExchangeRateValueChange?: (exchangeRate: string | null) => void;
+        isAddCategoryModalOpen?: boolean;
+        onAddCategoryModalClose?: () => void;
+        isEditCategoryModalOpen?: boolean;
+        onEditCategoryModalClose?: () => void;
+        isDeleteCategoryModalOpen?: boolean;
+        onDeleteCategoryModalClose?: () => void;
+        onCategoriesLoaded?: (cats: any[]) => void;
+        onValidationChange?: (valid: boolean) => void;
+        onCountsChange?: (counts: any) => void;
+        onDataChange?: () => void;
+        registerSaveCallback?: (cb: () => Promise<boolean>) => void;
+        onRowEditModeChange?: (isRowEditMode: boolean) => void;
+    }) => (
         <div
             data-testid="funds-expenditure-section"
             data-is-editing={String(isEditing)}
@@ -152,8 +169,8 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             >
                 Set Fail Save
             </button>
-            <button type="button" data-testid="set-row-edit-mode" onClick={() => onRowEditModeChange?.(true)}>
-                Set Row Edit Mode
+            <button type="button" data-testid="start-row-edit" onClick={() => onRowEditModeChange?.(true)}>
+                Start row edit
             </button>
         </div>
     ),
@@ -491,7 +508,7 @@ describe('ReportAnalytics', () => {
 
             fireEvent.click(screen.getByTestId('trigger-funds-data'));
             fireEvent.click(screen.getByTestId('trigger-program-data'));
-            fireEvent.click(screen.getByTestId('set-row-edit-mode'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
 
             const publishButton = screen.getByText('Опублікувати');
             expect(publishButton).toBeDisabled();
@@ -623,6 +640,34 @@ describe('ReportAnalytics', () => {
             await waitFor(() => {
                 expect(mockAddToast).toHaveBeenCalledWith('Не вдалося відмінити зміни', 'error');
             });
+        });
+
+        it('should keep sub-tabs blocked while a row is being edited', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES));
+
+            expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
+        });
+
+        it('should unblock sub-tabs after cancelling edit mode while a row was being edited (#3799)', async () => {
+            mockCancelRecords.mockResolvedValueOnce({});
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+
+            await waitFor(() => {
+                expect(mockCancelRecords).toHaveBeenCalled();
+            });
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES));
+
+            expect(screen.getByTestId('pdf-files-section')).toBeInTheDocument();
         });
     });
 });

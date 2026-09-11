@@ -152,6 +152,7 @@ export const ReportAnalytics = () => {
             addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
             setHasUnpublishedChanges(false);
             setIsFundsEditing(false);
+            setIsRowEditMode(false);
             setIsPublishModalOpen(false);
             refetchSettingsRef.current?.();
         } catch {
@@ -171,6 +172,7 @@ export const ReportAnalytics = () => {
             await FundsExpendituresApi.cancelRecords(adminClient);
             setHasUnpublishedChanges(false);
             setIsFundsEditing(false);
+            setIsRowEditMode(false);
             setIsCancelModalOpen(false);
             setRenderKey((prev) => prev + 1);
             refetchSettingsRef.current?.();
@@ -252,7 +254,7 @@ export const ReportAnalytics = () => {
                 onTranslateCategory={handleTranslateCategory}
             />
 
-            {isFundsEditing && activeTab.id !== 'pdf-files' && (
+            {isFundsEditing && activeTab.id === 'income-expenses' && (
                 <div className={styles['section-footer']}>
                     <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancelClick}>
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FundsExpenditureSection } from './FundsExpendituresSection';
+import { FundsExpenditureSection, FundsExpenditureSectionProps } from './FundsExpendituresSection';
 import {
     FUNDS_EXPENDITURES_TEXT,
     FUNDS_EXPENDITURES_VALIDATION,
@@ -17,7 +17,6 @@ import {
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
-import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -1616,5 +1615,61 @@ describe('FundsExpenditureSection aggregate row visibility', () => {
 
         fireEvent.click(screen.getByTestId('filter-income'));
         expect(table).toHaveAttribute('data-has-aggregate-row', 'false');
+    });
+});
+describe('FundsExpenditureSection add buttons disabled state based on selection', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            { ...MOCK_FUNDS_EXPENDITURES_SUMMARY, incomeCategories: 1, expenseCategories: 1 },
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    const renderSection = (props?: Partial<FundsExpenditureSectionProps>) => {
+        render(<FundsExpenditureSection {...props} />);
+    };
+
+    const getToolbar = () => screen.getByTestId('funds-toolbar');
+
+    const selectRow = (testId: string) => {
+        fireEvent.click(screen.getByTestId(testId));
+    };
+
+    const expectAddButtonsDisabled = (disabled: boolean) => {
+        const value = String(disabled);
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', value);
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', value);
+    };
+
+    it('should have both add buttons enabled when selectedRecordIds is empty and all else valid', () => {
+        renderSection();
+
+        expectAddButtonsDisabled(false);
+    });
+
+    it('should disable both add buttons when selectedRecordIds is non-empty', () => {
+        renderSection();
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+    });
+
+    it('should re-enable both add buttons when selection is cleared (e.g., via bulk delete cancel)', async () => {
+        renderSection({ isEditing: true });
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+            expectAddButtonsDisabled(false);
+        });
     });
 });

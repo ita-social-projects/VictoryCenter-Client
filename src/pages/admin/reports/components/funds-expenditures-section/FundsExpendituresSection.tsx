@@ -66,7 +66,7 @@ const enrichRecords = (
     }));
 };
 
-interface FundsExpenditureSectionProps {
+export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
@@ -408,10 +408,16 @@ export const FundsExpenditureSection = ({
             .map((r) => r.id);
     }, [filteredRecords, programCategoryLabel]);
 
+    const hasSelectedRecords = selectedRecordIds.length > 0;
+
     const isAddIncomeDisabled =
-        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
+        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
+        hasSelectedRecords ||
+        hasExchangeRateError;
     const isAddExpenseDisabled =
-        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
+        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
+        hasSelectedRecords ||
+        hasExchangeRateError;
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 

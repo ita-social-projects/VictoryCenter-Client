@@ -1,22 +1,22 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventModal } from './EventModal';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, error, name, id, label }: any) => (
+    InputWithCharacterLimitGroup: ({ value, onChange, error, name, id, label, onBlur }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
-            <input name={name} id={id} value={value} onChange={onChange} />
-            {error && <span data-testid="name-error">{error}</span>}
+            <input name={name} id={id} value={value} onChange={onChange} onBlur={onBlur} />
+            {error && <span data-testid="input-error">{error}</span>}
         </div>
     ),
 }));
@@ -32,10 +32,10 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, error, name, id, label }: any) => (
+        TextAreaWithCharacterLimitGroup: ({ value, onChange, error, name, id, label, onBlur }: any) => (
             <div>
                 <label htmlFor={id}>{label}</label>
-                <textarea name={name} id={id} value={value} onChange={onChange} />
+                <textarea name={name} id={id} value={value} onChange={onChange} onBlur={onBlur} />
                 {error && <span data-testid="description-error">{error}</span>}
             </div>
         ),
@@ -134,6 +134,24 @@ describe('EventModal', () => {
 
             expect(saveAsDraftButton).toBeDisabled();
             expect(saveAsPublishedButton).toBeDisabled();
+        });
+
+        it('sets validation error on blur', async () => {
+            render(<EventModal {...defaultProps} />);
+
+            const input = screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE });
+
+            fireEvent.change(input, {
+                target: { value: '' },
+            });
+
+            fireEvent.blur(input);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('input-error')).toHaveTextContent(
+                    mockEventValidation.title.getRequiredError(),
+                );
+            });
         });
     });
 

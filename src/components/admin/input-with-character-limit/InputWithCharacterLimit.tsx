@@ -23,6 +23,7 @@ export interface InputWithCharacterLimitProps {
     rows?: number;
     autoGrow?: boolean;
     maxRows?: number;
+    normalizeValue?: (value: string) => string;
 }
 
 export const InputWithCharacterLimit = ({
@@ -44,6 +45,7 @@ export const InputWithCharacterLimit = ({
     rows,
     autoGrow,
     maxRows,
+    normalizeValue,
 }: InputWithCharacterLimitProps) => {
     const [localValue, setLocalValue] = useState(value ?? '');
     const valueRef = useRef(value);
@@ -78,9 +80,23 @@ export const InputWithCharacterLimit = ({
         onWarningChange,
     });
 
-    const onInternalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalValue(e.target.value);
-        handleChange(e);
+    const onInternalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const rawValue = e.target.value;
+        const rawCaret = e.target.selectionStart ?? rawValue.length;
+
+        const nextValue = normalizeValue ? normalizeValue(rawValue) : rawValue;
+
+        const nextCaret = normalizeValue ? normalizeValue(rawValue.slice(0, rawCaret)).length : rawCaret;
+
+        if (nextValue !== rawValue) {
+            e.target.value = nextValue;
+            e.target.setSelectionRange(nextCaret, nextCaret);
+        }
+
+        setLocalValue(nextValue);
+
+        handleChange(e as React.ChangeEvent<HTMLInputElement>);
+
         Promise.resolve().then(() => {
             setLocalValue(valueRef.current ?? '');
         });

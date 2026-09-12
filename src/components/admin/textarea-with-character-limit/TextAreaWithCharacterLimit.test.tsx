@@ -2,6 +2,7 @@ import React, { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 
 jest.mock('./TextAreaWithCharacterLimit.scss', () => ({}));
 
@@ -222,6 +223,39 @@ describe('TextAreaWithCharacterLimit', () => {
         typeInTextArea('  Hello   world ');
 
         expect(getTextArea()).toHaveValue('Hello world ');
+    });
+
+    it('keeps the correct caret position when deleting text during normalization', () => {
+        const { rerender } = renderTextAreaWithCharacterLimit({
+            value: 'test   test   test',
+            normalizeValue: getNormalizedInputTextWhileTyping,
+            onChange: (e) => {
+                rerender(
+                    <TextAreaWithCharacterLimit
+                        {...defaultProps}
+                        value={e.target.value}
+                        onChange={defaultProps.onChange}
+                        normalizeValue={getNormalizedInputTextWhileTyping}
+                    />,
+                );
+            },
+        });
+
+        const textarea = getTextArea();
+
+        textarea.setSelectionRange(11, 11);
+
+        fireEvent.change(textarea, {
+            target: {
+                value: 'test      test',
+                selectionStart: 7,
+                selectionEnd: 7,
+            },
+        });
+
+        expect(textarea).toHaveValue('test test');
+        expect(textarea.selectionStart).toBe(5);
+        expect(textarea.selectionEnd).toBe(5);
     });
 
     it('keeps the typed value as is when normalizeValue is not provided', () => {

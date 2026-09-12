@@ -41,6 +41,7 @@ export const InputWithCharacterLimitGroup = ({
     showCounterBelow = false,
     isWhiteLabel,
     showCounter = true,
+    normalizeValue,
 }: InputWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const displayedError = localWarning || error;
@@ -67,6 +68,7 @@ export const InputWithCharacterLimitGroup = ({
                 rows={rows}
                 autoGrow={autoGrow}
                 maxRows={maxRows}
+                normalizeValue={normalizeValue}
             />
             {showCounter && showCounterBelow ? (
                 <InputErrorWithCharacterCounter

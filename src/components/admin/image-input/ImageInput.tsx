@@ -5,6 +5,7 @@ import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';
 import programVariantStyles from './ProgramImageInput.module.scss';
 import programSectionVariantStyles from './ProgramSectionImageInput.module.scss';
 import partnerBannerVariantStyles from './PartnerBannerImageInput.module.scss';
+import eventVariantStyles from './EventImageInput.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
@@ -22,6 +23,7 @@ const variantStylesMap = {
     program: programVariantStyles,
     programSection: programSectionVariantStyles,
     partnerBanner: partnerBannerVariantStyles,
+    event: eventVariantStyles,
 } as const;
 
 export type ImageInputVariant = keyof typeof variantStylesMap;
@@ -38,6 +40,7 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
+    className?: string;
     cropHeight?: number;
     cropWidth?: number;
     minHeight?: number;
@@ -59,6 +62,7 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
+    className,
     cropHeight = 1080,
     cropWidth = 1920,
     minHeight = 1080,
@@ -203,7 +207,7 @@ export const ImageInput = ({
 
     return (
         <div
-            className={cn(styles.container, {
+            className={cn(styles.container, className, {
                 [styles['container-focused']]: isFocused && !disabled,
                 [styles['container-disabled']]: disabled,
             })}

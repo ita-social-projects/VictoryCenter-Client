@@ -11,7 +11,6 @@ import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { Image, ImageValues } from '@/types/common/image';
 import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
@@ -92,14 +91,6 @@ export const EventModal = (props: EventModalProps) => {
             field.onBlur();
         },
         [],
-    );
-
-    const handleImageChange = useCallback(
-        (field: any) => (image: ImageValues | null) => {
-            field.onChange(image);
-            clearErrors('image');
-        },
-        [clearErrors],
     );
 
     const handleImageError = useCallback(
@@ -210,29 +201,33 @@ export const EventModal = (props: EventModalProps) => {
                                     name="image"
                                     control={control}
                                     render={({ field }) => (
-                                <div className={styles['image-section']}>
-                                    <InputLabel htmlFor="event-image" text={EVENTS_TEXT.FORM.LABEL.IMAGE} isRequired />
-                                    <ImageInput
-                                        value={field.value ?? null}
-                                        onChange={handleImageChange}
-                                        setError={handleImageError}
-                                        id="event-image"
-                                        name="image"
-                                        variant="event"
-                                        cropWidth={EVENT_VALIDATION.image.cropWidth}
-                                        cropHeight={EVENT_VALIDATION.image.cropHeight}
-                                        minWidth={EVENT_VALIDATION.image.minWidth}
-                                        minHeight={EVENT_VALIDATION.image.minHeight}
-                                        maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
-                                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                            EVENT_VALIDATION.image.cropHeight,
-                                            EVENT_VALIDATION.image.cropWidth,
-                                        )}
-                                    />
-                                    <InputError error={errors.image?.message} />
-                                </div>
-                                )}
+                                        <div className={styles['image-section']}>
+                                            <InputLabel
+                                                htmlFor="event-image"
+                                                text={EVENTS_TEXT.FORM.LABEL.IMAGE}
+                                                isRequired
+                                            />
+                                            <ImageInput
+                                                value={field.value ?? null}
+                                                onChange={(image) => field.onChange(image)}
+                                                setError={handleImageError}
+                                                id="event-image"
+                                                name="image"
+                                                variant="event"
+                                                cropWidth={EVENT_VALIDATION.image.cropWidth}
+                                                cropHeight={EVENT_VALIDATION.image.cropHeight}
+                                                minWidth={EVENT_VALIDATION.image.minWidth}
+                                                minHeight={EVENT_VALIDATION.image.minHeight}
+                                                maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
+                                                label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                                    EVENT_VALIDATION.image.cropHeight,
+                                                    EVENT_VALIDATION.image.cropWidth,
+                                                )}
+                                            />
+                                            <InputError error={errors.image?.message} />
+                                        </div>
+                                    )}
                                 />
                             </div>
 

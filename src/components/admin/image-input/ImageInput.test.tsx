@@ -7,10 +7,13 @@ import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/imag
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose }: any) => {
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
         if (!isOpen) return null;
+
         return (
             <div data-testid="confirmation-modal">
+                <span data-testid="confirmation-text">{title}</span>
+
                 <button data-testid="confirm-button" onClick={onConfirm}>
                     Confirm
                 </button>
@@ -248,6 +251,23 @@ describe('ImageInput', () => {
 
         expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         expect(onChangeMock).not.toHaveBeenCalled();
+    });
+
+    it('passes custom confirmation text to confirmation modal', () => {
+        const deleteConfirmationText = 'Are you sure?';
+
+        render(
+            <ImageInput
+                value={MockImageValue}
+                onChange={onChangeMock}
+                setError={setErrorMock}
+                deleteConfirmationText={deleteConfirmationText}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('remove-photo-button'));
+
+        expect(screen.getByTestId('confirmation-text')).toHaveTextContent(deleteConfirmationText);
     });
 
     it('shows format error and does not call onChange for invalid file format', async () => {

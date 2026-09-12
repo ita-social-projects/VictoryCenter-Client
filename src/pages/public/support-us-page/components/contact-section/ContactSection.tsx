@@ -85,12 +85,12 @@ const ContactField: React.FC<ContactFieldProps> = ({
 
 const getHint = (
     value: string,
-    limit: { MAX: number; WARN_AT: number } | undefined,
+    limit: { MAX: number; INFO_AT: number } | undefined,
     t: TFunction<'contactUsPage', undefined>,
 ) => {
     if (!limit) return null;
     if (value.length >= limit.MAX) return { text: t('contactForm.limitReached'), type: 'error' as const };
-    if (value.length >= limit.WARN_AT) {
+    if (value.length >= limit.INFO_AT) {
         return {
             text: t('contactForm.charactersRemaining', { count: limit.MAX - value.length }),
             type: 'warn' as const,

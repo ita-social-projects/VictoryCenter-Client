@@ -1,30 +1,26 @@
-import { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import { Modal } from '@/components/common/modal/Modal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { Image, ImageValues } from '@/types/common/image';
-import { EventCategoryDto } from '@/types/admin/event-category';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
-import styles from './EventModal.module.scss';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
+import { EventCategoryDto } from '@/types/admin/event-category';
+import { Image, ImageValues } from '@/types/common/image';
+import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
 import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
-
-interface EventFormValues {
-    title: string;
-    description: string;
-    additionalDescription: string;
-    publishDate: string | null;
-    image: Image | ImageValues | null;
-    linkUkr: string;
-    linkEng: string;
-}
-
-type EventFormErrorState = Partial<Record<keyof EventFormValues, string>>;
+import {
+    getNormalizedInputText,
+    getNormalizedInputTextWhileTyping,
+} from '@/utils/functions/formatters/text-formatters';
+import styles from './EventModal.module.scss';
 
 export type EventModalProps = {
     isOpen: boolean;
@@ -65,33 +61,62 @@ const mapEventImageError = (error: string | null): string | undefined => {
 export const EventModal = (props: EventModalProps) => {
     const { isOpen, onClose, currentCategory } = props;
 
-    const [formState, setFormState] = useState<EventFormValues>(defaultFormState);
-    const [errors, setErrors] = useState<EventFormErrorState>({});
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
 
-    const isDirty = JSON.stringify(formState) !== JSON.stringify(defaultFormState);
+    const {
+        control,
+        formState: { errors, isDirty },
+        reset,
+        setError,
+        clearErrors,
+    } = useForm<EventFormValues>({
+        resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
+        defaultValues: defaultFormState,
+        mode: 'onTouched',
+        context: { isPublishing },
+    });
 
-    const handleFieldChange = useCallback(
-        (name: keyof EventFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            setFormState((prev) => ({
-                ...prev,
-                [name]: e.target.value,
-            }));
+    const handleTextFieldChange = useCallback(
+        (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            field.onChange(getNormalizedInputTextWhileTyping(e.target.value));
         },
         [],
     );
 
-    const handleImageChange = (image: ImageValues | null) => {
-        setErrors((prev) => ({ ...prev, image: undefined }));
-        setFormState((prev) => ({ ...prev, image }));
-    };
+    const handleTextFieldBlur = useCallback(
+        (field: any) => () => {
+            if (field.value) {
+                field.onChange(getNormalizedInputText(field.value));
+            }
+            field.onBlur();
+        },
+        [],
+    );
 
-    const handleImageError = useCallback((error: string | null) => {
-        setErrors((prev) => ({
-            ...prev,
-            image: mapEventImageError(error),
-        }));
-    }, []);
+    const handleImageChange = useCallback(
+        (field: any) => (image: ImageValues | null) => {
+            field.onChange(image);
+            clearErrors('image');
+        },
+        [clearErrors],
+    );
+
+    const handleImageError = useCallback(
+        (error: string | null) => {
+            const mappedError = mapEventImageError(error);
+
+            if (mappedError) {
+                setError('image', {
+                    type: 'manual',
+                    message: mappedError,
+                });
+            } else {
+                clearErrors('image');
+            }
+        },
+        [setError, clearErrors],
+    );
 
     const handleClose = useCallback(() => {
         if (isDirty) {
@@ -111,14 +136,21 @@ export const EventModal = (props: EventModalProps) => {
         setShowCloseConfirmModal(false);
     }, []);
 
+    const handleSaveAsDraft = () => {
+        setIsPublishing(false);
+    };
+
+    const handlePublish = () => {
+        setIsPublishing(true);
+    };
+
     useEffect(() => {
         if (isOpen) {
             return;
         }
-        setFormState(defaultFormState);
-        setErrors({});
+        reset(defaultFormState);
         setShowCloseConfirmModal(false);
-    }, [isOpen]);
+    }, [isOpen, reset]);
 
     return (
         <>
@@ -131,38 +163,57 @@ export const EventModal = (props: EventModalProps) => {
                     <form onSubmit={(e) => e.preventDefault()} className={styles['container']}>
                         {currentCategory && <span className={styles['category-chip']}>{currentCategory.name}</span>}
 
-                        <InputWithCharacterLimitGroup
-                            label={EVENTS_TEXT.FORM.LABEL.TITLE}
-                            id="event-title"
+                        <Controller
                             name="title"
-                            value={formState.title}
-                            onChange={handleFieldChange('title')}
-                            maxLength={EVENT_VALIDATION.title.max}
-                            error={errors.title}
-                            isRequired
-                            showCounterBelow
+                            control={control}
+                            render={({ field }) => (
+                                <InputWithCharacterLimitGroup
+                                    name={field.name}
+                                    value={field.value}
+                                    onChange={handleTextFieldChange(field)}
+                                    onBlur={handleTextFieldBlur(field)}
+                                    label={EVENTS_TEXT.FORM.LABEL.TITLE}
+                                    id="event-title"
+                                    maxLength={EVENT_VALIDATION.title.max}
+                                    error={errors.title?.message}
+                                    isRequired
+                                    showCounterBelow
+                                />
+                            )}
                         />
 
-                        <TextAreaWithCharacterLimitGroup
-                            label={EVENTS_TEXT.FORM.LABEL.DESCRIPTION}
-                            id="event-description"
+                        <Controller
                             name="description"
-                            value={formState.description}
-                            onChange={handleFieldChange('description')}
-                            maxLength={EVENT_VALIDATION.description.max}
-                            error={errors.description}
-                            isRequired
-                            rows={4}
+                            control={control}
+                            render={({ field }) => (
+                                <TextAreaWithCharacterLimitGroup
+                                    name={field.name}
+                                    value={field.value ?? ''}
+                                    onChange={field.onChange}
+                                    onBlur={handleTextFieldBlur(field)}
+                                    label={EVENTS_TEXT.FORM.LABEL.DESCRIPTION}
+                                    id="event-description"
+                                    maxLength={EVENT_VALIDATION.description.max}
+                                    error={errors.description?.message}
+                                    isRequired
+                                    rows={4}
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
+                                />
+                            )}
                         />
 
                         <div className={styles['two-column-container']}>
                             <div className={styles['left-column']}>
                                 {/*date picker*/}
                                 <div className={styles['date-placeholder']}></div>
+                                <Controller
+                                    name="image"
+                                    control={control}
+                                    render={({ field }) => (
                                 <div className={styles['image-section']}>
                                     <InputLabel htmlFor="event-image" text={EVENTS_TEXT.FORM.LABEL.IMAGE} isRequired />
                                     <ImageInput
-                                        value={formState.image}
+                                        value={field.value ?? null}
                                         onChange={handleImageChange}
                                         setError={handleImageError}
                                         id="event-image"
@@ -179,20 +230,30 @@ export const EventModal = (props: EventModalProps) => {
                                             EVENT_VALIDATION.image.cropWidth,
                                         )}
                                     />
-                                    <InputError error={errors.image} />
+                                    <InputError error={errors.image?.message} />
                                 </div>
+                                )}
+                                />
                             </div>
 
                             <div>
-                                <TextAreaWithCharacterLimitGroup
-                                    label={EVENTS_TEXT.FORM.LABEL.ADDITIONAL_DESCRIPTION}
-                                    id="event-additional-description"
-                                    name="additional-description"
-                                    value={formState.additionalDescription}
-                                    onChange={handleFieldChange('additionalDescription')}
-                                    maxLength={EVENT_VALIDATION.additionalDescription.max}
-                                    error={errors.additionalDescription}
-                                    rows={2}
+                                <Controller
+                                    name="additionalDescription"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TextAreaWithCharacterLimitGroup
+                                            name={field.name}
+                                            value={field.value ?? ''}
+                                            onChange={field.onChange}
+                                            onBlur={handleTextFieldBlur(field)}
+                                            label={EVENTS_TEXT.FORM.LABEL.ADDITIONAL_DESCRIPTION}
+                                            id="event-additional-description"
+                                            maxLength={EVENT_VALIDATION.additionalDescription.max}
+                                            error={errors.additionalDescription?.message}
+                                            rows={2}
+                                            normalizeValue={getNormalizedInputTextWhileTyping}
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>
@@ -201,29 +262,43 @@ export const EventModal = (props: EventModalProps) => {
 
                         <h4 className={styles['link-section-title']}>{EVENTS_TEXT.FORM.LINKS_SECTION_TITLE}</h4>
 
-                        <InputWithCharacterLimitGroup
-                            label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
-                            id="event-link-ukr"
+                        <Controller
                             name="linkUkr"
-                            value={formState.linkUkr}
-                            onChange={handleFieldChange('linkUkr')}
-                            maxLength={EVENT_VALIDATION.link.max}
-                            error={errors.linkUkr}
-                            isRequired
-                            showCounter={false}
-                            className={styles['link-ukr']}
+                            control={control}
+                            render={({ field }) => (
+                                <InputWithCharacterLimitGroup
+                                    name={field.name}
+                                    value={field.value}
+                                    onChange={handleTextFieldChange(field)}
+                                    onBlur={handleTextFieldBlur(field)}
+                                    label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
+                                    id="event-link-ukr"
+                                    maxLength={EVENT_VALIDATION.linkUkr.max}
+                                    error={errors.linkUkr?.message}
+                                    isRequired
+                                    showCounter={false}
+                                    className={styles['link-ukr']}
+                                />
+                            )}
                         />
 
-                        <InputWithCharacterLimitGroup
-                            label={EVENTS_TEXT.FORM.LABEL.LINK_ENG}
-                            id="event-link-eng"
+                        <Controller
                             name="linkEng"
-                            value={formState.linkEng}
-                            onChange={handleFieldChange('linkEng')}
-                            maxLength={EVENT_VALIDATION.link.max}
-                            error={errors.linkEng}
-                            showCounter={false}
-                            className={styles['link-eng']}
+                            control={control}
+                            render={({ field }) => (
+                                <InputWithCharacterLimitGroup
+                                    name={field.name}
+                                    value={field.value ?? ''}
+                                    onChange={handleTextFieldChange(field)}
+                                    onBlur={handleTextFieldBlur(field)}
+                                    label={EVENTS_TEXT.FORM.LABEL.LINK_ENG}
+                                    id="event-link-eng"
+                                    maxLength={EVENT_VALIDATION.linkEng.max}
+                                    error={errors.linkEng?.message}
+                                    showCounter={false}
+                                    className={styles['link-eng']}
+                                />
+                            )}
                         />
                     </form>
                 </Modal.Content>
@@ -235,10 +310,17 @@ export const EventModal = (props: EventModalProps) => {
                             buttonStyle="secondary"
                             disabled={true}
                             className={styles['action-button']}
+                            onClick={handleSaveAsDraft}
                         >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                         </Button>
-                        <Button type="button" buttonStyle="primary" disabled={true} className={styles['action-button']}>
+                        <Button
+                            type="button"
+                            buttonStyle="primary"
+                            disabled={true}
+                            className={styles['action-button']}
+                            onClick={handlePublish}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>

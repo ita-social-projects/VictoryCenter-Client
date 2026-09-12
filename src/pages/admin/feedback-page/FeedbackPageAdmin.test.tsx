@@ -1,6 +1,6 @@
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FeedbackPageAdmin } from './FeedbackPageAdmin';
+import { FeedbackPageAdmin, isFeedbackHistory } from './FeedbackPageAdmin';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
@@ -142,6 +142,7 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchReviews: jest.fn(),
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
+        deleteHistory: jest.fn(),
     },
 }));
 
@@ -202,6 +203,7 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.fetchReviews.mockResolvedValue(mockReviewsData);
         mockFeedbackApi.fetchVideos.mockResolvedValue(mockVideosData);
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
+        mockFeedbackApi.deleteHistory.mockResolvedValue();
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -262,7 +264,7 @@ describe('FeedbackPageAdmin', () => {
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
-    it('should call addToast when Edit or Delete button on a card is clicked', async () => {
+    it('should call addToast when Edit button on a card is clicked', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -272,10 +274,98 @@ describe('FeedbackPageAdmin', () => {
         const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtns[0]);
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should open delete modal when Delete button is clicked on history card and delete item upon confirmation', async () => {
+        mockFeedbackApi.deleteHistory.mockResolvedValueOnce(undefined);
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
+        fireEvent.click(deleteBtns[0]);
+
+        expect(screen.getByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+
+        const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(yesBtn);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.deleteHistory).toHaveBeenCalledWith(mockAdminClient, 1);
+            expect(screen.queryByText('Історія 1')).not.toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
+        });
+    });
+
+    it('should call addToast when Delete button is clicked on non-history card', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByText(FEEDBACK_TEXT.TABS.REVIEWS);
+        fireEvent.click(reviewsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Учасник 10')).toBeInTheDocument();
+        });
 
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should call addToast and not open modal when item in history tab is not a valid FeedbackHistoryDto', async () => {
+        mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
+            items: [
+                {
+                    id: 99,
+                    title: 'Invalid History',
+                    status: VisibilityStatus.Published,
+                    priority: 0,
+                } as any,
+            ],
+            totalItemsCount: 1,
+        });
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Invalid History')).toBeInTheDocument();
+        });
+
+        const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
+        fireEvent.click(deleteBtns[0]);
+
+        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.queryByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
+    });
+
+    it('isFeedbackHistory correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackHistory({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackHistory({
+                id: 2,
+                authorName: 'A',
+                text: 'Txt',
+                priority: 0,
+                status: VisibilityStatus.Published,
+            }),
+        ).toBe(false);
+        expect(isFeedbackHistory(null as any)).toBe(false);
+        expect(isFeedbackHistory(undefined as any)).toBe(false);
     });
 
     it('should refetch items when status filter changes', async () => {

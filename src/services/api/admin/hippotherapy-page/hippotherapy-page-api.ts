@@ -10,20 +10,12 @@ import {
     HippotherapyScientificReferenceDto,
 } from '@/types/admin/hippotherapy-page';
 
-const resolveImageValue = async <T extends HippotherapyImageValue>(
-    client: AxiosInstance,
-    value: T,
-    imagesToDelete: number[],
-): Promise<T> => {
+const resolveImageValue = async <T extends HippotherapyImageValue>(client: AxiosInstance, value: T): Promise<T> => {
     if (!value.image && !value.imageId) {
         return value;
     }
 
-    const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(client, value.image, value.imageId);
-
-    if (imageIdToDelete) {
-        imagesToDelete.push(imageIdToDelete);
-    }
+    const { finalImageId } = await ImageApi.getUpdateImageId(client, value.image, value.imageId);
 
     return { ...value, imageId: finalImageId };
 };
@@ -31,9 +23,15 @@ const resolveImageValue = async <T extends HippotherapyImageValue>(
 const resolveGalleryCards = async (
     client: AxiosInstance,
     cards: HippotherapyGalleryCardContent[],
-    imagesToDelete: number[],
-): Promise<HippotherapyGalleryCardContent[]> =>
-    Promise.all(cards.map((card) => resolveImageValue(client, card, imagesToDelete)));
+): Promise<HippotherapyGalleryCardContent[]> => {
+    const resolved: HippotherapyGalleryCardContent[] = [];
+
+    for (const card of cards) {
+        resolved.push(await resolveImageValue(client, card));
+    }
+
+    return resolved;
+};
 
 const stripReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReference[],
@@ -80,25 +78,13 @@ export const HippotherapyPageApi = {
         client: AxiosInstance,
         content: HippotherapyPageContentModel,
     ): Promise<HippotherapyPageContentModel> => {
-        const imagesToDelete: number[] = [];
-
-        const [
-            introSection,
-            quoteSection,
-            hippoventionCenterSection,
-            advantagesCards,
-            anotherQuoteSection,
-            participantsCards,
-            ethicsSection,
-        ] = await Promise.all([
-            resolveImageValue(client, content.introSection, imagesToDelete),
-            resolveImageValue(client, content.quoteSection, imagesToDelete),
-            resolveImageValue(client, content.hippoventionCenterSection, imagesToDelete),
-            resolveGalleryCards(client, content.advantagesSection.cards, imagesToDelete),
-            resolveImageValue(client, content.anotherQuoteSection, imagesToDelete),
-            resolveGalleryCards(client, content.participantsSection.cards, imagesToDelete),
-            resolveImageValue(client, content.ethicsSection, imagesToDelete),
-        ]);
+        const introSection = await resolveImageValue(client, content.introSection);
+        const quoteSection = await resolveImageValue(client, content.quoteSection);
+        const hippoventionCenterSection = await resolveImageValue(client, content.hippoventionCenterSection);
+        const advantagesCards = await resolveGalleryCards(client, content.advantagesSection.cards);
+        const anotherQuoteSection = await resolveImageValue(client, content.anotherQuoteSection);
+        const participantsCards = await resolveGalleryCards(client, content.participantsSection.cards);
+        const ethicsSection = await resolveImageValue(client, content.ethicsSection);
 
         const payload: HippotherapyPageContentDto = {
             ...content,
@@ -116,8 +102,6 @@ export const HippotherapyPageApi = {
         };
 
         const response = await client.put<HippotherapyPageContentDto>(API_ROUTES.HIPPOTHERAPY_PAGE.BASE, payload);
-
-        await Promise.all(imagesToDelete.map((imageId) => ImageApi.delete(client, imageId)));
 
         return toContentModel(response.data);
     },

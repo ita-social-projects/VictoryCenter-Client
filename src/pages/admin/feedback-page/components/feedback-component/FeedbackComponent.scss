@@ -12,7 +12,9 @@
     &-profile {
         display: flex;
         gap: 16px;
-        width: 33%;
+        width: 30%;
+        max-width: 30%;
+        min-width: 0;
         align-items: center;
         height: 100%;
 
@@ -28,6 +30,7 @@
 
         &-data {
             flex: 1;
+            min-width: 0;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -37,23 +40,27 @@
                 @include typography.body-1-regular;
                 margin: 4px 0 0 0;
                 color: colors.$blue-900;
-                overflow-wrap: anywhere;
-                word-break: normal;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }
 
     &-position {
         text-align: start;
-        width: 33%;
+        width: 45%;
+        max-width: 45%;
+        min-width: 0;
 
         p {
             @include typography.body-1-regular;
             margin: 0;
-            color: colors.$blue-900;
             padding-right: 40px;
-            overflow-wrap: anywhere;
-            word-break: normal;
+            color: colors.$blue-900;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 
@@ -61,7 +68,8 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        width: 40%;
+        flex: 1;
+        min-width: 0;
     }
 
     &-actions {
@@ -70,6 +78,7 @@
         display: flex;
         justify-content: end;
         gap: 10px;
+        flex-shrink: 0;
 
         button {
             border: none;

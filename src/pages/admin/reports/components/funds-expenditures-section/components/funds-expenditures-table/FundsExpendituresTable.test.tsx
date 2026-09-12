@@ -378,6 +378,16 @@ describe('FundsExpendituresTable', () => {
             render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
             expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
         });
+
+        it('should not render the actions column header when isEditing is false (default)', () => {
+            renderTable({ records: [] });
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS)).not.toBeInTheDocument();
+        });
+
+        it('should render the actions column header when isEditing is true', () => {
+            renderTable({ records: [], isEditing: true });
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
+        });
     });
 
     describe('row category editing', () => {

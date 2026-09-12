@@ -9,7 +9,10 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { ReportsApi } from '@/services/api/admin/reports/reports-api';
+import { ReportsPublicApi } from '@/services/api/public/reports/reports-api';
 import { ReportsMediaSettings } from '@/types/admin/reports';
+import { RequestOptions } from '@/types/common/api';
+import { formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
 import { ToastType } from '@/types/admin/toast';
 import { Button } from '@/components/admin/button/Button';
 import axios from 'axios';
@@ -87,9 +90,9 @@ const syncValuesFromData = (data: ReportsMediaSettings | null): MediaSettingsFor
     if (!data) return DEFAULT_FORM_STATE;
     return {
         collectedFunds: {
+            totalAmount: 0,
             title: data.collectedFunds.title ?? '',
             titleEn: data.collectedFunds.titleEn ?? '',
-            totalAmount: 0,
             image: data.collectedFunds.image ?? null,
             imageId: data.collectedFunds.imageId ?? null,
         },
@@ -129,8 +132,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         const {
             data: mediaSettingsData,
-            isLoading,
-            error: fetchError,
+            isLoading: isMediaSettingsLoading,
+            error: mediaSettingsError,
             refetch,
         } = useDataFetch<ReportsMediaSettings>({
             initialData: {
@@ -141,13 +144,54 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             autoFetchDisabled: false,
         });
 
+        const fetchPublicCollectedTotalHandler = useCallback(async (options: RequestOptions = {}) => {
+            try {
+                const publishedReport = await ReportsPublicApi.getPublishedReports(undefined, options);
+                return publishedReport.funding.totalUah;
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    return 0;
+                }
+                throw error;
+            }
+        }, []);
+
+        const {
+            data: publicCollectedTotalUah,
+            isLoading: isPublicCollectedTotalLoading,
+            error: publicCollectedTotalError,
+            refetch: refetchPublicCollectedTotal,
+        } = useDataFetch<number>({
+            initialData: 0,
+            fetchHandler: fetchPublicCollectedTotalHandler,
+            autoFetchDependencies: [isActive],
+        });
+
+        const publicCollectedTotalLoadedRef = useRef(false);
         useEffect(() => {
-            if (!fetchError) return;
-            if (axios.isCancel?.(fetchError) || fetchError.name === 'CanceledError' || fetchError.name === 'AbortError')
-                return;
+            if (!isPublicCollectedTotalLoading && !publicCollectedTotalError) {
+                publicCollectedTotalLoadedRef.current = true;
+            }
+        }, [isPublicCollectedTotalLoading, publicCollectedTotalError]);
+
+        const isLoading =
+            isMediaSettingsLoading || (isPublicCollectedTotalLoading && !publicCollectedTotalLoadedRef.current);
+
+        const fetchError =
+            mediaSettingsError ?? (publicCollectedTotalLoadedRef.current ? null : publicCollectedTotalError);
+
+        useEffect(() => {
+            const error = mediaSettingsError ?? publicCollectedTotalError;
+            if (!error) return;
+            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') return;
 
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS, ToastType.Error);
-        }, [fetchError, addToast]);
+        }, [mediaSettingsError, publicCollectedTotalError, addToast]);
+
+        const handleRetry = useCallback(() => {
+            if (mediaSettingsError) refetch();
+            if (publicCollectedTotalError) refetchPublicCollectedTotal();
+        }, [mediaSettingsError, publicCollectedTotalError, refetch, refetchPublicCollectedTotal]);
 
         const initialData = useMemo(() => syncValuesFromData(mediaSettingsData), [mediaSettingsData]);
 
@@ -286,6 +330,14 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         useImperativeHandle(ref, () => ({ submit: handlePublishProxy }));
 
+        const collectedFundsBlockValues = useMemo(
+            () => ({
+                ...formState.collectedFunds,
+                totalAmount: formatCollectedAmount(publicCollectedTotalUah),
+            }),
+            [formState.collectedFunds, publicCollectedTotalUah],
+        );
+
         return (
             <div style={{ display: isActive ? 'block' : 'none' }}>
                 {isLoading && (
@@ -296,7 +348,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 {fetchError && !isLoading && (
                     <div className={styles.error}>
                         <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                        <Button onClick={() => refetch()} buttonStyle="primary" className={styles['error-button']}>
+                        <Button onClick={handleRetry} buttonStyle="primary" className={styles['error-button']}>
                             {REPORTS_TEXT.BUTTON.TRY_AGAIN}
                         </Button>
                     </div>
@@ -305,7 +357,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     <div>
                         <div className={styles.blocks}>
                             <ReportsMediaBlock
-                                values={formState.collectedFunds}
+                                values={collectedFundsBlockValues}
                                 titleError={errors.collectedFundsTitle}
                                 titleEnError={errors.collectedFundsTitleEn}
                                 totalAmountError={errors.collectedFundsTotalAmount}

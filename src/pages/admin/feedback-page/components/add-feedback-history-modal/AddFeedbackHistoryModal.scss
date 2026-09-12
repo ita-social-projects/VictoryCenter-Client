@@ -1,0 +1,37 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
+
+.add-feedback-history-modal {
+    width: 100%;
+    max-width: 580px;
+
+    &-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .error {
+            @include typography.small-text-regular;
+            color: colors.$error;
+            margin-top: 4px;
+        }
+    }
+
+    &-error-container {
+        @include typography.body-2-regular;
+        width: 100%;
+        margin-top: 12px;
+        text-align: center;
+        color: colors.$error;
+    }
+
+    &-submit-button {
+        width: 100% !important;
+    }
+}

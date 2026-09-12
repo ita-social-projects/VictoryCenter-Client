@@ -188,7 +188,7 @@ const mockVideosData = {
         {
             id: 20,
             title: 'Відео 20',
-            videoUrl: 'https://youtube.com/watch?v=20',
+            link: 'https://youtube.com/watch?v=20',
             status: VisibilityStatus.Published,
             priority: 0,
         },
@@ -249,6 +249,11 @@ describe('FeedbackPageAdmin', () => {
         });
         expect(mockFeedbackApi.fetchVideos).toHaveBeenCalledTimes(1);
         expect(screen.getByTestId('toolbar-placeholder')).toHaveTextContent(FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS);
+
+        const videoLink = screen.getByRole('link', { name: mockVideosData.items[0].link });
+        expect(videoLink).toHaveAttribute('href', mockVideosData.items[0].link);
+        expect(videoLink).toHaveAttribute('target', '_blank');
+        expect(videoLink).toHaveAttribute('rel', 'noreferrer');
     });
 
     it('should call addToast when Add button in toolbar is clicked', async () => {
@@ -634,6 +639,22 @@ describe('FeedbackPageAdmin', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+    });
+
+    it('should show standard empty state when videos list is empty', async () => {
+        mockFeedbackApi.fetchVideos.mockResolvedValueOnce({ items: [], totalItemsCount: 0 });
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const videosTab = screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS);
+        fireEvent.click(videosTab);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('empty-state')).toHaveTextContent(COMMON_TEXT_ADMIN.LIST.NOT_FOUND);
         });
     });
 });

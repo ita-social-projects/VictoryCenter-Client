@@ -35,10 +35,22 @@
 
             p {
                 @include typography.body-1-regular;
+
                 margin: 4px 0 0 0;
                 color: colors.$blue-900;
                 overflow-wrap: anywhere;
                 word-break: normal;
+            }
+
+            &.feedback-truncate {
+                min-width: 0;
+
+                p {
+                    overflow: hidden;
+                    overflow-wrap: normal;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
         }
     }
@@ -49,11 +61,32 @@
 
         p {
             @include typography.body-1-regular;
+
             margin: 0;
             color: colors.$blue-900;
             padding-right: 40px;
             overflow-wrap: anywhere;
             word-break: normal;
+        }
+
+        a {
+            @include typography.body-1-regular;
+
+            display: block;
+            margin: 0;
+            color: colors.$blue-900;
+            padding-right: 40px;
+        }
+
+        &.feedback-truncate {
+            min-width: 0;
+
+            p,
+            a {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
     }
 

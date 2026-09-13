@@ -65,6 +65,21 @@ describe('SingleImageRight', () => {
             expect(p).toHaveTextContent('Test Description');
         });
 
+        it('marks the text column with data-section-text so previews can hide it', () => {
+            const { container } = render(
+                <SingleImageRight
+                    title="Test"
+                    description="Desc"
+                    image={{ id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
+
+            const textColumn = container.querySelector('[data-section-text]');
+            expect(textColumn).toBeInTheDocument();
+            expect(textColumn).toContainElement(container.querySelector('h2'));
+            expect(textColumn).not.toContainElement(container.querySelector('img'));
+        });
+
         it('renders image when provided', () => {
             const { container } = render(
                 <SingleImageRight title="Test" image={{ id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' }} />,

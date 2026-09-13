@@ -271,7 +271,8 @@ export const FeedbackPageAdmin = () => {
         [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented, handleDeleteClick],
     );
 
-    const isFilteredView = Boolean(selectedSearchItem) || statusFilter !== undefined;
+    const isFilteredView =
+        Boolean(selectedSearchItem) || statusFilter !== undefined || translationStatusFilter !== undefined;
 
     return (
         <div className="feedback-page-wrapper" data-testid="feedback-page-content">

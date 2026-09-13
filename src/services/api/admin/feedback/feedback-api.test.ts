@@ -1,5 +1,6 @@
 import { FeedbackApi } from './feedback-api';
 import { VisibilityStatus } from '@/types/admin/common';
+import { FeedbackCategory } from '@/types/admin/feedback';
 
 describe('FeedbackApi', () => {
     const mockHistoryList = Array.from({ length: 21 }).map((_, i) => ({
@@ -194,21 +195,21 @@ describe('FeedbackApi', () => {
 
     describe('reorderFeedback', () => {
         it('should send reorder request for histories', async () => {
-            await FeedbackApi.reorderFeedback(mockClient, 'history', [1, 2, 3]);
+            await FeedbackApi.reorderFeedback(mockClient, FeedbackCategory.HISTORY, [1, 2, 3]);
 
             expect(mockClient.put).toHaveBeenCalledWith('FeedbackHistories/reorder', { orderedIds: [1, 2, 3] });
         });
 
         it('should send reorder request for reviews', async () => {
-            await FeedbackApi.reorderFeedback(mockClient, 'reviews', [5, 4]);
+            await FeedbackApi.reorderFeedback(mockClient, FeedbackCategory.REVIEWS, [1, 2, 3]);
 
-            expect(mockClient.put).toHaveBeenCalledWith('FeedbackReviews/reorder', { orderedIds: [5, 4] });
+            expect(mockClient.put).toHaveBeenCalledWith('FeedbackReviews/reorder', { orderedIds: [1, 2, 3] });
         });
 
         it('should send reorder request for videos', async () => {
-            await FeedbackApi.reorderFeedback(mockClient, 'videos', [7, 8]);
+            await FeedbackApi.reorderFeedback(mockClient, FeedbackCategory.VIDEOS, [1, 2, 3]);
 
-            expect(mockClient.put).toHaveBeenCalledWith('VideoReviews/reorder', { orderedIds: [7, 8] });
+            expect(mockClient.put).toHaveBeenCalledWith('VideoReviews/reorder', { orderedIds: [1, 2, 3] });
         });
     });
 });

@@ -76,8 +76,8 @@ export const FeedbackApi = {
 
         return filterAndPaginate(allItems, _params, (item) => item.title);
     },
-    reorderFeedback: async (client: AxiosInstance, category: string, orderedIds: number[]): Promise<void> => {
-        const routes: Record<string, string> = {
+    reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
+        const routes: Record<FeedbackCategory, string> = {
             [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
             [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
             [FeedbackCategory.VIDEOS]: API_ROUTES.VIDEO_REVIEWS.BASE,

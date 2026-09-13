@@ -28,7 +28,7 @@ export const ProgramsSection: React.FC = () => {
     const { data, isLoading, error } = useDataFetch<ProgramsPageData | null>({
         initialData: null,
         fetchHandler: programPageDataFetch,
-        autoFetchDependencies: [currentLanguage, programCategory],
+        autoFetchDependencies: [currentLanguage],
     });
     const programsByCategory = useMemo<ProgramsPageData['programsData'] | undefined>(() => {
         if (!data) return undefined;

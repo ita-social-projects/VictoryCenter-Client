@@ -548,7 +548,11 @@ export const FundsExpendituresTable = ({
                                     <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
                                 </span>
                             </th>
-                            {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
+                            {isEditing && (
+                                <th className={cn(styles.th, styles['actions-th'])}>
+                                    {FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS}
+                                </th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>

@@ -55,13 +55,29 @@ describe('useInputWithCharacterLimit', () => {
             expect(result.current.showClearButton).toBe(false);
         });
 
-        it('should calculate current length using raw input length', () => {
+        it('should count leading spaces  and not count trailing spaces in currentLength', () => {
             const testValue = '  test  ';
-            const rawLength = testValue.length;
-
             const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: testValue }));
 
-            expect(result.current.currentLength).toBe(rawLength);
+            expect(result.current.currentLength).toBe(6);
+        });
+
+        it('should count a space that is followed by more characters', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: 'test text' }));
+
+            expect(result.current.currentLength).toBe(9);
+        });
+
+        it('should return 0 for a value made entirely of spaces', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: '   ' }));
+
+            expect(result.current.currentLength).toBe(0);
+        });
+
+        it('should not treat a trailing newline/tab the same as a trailing space (textarea case)', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: 'test\n' }));
+
+            expect(result.current.currentLength).toBe(5);
         });
 
         it('should pass onWarningChange to useTemporaryWarning', () => {

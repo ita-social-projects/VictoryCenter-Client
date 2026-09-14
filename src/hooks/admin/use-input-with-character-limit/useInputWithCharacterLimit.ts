@@ -28,7 +28,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
 }: UseInputWithCharacterLimitProps<T>) => {
     const [isFocused, setIsFocused] = useState(false);
     const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({ onWarningChange });
-    const currentLength = (value ?? '').length;
+    const currentLength = (value ?? '').replace(/ +$/, '').length;
 
     const handleChange = (e: React.ChangeEvent<T>) => {
         let newValue = e.target.value;

@@ -51,7 +51,7 @@ export interface FeedbackCategoryItem {
 export interface FeedbackVideoDto {
     id: number;
     title: string;
-    videoUrl: string;
+    link: string;
     status: VisibilityStatus;
     priority: number;
 }

@@ -25,6 +25,13 @@
         padding: 64px 48px 48px;
         margin-inline: 0;
     }
+
+    &--popup {
+        box-shadow: none;
+        border-bottom: none;
+        gap: 24px;
+        padding: 32px 0 0;
+    }
 }
 
 .contact-form-field {
@@ -56,17 +63,25 @@
 .contact-form-textarea-field {
     border: 1px solid c.$blue-100;
     padding: 8px;
-    margin-block: 32px;
+    margin-top: 32px;
+
+    &--error {
+        border-color: c.$error;
+    }
 }
 
 .contact-form-textarea {
-    resize: vertical;
+    resize: none;
 }
 
 .contact-form-field-wrapper {
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    &--textarea {
+        margin-bottom: 24px;
+    }
 }
 
 .contact-form-message--info {
@@ -91,6 +106,11 @@
 
     &:hover {
         opacity: 0.9;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 

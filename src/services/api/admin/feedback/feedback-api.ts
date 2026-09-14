@@ -4,8 +4,6 @@ import { FeedbackCategory, FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoD
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
-const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export interface FeedbackFetchParams {
     status?: VisibilityStatus;
     language?: string;

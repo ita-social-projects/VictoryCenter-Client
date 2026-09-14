@@ -16,6 +16,10 @@ describe('FeedbackApi', () => {
         id: i + 1,
         authorName: `Учасник ${i + 1}`,
         text: `Текст відгуку ${i + 1}`,
+        status: VisibilityStatus.Published,
+        priority: i,
+    }));
+
     const mockVideosList = Array.from({ length: 21 }).map((_, i) => ({
         id: i + 1,
         title: `Відео ${i + 1}`,

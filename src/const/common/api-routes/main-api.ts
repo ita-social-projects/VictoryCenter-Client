@@ -80,7 +80,7 @@ export const API_ROUTES = {
     },
     HIPPOTHERAPY_PAGE: {
         BASE: 'HippotherapyPage',
-        PUBLIC: 'HippotherapyPage',
+        PUBLIC: 'HippotherapyPage/public',
     },
     FEEDBACK_PAGE: {
         BASE: 'FeedbackPage',

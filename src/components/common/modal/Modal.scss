@@ -52,6 +52,7 @@
             position: absolute;
             top: 0;
             right: 0;
+            z-index: z-index.$modal-close-button;
             display: flex;
 
             button {

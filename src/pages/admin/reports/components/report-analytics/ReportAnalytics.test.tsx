@@ -33,6 +33,13 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     },
 }));
 
+const mockSetBlocked = jest.fn();
+jest.mock('@/contexts/admin/admin-navigation-guard-provider/AdminNavigationGuardProvider', () => ({
+    useAdminNavigationGuard: () => ({
+        setBlocked: mockSetBlocked,
+    }),
+}));
+
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
         const idSuffix = title === 'Опублікувати зміни?' ? 'publish' : 'cancel';
@@ -172,17 +179,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
 jest.mock(
     '../funds-expenditures-section/components/common/translate-reports-category-modal/TranslateReportsCategoryModal',
     () => ({
-        TranslateReportsCategoryModal: ({
-            isOpen,
-            onClose,
-            onTranslateCategory,
-            categories,
-        }: {
-            isOpen?: boolean;
-            onClose?: () => void;
-            onTranslateCategory?: (cat: any) => void;
-            categories?: any[];
-        }) => (
+        TranslateReportsCategoryModal: ({ isOpen, onClose, onTranslateCategory, categories }: any) => (
             <div data-testid="translate-category-modal" data-open={String(isOpen ?? false)}>
                 <button type="button" data-testid="translate-modal-close" onClick={() => onClose?.()}>
                     Close
@@ -201,8 +198,8 @@ jest.mock(
 );
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({ onCountsChange, onDataChange }: any) => (
-        <div data-testid="program-expenses-section">
+    ProgramExpensesSection: ({ onCountsChange, onDataChange, exchangeRate }: any) => (
+        <div data-testid="program-expenses-section" data-exchange-rate={exchangeRate ?? ''}>
             ProgramExpensesSection
             <button
                 type="button"
@@ -293,6 +290,65 @@ describe('ReportAnalytics', () => {
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
 
         expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-draft-exchange-rate', '44.20');
+    });
+
+    it('should prevent exiting edit mode and show error toast if report data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+        fireEvent.click(screen.getByTestId('deactivate-funds-edit'));
+
+        expect(mockAddToast).toHaveBeenCalledWith(
+            'Неможливо завершити редагування: додайте щонайменше 2 доходи, 2 витрати та 1 програмну витрату',
+            'error',
+        );
+        expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-is-editing', 'true');
+    });
+
+    it('should block navigation via useAdminNavigationGuard when editing and data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        expect(mockSetBlocked).toHaveBeenCalledWith(false, COMMON_TEXT_ADMIN.MESSAGE.NAVIGATION_BLOCKED);
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+        expect(mockSetBlocked).toHaveBeenCalledWith(true, COMMON_TEXT_ADMIN.MESSAGE.NAVIGATION_BLOCKED);
+    });
+
+    it('should prevent default on beforeunload event when editing and data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+        const event = new Event('beforeunload');
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+
+        window.dispatchEvent(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should NOT prevent default on beforeunload event when not editing', () => {
+        render(<ReportAnalytics />);
+
+        const event = new Event('beforeunload');
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+
+        window.dispatchEvent(event);
+
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should pass exchangeRateDraft to ProgramExpensesSection', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+        fireEvent.click(screen.getByTestId('change-funds-exchange-rate'));
+        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
+
+        const programSection = screen.getByTestId('program-expenses-section');
+        expect(programSection).toHaveAttribute('data-exchange-rate', '44.20');
     });
 
     describe('add category modal', () => {
@@ -444,6 +500,18 @@ describe('ReportAnalytics', () => {
 
             const publishButton = screen.getByText('Опублікувати');
             expect(publishButton).not.toBeDisabled();
+        });
+
+        it('should disable publish button when isRowEditMode is true', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
+
+            const publishButton = screen.getByText('Опублікувати');
+            expect(publishButton).toBeDisabled();
         });
 
         it('should open publish modal on publish click', () => {

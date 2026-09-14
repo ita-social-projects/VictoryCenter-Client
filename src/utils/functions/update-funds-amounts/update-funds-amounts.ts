@@ -46,12 +46,19 @@ const computeOppositeAmount = (
     return { amount: convertedAmount, error: validateFundsExpendituresAmount(convertedAmount, trigger) };
 };
 
+export interface UpdateFundsAmountsOptions {
+    allowReverseConversion?: boolean;
+}
+
 export const updateFundsAmounts = (
     field: 'amountUah' | 'amountUsd',
     value: string,
     exchangeRate: string | null,
     trigger: 'change' | 'blur',
+    options: UpdateFundsAmountsOptions = {},
 ): ((prev: FundsAmountsState) => FundsAmountsState) => {
+    const { allowReverseConversion = true } = options;
+
     return (prev: FundsAmountsState) => {
         const shouldNormalize = trigger === 'blur';
         const normalized = normalizeFundsExpendituresAmountInput(value, shouldNormalize);
@@ -63,14 +70,11 @@ export const updateFundsAmounts = (
                 ? { amount: prev.amountUsd, error: prev.errors.amountUsd }
                 : { amount: prev.amountUah, error: prev.errors.amountUah };
 
-        const opposite = computeOppositeAmount(
-            normalized,
-            currentFieldError,
-            exchangeRate,
-            trigger,
-            direction,
-            fallback,
-        );
+        const shouldConvertOpposite = field === 'amountUah' || allowReverseConversion;
+
+        const opposite = shouldConvertOpposite
+            ? computeOppositeAmount(normalized, currentFieldError, exchangeRate, trigger, direction, fallback)
+            : fallback;
 
         const nextAmountUah = field === 'amountUah' ? normalized : opposite.amount;
         const nextAmountUsd = field === 'amountUsd' ? normalized : opposite.amount;

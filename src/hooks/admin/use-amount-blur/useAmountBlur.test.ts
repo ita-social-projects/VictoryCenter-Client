@@ -37,14 +37,14 @@ const triggerAmountUahBlur = (
 };
 
 describe('useAmountBlur', () => {
-    it('recalculates amountUah from amountUsd and clears usdMismatchMessage on blur', () => {
+    it('does not recalculate amountUah from amountUsd and surfaces a mismatch message on blur', () => {
         const { result } = renderHook(() => useAmountBlur('40'));
 
         const nextState = triggerAmountUsdBlur(result.current, createFormState({ amountUah: '100', amountUsd: '999' }));
 
-        expect(result.current.usdMismatchMessage).toBeUndefined();
+        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
         expect(nextState.amountUsd).toBe('999');
-        expect(nextState.amountUah).toBe('39960');
+        expect(nextState.amountUah).toBe('100');
         expect(nextState.errors.amountUsd).toBeUndefined();
     });
 

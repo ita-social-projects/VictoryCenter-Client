@@ -168,7 +168,7 @@ describe('HippotherapyPageApi', () => {
             );
         });
 
-        it('resolves gallery card images and deletes stale ones after a successful publish', async () => {
+        it('resolves gallery card images and leaves image cleanup to the backend', async () => {
             const content = buildContent();
             const newCardImage: ImageValues = { base64: 'mock-card-base64', mimeType: 'image/png' };
             content.advantagesSection.cards[0].image = newCardImage;
@@ -176,7 +176,6 @@ describe('HippotherapyPageApi', () => {
 
             (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({ finalImageId: 99, imageIdToDelete: 7 });
             mockClient.put.mockResolvedValue({ data: buildDto() });
-            (ImageApi.delete as jest.Mock).mockResolvedValue({});
 
             await HippotherapyPageApi.update(mockClient, content);
 
@@ -189,7 +188,24 @@ describe('HippotherapyPageApi', () => {
                     }),
                 }),
             );
-            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 7);
+            expect(ImageApi.delete).not.toHaveBeenCalled();
+        });
+
+        it('does not delete an image from the client when it is removed from a section', async () => {
+            const content = buildContent();
+            content.introSection.image = null;
+            content.introSection.imageId = 42;
+
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({ finalImageId: null, imageIdToDelete: 42 });
+            mockClient.put.mockResolvedValue({ data: buildDto() });
+
+            await HippotherapyPageApi.update(mockClient, content);
+
+            expect(ImageApi.delete).not.toHaveBeenCalled();
+            expect(mockClient.put).toHaveBeenCalledWith(
+                API_ROUTES.HIPPOTHERAPY_PAGE.BASE,
+                expect.objectContaining({ introSection: expect.objectContaining({ imageId: null }) }),
+            );
         });
 
         it('sends the stored imageId when the image has not changed', async () => {
@@ -206,6 +222,31 @@ describe('HippotherapyPageApi', () => {
                 API_ROUTES.HIPPOTHERAPY_PAGE.BASE,
                 expect.objectContaining({ introSection: expect.objectContaining({ imageId: 42 }) }),
             );
+        });
+
+        it('uploads images one at a time so the backend rate limit is not hit', async () => {
+            const content = buildContent();
+            const newImage: ImageValues = { base64: 'mock-base64', mimeType: 'image/png' };
+            content.introSection.image = newImage;
+            content.quoteSection.image = newImage;
+            content.ethicsSection.image = newImage;
+
+            let inFlight = 0;
+            let maxInFlight = 0;
+
+            (ImageApi.getUpdateImageId as jest.Mock).mockImplementation(async () => {
+                inFlight += 1;
+                maxInFlight = Math.max(maxInFlight, inFlight);
+                await Promise.resolve();
+                inFlight -= 1;
+                return { finalImageId: 1, imageIdToDelete: null };
+            });
+            mockClient.put.mockResolvedValue({ data: buildDto() });
+
+            await HippotherapyPageApi.update(mockClient, content);
+
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledTimes(3);
+            expect(maxInFlight).toBe(1);
         });
     });
 });

@@ -16,6 +16,11 @@ import {
     isHistoryTemplate,
     renderHistorySection,
 } from '@/utils/functions/render-history-section';
+import {
+    getExpectedHistoryImageCount,
+    getHistorySectionData,
+    getOrderedHistoryContentsByType,
+} from '@/utils/functions/history-section-data';
 import { buildSectionCancelOptions } from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import styles from './HistorySectionForm.module.scss';
 import { LocalizationLanguage } from '@/types/common/language';
@@ -24,13 +29,6 @@ import { mapHistorySectionContentDtoToModel } from '@/utils/functions/mappers/ad
 
 const SUPPORTED_CONTENT_TYPES = new Set<ContentType>([ContentType.Title, ContentType.Description, ContentType.Image]);
 const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
-
-const getOrderedContentsByType = (
-    contents: HistorySectionContentDto[],
-    type: ContentType,
-): HistorySectionContentDto[] => {
-    return contents.filter((content) => content.contentType === type).sort((a, b) => a.order - b.order);
-};
 
 const areContentsEqual = (left: HistorySectionContentDto, right: HistorySectionContentDto): boolean => {
     return (
@@ -50,9 +48,9 @@ const normalizeHistorySectionContents = (section: HistorySectionDto): HistorySec
         return section;
     }
 
-    const titleContent = getOrderedContentsByType(section.contents, ContentType.Title)[0];
-    const descriptionContent = getOrderedContentsByType(section.contents, ContentType.Description)[0];
-    const imageContents = getOrderedContentsByType(section.contents, ContentType.Image);
+    const titleContent = getOrderedHistoryContentsByType(section.contents, ContentType.Title)[0];
+    const descriptionContent = getOrderedHistoryContentsByType(section.contents, ContentType.Description)[0];
+    const imageContents = getOrderedHistoryContentsByType(section.contents, ContentType.Image);
 
     let imageIndex = 0;
     const normalizedContents = getInitialHistorySectionContents(section.template).map((expectedContent) => {
@@ -89,32 +87,6 @@ const normalizeHistorySectionContents = (section: HistorySectionDto): HistorySec
         });
 
     return hasSameContents ? section : { ...section, contents: normalizedContents };
-};
-
-const getExpectedImageCount = (section: HistorySectionDto): number => {
-    return getInitialHistorySectionContents(section.template).filter(
-        (content) => content.contentType === ContentType.Image,
-    ).length;
-};
-
-const getHistorySectionData = (section: HistorySectionDto) => {
-    const title = getOrderedContentsByType(section.contents, ContentType.Title)[0]?.title ?? '';
-    const description = getOrderedContentsByType(section.contents, ContentType.Description)[0]?.description ?? '';
-
-    const images = getOrderedContentsByType(section.contents, ContentType.Image).map(
-        (content) => content.image ?? null,
-    );
-
-    const expectedImageCount = getExpectedImageCount(section);
-    while (images.length < expectedImageCount) {
-        images.push(null);
-    }
-
-    return {
-        title,
-        description,
-        images,
-    };
 };
 
 export interface HistorySectionFormProps {
@@ -189,8 +161,8 @@ export const HistorySectionForm = ({
     }, [sectionMode]);
 
     useEffect(() => {
-        const titleContent = getOrderedContentsByType(localSection.contents, ContentType.Title)[0];
-        const descriptionContent = getOrderedContentsByType(localSection.contents, ContentType.Description)[0];
+        const titleContent = getOrderedHistoryContentsByType(localSection.contents, ContentType.Title)[0];
+        const descriptionContent = getOrderedHistoryContentsByType(localSection.contents, ContentType.Description)[0];
 
         let title = titleContent?.title ?? '';
         let description = descriptionContent?.description ?? '';
@@ -256,7 +228,7 @@ export const HistorySectionForm = ({
     const handleTitleChange = useCallback(
         (value: string) => {
             const prev = localSectionRef.current;
-            const titleContent = getOrderedContentsByType(prev.contents, ContentType.Title)[0];
+            const titleContent = getOrderedHistoryContentsByType(prev.contents, ContentType.Title)[0];
             if (!titleContent) {
                 return;
             }
@@ -278,7 +250,7 @@ export const HistorySectionForm = ({
     const handleDescriptionChange = useCallback(
         (value: string) => {
             const prev = localSectionRef.current;
-            const descriptionContent = getOrderedContentsByType(prev.contents, ContentType.Description)[0];
+            const descriptionContent = getOrderedHistoryContentsByType(prev.contents, ContentType.Description)[0];
             if (!descriptionContent) {
                 return;
             }
@@ -300,12 +272,12 @@ export const HistorySectionForm = ({
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
             const prev = localSectionRef.current;
-            const expectedImageCount = getExpectedImageCount(prev);
+            const expectedImageCount = getExpectedHistoryImageCount(prev);
             if (index < 0 || index >= expectedImageCount) {
                 return;
             }
 
-            const imageContents = getOrderedContentsByType(prev.contents, ContentType.Image);
+            const imageContents = getOrderedHistoryContentsByType(prev.contents, ContentType.Image);
             const targetContent = imageContents[index];
             if (!targetContent) {
                 return;
@@ -337,8 +309,8 @@ export const HistorySectionForm = ({
     );
 
     const hasDeletedExistingImage = useMemo(() => {
-        const originalImages = getOrderedContentsByType(originalSection.contents, ContentType.Image);
-        const currentImages = getOrderedContentsByType(localSection.contents, ContentType.Image);
+        const originalImages = getOrderedHistoryContentsByType(originalSection.contents, ContentType.Image);
+        const currentImages = getOrderedHistoryContentsByType(localSection.contents, ContentType.Image);
         const maxLength = Math.max(originalImages.length, currentImages.length);
 
         for (let index = 0; index < maxLength; index += 1) {

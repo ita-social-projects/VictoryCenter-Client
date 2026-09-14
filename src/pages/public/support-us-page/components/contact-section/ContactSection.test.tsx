@@ -174,8 +174,8 @@ describe('ContactSection', () => {
 
     it('shows warning and reached-limit hints at their boundaries', () => {
         render(<ContactSection />);
-        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
-        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT));
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.INFO_AT));
 
         expect(screen.getByText(charactersRemaining(20))).toBeInTheDocument();
         expect(screen.getByText(charactersRemaining(200))).toBeInTheDocument();

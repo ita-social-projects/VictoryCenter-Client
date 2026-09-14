@@ -13,7 +13,7 @@ export const EthicalPrinciples = ({
         <section className={styles['ethical-principles']}>
             <div className={styles.imageContainer}>
                 <img
-                    src={imgURL ?? hippoventionCenterImg}
+                    src={imgURL || hippoventionCenterImg}
                     className={styles.image}
                     alt={imgAlternativeText ?? 'Група людей на конях'}
                 />

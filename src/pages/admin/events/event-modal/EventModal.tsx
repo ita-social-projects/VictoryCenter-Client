@@ -7,11 +7,10 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { ImageInput, getImageSrc } from '@/components/admin/image-input/ImageInput';
+import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { ImageValues } from '@/types/common/image';
 import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
@@ -21,8 +20,6 @@ import {
     getNormalizedInputTextWhileTyping,
 } from '@/utils/functions/formatters/text-formatters';
 import styles from './EventModal.module.scss';
-import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 
 export type EventModalProps = {
     isOpen: boolean;
@@ -94,14 +91,6 @@ export const EventModal = (props: EventModalProps) => {
             field.onBlur();
         },
         [],
-    );
-
-    const handleImageChange = useCallback(
-        (field: any) => (image: ImageValues | null) => {
-            field.onChange(image);
-            clearErrors('image');
-        },
-        [clearErrors],
     );
 
     const handleImageError = useCallback(
@@ -208,7 +197,6 @@ export const EventModal = (props: EventModalProps) => {
                             <div className={styles['left-column']}>
                                 {/*date picker*/}
                                 <div className={styles['date-placeholder']}></div>
-
                                 <Controller
                                     name="image"
                                     control={control}
@@ -219,56 +207,24 @@ export const EventModal = (props: EventModalProps) => {
                                                 text={EVENTS_TEXT.FORM.LABEL.IMAGE}
                                                 isRequired
                                             />
-                                            <div className={styles['image-wrapper']}>
-                                                {field.value ? (
-                                                    <div className={styles['image-preview']}>
-                                                        <img
-                                                            src={getImageSrc(field.value)}
-                                                            alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                                                            className={styles['preview-image']}
-                                                            data-testid="event-image-preview"
-                                                        />
-                                                        <div className={styles['preview-overlay']}>
-                                                            <button
-                                                                type="button"
-                                                                disabled
-                                                                className={styles['disabled-action-icon']}
-                                                                aria-label="Delete image"
-                                                            >
-                                                                <DeleteIcon />
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                disabled
-                                                                className={styles['disabled-action-icon']}
-                                                                aria-label="Crop image"
-                                                            >
-                                                                <CropIcon />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <ImageInput
-                                                        value={field.value ?? null}
-                                                        onChange={handleImageChange(field)}
-                                                        setError={handleImageError}
-                                                        id="event-image"
-                                                        name="image"
-                                                        variant="whoWeAre"
-                                                        enableCrop={false}
-                                                        cropWidth={EVENT_VALIDATION.image.cropWidth}
-                                                        cropHeight={EVENT_VALIDATION.image.cropHeight}
-                                                        minWidth={EVENT_VALIDATION.image.minWidth}
-                                                        minHeight={EVENT_VALIDATION.image.minHeight}
-                                                        maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
-                                                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                                            EVENT_VALIDATION.image.cropHeight,
-                                                            EVENT_VALIDATION.image.cropWidth,
-                                                        )}
-                                                    />
+                                            <ImageInput
+                                                value={field.value ?? null}
+                                                onChange={(image) => field.onChange(image)}
+                                                setError={handleImageError}
+                                                id="event-image"
+                                                name="image"
+                                                variant="event"
+                                                cropWidth={EVENT_VALIDATION.image.cropWidth}
+                                                cropHeight={EVENT_VALIDATION.image.cropHeight}
+                                                minWidth={EVENT_VALIDATION.image.minWidth}
+                                                minHeight={EVENT_VALIDATION.image.minHeight}
+                                                maxSizeMB={EVENT_VALIDATION.image.maxSizeMB}
+                                                label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                                    EVENT_VALIDATION.image.cropHeight,
+                                                    EVENT_VALIDATION.image.cropWidth,
                                                 )}
-                                            </div>
+                                            />
                                             <InputError error={errors.image?.message} />
                                         </div>
                                     )}

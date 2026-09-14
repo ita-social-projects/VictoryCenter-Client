@@ -42,33 +42,43 @@ jest.mock(
     }),
 );
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError }: Pick<ImageInputProps, 'onChange' | 'setError'>) => (
-        <div data-testid="image-input">
-            <button
-                type="button"
-                data-testid="upload-valid-image"
-                onClick={() => onChange({ base64: 'test-base64-data', mimeType: 'image/png' })}
-            >
-                Upload Image
-            </button>
-            <button
-                type="button"
-                data-testid="trigger-image-error"
-                onClick={() => setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))}
-            >
-                Trigger Error
-            </button>
-        </div>
-    ),
-    getImageSrc: (image: any) => {
+jest.mock('@/components/admin/image-input/ImageInput', () => {
+    const getImageSrc = (image: any) => {
         if (!image) return '';
         if (typeof image === 'string') return image;
         if ('url' in image && image.url) return image.url;
         if ('base64' in image) return `data:${image.mimeType};base64,${image.base64}`;
         return '';
-    },
-}));
+    };
+
+    return {
+        ImageInput: ({ value, onChange, setError }: Pick<ImageInputProps, 'value' | 'onChange' | 'setError'>) => (
+            <div data-testid="image-input">
+                {value && <img data-testid="event-image-preview" src={getImageSrc(value)} alt="preview" />}
+                <button
+                    type="button"
+                    data-testid="upload-valid-image"
+                    onClick={() => {
+                        setError('');
+                        onChange({ base64: 'test-base64-data', mimeType: 'image/png' });
+                    }}
+                >
+                    Upload Image
+                </button>
+                <button
+                    type="button"
+                    data-testid="trigger-image-error"
+                    onClick={() =>
+                        setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))
+                    }
+                >
+                    Trigger Error
+                </button>
+            </div>
+        ),
+        getImageSrc,
+    };
+});
 
 const currentCategory: EventCategoryDto | null = {
     id: 1,
@@ -251,31 +261,35 @@ describe('EventModal', () => {
                 'src',
                 'data:image/png;base64,test-base64-data',
             );
-            expect(screen.queryByTestId('image-input')).not.toBeInTheDocument();
+            expect(screen.getByTestId('image-input')).toBeInTheDocument();
         });
 
-        it('displays error message when image validation fails', () => {
+        it('displays error message when image validation fails', async () => {
             render(<EventModal {...defaultProps} />);
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
 
-            expect(
-                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
-            ).toBeInTheDocument();
+            const errorMessage = await screen.findByText(
+                mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB),
+            );
+            expect(errorMessage).toBeInTheDocument();
         });
 
-        it('clears image error when a valid image is selected', () => {
+        it('clears image error when a valid image is selected', async () => {
             render(<EventModal {...defaultProps} />);
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
             expect(
-                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+                await screen.findByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
             ).toBeInTheDocument();
 
             fireEvent.click(screen.getByTestId('upload-valid-image'));
-            expect(
-                screen.queryByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
-            ).not.toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(
+                    screen.queryByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+                ).not.toBeInTheDocument();
+            });
         });
 
         it('shows confirmation modal on close when image was added (isDirty state)', () => {

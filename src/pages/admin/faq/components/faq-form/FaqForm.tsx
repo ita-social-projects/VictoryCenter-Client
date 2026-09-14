@@ -137,6 +137,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                     maxLength={FAQ_VALIDATION.question.max}
                     disabled={isSubmitting || isFormDisabled}
                     error={errors.questionText && errors.questionText.length > 0 ? errors.questionText[0] : undefined}
+                    showCounterBelow
                 />
 
                 {/* Description Field */}

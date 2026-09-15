@@ -186,6 +186,7 @@ export const EventModal = (props: EventModalProps) => {
         if (!pendingDate) return;
 
         setFormState((prev) => ({ ...prev, publishDate: formatDateValue(pendingDate) }));
+        setIsDatePickerOpen(false);
         setActivePickerLayer('date-picker');
     };
 

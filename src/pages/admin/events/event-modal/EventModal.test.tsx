@@ -268,6 +268,7 @@ describe('EventModal', () => {
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
 
             expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
         });
 
         it('opens month and year selection from the calendar header', () => {

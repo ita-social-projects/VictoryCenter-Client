@@ -2,8 +2,10 @@ import { render, screen, act } from '@testing-library/react';
 import { MainStatisticsSection } from './MainStatisticsSection';
 import { PublicImpactStatisticDto, MetricPrefix, MetricType, PublicMetricDto } from '@/types/public/main-page';
 
+let mockCurrentLanguage = 'uk';
+
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
-    useLocale: () => ({ currentLanguage: 'uk' }),
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
 }));
 
 jest.mock('@/hooks/common/use-scroll-animation/useScrollAnimation', () => ({
@@ -70,6 +72,7 @@ const makeStatistics = (overrides: Partial<PublicImpactStatisticDto> = {}): Publ
 describe('MainStatisticsSection', () => {
     afterEach(() => {
         jest.clearAllMocks();
+        mockCurrentLanguage = 'uk';
     });
 
     it('renders nothing when impactStatistics is null', () => {
@@ -227,5 +230,76 @@ describe('MainStatisticsSection', () => {
         render(<MainStatisticsSection impactStatistics={makeStatistics()} />);
         const figures = screen.getAllByRole('figure');
         expect(figures).toHaveLength(4);
+    });
+
+    it('uses the English title and metric names when the language is English', () => {
+        mockCurrentLanguage = 'en';
+        const stats = makeStatistics({
+            localizations: [
+                {
+                    entityId: 1,
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: 'Relevant' as any,
+                    title: 'Changes you can measure',
+                },
+            ],
+            metrics: [
+                {
+                    ...makeMetric(1, 20, 'партнерств', MetricType.Partners),
+                    localizations: [
+                        {
+                            entityId: 1,
+                            localizationInfoDto: { id: 2, code: 'en' },
+                            translationStatus: 'Relevant' as any,
+                            name: 'partners',
+                        },
+                    ],
+                },
+            ],
+        });
+
+        render(<MainStatisticsSection impactStatistics={stats} />);
+
+        expect(screen.getByText('Changes you can measure')).toBeInTheDocument();
+        expect(screen.getByText('partners')).toBeInTheDocument();
+    });
+
+    it('shows the dollar amount before the value for Raised in English', () => {
+        mockCurrentLanguage = 'en';
+        const stats = makeStatistics({
+            metrics: [
+                {
+                    ...makeMetric(3, 1249854, 'зібрано', MetricType.Raised),
+                    localizations: [
+                        {
+                            entityId: 3,
+                            localizationInfoDto: { id: 2, code: 'en' },
+                            translationStatus: 'Relevant' as any,
+                            name: 'raised',
+                            value: '48',
+                        },
+                    ],
+                },
+            ],
+        });
+
+        render(<MainStatisticsSection impactStatistics={stats} />);
+        act(() => {
+            (globalThis as any).__triggerVisible();
+        });
+
+        expect(screen.getByText('$48')).toBeInTheDocument();
+    });
+
+    it('falls back to the hryvnia amount in English when there is no dollar value', () => {
+        mockCurrentLanguage = 'en';
+        const stats = makeStatistics({ metrics: [makeMetric(3, 1249854, 'зібрано', MetricType.Raised)] });
+
+        render(<MainStatisticsSection impactStatistics={stats} />);
+        act(() => {
+            (globalThis as any).__triggerVisible();
+        });
+
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
     });
 });

@@ -117,6 +117,22 @@ describe('AddFeedbackHistoryModal', () => {
         expect(screen.getByText('18/1000')).toBeInTheDocument();
     });
 
+    it('shows validation error when inputs are too short', () => {
+        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+
+        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+        fireEvent.focus(titleInput);
+        fireEvent.change(titleInput, { target: { value: 'Коротко' } });
+        fireEvent.blur(titleInput);
+        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+        fireEvent.focus(storyTextarea);
+        fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
+        fireEvent.blur(storyTextarea);
+        expect(screen.getAllByText('Не менше 10 символів').length).toBe(2);
+    });
+
     it('clears field when clean-up icon is clicked', () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
@@ -242,10 +258,10 @@ describe('AddFeedbackHistoryModal', () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Заголовок' } });
+        fireEvent.change(titleInput, { target: { value: 'Тестовий заголовок' } });
 
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
-        fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
+        fireEvent.change(storyTextarea, { target: { value: 'Довгий опис для тестування' } });
 
         const fileInput = screen.getByTestId('image-input-hidden');
         const file = new File(['dummy'], 'photo.png', { type: 'image/png' });

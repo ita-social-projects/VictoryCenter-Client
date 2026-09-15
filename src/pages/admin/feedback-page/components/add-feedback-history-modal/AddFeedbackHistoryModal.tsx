@@ -85,6 +85,8 @@ export const AddFeedbackHistoryModal = ({ isOpen, onClose, onAddHistory }: AddFe
         const trimmed = formState.title.trim();
         if (!trimmed) {
             setErrors((prev) => ({ ...prev, title: FEEDBACK_HISTORY_VALIDATION.title.getRequiredError() }));
+        } else if (trimmed.length < FEEDBACK_HISTORY_VALIDATION.title.min) {
+            setErrors((prev) => ({ ...prev, title: FEEDBACK_HISTORY_VALIDATION.title.getMinError() }));
         } else if (trimmed.length > FEEDBACK_HISTORY_VALIDATION.title.max) {
             setErrors((prev) => ({ ...prev, title: FEEDBACK_HISTORY_VALIDATION.title.getMaxError() }));
         } else {
@@ -102,6 +104,8 @@ export const AddFeedbackHistoryModal = ({ isOpen, onClose, onAddHistory }: AddFe
         const trimmed = formState.story.trim();
         if (!trimmed) {
             setErrors((prev) => ({ ...prev, story: FEEDBACK_HISTORY_VALIDATION.story.getRequiredError() }));
+        } else if (trimmed.length < FEEDBACK_HISTORY_VALIDATION.story.min) {
+            setErrors((prev) => ({ ...prev, story: FEEDBACK_HISTORY_VALIDATION.story.getMinError() }));
         } else if (trimmed.length > FEEDBACK_HISTORY_VALIDATION.story.max) {
             setErrors((prev) => ({ ...prev, story: FEEDBACK_HISTORY_VALIDATION.story.getMaxError() }));
         } else {
@@ -150,12 +154,16 @@ export const AddFeedbackHistoryModal = ({ isOpen, onClose, onAddHistory }: AddFe
 
         if (!titleTrimmed) {
             newErrors.title = FEEDBACK_HISTORY_VALIDATION.title.getRequiredError();
+        } else if (titleTrimmed.length < FEEDBACK_HISTORY_VALIDATION.title.min) {
+            newErrors.title = FEEDBACK_HISTORY_VALIDATION.title.getMinError();
         } else if (titleTrimmed.length > FEEDBACK_HISTORY_VALIDATION.title.max) {
             newErrors.title = FEEDBACK_HISTORY_VALIDATION.title.getMaxError();
         }
 
         if (!storyTrimmed) {
             newErrors.story = FEEDBACK_HISTORY_VALIDATION.story.getRequiredError();
+        } else if (storyTrimmed.length < FEEDBACK_HISTORY_VALIDATION.story.min) {
+            newErrors.story = FEEDBACK_HISTORY_VALIDATION.story.getMinError();
         } else if (storyTrimmed.length > FEEDBACK_HISTORY_VALIDATION.story.max) {
             newErrors.story = FEEDBACK_HISTORY_VALIDATION.story.getMaxError();
         }
@@ -169,9 +177,14 @@ export const AddFeedbackHistoryModal = ({ isOpen, onClose, onAddHistory }: AddFe
     }, [formState]);
 
     const isSubmitDisabled = useMemo(() => {
-        const hasEmptyFields = !formState.title.trim() || !formState.story.trim() || !formState.image;
+        const titleTrimmed = formState.title.trim();
+        const storyTrimmed = formState.story.trim();
+        const hasEmptyFields = !titleTrimmed || !storyTrimmed || !formState.image;
+        const hasInvalidLength =
+            titleTrimmed.length < FEEDBACK_HISTORY_VALIDATION.title.min ||
+            storyTrimmed.length < FEEDBACK_HISTORY_VALIDATION.story.min;
         const hasValidationErrors = Boolean(errors.title || errors.story || errors.image);
-        return isSubmitting || hasEmptyFields || hasValidationErrors;
+        return isSubmitting || hasEmptyFields || hasInvalidLength || hasValidationErrors;
     }, [formState.title, formState.story, formState.image, errors, isSubmitting]);
 
     const handleSubmit = useCallback(async () => {

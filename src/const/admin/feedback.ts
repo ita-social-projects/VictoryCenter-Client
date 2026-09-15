@@ -47,13 +47,17 @@ export const FEEDBACK_TEXT = {
 
 export const FEEDBACK_HISTORY_VALIDATION = {
     title: {
+        min: 10,
         max: 50,
         getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 10 символів',
         getMaxError: () => 'Не більше 50 символів',
     },
     story: {
+        min: 10,
         max: 1000,
         getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 10 символів',
         getMaxError: () => 'Не більше 1000 символів',
     },
     image: {

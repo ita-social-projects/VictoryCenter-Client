@@ -41,7 +41,6 @@ export const EventValidationSchema = Yup.object({
 
     publishDate: Yup.string()
         .nullable()
-        .notRequired()
         .test('is-valid-date', EVENT_VALIDATION.publishDate.getInvalidError(), (value) => {
             if (!value) return true;
 
@@ -51,7 +50,10 @@ export const EventValidationSchema = Yup.object({
             const date = new Date(year, month - 1, day);
 
             return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
-        }),
+        })
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing ? schema.required(EVENT_VALIDATION.publishDate.getRequiredError()) : schema.notRequired(),
+        ),
 
     image: Yup.mixed<Image | ImageValues>()
         .nullable()

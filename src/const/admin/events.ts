@@ -94,6 +94,7 @@ export const EVENT_VALIDATION = {
     },
     publishDate: {
         getInvalidError: () => 'Невірний формат дати',
+        getRequiredError: () => getGenericRequiredError(),
     },
 };
 

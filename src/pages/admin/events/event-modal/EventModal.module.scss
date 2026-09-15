@@ -62,8 +62,223 @@
     gap: 16px;
 }
 
-.date-placeholder {
-    height: 77px;
+.date-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 230px;
+    gap: 8px;
+}
+
+.date-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 40px;
+    padding: 8px 10px 8px 12px;
+    border: 1px solid c.$grey-700;
+    border-radius: 4px;
+    background-color: c.$white;
+    color: c.$blue-900;
+    cursor: pointer;
+
+    span {
+        @include type.body-2-regular;
+    }
+
+    svg {
+        flex: 0 0 24px;
+    }
+
+    &:hover,
+    &:focus-visible {
+        border-color: c.$blue-500;
+        outline: none;
+    }
+}
+
+.date-picker {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: z.admin('image-input-action-buttons');
+    width: 330px;
+    padding: 20px 24px 16px;
+    border: 1px solid c.$grey-500;
+    border-radius: 8px;
+    background-color: c.$white;
+    box-shadow: 0 4px 12px rgba(c.$blue-900, 0.2);
+}
+
+.date-picker-header {
+    @include type.body-1-medium;
+    display: flex;
+    align-items: center;
+    color: c.$blue-500;
+}
+
+.month-year-trigger,
+.month-year-close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        outline: 1px solid c.$blue-500;
+    }
+}
+
+.month-year-trigger {
+    @include type.body-1-bold;
+    gap: 4px;
+    color: c.$blue-500;
+}
+
+.month-year-title {
+    @include type.body-1-bold;
+    color: c.$blue-500;
+}
+
+.month-year-close-button {
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+}
+
+.month-year-picker {
+    margin-top: 16px;
+}
+
+.year-grid,
+.month-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.year-grid {
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 16px;
+}
+
+.month-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.month-year-option {
+    @include type.body-2-regular;
+    height: 48px;
+    padding: 0 8px;
+    border: 1px solid c.$grey-500;
+    border-radius: 24px;
+    background-color: c.$white;
+    color: c.$black;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        border-color: c.$blue-500;
+        outline: none;
+    }
+}
+
+.today-month-year-option {
+    border-color: c.$blue-500;
+    color: c.$blue-500;
+}
+
+.selected-month-year-option {
+    background-color: c.$blue-500;
+    border-color: c.$blue-500;
+    color: c.$white;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-items: center;
+    gap: 8px 4px;
+    margin-top: 16px;
+}
+
+.weekday {
+    @include type.small-text-medium;
+    text-align: center;
+    color: c.$grey-700;
+}
+
+.calendar-day {
+    @include type.body-2-regular;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid transparent;
+    background: transparent;
+    color: c.$black;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        background-color: c.$light-blue-75;
+        outline: none;
+    }
+}
+
+.today {
+    border-color: c.$blue-500;
+    color: c.$blue-500;
+}
+
+.selected-day {
+    border-color: c.$blue-500;
+    background-color: c.$blue-500;
+    color: c.$white;
+
+    &:hover,
+    &:focus-visible {
+        background-color: c.$blue-600;
+    }
+}
+
+.date-picker-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid c.$grey-500;
+}
+
+.date-picker-action {
+    @include type.body-2-bold;
+    min-width: 76px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid c.$blue-500;
+    border-radius: 0;
+    background-color: c.$white;
+    color: c.$blue-500;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        background-color: c.$blue-25;
+        outline: none;
+    }
+
+    &:disabled {
+        border-color: c.$grey-600;
+        color: c.$grey-700;
+        cursor: not-allowed;
+    }
 }
 
 .image-section {

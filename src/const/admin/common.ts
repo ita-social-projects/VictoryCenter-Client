@@ -79,6 +79,7 @@ export const COMMON_TEXT_ADMIN = {
         SAVE: 'Зберегти',
         DELETE: 'Видалити',
         CANCEL: 'Відмінити',
+        OK: 'ОК',
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         SAVE_TRANSLATION: 'Зберегти переклад',

@@ -14,6 +14,9 @@ import { InputError } from '@/components/admin/input-error/InputError';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ReactComponent as CalendarIcon } from '@/assets/icons/calendar.svg';
+import { ReactComponent as ChevronRightIcon } from '@/assets/icons/chevron-right.svg';
+import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
 
 interface EventFormValues {
@@ -27,6 +30,7 @@ interface EventFormValues {
 }
 
 type EventFormErrorState = Partial<Record<keyof EventFormValues, string>>;
+type PickerLayer = 'date-picker' | 'month-year-selector' | 'calendar';
 
 export type EventModalProps = {
     isOpen: boolean;
@@ -42,6 +46,44 @@ const defaultFormState: EventFormValues = {
     image: null,
     linkUkr: '',
     linkEng: '',
+};
+
+const WEEKDAY_LABELS = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'НД'];
+const MONTH_LABELS = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
+
+const formatDateValue = (date: Date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${date.getFullYear()}-${month}-${day}`;
+};
+
+const parseDateValue = (value: string) => {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+};
+
+const formatDateLabel = (date: Date) => {
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}/${month}/${date.getFullYear()}`;
+};
+
+const formatMonthLabel = (date: Date) => {
+    const label = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(date);
+    return label.charAt(0).toUpperCase() + label.slice(1);
+};
+
+const getCalendarDays = (date: Date): Array<Date | null> => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDayOffset = (new Date(year, month, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    return Array.from({ length: firstDayOffset + daysInMonth }, (_, index) =>
+        index < firstDayOffset ? null : new Date(year, month, index - firstDayOffset + 1),
+    );
 };
 
 const mapEventImageError = (error: string | null): string | undefined => {
@@ -70,8 +112,18 @@ export const EventModal = (props: EventModalProps) => {
     const [formState, setFormState] = useState<EventFormValues>(defaultFormState);
     const [errors, setErrors] = useState<EventFormErrorState>({});
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+    const [activePickerLayer, setActivePickerLayer] = useState<PickerLayer>('date-picker');
+    const [visibleMonth, setVisibleMonth] = useState(() => new Date());
+    const [pendingDate, setPendingDate] = useState<Date | null>(null);
+    const [initialPickerDate, setInitialPickerDate] = useState<Date | null>(null);
+    const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
     const isDirty = JSON.stringify(formState) !== JSON.stringify(defaultFormState);
+    const calendarDays = getCalendarDays(visibleMonth);
+    const todayValue = formatDateValue(new Date());
+    const currentDate = new Date();
+    const selectableYears = [currentDate.getFullYear() - 1, currentDate.getFullYear()];
 
     const handleFieldChange = useCallback(
         (name: keyof EventFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -113,6 +165,58 @@ export const EventModal = (props: EventModalProps) => {
         setShowCloseConfirmModal(false);
     }, []);
 
+    const handleDatePickerOpen = () => {
+        const selectedDate = formState.publishDate ? parseDateValue(formState.publishDate) : new Date();
+        setPendingDate(selectedDate);
+        setInitialPickerDate(selectedDate);
+        setVisibleMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+        setSelectedMonth(selectedDate.getMonth());
+        setActivePickerLayer('date-picker');
+        setIsDatePickerOpen(true);
+    };
+
+    const handleDatePickerCancel = () => {
+        setIsDatePickerOpen(false);
+        setActivePickerLayer('date-picker');
+        setPendingDate(null);
+        setInitialPickerDate(null);
+    };
+
+    const handleDatePickerConfirm = () => {
+        if (!pendingDate) return;
+
+        setFormState((prev) => ({ ...prev, publishDate: formatDateValue(pendingDate) }));
+        setActivePickerLayer('date-picker');
+    };
+
+    const handleDateSelect = (date: Date) => {
+        setPendingDate((prev) => (prev && formatDateValue(prev) === formatDateValue(date) ? null : date));
+    };
+
+    const handleYearSelect = (year: number) => {
+        const isCurrentYear = year === currentDate.getFullYear();
+        const month = isCurrentYear ? currentDate.getMonth() : visibleMonth.getMonth();
+
+        setVisibleMonth(new Date(year, month, 1));
+        setSelectedMonth(isCurrentYear ? currentDate.getMonth() : null);
+        setPendingDate(null);
+    };
+
+    const handleMonthSelect = (month: number) => {
+        setVisibleMonth((prev) => new Date(prev.getFullYear(), month, 1));
+        setSelectedMonth(month);
+        setPendingDate(null);
+        setActivePickerLayer('calendar');
+    };
+
+    const handleMonthYearPickerClose = () => {
+        const initialDate = initialPickerDate ?? new Date();
+        setVisibleMonth(new Date(initialDate.getFullYear(), initialDate.getMonth(), 1));
+        setSelectedMonth(initialDate.getMonth());
+        setPendingDate(initialDate);
+        setActivePickerLayer('date-picker');
+    };
+
     useEffect(() => {
         if (isOpen) {
             return;
@@ -120,6 +224,11 @@ export const EventModal = (props: EventModalProps) => {
         setFormState(defaultFormState);
         setErrors({});
         setShowCloseConfirmModal(false);
+        setIsDatePickerOpen(false);
+        setActivePickerLayer('date-picker');
+        setPendingDate(null);
+        setInitialPickerDate(null);
+        setSelectedMonth(null);
     }, [isOpen]);
 
     return (
@@ -159,8 +268,178 @@ export const EventModal = (props: EventModalProps) => {
 
                         <div className={styles['two-column-container']}>
                             <div className={styles['left-column']}>
-                                {/*date picker*/}
-                                <div className={styles['date-placeholder']}></div>
+                                <div className={styles['date-section']}>
+                                    <InputLabel
+                                        htmlFor="event-date"
+                                        text={EVENTS_TEXT.FORM.LABEL.PUBLISH_DATE}
+                                        isRequired
+                                    />
+                                    <button
+                                        id="event-date"
+                                        type="button"
+                                        className={styles['date-trigger']}
+                                        onClick={handleDatePickerOpen}
+                                        aria-haspopup="dialog"
+                                        aria-expanded={isDatePickerOpen}
+                                        aria-label={
+                                            formState.publishDate
+                                                ? `Вибір дати: ${formatDateLabel(parseDateValue(formState.publishDate))}`
+                                                : 'Вибір дати'
+                                        }
+                                    >
+                                        <span>
+                                            {formState.publishDate
+                                                ? formatDateLabel(parseDateValue(formState.publishDate))
+                                                : ''}
+                                        </span>
+                                        <CalendarIcon aria-hidden="true" />
+                                    </button>
+
+                                    {isDatePickerOpen && (
+                                        <div className={styles['date-picker']} role="dialog" aria-label="Вибір дати">
+                                            <div className={styles['date-picker-header']}>
+                                                {activePickerLayer === 'calendar' ? (
+                                                    <span className={styles['month-year-title']}>
+                                                        {formatMonthLabel(visibleMonth)}
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className={styles['month-year-trigger']}
+                                                        onClick={() => setActivePickerLayer('month-year-selector')}
+                                                        aria-label="Вибрати місяць і рік"
+                                                    >
+                                                        <span>{formatMonthLabel(visibleMonth)}</span>
+                                                        <ChevronRightIcon aria-hidden="true" />
+                                                    </button>
+                                                )}
+                                                {activePickerLayer !== 'date-picker' && (
+                                                    <button
+                                                        type="button"
+                                                        className={styles['month-year-close-button']}
+                                                        onClick={handleMonthYearPickerClose}
+                                                        aria-label="Закрити вибір місяця і року"
+                                                    >
+                                                        <CrossIcon aria-hidden="true" />
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {activePickerLayer === 'month-year-selector' ? (
+                                                <div className={styles['month-year-picker']}>
+                                                    <div className={styles['year-grid']}>
+                                                        {selectableYears.map((year) => (
+                                                            <button
+                                                                key={year}
+                                                                type="button"
+                                                                className={`${styles['month-year-option']} ${
+                                                                    year === currentDate.getFullYear()
+                                                                        ? styles['today-month-year-option']
+                                                                        : ''
+                                                                } ${
+                                                                    year === visibleMonth.getFullYear()
+                                                                        ? styles['selected-month-year-option']
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() => handleYearSelect(year)}
+                                                                aria-pressed={year === visibleMonth.getFullYear()}
+                                                            >
+                                                                {year}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                    <div className={styles['month-grid']}>
+                                                        {MONTH_LABELS.map((month, index) => (
+                                                            <button
+                                                                key={month}
+                                                                type="button"
+                                                                className={`${styles['month-year-option']} ${
+                                                                    index === currentDate.getMonth()
+                                                                        ? styles['today-month-year-option']
+                                                                        : ''
+                                                                } ${
+                                                                    selectedMonth === index
+                                                                        ? styles['selected-month-year-option']
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() => handleMonthSelect(index)}
+                                                                aria-pressed={index === visibleMonth.getMonth()}
+                                                            >
+                                                                {month}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className={styles['calendar-grid']}>
+                                                        {WEEKDAY_LABELS.map((weekday) => (
+                                                            <span key={weekday} className={styles['weekday']}>
+                                                                {weekday}
+                                                            </span>
+                                                        ))}
+                                                        {calendarDays.map((date, index) => {
+                                                            if (!date) {
+                                                                return (
+                                                                    <span key={`empty-${index}`} aria-hidden="true" />
+                                                                );
+                                                            }
+
+                                                            const dateValue = formatDateValue(date);
+                                                            const classNames = [styles['calendar-day']];
+                                                            if (dateValue === todayValue)
+                                                                classNames.push(styles['today']);
+                                                            if (
+                                                                dateValue ===
+                                                                (pendingDate ? formatDateValue(pendingDate) : '')
+                                                            ) {
+                                                                classNames.push(styles['selected-day']);
+                                                            }
+
+                                                            return (
+                                                                <button
+                                                                    key={dateValue}
+                                                                    type="button"
+                                                                    className={classNames.join(' ')}
+                                                                    onClick={() => handleDateSelect(date)}
+                                                                    aria-label={formatDateLabel(date)}
+                                                                    aria-pressed={
+                                                                        dateValue ===
+                                                                        (pendingDate
+                                                                            ? formatDateValue(pendingDate)
+                                                                            : '')
+                                                                    }
+                                                                >
+                                                                    {date.getDate()}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+
+                                                    <div className={styles['date-picker-actions']}>
+                                                        {activePickerLayer === 'date-picker' && (
+                                                            <button
+                                                                type="button"
+                                                                className={styles['date-picker-action']}
+                                                                onClick={handleDatePickerCancel}
+                                                            >
+                                                                {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            className={styles['date-picker-action']}
+                                                            onClick={handleDatePickerConfirm}
+                                                            disabled={!pendingDate}
+                                                        >
+                                                            {COMMON_TEXT_ADMIN.BUTTON.OK}
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                                 <div className={styles['image-section']}>
                                     <InputLabel htmlFor="event-image" text={EVENTS_TEXT.FORM.LABEL.IMAGE} isRequired />
                                     <div className={styles['image-wrapper']}>

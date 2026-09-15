@@ -109,6 +109,12 @@ describe('EventModal', () => {
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_ENG })).toBeInTheDocument();
         });
 
+        it('renders date picker trigger', () => {
+            render(<EventModal {...defaultProps} />);
+
+            expect(screen.getByRole('button', { name: /Вибір дати/i })).toBeInTheDocument();
+        });
+
         it('renders category chip when currentCategory is provided', () => {
             render(<EventModal {...defaultProps} />);
 
@@ -211,6 +217,90 @@ describe('EventModal', () => {
             );
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_UKR })).toHaveValue('');
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_ENG })).toHaveValue('');
+        });
+    });
+
+    describe('date picker', () => {
+        it('applies the selected date only after confirming', () => {
+            render(<EventModal {...defaultProps} />);
+            const today = new Date();
+            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
+                2,
+                '0',
+            )}/${today.getFullYear()}`;
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+
+            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+        });
+
+        it('discards a pending date when cancelled', () => {
+            render(<EventModal {...defaultProps} />);
+            const today = new Date();
+            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
+                2,
+                '0',
+            )}/${today.getFullYear()}`;
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+            expect(screen.getByRole('button', { name: /Вибір дати/i })).toHaveTextContent('');
+            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+        });
+
+        it('deselects a day and confirms the current date when no date remains selected', () => {
+            render(<EventModal {...defaultProps} />);
+            const today = new Date();
+            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
+                2,
+                '0',
+            )}/${today.getFullYear()}`;
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            expect(screen.getByRole('button', { name: todayLabel })).toHaveAttribute('aria-pressed', 'false');
+
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+
+            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+        });
+
+        it('opens month and year selection from the calendar header', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+
+            expect(screen.getByRole('button', { name: String(new Date().getFullYear()) })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Січ' })).toBeInTheDocument();
+        });
+
+        it('opens a month calendar with an inactive confirmation button', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+            fireEvent.click(screen.getByRole('button', { name: 'Січ' }));
+
+            expect(screen.getByText('ПН')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).toBeDisabled();
+            expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Вибрати місяць і рік' })).not.toBeInTheDocument();
+        });
+
+        it('does not allow interaction with the parent date picker while the month selector is open', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+
+            expect(screen.queryByText('ПН')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).not.toBeInTheDocument();
         });
     });
 

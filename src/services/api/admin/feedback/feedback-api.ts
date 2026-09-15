@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import {
     CreateFeedbackHistoryDto,
+    UpdateFeedbackHistoryDto,
     FeedbackHistoryDto,
     FeedbackReviewDto,
     FeedbackVideoDto,
@@ -60,6 +61,14 @@ export const FeedbackApi = {
     },
     createHistory: async (client: AxiosInstance, data: CreateFeedbackHistoryDto): Promise<FeedbackHistoryDto> => {
         const response = await client.post<FeedbackHistoryDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);
+        return response.data;
+    },
+    updateHistory: async (
+        client: AxiosInstance,
+        id: number,
+        data: UpdateFeedbackHistoryDto,
+    ): Promise<FeedbackHistoryDto> => {
+        const response = await client.put<FeedbackHistoryDto>(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`, data);
         return response.data;
     },
     fetchReviews: async (

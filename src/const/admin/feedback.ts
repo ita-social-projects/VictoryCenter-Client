@@ -26,6 +26,8 @@ export const FEEDBACK_TEXT = {
         SUCCESS_DELETE_HISTORY: 'Історію успішно видалено',
         SUCCESS_ADD_HISTORY: 'Історію успішно додано',
         FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
+        SUCCESS_EDIT_HISTORY: 'Зміни успішно опубліковано',
+        FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
     },
     DELETE_HISTORY_MODAL: {
         TITLE: 'Видалити історію?',
@@ -42,6 +44,9 @@ export const FEEDBACK_TEXT = {
             PHOTO_LABEL: 'Додайте файл сюди',
             PHOTO_SUBTEXT: 'Розмір: 650х360',
         },
+    },
+    EDIT_HISTORY_MODAL: {
+        TITLE: 'Редагувати історію',
     },
 };
 

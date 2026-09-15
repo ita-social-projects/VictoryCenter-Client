@@ -15,6 +15,7 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
     FeedbackApi: {
         createHistory: jest.fn(),
+        updateHistory: jest.fn(),
     },
 }));
 
@@ -131,6 +132,42 @@ describe('AddFeedbackHistoryModal', () => {
         fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
         fireEvent.blur(storyTextarea);
         expect(screen.getAllByText('Не менше 10 символів').length).toBe(2);
+    });
+
+    it('validates text fields in real-time during typing (onChange) without blur', () => {
+        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+
+        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+
+        // Typing fewer than 10 characters immediately displays error
+        fireEvent.change(titleInput, { target: { value: 'Коротко' } });
+        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+
+        // Reaching 10 characters immediately clears error
+        fireEvent.change(titleInput, { target: { value: 'Достатня назва' } });
+        expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+
+        // Clearing field displays required error immediately
+        fireEvent.change(titleInput, { target: { value: '' } });
+        expect(screen.getByText("Поле обов'язкове")).toBeInTheDocument();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+
+        // Typing story fewer than 10 chars
+        fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
+        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+
+        // Reaching 10 characters clears error
+        fireEvent.change(storyTextarea, { target: { value: 'Достатньо довгий опис історії' } });
+        expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+    });
+
+    it('applies getNormalizedInputTextWhileTyping to collapse multiple spaces and remove leading spaces while typing', () => {
+        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+
+        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+        fireEvent.change(titleInput, { target: { value: '   Заголовок   з   пробілами' } });
+        expect(titleInput).toHaveValue('Заголовок з пробілами');
     });
 
     it('clears field when clean-up icon is clicked', () => {
@@ -283,5 +320,75 @@ describe('AddFeedbackHistoryModal', () => {
 
         expect(onClose).not.toHaveBeenCalled();
         expect(onAddHistory).not.toHaveBeenCalled();
+    });
+
+    describe('Edit Mode', () => {
+        const mockInitialData: FeedbackHistoryDto = {
+            id: 2,
+            title: 'Існуючий заголовок',
+            story: 'Це існуюча історія для перевірки редагування',
+            image: { id: 20, url: 'https://example.com/existing.jpg', mimeType: 'image/jpeg' },
+            status: VisibilityStatus.Published,
+            priority: 1,
+        };
+
+        it('pre-populates fields with initialData and disables publish button initially', () => {
+            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+
+            expect(screen.getByRole('textbox', { name: /заголовок/i })).toHaveValue('Існуючий заголовок');
+            expect(screen.getByRole('textbox', { name: /історія/i })).toHaveValue(
+                'Це існуюча історія для перевірки редагування',
+            );
+            expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+
+            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            expect(publishBtn).toBeDisabled();
+        });
+
+        it('enables publish button when a field is changed, shows confirm modal and calls update API', async () => {
+            (FeedbackApi.updateHistory as jest.Mock).mockResolvedValueOnce({
+                ...mockInitialData,
+                title: 'Оновлений заголовок',
+            });
+
+            const onEditHistory = jest.fn();
+            render(
+                <AddFeedbackHistoryModal
+                    isOpen={true}
+                    onClose={onClose}
+                    onEditHistory={onEditHistory}
+                    initialData={mockInitialData}
+                />,
+            );
+
+            const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+            fireEvent.change(titleInput, { target: { value: 'Оновлений заголовок' } });
+
+            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            expect(publishBtn).not.toBeDisabled();
+
+            fireEvent.click(publishBtn);
+
+            const confirmModalTitle = await screen.findByText('Опублікувати зміни?');
+            expect(confirmModalTitle).toBeInTheDocument();
+
+            const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+            fireEvent.click(yesBtn);
+
+            await waitFor(() => {
+                expect(FeedbackApi.updateHistory).toHaveBeenCalledWith(
+                    expect.anything(),
+                    2,
+                    expect.objectContaining({
+                        title: 'Оновлений заголовок',
+                        story: 'Це існуюча історія для перевірки редагування',
+                        imageId: 20,
+                        status: VisibilityStatus.Published,
+                    }),
+                );
+                expect(onEditHistory).toHaveBeenCalled();
+                expect(onClose).toHaveBeenCalledTimes(1);
+            });
+        });
     });
 });

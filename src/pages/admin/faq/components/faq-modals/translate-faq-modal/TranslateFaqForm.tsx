@@ -101,6 +101,7 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                             maxLength={FAQ_VALIDATION.question.max}
                             disabled={isSubmitting || formDisabled}
                             error={errors.question && Array.isArray(errors.question) ? errors.question[0] : undefined}
+                            showCounterBelow
                         />
                     </div>
 

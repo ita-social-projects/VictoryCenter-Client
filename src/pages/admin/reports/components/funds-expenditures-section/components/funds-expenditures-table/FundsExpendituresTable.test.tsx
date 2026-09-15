@@ -285,20 +285,22 @@ describe('FundsExpendituresTable', () => {
 
         const amountUahHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH);
 
-        fireEvent.click(amountUahHeader);
         let rows = screen.getAllByRole('row').slice(1);
-        let firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('1 000');
+        let amounts = rows.map((row) => within(row).getAllByRole('cell')[3].textContent);
+        expect(amounts).toEqual(['7 265', '4 200', '1 000']);
 
         fireEvent.click(amountUahHeader);
         rows = screen.getAllByRole('row').slice(1);
-        firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('7 265');
+        expect(within(rows[0]).getAllByRole('cell')[3]).toHaveTextContent('1 000');
 
         fireEvent.click(amountUahHeader);
         rows = screen.getAllByRole('row').slice(1);
-        firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('7 265');
+        expect(within(rows[0]).getAllByRole('cell')[3]).toHaveTextContent('7 265');
+
+        fireEvent.click(amountUahHeader);
+        rows = screen.getAllByRole('row').slice(1);
+        amounts = rows.map((row) => within(row).getAllByRole('cell')[3].textContent);
+        expect(amounts).toEqual(['7 265', '4 200', '1 000']);
     });
 
     describe('scroll to top button', () => {
@@ -800,6 +802,15 @@ describe('FundsExpendituresTable program aggregate row', () => {
         expect(screen.getByTestId('program-aggregate-row')).toBeInTheDocument();
         expect(screen.getByText('Програмні')).toBeInTheDocument();
         expect(screen.getByLabelText('Edit program reporting year')).toBeInTheDocument();
+    });
+
+    it('participates in sorting along with other expense records', () => {
+        renderTable({ programAggregateRow, isEditing: false });
+
+        const rows = screen.getAllByRole('row').slice(1);
+        const categories = rows.map((row) => within(row).getAllByRole('cell')[2].textContent);
+
+        expect(categories).toEqual(['Грантові кошти', 'Благодійні внески', 'Програмні', 'Адміністративні витрати']);
     });
 
     it('keeps accept disabled until the year changes, then saves the new year', async () => {

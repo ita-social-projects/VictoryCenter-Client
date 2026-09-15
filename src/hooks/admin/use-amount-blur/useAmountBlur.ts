@@ -22,7 +22,9 @@ export const useAmountBlur = (exchangeRate: string | null, customMismatchMessage
             setFormState((prev: any) => {
                 const updated = {
                     ...prev,
-                    ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur')(prev),
+                    ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur', {
+                        allowReverseConversion: false,
+                    })(prev),
                 };
 
                 setUsdMismatchMessage(

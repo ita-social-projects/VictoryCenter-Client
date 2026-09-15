@@ -23,6 +23,11 @@ export const FEEDBACK_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
         FAIL_TO_REORDER: 'Виникла помилка, не вдалося змінити порядок елемента',
+        SUCCESS_DELETE_HISTORY: 'Історію успішно видалено',
+    },
+    DELETE_HISTORY_MODAL: {
+        TITLE: 'Видалити історію?',
+        FAIL_TO_DELETE: 'Виникла помилка під час видалення історії',
     },
 };
 

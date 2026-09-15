@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ReportsMediaBlock, ReportsMediaBlockProps, ReportsMediaBlockValues } from './ReportsMediaBlock';
+import { REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -41,11 +42,12 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled, value }: any) => (
+    ImageInput: ({ onChange, label, setError, disabled, value, deleteConfirmationText }: any) => (
         <div data-testid="mock-image-input">
             <span>{label}</span>
             <span data-testid="mock-image-disabled">{disabled ? 'disabled' : 'enabled'}</span>
             <span data-testid="mock-image-value">{value ? 'has-value' : 'no-value'}</span>
+            <span data-testid="mock-image-delete-confirmation-text">{deleteConfirmationText}</span>
             <button
                 data-testid="mock-image-upload"
                 onClick={() => onChange({ base64: 'data:image/png;base64,abc123', mimeType: 'image/png' })}
@@ -224,6 +226,14 @@ describe('ReportsMediaBlock', () => {
             renderComponent();
             fireEvent.click(screen.getByTestId('mock-image-clear-error'));
             expect(mockOnImageError).not.toHaveBeenCalled();
+        });
+
+        it('should pass delete confirmation text to ImageInput', () => {
+            renderComponent();
+
+            expect(screen.getByTestId('mock-image-delete-confirmation-text')).toHaveTextContent(
+                REPORTS_TEXT.DELETE_IMAGE.TITLE,
+            );
         });
     });
 });

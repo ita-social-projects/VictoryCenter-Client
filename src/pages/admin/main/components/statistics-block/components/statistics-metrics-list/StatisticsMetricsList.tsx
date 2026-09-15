@@ -163,7 +163,7 @@ export const StatisticsMetricsList = ({
                     {metric.type === MetricType.Raised ? (
                         <div className={styles.raisedValues}>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                                ₴{formatMetricValue(metric, 'UA')}
+                                {formatMetricValue(metric, 'UA')} {MAIN_PAGE_TEXT.BLOCKS.STATISTICS.CURRENCY_UAH}
                             </p>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
                                 ${formatMetricValue(metric, 'EN')}

@@ -11,7 +11,7 @@ interface SwipedGalleryProps {
 
 export const SwipedGallery = ({ title, cards }: SwipedGalleryProps) => {
     const renderSwiperItem = (card: HippotherapySwipedCard, index: number) => {
-        const imageUrl = card.imgURL ?? HIPPOTHERAPY_SWIPED_IMAGES[index];
+        const imageUrl = card.imgURL || HIPPOTHERAPY_SWIPED_IMAGES[index];
         const altText = card.imgAlternativeText;
 
         return <SwipedCard description={card.text} index={index} imageUrl={imageUrl} altText={altText} />;

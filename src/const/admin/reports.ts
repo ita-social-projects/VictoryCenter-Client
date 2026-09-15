@@ -37,6 +37,9 @@ export const REPORTS_TEXT = {
             PDF_FILES: 'PDF Файли',
         },
     },
+    DELETE_IMAGE: {
+        TITLE: 'Видалити фото?',
+    },
 };
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
@@ -307,6 +310,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY: 'Категорія',
             AMOUNT_UAH: 'Сума UAH',
             AMOUNT_USD: 'Сума USD',
+            ACTIONS: 'Дії',
         },
         TYPE_LABELS: {
             INCOME: 'Надходження',
@@ -366,7 +370,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Така категорія вже додана. Оберіть іншу категорію',
+        PROGRAM_UNIQUE: 'Категорія має бути унікальною',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',

@@ -2,10 +2,33 @@ import { FeedbackApi } from './feedback-api';
 import { VisibilityStatus } from '@/types/admin/common';
 
 describe('FeedbackApi', () => {
-    const mockClient = {} as any;
+    const mockHistoryList = Array.from({ length: 21 }).map((_, i) => ({
+        id: i + 1,
+        title: `Історія ${i + 1}`,
+        story: `Текст історії ${i + 1}`,
+        image: null,
+        status: VisibilityStatus.Published,
+        priority: i,
+    }));
+
+    const mockVideosList = Array.from({ length: 21 }).map((_, i) => ({
+        id: i + 1,
+        title: `Відео ${i + 1}`,
+        link: `https://www.youtube.com/watch?v=video-${i + 1}`,
+        status: VisibilityStatus.Published,
+        priority: i,
+    }));
+
+    const mockClient = {
+        get: jest.fn(),
+        delete: jest.fn(),
+    } as any;
 
     beforeEach(() => {
         jest.useFakeTimers();
+        jest.clearAllMocks();
+        mockClient.get.mockResolvedValue({ data: mockHistoryList });
+        mockClient.delete.mockResolvedValue({ data: undefined });
     });
 
     afterEach(() => {
@@ -14,10 +37,9 @@ describe('FeedbackApi', () => {
 
     describe('fetchHistory', () => {
         it('should fetch history with default pagination when no params provided', async () => {
-            const promise = FeedbackApi.fetchHistory(mockClient);
-            jest.advanceTimersByTime(500);
-            const result = await promise;
+            const result = await FeedbackApi.fetchHistory(mockClient);
 
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackHistories');
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].id).toBe(1);
@@ -25,38 +47,32 @@ describe('FeedbackApi', () => {
         });
 
         it('should fetch history with custom take and skip', async () => {
-            const promise = FeedbackApi.fetchHistory(mockClient, {
+            const result = await FeedbackApi.fetchHistory(mockClient, {
                 take: 5,
                 skip: 10,
                 status: VisibilityStatus.Published,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(5);
             expect(result.items[0].id).toBe(11);
         });
 
         it('should fetch history with offset and limit', async () => {
-            const promise = FeedbackApi.fetchHistory(mockClient, {
+            const result = await FeedbackApi.fetchHistory(mockClient, {
                 limit: 5,
                 offset: 10,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(5);
             expect(result.items[0].id).toBe(11);
         });
 
         it('should filter history by searchTerm', async () => {
-            const promise = FeedbackApi.fetchHistory(mockClient, {
+            const result = await FeedbackApi.fetchHistory(mockClient, {
                 searchTerm: 'Історія 1',
                 offset: 7,
                 limit: 7,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.totalItemsCount).toBe(11);
             expect(result.items.length).toBe(4);
@@ -64,13 +80,19 @@ describe('FeedbackApi', () => {
         });
 
         it('should return empty items when skip is greater than total items', async () => {
-            const promise = FeedbackApi.fetchHistory(mockClient, {
+            const result = await FeedbackApi.fetchHistory(mockClient, {
                 skip: 25,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(0);
+        });
+    });
+
+    describe('deleteHistory', () => {
+        it('should send delete request with correct id', async () => {
+            await FeedbackApi.deleteHistory(mockClient, 42);
+
+            expect(mockClient.delete).toHaveBeenCalledWith('FeedbackHistories/42');
         });
     });
 
@@ -122,48 +144,45 @@ describe('FeedbackApi', () => {
     });
 
     describe('fetchVideos', () => {
-        it('should fetch videos with default pagination when no params provided', async () => {
-            const promise = FeedbackApi.fetchVideos(mockClient);
-            jest.advanceTimersByTime(500);
-            const result = await promise;
+        beforeEach(() => {
+            mockClient.get.mockResolvedValue({ data: mockVideosList });
+        });
 
+        it('should fetch videos with default pagination when no params provided', async () => {
+            const result = await FeedbackApi.fetchVideos(mockClient);
+
+            expect(mockClient.get).toHaveBeenCalledWith('VideoReviews');
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].title).toBe('Відео 1');
-            expect(result.items[0].videoUrl).toBe('https://example.com/video');
+            expect(result.items[0].link).toBe('https://www.youtube.com/watch?v=video-1');
         });
 
         it('should fetch videos with custom take and skip', async () => {
-            const promise = FeedbackApi.fetchVideos(mockClient, {
+            const result = await FeedbackApi.fetchVideos(mockClient, {
                 take: 4,
                 skip: 2,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(4);
             expect(result.items[0].id).toBe(3);
         });
 
         it('should fetch videos with offset and limit and filter by searchTerm', async () => {
-            const promise = FeedbackApi.fetchVideos(mockClient, {
+            const result = await FeedbackApi.fetchVideos(mockClient, {
                 searchTerm: 'Відео 1',
                 offset: 7,
                 limit: 7,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.totalItemsCount).toBe(11);
             expect(result.items.length).toBe(4);
         });
 
         it('should return empty items when skip is greater than total items', async () => {
-            const promise = FeedbackApi.fetchVideos(mockClient, {
+            const result = await FeedbackApi.fetchVideos(mockClient, {
                 skip: 25,
             });
-            jest.advanceTimersByTime(500);
-            const result = await promise;
 
             expect(result.items).toHaveLength(0);
         });

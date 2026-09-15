@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { createContactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
@@ -14,6 +15,7 @@ import { TFunction } from 'i18next';
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
 interface ContactFormCardProps {
+    isPopup?: boolean;
     title: string;
     namePlaceholder: string;
     emailPlaceholder: string;
@@ -25,13 +27,13 @@ interface ContactFormCardProps {
 const getCharacterLimitHint = (
     length: number,
     maxLength: number,
-    warnAt: number,
+    infoAt: number,
     t: TFunction<'contactUsPage', undefined>,
 ): string | null => {
     if (length >= maxLength) {
         return t('contactForm.limitReached');
     }
-    if (length >= warnAt) {
+    if (length >= infoAt) {
         return t('contactForm.charactersRemaining', {
             count: maxLength - length,
         });
@@ -40,6 +42,7 @@ const getCharacterLimitHint = (
 };
 
 export const ContactFormCard: React.FC<ContactFormCardProps> = ({
+    isPopup = false,
     title,
     namePlaceholder,
     emailPlaceholder,
@@ -56,11 +59,13 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         handleSubmit,
         watch,
         reset,
+        clearErrors,
         trigger,
         formState: { errors },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
         mode: 'onBlur',
+        reValidateMode: 'onBlur',
     });
 
     const errorsRef = useRef(errors);
@@ -96,13 +101,13 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     const subjectHint = getCharacterLimitHint(
         subjectValue.length,
         CONTACT_FORM_LIMITS.SUBJECT.MAX,
-        CONTACT_FORM_LIMITS.SUBJECT.WARN_AT,
+        CONTACT_FORM_LIMITS.SUBJECT.INFO_AT,
         t,
     );
     const messageHint = getCharacterLimitHint(
         messageValue.length,
         CONTACT_FORM_LIMITS.MESSAGE.MAX,
-        CONTACT_FORM_LIMITS.MESSAGE.WARN_AT,
+        CONTACT_FORM_LIMITS.MESSAGE.INFO_AT,
         t,
     );
 
@@ -134,20 +139,28 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 </div>
             )}
             <form
-                className={styles['contact-form-card']}
+                className={classNames(styles['contact-form-card'], {
+                    [styles['contact-form-card--popup']]: isPopup,
+                })}
                 aria-label={title}
                 onSubmit={handleSubmit(onSubmit)}
                 noValidate
             >
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.name ? ' ' + styles['contact-form-field--error'] : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.name,
+                        })}
                     >
                         <input
                             type="text"
                             placeholder={namePlaceholder}
                             className={styles['contact-form-input']}
-                            {...register('name')}
+                            {...register('name', {
+                                onChange: () => {
+                                    if (errors.name) clearErrors('name');
+                                },
+                            })}
                         />
                     </label>
                     {errors.name && (
@@ -159,13 +172,19 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.email ? ' ' + styles['contact-form-field--error'] : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.email,
+                        })}
                     >
                         <input
                             type="email"
                             placeholder={emailPlaceholder}
                             className={styles['contact-form-input']}
-                            {...register('email')}
+                            {...register('email', {
+                                onChange: () => {
+                                    if (errors.email) clearErrors('email');
+                                },
+                            })}
                         />
                     </label>
                     {errors.email && (
@@ -177,14 +196,20 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div className={styles['contact-form-field-wrapper']}>
                     <label
-                        className={`${styles['contact-form-field']}${errors.subject ? ' ' + styles['contact-form-field--error'] : ''}`}
+                        className={classNames(styles['contact-form-field'], {
+                            [styles['contact-form-field--error']]: errors.subject,
+                        })}
                     >
                         <input
                             type="text"
                             placeholder={subjectPlaceholder}
                             className={styles['contact-form-input']}
                             maxLength={CONTACT_FORM_LIMITS.SUBJECT.MAX}
-                            {...register('subject')}
+                            {...register('subject', {
+                                onChange: () => {
+                                    if (errors.subject) clearErrors('subject');
+                                },
+                            })}
                         />
                     </label>
                     {errors.subject && (
@@ -199,14 +224,27 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                     )}
                 </div>
 
-                <div className={styles['contact-form-field-wrapper']}>
-                    <label className={styles['contact-form-textarea-field']}>
+                <div
+                    className={classNames(
+                        styles['contact-form-field-wrapper'],
+                        styles['contact-form-field-wrapper--textarea'],
+                    )}
+                >
+                    <label
+                        className={classNames(styles['contact-form-textarea-field'], {
+                            [styles['contact-form-textarea-field--error']]: errors.message,
+                        })}
+                    >
                         <textarea
                             placeholder={messagePlaceholder}
                             className={styles['contact-form-textarea']}
                             rows={6}
                             maxLength={CONTACT_FORM_LIMITS.MESSAGE.MAX}
-                            {...register('message')}
+                            {...register('message', {
+                                onChange: () => {
+                                    if (errors.message) clearErrors('message');
+                                },
+                            })}
                         />
                     </label>
                     {errors.message && (
@@ -223,7 +261,11 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
                 <div ref={turnstileRef} />
 
-                <button type="submit" className={styles['contact-form-submit']} disabled={!turnstileToken}>
+                <button
+                    type="submit"
+                    className={styles['contact-form-submit']}
+                    disabled={!turnstileToken || Object.keys(errors).length > 0}
+                >
                     {submitLabel}
                 </button>
             </form>

@@ -1,0 +1,10 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
+
+.delete-feedback-history-error-container {
+    @include typography.body-2-regular;
+    width: 100%;
+    margin: 8px;
+    text-align: center;
+    color: colors.$error;
+}

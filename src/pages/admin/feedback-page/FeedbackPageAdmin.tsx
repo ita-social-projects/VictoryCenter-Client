@@ -178,7 +178,7 @@ export const FeedbackPageAdmin = () => {
                 setItems((prev) => {
                     const exists = prev.some((item) => item.id === newHistory.id);
                     if (exists) return prev;
-                    if (!hasMore) {
+                    if (prev.length < FEEDBACK_PAGINATION_LIMIT) {
                         return [...prev, newHistory];
                     }
                     return prev;

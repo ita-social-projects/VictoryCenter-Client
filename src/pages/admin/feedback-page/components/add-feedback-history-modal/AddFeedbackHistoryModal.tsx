@@ -233,6 +233,7 @@ export const AddFeedbackHistoryModal = ({
             if (formState.image && 'base64' in formState.image) {
                 const imageResult = await ImageApi.post(client, formState.image);
                 imageId = imageResult.id;
+                setFormState((prev) => ({ ...prev, image: imageResult }));
             } else if (formState.image && 'id' in formState.image) {
                 imageId = formState.image.id;
             }

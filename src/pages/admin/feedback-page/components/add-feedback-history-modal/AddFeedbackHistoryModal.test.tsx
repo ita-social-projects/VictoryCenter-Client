@@ -291,6 +291,7 @@ describe('AddFeedbackHistoryModal', () => {
 
     it('displays error message when history creation fails', async () => {
         (FeedbackApi.createHistory as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+        (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 10, url: 'https://example.com/photo.jpg' });
 
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 

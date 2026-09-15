@@ -10,6 +10,9 @@ export const FEEDBACK_TEXT = {
         SEARCH_REVIEWS: "Введіть відгук або ім'я",
         SEARCH_VIDEOS: "Введіть відгук або ім'я",
     },
+    LIST: {
+        NO_MATERIALS: 'Ще немає матеріалів',
+    },
     TABS: {
         HISTORY: 'Історії',
         REVIEWS: 'Що кажуть учасники',

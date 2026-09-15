@@ -7,6 +7,24 @@ import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
+const getTodayLabel = () => {
+    const today = new Date();
+
+    return `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
+        2,
+        '0',
+    )}/${today.getFullYear()}`;
+};
+
+const openDatePickerAndSelectToday = (todayLabel: string) => {
+    fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+    fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+};
+
+const expectDatePickerClosed = () => {
+    expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+};
+
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
 }));
@@ -251,52 +269,37 @@ describe('EventModal', () => {
     describe('date picker', () => {
         it('applies the selected date only after confirming', () => {
             render(<EventModal {...defaultProps} />);
-            const today = new Date();
-            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
-                2,
-                '0',
-            )}/${today.getFullYear()}`;
+            const todayLabel = getTodayLabel();
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            openDatePickerAndSelectToday(todayLabel);
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
 
             expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
-            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+            expectDatePickerClosed();
         });
 
         it('discards a pending date when cancelled', () => {
             render(<EventModal {...defaultProps} />);
-            const today = new Date();
-            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
-                2,
-                '0',
-            )}/${today.getFullYear()}`;
+            const todayLabel = getTodayLabel();
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            openDatePickerAndSelectToday(todayLabel);
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
 
             expect(screen.getByRole('button', { name: /Вибір дати/i })).toHaveTextContent('');
-            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+            expectDatePickerClosed();
         });
 
         it('deselects a day and confirms the current date when no date remains selected', () => {
             render(<EventModal {...defaultProps} />);
-            const today = new Date();
-            const todayLabel = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
-                2,
-                '0',
-            )}/${today.getFullYear()}`;
+            const todayLabel = getTodayLabel();
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+            openDatePickerAndSelectToday(todayLabel);
             expect(screen.getByRole('button', { name: todayLabel })).toHaveAttribute('aria-pressed', 'false');
 
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
 
             expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
-            expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+            expectDatePickerClosed();
         });
 
         it('opens month and year selection from the calendar header', () => {

@@ -42,6 +42,7 @@ export const ReportAnalytics = () => {
     const [translationLanguages, setTranslationLanguages] = useState<LocalizationLanguage[]>([]);
     const [categories, setCategories] = useState<ReportFundsExpendituresCategory[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
+    const [hasSelectedRecords, setHasSelectedRecords] = useState(false);
 
     const adminClient = useAdminClient();
     const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
@@ -98,7 +99,12 @@ export const ReportAnalytics = () => {
     );
 
     const isPublishEnabled =
-        hasUnpublishedChanges && incomeCount >= 2 && expenseCount >= 2 && programRecordsCount >= 1 && isFundsValid;
+        hasUnpublishedChanges &&
+        incomeCount >= 2 &&
+        expenseCount >= 2 &&
+        programRecordsCount >= 1 &&
+        isFundsValid &&
+        !hasSelectedRecords;
 
     const handlePublishClick = useCallback(() => {
         setIsPublishModalOpen(true);
@@ -200,6 +206,7 @@ export const ReportAnalytics = () => {
                         registerRefetchSettingsCallback={(fn) => {
                             refetchSettingsRef.current = fn;
                         }}
+                        onSelectionChange={setHasSelectedRecords}
                     />
                 </div>
                 <div style={{ display: activeTab.id === 'program-expenses' ? 'block' : 'none' }}>

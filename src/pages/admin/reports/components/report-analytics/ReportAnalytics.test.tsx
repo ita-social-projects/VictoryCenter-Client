@@ -72,6 +72,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onValidationChange,
         onCountsChange,
         onDataChange,
+        onSelectionChange,
         registerSaveCallback,
         onRowEditModeChange,
     }: {
@@ -89,6 +90,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onValidationChange?: (valid: boolean) => void;
         onCountsChange?: (counts: any) => void;
         onDataChange?: () => void;
+        onSelectionChange?: (hasSelected: boolean) => void;
         registerSaveCallback?: (cb: () => Promise<boolean>) => void;
         onRowEditModeChange?: (isRowEditMode: boolean) => void;
     }) => (
@@ -101,6 +103,12 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             data-delete-category-modal-open={String(isDeleteCategoryModalOpen ?? false)}
         >
             FundsExpenditureSection
+            <button type="button" data-testid="trigger-select-records" onClick={() => onSelectionChange?.(true)}>
+                Select Records
+            </button>
+            <button type="button" data-testid="trigger-unselect-records" onClick={() => onSelectionChange?.(false)}>
+                Unselect Records
+            </button>
             <button
                 type="button"
                 data-testid="activate-funds-edit"
@@ -435,35 +443,54 @@ describe('ReportAnalytics', () => {
     });
 
     describe('Publish functionality', () => {
-        it('should enable publish button when data is valid and changes exist', () => {
+        const getPublishButton = () => screen.getByText('Опублікувати');
+        const selectRecords = () => fireEvent.click(screen.getByTestId('trigger-select-records'));
+        const unselectRecords = () => fireEvent.click(screen.getByTestId('trigger-unselect-records'));
+
+        const setupValidPublishState = () => {
             render(<ReportAnalytics />);
             fireEvent.click(screen.getByTestId('activate-funds-edit'));
-
             fireEvent.click(screen.getByTestId('trigger-funds-data'));
             fireEvent.click(screen.getByTestId('trigger-program-data'));
+        };
 
-            const publishButton = screen.getByText('Опублікувати');
-            expect(publishButton).not.toBeDisabled();
+        it('should disable publish button when some records are selected', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).toBeEnabled();
+
+            selectRecords();
+
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should re-enable publish button when selected records are unselected', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).toBeEnabled();
+
+            selectRecords();
+            expect(getPublishButton()).toBeDisabled();
+
+            unselectRecords();
+            expect(getPublishButton()).toBeEnabled();
+        });
+
+        it('should enable publish button when data is valid and changes exist', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).not.toBeDisabled();
         });
 
         it('should open publish modal on publish click', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'true');
         });
 
         it('should handle publish confirm successfully', async () => {
             mockPublishRecords.mockResolvedValueOnce({});
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
@@ -474,13 +501,10 @@ describe('ReportAnalytics', () => {
         });
 
         it('should handle publish save settings failure', async () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            setupValidPublishState();
             fireEvent.click(screen.getByTestId('trigger-funds-save-fail'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
@@ -490,12 +514,9 @@ describe('ReportAnalytics', () => {
 
         it('should handle publish records API error', async () => {
             mockPublishRecords.mockRejectedValueOnce(new Error('fail'));
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
@@ -504,24 +525,18 @@ describe('ReportAnalytics', () => {
         });
 
         it('should close publish modal when cancelled', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('cancel-modal-publish'));
 
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
         });
 
         it('should close publish modal when close is clicked', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('close-modal-publish'));
 
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');

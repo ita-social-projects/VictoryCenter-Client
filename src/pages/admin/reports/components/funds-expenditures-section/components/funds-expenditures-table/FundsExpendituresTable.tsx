@@ -181,22 +181,15 @@ export const FundsExpendituresTable = ({
     const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
     const isProgramYearEditing = programYearEdit !== null;
-    const {
-        rowEditState,
-        setRowEditState,
-        savingRecordId,
-        setSavingRecordId,
-        isAnyRowEditing,
-        setRowEditMode,
-        renderAmountEditRow,
-    } = useTableRowAmountEdit<RowEditState>({
-        isEditing,
-        isRowActionsDisabled: isRowActionsDisabled || isProgramYearEditing,
-        exchangeRate,
-        mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-        isAcceptButtonDisabled: (state) => isAcceptButtonDisabled(state, exchangeRate),
-        onRowEditModeChange,
-    });
+    const { rowEditState, setRowEditState, isAnyRowEditing, setRowEditMode, renderAmountEditRow } =
+        useTableRowAmountEdit<RowEditState>({
+            isEditing,
+            isRowActionsDisabled: isRowActionsDisabled || isProgramYearEditing,
+            exchangeRate,
+            mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+            isAcceptButtonDisabled: (state) => isAcceptButtonDisabled(state, exchangeRate),
+            onRowEditModeChange,
+        });
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -331,12 +324,8 @@ export const FundsExpendituresTable = ({
     );
 
     const handleAcceptRowEdit = useCallback(
-        async (record: EnrichedRecord) => {
+        (record: EnrichedRecord) => {
             if (rowEditState?.recordId !== record.id) {
-                return;
-            }
-
-            if (savingRecordId !== null) {
                 return;
             }
 
@@ -386,33 +375,15 @@ export const FundsExpendituresTable = ({
                 return;
             }
 
-            setSavingRecordId(record.id);
+            onRecordSave?.(record.id, {
+                categoryId: nextCategoryId,
+                amountUah: preparedAmountUah,
+                amountUsd: preparedAmountUsd,
+            });
 
-            try {
-                const isSaved = await onRecordSave?.(record.id, {
-                    categoryId: nextCategoryId,
-                    amountUah: preparedAmountUah,
-                    amountUsd: preparedAmountUsd,
-                });
-
-                if (isSaved === false) {
-                    return;
-                }
-
-                setRowEditMode(null);
-            } finally {
-                setSavingRecordId(null);
-            }
+            setRowEditMode(null);
         },
-        [
-            getRowEditValidationError,
-            onRecordSave,
-            rowEditState,
-            savingRecordId,
-            setRowEditMode,
-            setRowEditState,
-            setSavingRecordId,
-        ],
+        [getRowEditValidationError, onRecordSave, rowEditState, setRowEditMode, setRowEditState],
     );
 
     const handleSort = useCallback(
@@ -439,7 +410,6 @@ export const FundsExpendituresTable = ({
     );
 
     const isTableEditing = isAnyRowEditing || isProgramYearEditing;
-    const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
     const isProgramYearAcceptDisabled =
@@ -632,9 +602,7 @@ export const FundsExpendituresTable = ({
                                                     className={cn(styles['icon-button'], styles['edit-icon-button'])}
                                                     aria-label="Edit program reporting year"
                                                     onClick={handleStartProgramYearEdit}
-                                                    disabled={
-                                                        isAnyRowEditing || isSavingInProgress || isRowActionsDisabled
-                                                    }
+                                                    disabled={isAnyRowEditing || isRowActionsDisabled}
                                                     DefaultIcon={ACTION_ICONS.edit.default}
                                                     FilledIcon={ACTION_ICONS.edit.hover}
                                                 />
@@ -708,7 +676,6 @@ export const FundsExpendituresTable = ({
                                                         onValueChange={(value) =>
                                                             handleRowCategoryChange(record, value)
                                                         }
-                                                        disabled={savingRecordId === record.id}
                                                         placeholder={
                                                             FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER
                                                         }

@@ -25,11 +25,15 @@ const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jes
 const mockPublishRecords = jest.fn();
 const mockGetSettings = jest.fn();
 const mockCancelRecords = jest.fn();
+const mockUpdateRecord = jest.fn();
+const mockBulkDelete = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         publishRecords: (...args: unknown[]) => mockPublishRecords(...args),
         getSettings: (...args: unknown[]) => mockGetSettings(...args),
         cancelRecords: (...args: unknown[]) => mockCancelRecords(...args),
+        updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
+        bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
     },
 }));
 
@@ -148,7 +152,11 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
                     onValidationChange?.(true);
                     onCountsChange?.({ income: 2, expense: 2 });
                     onDataChange?.();
-                    registerSaveCallback?.(async () => true);
+                    registerSaveCallback?.(async () => {
+                        await mockUpdateRecord();
+                        await mockBulkDelete();
+                        return true;
+                    });
                 }}
             >
                 Set Valid Funds Data
@@ -458,6 +466,9 @@ describe('ReportAnalytics', () => {
 
         it('should handle publish confirm successfully', async () => {
             mockPublishRecords.mockResolvedValueOnce({});
+            mockUpdateRecord.mockResolvedValueOnce({});
+            mockBulkDelete.mockResolvedValueOnce({});
+
             render(<ReportAnalytics />);
             fireEvent.click(screen.getByTestId('activate-funds-edit'));
             fireEvent.click(screen.getByTestId('trigger-funds-data'));
@@ -468,6 +479,8 @@ describe('ReportAnalytics', () => {
 
             await waitFor(() => {
                 expect(mockPublishRecords).toHaveBeenCalled();
+                expect(mockUpdateRecord).toHaveBeenCalled();
+                expect(mockBulkDelete).toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
             });
             expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument(); // should exit edit mode

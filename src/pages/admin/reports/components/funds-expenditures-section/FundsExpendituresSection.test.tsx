@@ -17,7 +17,6 @@ import {
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
-import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -501,16 +500,7 @@ describe('FundsExpenditureSection', () => {
         });
     });
 
-    it('should show success toast when record is saved from table', async () => {
-        mockUpdateRecord.mockResolvedValueOnce({
-            id: 1,
-            categoryId: 1,
-            type: 'income',
-            reportingYear: '2025',
-            amountUah: '7300',
-            amountUsd: '173.81',
-        });
-
+    it('should update record locally and not call api immediately', async () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('trigger-record-save'));
@@ -520,17 +510,7 @@ describe('FundsExpenditureSection', () => {
             FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
             'success',
         );
-    });
-
-    it('should show retry error toast when record save fails', async () => {
-        mockUpdateRecord.mockRejectedValueOnce(new Error('save failed'));
-
-        render(<FundsExpenditureSection />);
-
-        fireEvent.click(screen.getByTestId('trigger-record-save'));
-
-        await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        expect(mockUpdateRecord).not.toHaveBeenCalled();
     });
 
     it('should render the disclaimer text', () => {
@@ -733,48 +713,94 @@ describe('FundsExpenditureSection', () => {
             });
         });
 
-        it('should delete record successfully', async () => {
+        it('should delete record locally and not call api immediately', async () => {
             render(<FundsExpenditureSection isEditing />);
+
+            expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                'data-record-count',
+                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
+            );
+
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
             await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalled();
+                expect(mockDeleteRecord).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
                     'success',
                 );
-            });
-        });
-
-        it('should show error when deleting record fails', async () => {
-            mockDeleteRecord.mockRejectedValueOnce(new Error('fail'));
-            render(<FundsExpenditureSection isEditing />);
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-            await waitFor(() => {
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
-                    'error',
+                expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                    'data-record-count',
+                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
                 );
+                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
             });
         });
 
-        it('should save settings when registered save function is called', async () => {
+        it('should update modified records and save settings when save callback is invoked', async () => {
             let saveFn: (() => Promise<boolean>) | undefined;
             const registerSaveCallback = (fn: () => Promise<boolean>) => {
                 saveFn = fn;
             };
             render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
-            mockUpdateSettings.mockResolvedValueOnce({
-                id: 1,
-                disclaimerTitle: 'saved',
-                exchangeRate: '42.18',
-            });
+            fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockUpdateRecord.mockResolvedValueOnce({});
 
             expect(saveFn).toBeDefined();
             const success = await saveFn!();
             expect(success).toBe(true);
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockUpdateRecord).toHaveBeenCalled();
+        });
+
+        it('should send deleted records to api when save callback is invoked after single record deletion', async () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockBulkDelete.mockResolvedValueOnce(undefined);
+
+            expect(saveFn).toBeDefined();
+            const success = await saveFn!();
+            expect(success).toBe(true);
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBulkDelete).toHaveBeenCalled();
+        });
+
+        it('should send all selected records to api when save callback is invoked after bulk deletion', async () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            fireEvent.click(screen.getByLabelText('Select all records'));
+            fireEvent.click(screen.getByTestId('delete-selected'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockBulkDelete.mockResolvedValueOnce(undefined);
+
+            expect(saveFn).toBeDefined();
+            const success = await saveFn!();
+            expect(success).toBe(true);
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBulkDelete).toHaveBeenCalled();
         });
 
         it('should show error when registered save function fails', async () => {
@@ -1041,59 +1067,6 @@ describe('FundsExpenditureSection', () => {
             );
         });
 
-        it('should delete record after confirmation and show success toast', async () => {
-            mockDeleteRecord.mockResolvedValueOnce(undefined);
-
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            expect(screen.getByTestId('funds-table')).toHaveAttribute(
-                'data-record-count',
-                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
-            );
-
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
-
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
-                    'success',
-                );
-                expect(screen.getByTestId('funds-table')).toHaveAttribute(
-                    'data-record-count',
-                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
-                );
-                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
-            });
-        });
-
-        it('should show delete error toast and keep modal open when delete fails', async () => {
-            mockDeleteRecord.mockRejectedValueOnce(new Error('delete failed'));
-
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
-                    'error',
-                );
-                expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
-                expect(screen.getByTestId('funds-table')).toHaveAttribute(
-                    'data-record-count',
-                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
-                );
-            });
-        });
-
         it('should close delete confirmation modal on cancel', () => {
             render(<FundsExpenditureSection />);
 
@@ -1260,9 +1233,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
         });
     });
 
-    it('confirms bulk delete calls API and shows success toast', async () => {
-        mockBulkDelete.mockResolvedValue(undefined);
-
+    it('should delete records locally on bulk delete and not call api immediately', async () => {
         render(<FundsExpenditureSection isEditing={true} />);
 
         fireEvent.click(screen.getByLabelText('Select all records'));
@@ -1275,7 +1246,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
         await waitFor(() => {
-            expect(mockBulkDelete).toHaveBeenCalledWith(expect.anything(), [1, 2]);
+            expect(mockBulkDelete).not.toHaveBeenCalled();
             expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, 'success');
         });
     });

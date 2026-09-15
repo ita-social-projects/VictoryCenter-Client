@@ -620,33 +620,6 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
-        it('should show saving indicator, lock controls and disable inputs while row save is in progress', async () => {
-            let resolveSave: (() => void) | undefined;
-            const onRecordSave = jest.fn(
-                () =>
-                    new Promise<boolean>((resolve) => {
-                        resolveSave = () => resolve(true);
-                    }),
-            );
-
-            renderTable({ isEditing: true, onRecordSave });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
-            fireEvent.click(screen.getByLabelText('Accept record 1'));
-
-            expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
-            expect(screen.getByLabelText('Edit record 2')).toBeDisabled();
-            expect(screen.getByLabelText('Amount UAH record 1')).toBeDisabled();
-            expect(screen.getByLabelText('Amount USD record 1')).toBeDisabled();
-
-            resolveSave?.();
-
-            await waitFor(() => {
-                expect(screen.queryByTestId('inline-loader')).not.toBeInTheDocument();
-            });
-        });
-
         it('should show validation error and skip saving when Accept is clicked before blurring an invalid zero amount', () => {
             const onRecordSave = jest.fn();
 

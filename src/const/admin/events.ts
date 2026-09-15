@@ -92,6 +92,9 @@ export const EVENT_VALIDATION = {
         getMinError: () => `Не менше ${EVENT_VALIDATION.linkEng.min} символів`,
         getMaxError: () => `Не більше ${EVENT_VALIDATION.linkEng.max} символів`,
     },
+    publishDate: {
+        getInvalidError: () => 'Невірний формат дати',
+    },
 };
 
 export const EVENT_NOTIFICATION_TIMERS = {

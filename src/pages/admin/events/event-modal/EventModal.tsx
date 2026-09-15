@@ -110,13 +110,10 @@ export const EventModal = (props: EventModalProps) => {
     const [pendingDate, setPendingDate] = useState<Date | null>(null);
     const [initialPickerDate, setInitialPickerDate] = useState<Date | null>(null);
     const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+    const [hasDeselectedDate, setHasDeselectedDate] = useState(false);
     const calendarDays = getCalendarDays(visibleMonth);
     const todayValue = formatDateValue(new Date());
     const currentDate = new Date();
-    const isInitialPickerMonth =
-        initialPickerDate !== null &&
-        visibleMonth.getFullYear() === initialPickerDate.getFullYear() &&
-        visibleMonth.getMonth() === initialPickerDate.getMonth();
     const selectableYears = [currentDate.getFullYear() - 1, currentDate.getFullYear()];
 
     const [isPublishing, setIsPublishing] = useState(false);
@@ -194,6 +191,7 @@ export const EventModal = (props: EventModalProps) => {
             setSelectedMonth(selectedDate.getMonth());
             setActivePickerLayer('date-picker');
             setIsDatePickerOpen(true);
+            setHasDeselectedDate(false);
         },
         [],
     );
@@ -203,6 +201,7 @@ export const EventModal = (props: EventModalProps) => {
         setActivePickerLayer('date-picker');
         setPendingDate(null);
         setInitialPickerDate(null);
+        setHasDeselectedDate(false);
     };
 
     const handleDatePickerConfirm = useCallback(
@@ -215,7 +214,9 @@ export const EventModal = (props: EventModalProps) => {
     );
 
     const handleDateSelect = (date: Date) => {
-        setPendingDate((prev) => (prev && formatDateValue(prev) === formatDateValue(date) ? null : date));
+        const isDeselecting = pendingDate !== null && formatDateValue(pendingDate) === formatDateValue(date);
+        setPendingDate(isDeselecting ? null : date);
+        setHasDeselectedDate(isDeselecting);
     };
 
     const handleYearSelect = (year: number) => {
@@ -225,6 +226,7 @@ export const EventModal = (props: EventModalProps) => {
         setVisibleMonth(new Date(year, month, 1));
         setSelectedMonth(isCurrentYear ? currentDate.getMonth() : null);
         setPendingDate(null);
+        setHasDeselectedDate(false);
     };
 
     const handleMonthSelect = (month: number) => {
@@ -232,6 +234,7 @@ export const EventModal = (props: EventModalProps) => {
         setSelectedMonth(month);
         setPendingDate(null);
         setActivePickerLayer('calendar');
+        setHasDeselectedDate(false);
     };
 
     const handleMonthYearPickerClose = () => {
@@ -240,6 +243,7 @@ export const EventModal = (props: EventModalProps) => {
         setSelectedMonth(initialDate.getMonth());
         setPendingDate(initialDate);
         setActivePickerLayer('date-picker');
+        setHasDeselectedDate(false);
     };
 
     const handleSaveAsDraft = () => {
@@ -261,6 +265,7 @@ export const EventModal = (props: EventModalProps) => {
         setPendingDate(null);
         setInitialPickerDate(null);
         setSelectedMonth(null);
+        setHasDeselectedDate(false);
     }, [isOpen, reset]);
 
     return (
@@ -420,7 +425,7 @@ export const EventModal = (props: EventModalProps) => {
                                                                                 : ''
                                                                         }`}
                                                                         onClick={() => handleMonthSelect(index)}
-                                                                        aria-pressed={index === visibleMonth.getMonth()}
+                                                                        aria-pressed={selectedMonth === index}
                                                                     >
                                                                         {month}
                                                                     </button>
@@ -492,7 +497,7 @@ export const EventModal = (props: EventModalProps) => {
                                                                     type="button"
                                                                     className={styles['date-picker-action']}
                                                                     onClick={handleDatePickerConfirm(field.onChange)}
-                                                                    disabled={!pendingDate && !isInitialPickerMonth}
+                                                                    disabled={!pendingDate && !hasDeselectedDate}
                                                                 >
                                                                     {COMMON_TEXT_ADMIN.BUTTON.OK}
                                                                 </button>
@@ -501,6 +506,7 @@ export const EventModal = (props: EventModalProps) => {
                                                     )}
                                                 </div>
                                             )}
+                                            <InputError error={errors.publishDate?.message} />
                                         </div>
                                     )}
                                 />

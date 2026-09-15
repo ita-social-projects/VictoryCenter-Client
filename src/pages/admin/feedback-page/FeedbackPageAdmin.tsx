@@ -13,6 +13,7 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -71,6 +72,8 @@ export const FeedbackPageAdmin = () => {
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
 
+    const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
+
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
             if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
@@ -92,6 +95,14 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
+
+    const handleAddMaterialClick = useCallback(() => {
+        if (activeCategory === FeedbackCategory.REVIEWS) {
+            setIsAddReviewModalOpen(true);
+            return;
+        }
+        handleNotImplemented();
+    }, [activeCategory, handleNotImplemented]);
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -285,7 +296,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={handleNotImplemented}
+                    onAddItem={handleAddMaterialClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
@@ -340,6 +351,8 @@ export const FeedbackPageAdmin = () => {
                 historyToDelete={historyToDelete}
                 onDeleteHistory={handleDeleteHistoryConfirm}
             />
+
+            <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
             <ToastContainer />
         </div>
     );

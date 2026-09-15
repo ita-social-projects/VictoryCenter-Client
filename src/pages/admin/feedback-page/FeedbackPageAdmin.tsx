@@ -13,6 +13,7 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -69,6 +70,15 @@ export const FeedbackPageAdmin = () => {
     }, [addToast]);
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
+    const [isAddHistoryModalOpen, setIsAddHistoryModalOpen] = useState<boolean>(false);
+
+    const handleAddItemClick = useCallback(() => {
+        if (activeCategory === FeedbackCategory.HISTORY) {
+            setIsAddHistoryModalOpen(true);
+        } else {
+            handleNotImplemented();
+        }
+    }, [activeCategory, handleNotImplemented]);
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
@@ -144,6 +154,30 @@ export const FeedbackPageAdmin = () => {
             fetchCategoryItems(activeCategory);
         }
     }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
+
+    const handleAddHistorySuccess = useCallback(
+        (newHistory: FeedbackHistoryDto) => {
+            setSelectedSearchItem(null);
+            const passesStatusFilter = statusFilter === undefined || newHistory.status === statusFilter;
+
+            if (passesStatusFilter) {
+                setItems((prev) => {
+                    const exists = prev.some((item) => item.id === newHistory.id);
+                    if (exists) return prev;
+                    if (!hasMore) {
+                        return [...prev, newHistory];
+                    }
+                    return prev;
+                });
+                if (hasMore) {
+                    setHasMore(true);
+                }
+            }
+
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
+        },
+        [statusFilter, hasMore, addToast],
+    );
 
     const getFeedbackSearchItems = useCallback(
         async (
@@ -281,7 +315,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={handleNotImplemented}
+                    onAddItem={handleAddItemClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
@@ -326,6 +360,11 @@ export const FeedbackPageAdmin = () => {
                 onClose={() => setHistoryToDelete(null)}
                 historyToDelete={historyToDelete}
                 onDeleteHistory={handleDeleteHistoryConfirm}
+            />
+            <AddFeedbackHistoryModal
+                isOpen={isAddHistoryModalOpen}
+                onClose={() => setIsAddHistoryModalOpen(false)}
+                onAddHistory={handleAddHistorySuccess}
             />
             <ToastContainer />
         </div>

@@ -1,6 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
+import {
+    CreateFeedbackHistoryDto,
+    FeedbackHistoryDto,
+    FeedbackReviewDto,
+    FeedbackVideoDto,
+} from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
@@ -52,6 +57,10 @@ export const FeedbackApi = {
     },
     deleteHistory: async (client: AxiosInstance, id: number): Promise<void> => {
         await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
+    },
+    createHistory: async (client: AxiosInstance, data: CreateFeedbackHistoryDto): Promise<FeedbackHistoryDto> => {
+        const response = await client.post<FeedbackHistoryDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);
+        return response.data;
     },
     fetchReviews: async (
         _client: AxiosInstance,

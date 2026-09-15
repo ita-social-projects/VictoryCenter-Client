@@ -163,7 +163,7 @@ export const ProgramExpensesTable = ({
                     recordId,
                     programId: value,
                     records: allRecords ?? records,
-                    trigger: 'change',
+                    trigger: value === undefined ? 'blur' : 'change',
                 });
 
                 return {

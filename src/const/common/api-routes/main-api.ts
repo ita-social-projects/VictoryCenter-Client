@@ -89,6 +89,9 @@ export const API_ROUTES = {
     FEEDBACK_HISTORIES: {
         BASE: 'FeedbackHistories',
     },
+    VIDEO_REVIEWS: {
+        BASE: 'VideoReviews',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },

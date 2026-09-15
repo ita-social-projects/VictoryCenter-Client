@@ -46,6 +46,17 @@
                 overflow-wrap: anywhere;
                 word-break: normal;
             }
+
+            &.feedback-truncate {
+                min-width: 0;
+
+                p {
+                    overflow: hidden;
+                    overflow-wrap: normal;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
         }
     }
 
@@ -66,6 +77,26 @@
             text-overflow: ellipsis;
             overflow-wrap: anywhere;
             word-break: normal;
+        }
+
+        a {
+            @include typography.body-1-regular;
+
+            display: block;
+            margin: 0;
+            color: colors.$blue-900;
+            padding-right: 40px;
+        }
+
+        &.feedback-truncate {
+            min-width: 0;
+
+            p,
+            a {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
     }
 

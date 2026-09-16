@@ -39,7 +39,21 @@ export const EventValidationSchema = Yup.object({
             return !value || value.length >= EVENT_VALIDATION.linkEng.min;
         }),
 
-    publishDate: Yup.string().nullable().notRequired(),
+    publishDate: Yup.string()
+        .nullable()
+        .test('is-valid-date', EVENT_VALIDATION.publishDate.getInvalidError(), (value) => {
+            if (!value) return true;
+
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+            const [year, month, day] = value.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+
+            return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+        })
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing ? schema.required(EVENT_VALIDATION.publishDate.getRequiredError()) : schema.notRequired(),
+        ),
 
     image: Yup.mixed<Image | ImageValues>()
         .nullable()

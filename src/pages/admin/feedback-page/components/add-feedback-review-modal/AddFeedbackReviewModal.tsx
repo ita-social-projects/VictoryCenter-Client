@@ -41,23 +41,6 @@ export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewMod
         mode: 'onTouched',
     });
 
-    const handleTextFieldChange = useCallback(
-        (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            field.onChange(getNormalizedInputTextWhileTyping(e.target.value));
-        },
-        [],
-    );
-
-    const handleTextFieldBlur = useCallback(
-        (field: any) => () => {
-            if (field.value) {
-                field.onChange(getNormalizedInputText(field.value));
-            }
-            field.onBlur();
-        },
-        [],
-    );
-
     const handleClose = useCallback(() => {
         if (isDirty) {
             setShowCloseConfirmModal(true);
@@ -86,8 +69,13 @@ export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewMod
                             <InputWithCharacterLimitGroup
                                 name={field.name}
                                 value={field.value}
-                                onChange={handleTextFieldChange(field)}
-                                onBlur={handleTextFieldBlur(field)}
+                                onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
+                                onBlur={() => {
+                                    if (field.value) {
+                                        field.onChange(getNormalizedInputText(field.value));
+                                    }
+                                    field.onBlur();
+                                }}
                                 label={FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.AUTHOR_NAME}
                                 id="feedback-review-author-name"
                                 maxLength={FEEDBACK_REVIEW_VALIDATION.authorName.max}
@@ -105,15 +93,19 @@ export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewMod
                             <TextAreaWithCharacterLimitGroup
                                 name={field.name}
                                 value={field.value}
-                                onChange={field.onChange}
-                                onBlur={handleTextFieldBlur(field)}
+                                onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
+                                onBlur={() => {
+                                    if (field.value) {
+                                        field.onChange(getNormalizedInputText(field.value));
+                                    }
+                                    field.onBlur();
+                                }}
                                 label={FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.TEXT}
                                 id="feedback-review-text"
                                 maxLength={FEEDBACK_REVIEW_VALIDATION.text.max}
                                 error={errors.text?.message}
                                 isRequired
                                 rows={4}
-                                normalizeValue={getNormalizedInputTextWhileTyping}
                             />
                         )}
                     />

@@ -48,21 +48,25 @@ export const FEEDBACK_CATEGORIES: FeedbackCategoryItem[] = [
     { id: FeedbackCategory.VIDEOS, name: FEEDBACK_TEXT.TABS.VIDEOS },
 ];
 
+const AUTHOR_NAME_MIN = 2;
+const AUTHOR_NAME_MAX = 200;
+const REVIEW_TEXT_MIN = 10;
+const REVIEW_TEXT_MAX = 500;
+
 export const FEEDBACK_REVIEW_VALIDATION = {
     authorName: {
-        min: 2,
-        max: 200,
+        min: AUTHOR_NAME_MIN,
+        max: AUTHOR_NAME_MAX,
         getRequiredError: () => "Поле обов'язкове",
-        getMinError: () => `Не менше ${FEEDBACK_REVIEW_VALIDATION.authorName.min} символів`,
-        getMaxError: () => `Не більше ${FEEDBACK_REVIEW_VALIDATION.authorName.max} символів`,
+        getMinError: () => `Не менше ${AUTHOR_NAME_MIN} символів`,
+        getMaxError: () => `Не більше ${AUTHOR_NAME_MAX} символів`,
     },
     text: {
-        min: 10,
-        max: 500,
+        min: REVIEW_TEXT_MIN,
+        max: REVIEW_TEXT_MAX,
         getRequiredError: () => "Поле обов'язкове",
-        getMinError: () => `Не менше ${FEEDBACK_REVIEW_VALIDATION.text.min} символів`,
-        getMaxError: () => `Не більше ${FEEDBACK_REVIEW_VALIDATION.text.max} символів`,
+        getMinError: () => `Не менше ${REVIEW_TEXT_MIN} символів`,
+        getMaxError: () => `Не більше ${REVIEW_TEXT_MAX} символів`,
     },
 };
-
 export const FEEDBACK_PAGINATION_LIMIT = 7;

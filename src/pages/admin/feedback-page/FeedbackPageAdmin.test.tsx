@@ -136,6 +136,20 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     ),
 }));
 
+jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => ({
+    AddVideoReviewModal: ({ isOpen, onClose, onSubmit }: any) =>
+        isOpen ? (
+            <div data-testid="add-video-review-modal">
+                <button data-testid="add-video-review-close" onClick={onClose}>
+                    Close
+                </button>
+                <button data-testid="add-video-review-submit" onClick={() => onSubmit?.({ title: 't', link: 'l' })}>
+                    Submit
+                </button>
+            </div>
+        ) : null,
+}));
+
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
     FeedbackApi: {
         fetchHistory: jest.fn(),
@@ -267,6 +281,66 @@ describe('FeedbackPageAdmin', () => {
         fireEvent.click(addBtn);
 
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
+    });
+
+    it('should open AddVideoReviewModal when Add button is clicked on the videos tab', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const videosTab = screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS);
+        fireEvent.click(videosTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Відео 20')).toBeInTheDocument();
+        });
+
+        const addBtn = screen.getByTestId('toolbar-add-button');
+        fireEvent.click(addBtn);
+
+        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+        await waitFor(() => {
+            expect(screen.getByText('Відео 20')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('toolbar-add-button'));
+        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('add-video-review-submit'));
+        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should close AddVideoReviewModal when its onClose is called', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+        await waitFor(() => {
+            expect(screen.getByText('Відео 20')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('toolbar-add-button'));
+        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('add-video-review-close'));
+        expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
     });
 
     it('should call addToast when Edit button on a card is clicked', async () => {

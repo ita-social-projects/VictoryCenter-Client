@@ -13,6 +13,7 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -69,6 +70,20 @@ export const FeedbackPageAdmin = () => {
     }, [addToast]);
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
+    const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
+
+    const handleAddClick = useCallback(() => {
+        if (activeCategory === FeedbackCategory.VIDEOS) {
+            setIsAddVideoReviewModalOpen(true);
+        } else {
+            handleNotImplemented();
+        }
+    }, [activeCategory, handleNotImplemented]);
+
+    const handleAddVideoReviewSubmit = useCallback(async () => {
+        handleNotImplemented();
+        return false;
+    }, [handleNotImplemented]);
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
@@ -281,7 +296,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={handleNotImplemented}
+                    onAddItem={handleAddClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
@@ -326,6 +341,11 @@ export const FeedbackPageAdmin = () => {
                 onClose={() => setHistoryToDelete(null)}
                 historyToDelete={historyToDelete}
                 onDeleteHistory={handleDeleteHistoryConfirm}
+            />
+            <AddVideoReviewModal
+                isOpen={isAddVideoReviewModalOpen}
+                onClose={() => setIsAddVideoReviewModalOpen(false)}
+                onSubmit={handleAddVideoReviewSubmit}
             />
             <ToastContainer />
         </div>

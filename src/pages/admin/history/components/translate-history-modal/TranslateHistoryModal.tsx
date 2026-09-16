@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import cn from 'classnames';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -16,8 +17,19 @@ import { renderHistorySection } from '@/utils/functions/render-history-section';
 import { getHistorySectionData, getOrderedHistoryContentsByType } from '@/utils/functions/history-section-data';
 import styles from './TranslateHistoryModal.module.scss';
 
-// Templates whose UA layout puts the image above the text (all others render it below).
-export const IMAGE_FIRST_TEMPLATES = new Set<SectionTemplate>([SectionTemplate.SingleImageTop]);
+export type HistoryImagePosition = 'top' | 'bottom' | 'right';
+
+export const HISTORY_TEMPLATE_IMAGE_POSITION: Partial<Record<SectionTemplate, HistoryImagePosition>> = {
+    [SectionTemplate.SingleImageTop]: 'top',
+    [SectionTemplate.SingleImageRight]: 'right',
+    [SectionTemplate.SingleImageBottom]: 'bottom',
+    [SectionTemplate.DualImagesBottom]: 'bottom',
+    [SectionTemplate.TripleImagesBottom]: 'bottom',
+    [SectionTemplate.QuadImagesBottom]: 'bottom',
+};
+
+export const getHistoryImagePosition = (template: SectionTemplate): HistoryImagePosition =>
+    HISTORY_TEMPLATE_IMAGE_POSITION[template] ?? 'bottom';
 
 const getInitialData = (section: HistorySectionDto, languageId?: number): TranslateHistorySectionFormValues | null => {
     if (!languageId) return null;
@@ -209,7 +221,7 @@ const SectionTranslationRow = ({
               validationResetKey: 0,
           })
         : null;
-    const imageFirst = IMAGE_FIRST_TEMPLATES.has(section.template);
+    const imagePosition = getHistoryImagePosition(section.template);
     const previewNode = imagesPreview ? (
         <div className={styles['section-preview']} data-testid="history-section-images-preview">
             {imagesPreview}
@@ -217,16 +229,21 @@ const SectionTranslationRow = ({
     ) : null;
 
     return (
-        <div className={styles['section-row']} data-testid="translate-section-row">
-            {imageFirst && previewNode}
+        <div
+            className={cn(styles['section-row'], styles[`section-row--${imagePosition}`])}
+            data-testid="translate-section-row"
+            data-image-position={imagePosition}
+        >
+            {imagePosition === 'top' && previewNode}
             <TranslateHistorySectionForm
                 ref={formRef}
                 initialData={initialData}
                 onSubmit={() => {}}
                 onValidationChange={handleValidationChange}
                 onDirtyChange={handleDirtyChange}
+                stacked={imagePosition === 'right'}
             />
-            {!imageFirst && previewNode}
+            {imagePosition !== 'top' && previewNode}
         </div>
     );
 };

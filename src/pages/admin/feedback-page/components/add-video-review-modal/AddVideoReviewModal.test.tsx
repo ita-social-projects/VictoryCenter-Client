@@ -3,22 +3,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
 import { AddVideoReviewModal } from './AddVideoReviewModal';
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose }: any) => (
-        <div data-testid="confirm-modal" data-open={String(isOpen)}>
-            <span>{title}</span>
-            <button data-testid="confirm-yes" onClick={onConfirm}>
-                Yes
-            </button>
-            <button data-testid="confirm-no" onClick={onCancel}>
-                No
-            </button>
-            <button data-testid="confirm-close" onClick={onClose}>
-                Close
-            </button>
-        </div>
-    ),
-}));
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
 
 describe('AddVideoReviewModal', () => {
     const SUBMIT_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED;

@@ -284,28 +284,7 @@ describe('FeedbackPageAdmin', () => {
         expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
     });
 
-    it('should open AddVideoReviewModal when Add button is clicked on the videos tab', async () => {
-        render(<FeedbackPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Історія 1')).toBeInTheDocument();
-        });
-
-        const videosTab = screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS);
-        fireEvent.click(videosTab);
-
-        await waitFor(() => {
-            expect(screen.getByText('Відео 20')).toBeInTheDocument();
-        });
-
-        const addBtn = screen.getByTestId('toolbar-add-button');
-        fireEvent.click(addBtn);
-
-        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
-        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
-    });
-
-    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+    const openAddVideoReviewModalOnVideosTab = async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -319,25 +298,23 @@ describe('FeedbackPageAdmin', () => {
 
         fireEvent.click(screen.getByTestId('toolbar-add-button'));
         expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+    };
+
+    it('should open AddVideoReviewModal when Add button is clicked on the videos tab', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+        await openAddVideoReviewModalOnVideosTab();
 
         fireEvent.click(screen.getByTestId('add-video-review-submit'));
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
     it('should close AddVideoReviewModal when its onClose is called', async () => {
-        render(<FeedbackPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Історія 1')).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
-        await waitFor(() => {
-            expect(screen.getByText('Відео 20')).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('toolbar-add-button'));
-        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+        await openAddVideoReviewModalOnVideosTab();
 
         fireEvent.click(screen.getByTestId('add-video-review-close'));
         expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();

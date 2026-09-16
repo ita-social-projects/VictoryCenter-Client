@@ -88,11 +88,15 @@ describe('AddVideoReviewModal', () => {
         });
     });
 
+    const expectRequiredErrorOnBlur = (getInput: () => HTMLElement) => {
+        fireEvent.blur(getInput());
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+    };
+
     describe('title field validation (#3458)', () => {
         it('shows required error on blur when empty', () => {
             renderOpen();
-            fireEvent.blur(getTitleInput());
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+            expectRequiredErrorOnBlur(getTitleInput);
         });
 
         it('treats a value with only spaces as empty', () => {
@@ -128,8 +132,7 @@ describe('AddVideoReviewModal', () => {
     describe('link field validation (#3458)', () => {
         it('shows required error on blur when empty', () => {
             renderOpen();
-            fireEvent.blur(getLinkInput());
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+            expectRequiredErrorOnBlur(getLinkInput);
         });
 
         it('shows min length error when shorter than 10 characters after trim', () => {
@@ -209,6 +212,13 @@ describe('AddVideoReviewModal', () => {
     });
 
     describe('close behavior ("X" button, #3457)', () => {
+        const requestCloseWithDraftTitle = (onClose = jest.fn()) => {
+            renderOpen(onClose);
+            fireEvent.change(getTitleInput(), { target: { value: 'draft' } });
+            fireEvent.click(getCloseButton());
+            return onClose;
+        };
+
         it('closes immediately when both fields are empty', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
@@ -218,10 +228,7 @@ describe('AddVideoReviewModal', () => {
         });
 
         it('shows the unsaved-changes confirmation when a field has data', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(getTitleInput(), { target: { value: 'draft' } });
-            fireEvent.click(getCloseButton());
+            const onClose = requestCloseWithDraftTitle();
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
             expect(
@@ -232,19 +239,13 @@ describe('AddVideoReviewModal', () => {
         });
 
         it('closes and clears the form when confirming close', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(getTitleInput(), { target: { value: 'draft' } });
-            fireEvent.click(getCloseButton());
+            const onClose = requestCloseWithDraftTitle();
             fireEvent.click(screen.getByTestId('confirm-yes'));
             expect(onClose).toHaveBeenCalledTimes(1);
         });
 
         it('keeps the modal open with entered data when cancelling close', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(getTitleInput(), { target: { value: 'draft' } });
-            fireEvent.click(getCloseButton());
+            const onClose = requestCloseWithDraftTitle();
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(onClose).not.toHaveBeenCalled();
             expect(getTitleInput()).toHaveValue('draft');

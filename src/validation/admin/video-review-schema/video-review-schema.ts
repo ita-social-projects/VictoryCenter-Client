@@ -12,9 +12,6 @@ const isHttpOrHttpsUrl = (value: string): boolean => {
     }
 };
 
-// Live validation runs on every keystroke, while a single trailing space is still allowed to
-// persist mid-typing (see getNormalizedInputTextWhileTyping) - trimming here keeps length checks
-// accurate against the value that will actually be sent, instead of the transient raw input.
 const trimTransform = (value: string | undefined) => (typeof value === 'string' ? value.trim() : value);
 
 export const VideoReviewValidationSchema = Yup.object({

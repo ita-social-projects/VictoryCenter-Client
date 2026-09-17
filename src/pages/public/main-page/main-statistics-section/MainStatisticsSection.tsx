@@ -3,13 +3,13 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { useCounterAnimation } from '@/hooks/common/use-counter-animation/useCounterAnimation';
 import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricType } from '@/types/public/main-page';
+import { CURRENCY_LABELS } from '@/const/common/currency';
+import { DEFAULT_LOCALE, NUMBER_FORMAT_LOCALES } from '@/const/common/locales';
+import { applyMetricPrefix } from '@/utils/functions/formatters/metric-formatters';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import fallbackImage from '@/assets/images/two-horses-gray.webp';
 import styles from './MainStatisticsSection.module.scss';
-
-const UAH_LABEL = 'грн';
-const USD_LABEL = '$';
 
 interface MainStatisticsSectionProps {
     impactStatistics: PublicImpactStatisticDto | null | undefined;
@@ -21,7 +21,7 @@ const getMetricLocalizedName = (metric: PublicMetricDto, currentLanguage: string
 };
 
 const getUsdValue = (metric: PublicMetricDto, currentLanguage: string): number | null => {
-    if (metric.type !== MetricType.Raised || currentLanguage !== 'en') return null;
+    if (metric.type !== MetricType.Raised) return null;
 
     const loc = metric.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
     return loc?.value ? parseFormattedNumber(loc.value) : null;
@@ -32,13 +32,13 @@ const formatMetricValue = (
     prefix: MetricPrefix | null | undefined,
     type: MetricType,
     isUsd: boolean,
+    locale: string,
 ): string => {
-    const formatted = value.toLocaleString(isUsd ? 'en-US' : 'uk-UA');
-    const prefixStr = prefix === MetricPrefix.Plus ? '+' : prefix === MetricPrefix.Percent ? '%' : '';
+    const formatted = applyMetricPrefix(value.toLocaleString(locale), prefix);
 
-    if (type !== MetricType.Raised) return `${formatted}${prefixStr}`;
+    if (type !== MetricType.Raised) return formatted;
 
-    return isUsd ? `${USD_LABEL}${formatted}${prefixStr}` : `${formatted}${prefixStr} ${UAH_LABEL}`;
+    return isUsd ? `${CURRENCY_LABELS.USD}${formatted}` : `${formatted} ${CURRENCY_LABELS.UAH}`;
 };
 
 const getStatisticTitle = (statistic: PublicImpactStatisticDto, currentLanguage: string): string => {
@@ -59,8 +59,9 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ metric, currentLangua
     const displayValue = useCounterAnimation(targetValue, isVisible);
 
     const name = getMetricLocalizedName(metric, currentLanguage);
-    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type, isUsd);
-    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.type, isUsd);
+    const locale = NUMBER_FORMAT_LOCALES[currentLanguage] ?? NUMBER_FORMAT_LOCALES[DEFAULT_LOCALE];
+    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type, isUsd, locale);
+    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.type, isUsd, locale);
 
     return (
         <div className={styles.metric} role="figure" aria-label={`${name}: ${finalValueText}`}>

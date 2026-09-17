@@ -35,12 +35,16 @@ export const formatMetricValue = (metric: Metric, language: 'UA' | 'EN' = 'UA') 
 
     const valueStr = numValue.toLocaleString(locale);
 
-    switch (metric.prefix) {
+    return applyMetricPrefix(valueStr, metric.prefix);
+};
+
+export const applyMetricPrefix = (value: string, prefix?: number | null): string => {
+    switch (prefix) {
         case MetricPrefix.Plus:
-            return `${valueStr}+`;
+            return `${value}+`;
         case MetricPrefix.Percent:
-            return `${valueStr}%`;
+            return `${value}%`;
         default:
-            return valueStr;
+            return value;
     }
 };

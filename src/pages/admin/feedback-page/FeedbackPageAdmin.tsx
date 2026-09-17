@@ -341,7 +341,7 @@ export const FeedbackPageAdmin = () => {
                     }
                     emptyStateAction={
                         !isFilteredView ? (
-                            <Button buttonStyle="secondary" onClick={handleNotImplemented}>
+                            <Button buttonStyle="secondary" onClick={handleAddClick}>
                                 {FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                             </Button>
                         ) : undefined

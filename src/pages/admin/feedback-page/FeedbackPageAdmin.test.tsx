@@ -276,8 +276,8 @@ describe('FeedbackPageAdmin', () => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
-        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
-        fireEvent.click(reviewsTab);
+        const videosTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.VIDEOS });
+        fireEvent.click(videosTab);
 
         const addBtn = screen.getByTestId('toolbar-add-button');
         fireEvent.click(addBtn);

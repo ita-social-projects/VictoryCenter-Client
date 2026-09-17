@@ -285,7 +285,7 @@ describe('FeedbackPageAdmin', () => {
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
-    it('should call addToast when Edit button on a card is clicked', async () => {
+    it('should open edit modal when Edit button is clicked on a history card', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -294,7 +294,7 @@ describe('FeedbackPageAdmin', () => {
 
         const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtns[0]);
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
     });
 
     it('should open delete modal when Delete button is clicked on history card and delete item upon confirmation', async () => {

@@ -170,27 +170,12 @@ export const FeedbackPageAdmin = () => {
     }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
 
     const handleAddHistorySuccess = useCallback(
-        (newHistory: FeedbackHistoryDto) => {
+        (_newHistory: FeedbackHistoryDto) => {
             setSelectedSearchItem(null);
-            const passesStatusFilter = statusFilter === undefined || newHistory.status === statusFilter;
-
-            if (passesStatusFilter) {
-                setItems((prev) => {
-                    const exists = prev.some((item) => item.id === newHistory.id);
-                    if (exists) return prev;
-                    if (prev.length < FEEDBACK_PAGINATION_LIMIT) {
-                        return [...prev, newHistory];
-                    }
-                    return prev;
-                });
-                if (hasMore) {
-                    setHasMore(true);
-                }
-            }
-
+            fetchCategoryItems(activeCategory, 0);
             addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
         },
-        [statusFilter, hasMore, addToast],
+        [fetchCategoryItems, activeCategory, addToast],
     );
 
     const handleEditHistorySuccess = useCallback(
@@ -198,10 +183,16 @@ export const FeedbackPageAdmin = () => {
             if (selectedSearchItem?.id === updatedHistory.id) {
                 setSelectedSearchItem(updatedHistory);
             }
-            setItems((prev) => prev.map((item) => (item.id === updatedHistory.id ? updatedHistory : item)));
+            const passesStatusFilter = statusFilter === undefined || updatedHistory.status === statusFilter;
+
+            if (passesStatusFilter) {
+                setItems((prev) => prev.map((item) => (item.id === updatedHistory.id ? updatedHistory : item)));
+            } else {
+                setItems((prev) => prev.filter((item) => item.id !== updatedHistory.id));
+            }
             addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_EDIT_HISTORY, ToastType.Success);
         },
-        [selectedSearchItem, addToast],
+        [selectedSearchItem, statusFilter, addToast],
     );
 
     const getFeedbackSearchItems = useCallback(

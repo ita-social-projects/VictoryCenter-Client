@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface UseImageErrorProps {
     resetKey?: number;
@@ -6,8 +6,13 @@ export interface UseImageErrorProps {
 
 export const useImageError = ({ resetKey }: UseImageErrorProps = {}) => {
     const [error, setError] = useState<string>('');
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         setError('');
     }, [resetKey]);
 

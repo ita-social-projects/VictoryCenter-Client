@@ -1,6 +1,5 @@
 import {
     CreateUpdateHistorySectionDto,
-    CreateHistorySectionContentDto,
     HistorySectionDto,
 } from '@/types/common/history-sections';
 import { AxiosInstance } from 'axios';

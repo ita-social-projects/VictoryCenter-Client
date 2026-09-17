@@ -125,7 +125,7 @@ describe('StatisticsMetricsList', () => {
 
     it('renders both UAH and USD values with symbols for Raised metric type', () => {
         setup();
-        const raisedUahEl = screen.getByText((content) => normalizeSpaces(content).includes('₴5 000 000'));
+        const raisedUahEl = screen.getByText((content) => normalizeSpaces(content).includes('5 000 000 грн'));
         expect(raisedUahEl).toBeInTheDocument();
 
         const raisedUsdEl = screen.getByText('$125,000');

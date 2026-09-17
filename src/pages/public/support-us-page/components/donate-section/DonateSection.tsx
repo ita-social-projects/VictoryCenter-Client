@@ -1,34 +1,17 @@
-import React from 'react';
-import { Button } from '@/components/public/ui/button';
-import { PUBLIC_ROUTES } from '@/const/public/routes';
-import fallbackImage from '@/assets/images/girl-horse.webp';
-import background from '@/assets/videos/child-riding-horse.webm';
 import { useTranslation } from 'react-i18next';
-import styles from './DonateSection.module.scss';
+import { CtaSection } from '@/components/public/cta';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import background from '@/assets/videos/child-riding-horse.webm';
 
-export const DonateSection: React.FC = () => {
+export const DonateSection = () => {
     const { t } = useTranslation('supportUsPage');
 
     return (
-        <div className={styles['donate-block']}>
-            <video autoPlay muted loop playsInline aria-hidden="true" poster={fallbackImage}>
-                <source src={background} type="video/webm" />
-            </video>
-            <div className={styles['donate-info']}>
-                <h2 className={styles['donate-title']}>{t('DONATE.TITLE')}</h2>
-                <div className={styles['donate-button']}>
-                    <p>{t('DONATE.DESCRIPTION')}</p>
-                    <Button
-                        href={PUBLIC_ROUTES.DONATE.FULL}
-                        variant="primary-light"
-                        aria-label={t('DONATE.SUBMIT_BUTTON')}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        {t('DONATE.SUBMIT_BUTTON')}
-                    </Button>
-                </div>
-            </div>
-        </div>
+        <CtaSection
+            title={t('DONATE.TITLE')}
+            description={t('DONATE.DESCRIPTION')}
+            mediaUrl={background}
+            buttons={[{ label: t('DONATE.SUBMIT_BUTTON'), href: PUBLIC_ROUTES.DONATE.FULL }]}
+        />
     );
 };

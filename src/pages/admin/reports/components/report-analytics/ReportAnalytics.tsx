@@ -18,6 +18,7 @@ import { PdfFilesSection } from '../pdf-files-section/PdfFilesSection';
 import { FundsExpenditureSection } from '../funds-expenditures-section/FundsExpendituresSection';
 import { ProgramExpensesSection } from '../program-expenses-section/ProgramExpensesSection';
 import { TranslateReportsCategoryModal } from '../funds-expenditures-section/components/common/translate-reports-category-modal/TranslateReportsCategoryModal';
+import { useAdminNavigationGuard } from '@/contexts/admin/admin-navigation-guard-provider/AdminNavigationGuardProvider';
 
 interface ReportAnalyticsTab {
     id: 'income-expenses' | 'program-expenses' | 'pdf-files';
@@ -55,8 +56,13 @@ export const ReportAnalytics = () => {
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
     const [renderKey, setRenderKey] = useState(0);
+    const { setBlocked } = useAdminNavigationGuard();
     const saveSettingsCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
     const refetchSettingsRef = useRef<(() => void) | null>(null);
+
+    const isReportDataValid = incomeCount >= 2 && expenseCount >= 2 && programRecordsCount >= 1 && isFundsValid;
+    const isPublishEnabled = hasUnpublishedChanges && isReportDataValid;
+    const canExitEditMode = !isFundsEditing || isReportDataValid;
 
     useEffect(() => {
         localizationLanguagesDataFetch()
@@ -67,6 +73,11 @@ export const ReportAnalytics = () => {
                 addToast(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, ToastType.Error);
             });
     }, [addToast]);
+
+    useEffect(() => {
+        setBlocked(!canExitEditMode, COMMON_TEXT_ADMIN.MESSAGE.NAVIGATION_BLOCKED);
+        return () => setBlocked(false);
+    }, [canExitEditMode, setBlocked]);
 
     const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
@@ -98,6 +109,7 @@ export const ReportAnalytics = () => {
         [addToast],
     );
 
+<<<<<<< HEAD
     const isPublishEnabled =
         hasUnpublishedChanges &&
         incomeCount >= 2 &&
@@ -105,6 +117,31 @@ export const ReportAnalytics = () => {
         programRecordsCount >= 1 &&
         isFundsValid &&
         !hasSelectedRecords;
+=======
+    const handleEditModeChange = useCallback(
+        (nextIsEditing: boolean) => {
+            if (!nextIsEditing && !isReportDataValid) {
+                addToast(
+                    'Неможливо завершити редагування: додайте щонайменше 2 доходи, 2 витрати та 1 програмну витрату',
+                    ToastType.Error,
+                );
+                return;
+            }
+            setIsFundsEditing(nextIsEditing);
+        },
+        [isReportDataValid, addToast],
+    );
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (!canExitEditMode) {
+                e.preventDefault();
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [canExitEditMode]);
+>>>>>>> release/1.0.0
 
     const handlePublishClick = useCallback(() => {
         setIsPublishModalOpen(true);
@@ -181,7 +218,7 @@ export const ReportAnalytics = () => {
                     <FundsExpenditureSection
                         isEditing={isFundsEditing}
                         draftExchangeRate={exchangeRateDraft}
-                        onEditModeChange={setIsFundsEditing}
+                        onEditModeChange={handleEditModeChange}
                         onExchangeRateValueChange={setExchangeRateDraft}
                         isAddCategoryModalOpen={isAddCategoryModalOpen}
                         onAddCategoryModalClose={() => setIsAddCategoryModalOpen(false)}

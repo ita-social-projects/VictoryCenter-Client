@@ -1,22 +1,40 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventModal } from './EventModal';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
+
+const getTodayLabel = () => {
+    const today = new Date();
+
+    return `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
+        2,
+        '0',
+    )}/${today.getFullYear()}`;
+};
+
+const openDatePickerAndSelectToday = (todayLabel: string) => {
+    fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+    fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+};
+
+const expectDatePickerClosed = () => {
+    expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+};
 
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, error, name, id, label }: any) => (
+    InputWithCharacterLimitGroup: ({ value, onChange, error, name, id, label, onBlur }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
-            <input name={name} id={id} value={value} onChange={onChange} />
-            {error && <span data-testid="name-error">{error}</span>}
+            <input name={name} id={id} value={value} onChange={onChange} onBlur={onBlur} />
+            {error && <span data-testid="input-error">{error}</span>}
         </div>
     ),
 }));
@@ -32,43 +50,53 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, error, name, id, label }: any) => (
+        TextAreaWithCharacterLimitGroup: ({ value, onChange, error, name, id, label, onBlur }: any) => (
             <div>
                 <label htmlFor={id}>{label}</label>
-                <textarea name={name} id={id} value={value} onChange={onChange} />
+                <textarea name={name} id={id} value={value} onChange={onChange} onBlur={onBlur} />
                 {error && <span data-testid="description-error">{error}</span>}
             </div>
         ),
     }),
 );
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError }: Pick<ImageInputProps, 'onChange' | 'setError'>) => (
-        <div data-testid="image-input">
-            <button
-                type="button"
-                data-testid="upload-valid-image"
-                onClick={() => onChange({ base64: 'test-base64-data', mimeType: 'image/png' })}
-            >
-                Upload Image
-            </button>
-            <button
-                type="button"
-                data-testid="trigger-image-error"
-                onClick={() => setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))}
-            >
-                Trigger Error
-            </button>
-        </div>
-    ),
-    getImageSrc: (image: any) => {
+jest.mock('@/components/admin/image-input/ImageInput', () => {
+    const getImageSrc = (image: any) => {
         if (!image) return '';
         if (typeof image === 'string') return image;
         if ('url' in image && image.url) return image.url;
         if ('base64' in image) return `data:${image.mimeType};base64,${image.base64}`;
         return '';
-    },
-}));
+    };
+
+    return {
+        ImageInput: ({ value, onChange, setError }: Pick<ImageInputProps, 'value' | 'onChange' | 'setError'>) => (
+            <div data-testid="image-input">
+                {value && <img data-testid="event-image-preview" src={getImageSrc(value)} alt="preview" />}
+                <button
+                    type="button"
+                    data-testid="upload-valid-image"
+                    onClick={() => {
+                        setError('');
+                        onChange({ base64: 'test-base64-data', mimeType: 'image/png' });
+                    }}
+                >
+                    Upload Image
+                </button>
+                <button
+                    type="button"
+                    data-testid="trigger-image-error"
+                    onClick={() =>
+                        setError(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB))
+                    }
+                >
+                    Trigger Error
+                </button>
+            </div>
+        ),
+        getImageSrc,
+    };
+});
 
 const currentCategory: EventCategoryDto | null = {
     id: 1,
@@ -109,6 +137,12 @@ describe('EventModal', () => {
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.LINK_ENG })).toBeInTheDocument();
         });
 
+        it('renders date picker trigger', () => {
+            render(<EventModal {...defaultProps} />);
+
+            expect(screen.getByRole('button', { name: /Вибір дати/i })).toBeInTheDocument();
+        });
+
         it('renders category chip when currentCategory is provided', () => {
             render(<EventModal {...defaultProps} />);
 
@@ -134,6 +168,24 @@ describe('EventModal', () => {
 
             expect(saveAsDraftButton).toBeDisabled();
             expect(saveAsPublishedButton).toBeDisabled();
+        });
+
+        it('sets validation error on blur', async () => {
+            render(<EventModal {...defaultProps} />);
+
+            const input = screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE });
+
+            fireEvent.change(input, {
+                target: { value: '' },
+            });
+
+            fireEvent.blur(input);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('input-error')).toHaveTextContent(
+                    mockEventValidation.title.getRequiredError(),
+                );
+            });
         });
     });
 
@@ -214,6 +266,76 @@ describe('EventModal', () => {
         });
     });
 
+    describe('date picker', () => {
+        it('applies the selected date only after confirming', () => {
+            render(<EventModal {...defaultProps} />);
+            const todayLabel = getTodayLabel();
+
+            openDatePickerAndSelectToday(todayLabel);
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+
+            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expectDatePickerClosed();
+        });
+
+        it('discards a pending date when cancelled', () => {
+            render(<EventModal {...defaultProps} />);
+            const todayLabel = getTodayLabel();
+
+            openDatePickerAndSelectToday(todayLabel);
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+            expect(screen.getByRole('button', { name: /Вибір дати/i })).toHaveTextContent('');
+            expectDatePickerClosed();
+        });
+
+        it('deselects a day and confirms the current date when no date remains selected', () => {
+            render(<EventModal {...defaultProps} />);
+            const todayLabel = getTodayLabel();
+
+            openDatePickerAndSelectToday(todayLabel);
+            expect(screen.getByRole('button', { name: todayLabel })).toHaveAttribute('aria-pressed', 'false');
+
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+
+            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expectDatePickerClosed();
+        });
+
+        it('opens month and year selection from the calendar header', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+
+            expect(screen.getByRole('button', { name: String(new Date().getFullYear()) })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Січ' })).toBeInTheDocument();
+        });
+
+        it('opens a month calendar with an inactive confirmation button', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+            fireEvent.click(screen.getByRole('button', { name: 'Січ' }));
+
+            expect(screen.getByText('ПН')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).toBeDisabled();
+            expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Вибрати місяць і рік' })).not.toBeInTheDocument();
+        });
+
+        it('does not allow interaction with the parent date picker while the month selector is open', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+
+            expect(screen.queryByText('ПН')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).not.toBeInTheDocument();
+        });
+    });
+
     describe('image handling', () => {
         it('renders image section label and upload component initially', () => {
             render(<EventModal {...defaultProps} />);
@@ -233,31 +355,35 @@ describe('EventModal', () => {
                 'src',
                 'data:image/png;base64,test-base64-data',
             );
-            expect(screen.queryByTestId('image-input')).not.toBeInTheDocument();
+            expect(screen.getByTestId('image-input')).toBeInTheDocument();
         });
 
-        it('displays error message when image validation fails', () => {
+        it('displays error message when image validation fails', async () => {
             render(<EventModal {...defaultProps} />);
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
 
-            expect(
-                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
-            ).toBeInTheDocument();
+            const errorMessage = await screen.findByText(
+                mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB),
+            );
+            expect(errorMessage).toBeInTheDocument();
         });
 
-        it('clears image error when a valid image is selected', () => {
+        it('clears image error when a valid image is selected', async () => {
             render(<EventModal {...defaultProps} />);
 
             fireEvent.click(screen.getByTestId('trigger-image-error'));
             expect(
-                screen.getByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+                await screen.findByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
             ).toBeInTheDocument();
 
             fireEvent.click(screen.getByTestId('upload-valid-image'));
-            expect(
-                screen.queryByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
-            ).not.toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(
+                    screen.queryByText(mockEventValidation.image.getSizeError(mockEventValidation.image.maxSizeMB)),
+                ).not.toBeInTheDocument();
+            });
         });
 
         it('shows confirmation modal on close when image was added (isDirty state)', () => {

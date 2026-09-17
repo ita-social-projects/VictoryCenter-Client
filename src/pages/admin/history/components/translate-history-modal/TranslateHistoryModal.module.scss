@@ -16,3 +16,7 @@
     user-select: none;
     opacity: 1;
 }
+
+.section-preview :global([data-section-text]) {
+    display: none;
+}

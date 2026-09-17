@@ -61,7 +61,7 @@ export const ReportAnalytics = () => {
     const refetchSettingsRef = useRef<(() => void) | null>(null);
 
     const isReportDataValid = incomeCount >= 2 && expenseCount >= 2 && programRecordsCount >= 1 && isFundsValid;
-    const isPublishEnabled = hasUnpublishedChanges && isReportDataValid;
+    const isPublishEnabled = hasUnpublishedChanges && isReportDataValid && !hasSelectedRecords;
     const canExitEditMode = !isFundsEditing || isReportDataValid;
 
     useEffect(() => {
@@ -109,15 +109,6 @@ export const ReportAnalytics = () => {
         [addToast],
     );
 
-<<<<<<< HEAD
-    const isPublishEnabled =
-        hasUnpublishedChanges &&
-        incomeCount >= 2 &&
-        expenseCount >= 2 &&
-        programRecordsCount >= 1 &&
-        isFundsValid &&
-        !hasSelectedRecords;
-=======
     const handleEditModeChange = useCallback(
         (nextIsEditing: boolean) => {
             if (!nextIsEditing && !isReportDataValid) {
@@ -141,7 +132,6 @@ export const ReportAnalytics = () => {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [canExitEditMode]);
->>>>>>> release/1.0.0
 
     const handlePublishClick = useCallback(() => {
         setIsPublishModalOpen(true);

@@ -256,7 +256,7 @@ describe('FeedbackPageAdmin', () => {
         expect(videoLink).toHaveAttribute('rel', 'noreferrer');
     });
 
-    it('should call addToast when Add button in toolbar is clicked', async () => {
+    it('should open AddFeedbackHistoryModal when Add button in toolbar is clicked in History tab', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -266,10 +266,26 @@ describe('FeedbackPageAdmin', () => {
         const addBtn = screen.getByTestId('toolbar-add-button');
         fireEvent.click(addBtn);
 
+        expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+    });
+
+    it('should call addToast when Add button in toolbar is clicked in non-history tab', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const videosTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.VIDEOS });
+        fireEvent.click(videosTab);
+
+        const addBtn = screen.getByTestId('toolbar-add-button');
+        fireEvent.click(addBtn);
+
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
-    it('should call addToast when Edit button on a card is clicked', async () => {
+    it('should open edit modal when Edit button is clicked on a history card', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -278,7 +294,47 @@ describe('FeedbackPageAdmin', () => {
 
         const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtns[0]);
+        expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+    });
+
+    it('should call addToast when Edit button is clicked on a non-history card', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
+        fireEvent.click(reviewsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
+        });
+
+        const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
+        fireEvent.click(editBtns[0]);
+
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should open AddFeedbackReviewModal when Add button in toolbar is clicked in REVIEWS tab', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
+        fireEvent.click(reviewsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
+        });
+
+        const addBtn = screen.getByTestId('toolbar-add-button');
+        fireEvent.click(addBtn);
+
+        expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
     });
 
     it('should open delete modal when Delete button is clicked on history card and delete item upon confirmation', async () => {

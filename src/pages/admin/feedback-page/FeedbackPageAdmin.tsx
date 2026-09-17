@@ -13,6 +13,7 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
@@ -71,6 +72,31 @@ export const FeedbackPageAdmin = () => {
     }, [addToast]);
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
+    const [historyToEdit, setHistoryToEdit] = useState<FeedbackHistoryDto | null>(null);
+    const [isAddHistoryModalOpen, setIsAddHistoryModalOpen] = useState<boolean>(false);
+
+    const handleAddItemClick = useCallback(() => {
+        if (activeCategory === FeedbackCategory.HISTORY) {
+            setHistoryToEdit(null);
+            setIsAddHistoryModalOpen(true);
+        } else if (activeCategory === FeedbackCategory.REVIEWS) {
+            setIsAddReviewModalOpen(true);
+        } else {
+            handleNotImplemented();
+        }
+    }, [activeCategory, handleNotImplemented]);
+
+    const handleEditClick = useCallback(
+        (item: FeedbackListItem) => {
+            if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
+                setHistoryToEdit(item);
+                setIsAddHistoryModalOpen(true);
+            } else {
+                handleNotImplemented();
+            }
+        },
+        [activeCategory, handleNotImplemented],
+    );
 
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
 
@@ -95,14 +121,6 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
-
-    const handleAddMaterialClick = useCallback(() => {
-        if (activeCategory === FeedbackCategory.REVIEWS) {
-            setIsAddReviewModalOpen(true);
-            return;
-        }
-        handleNotImplemented();
-    }, [activeCategory, handleNotImplemented]);
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -156,6 +174,32 @@ export const FeedbackPageAdmin = () => {
             fetchCategoryItems(activeCategory);
         }
     }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
+
+    const handleAddHistorySuccess = useCallback(
+        (_newHistory: FeedbackHistoryDto) => {
+            setSelectedSearchItem(null);
+            fetchCategoryItems(activeCategory, 0);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
+        },
+        [fetchCategoryItems, activeCategory, addToast],
+    );
+
+    const handleEditHistorySuccess = useCallback(
+        (updatedHistory: FeedbackHistoryDto) => {
+            if (selectedSearchItem?.id === updatedHistory.id) {
+                setSelectedSearchItem(updatedHistory);
+            }
+            const passesStatusFilter = statusFilter === undefined || updatedHistory.status === statusFilter;
+
+            if (passesStatusFilter) {
+                setItems((prev) => prev.map((item) => (item.id === updatedHistory.id ? updatedHistory : item)));
+            } else {
+                setItems((prev) => prev.filter((item) => item.id !== updatedHistory.id));
+            }
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_EDIT_HISTORY, ToastType.Success);
+        },
+        [selectedSearchItem, statusFilter, addToast],
+    );
 
     const getFeedbackSearchItems = useCallback(
         async (
@@ -270,7 +314,7 @@ export const FeedbackPageAdmin = () => {
                         key={i.id}
                         item={i}
                         showPhoto={activeCategory === FeedbackCategory.HISTORY}
-                        onEdit={handleNotImplemented}
+                        onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
                     />
                 )}
@@ -279,7 +323,7 @@ export const FeedbackPageAdmin = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented, handleDeleteClick],
+        [itemsToRender, activeCategory, handleEntitiesReordered, handleEditClick, handleDeleteClick],
     );
 
     const isFilteredView =
@@ -296,7 +340,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={handleAddMaterialClick}
+                    onAddItem={handleAddItemClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
@@ -337,7 +381,7 @@ export const FeedbackPageAdmin = () => {
                     }
                     emptyStateAction={
                         !isFilteredView ? (
-                            <Button buttonStyle="secondary" onClick={handleNotImplemented}>
+                            <Button buttonStyle="secondary" onClick={handleAddItemClick}>
                                 {FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                             </Button>
                         ) : undefined
@@ -351,7 +395,16 @@ export const FeedbackPageAdmin = () => {
                 historyToDelete={historyToDelete}
                 onDeleteHistory={handleDeleteHistoryConfirm}
             />
-
+            <AddFeedbackHistoryModal
+                isOpen={isAddHistoryModalOpen}
+                onClose={() => {
+                    setIsAddHistoryModalOpen(false);
+                    setHistoryToEdit(null);
+                }}
+                onAddHistory={handleAddHistorySuccess}
+                onEditHistory={handleEditHistorySuccess}
+                initialData={historyToEdit || undefined}
+            />
             <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
             <ToastContainer />
         </div>

@@ -46,7 +46,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     collectedAmount: {
         max: 10,
@@ -61,7 +61,7 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     changedLives: {
         min: 2,

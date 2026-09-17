@@ -1,7 +1,4 @@
-import {
-    CreateUpdateHistorySectionDto,
-    HistorySectionDto,
-} from '@/types/common/history-sections';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';

@@ -1,10 +1,14 @@
 import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
-import { EventsDto, EventSearchItemData } from '@/types/admin/events';
+import { EventsDto, EventSearchItemData, EventsIntroSectionDto } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const EventsApi = {
+    getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
+        const response = await client.get<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.BASE);
+        return response.data;
+    },
     fetchEvents: async (
         client: AxiosInstance,
         categoryId: number,

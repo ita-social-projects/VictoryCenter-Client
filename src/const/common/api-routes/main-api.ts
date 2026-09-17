@@ -75,6 +75,9 @@ export const API_ROUTES = {
         PUBLISHED: 'Events/published',
         BY_SLUG: 'Events/slug',
     },
+    EVENTS_PAGE: {
+        BASE: 'EventsPage',
+    },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
     },

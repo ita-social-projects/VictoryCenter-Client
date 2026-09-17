@@ -3,6 +3,7 @@ import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { AxiosInstance } from 'axios';
+import { EventsIntroSectionDto } from '@/types/admin/events';
 
 describe('EventsApi', () => {
     const mockGet = jest.fn();
@@ -10,6 +11,23 @@ describe('EventsApi', () => {
 
     beforeEach(() => {
         mockGet.mockReset();
+    });
+
+    describe('getEventsIntroSection', () => {
+        it('calls the EventsPage endpoint and returns both intro fields', async () => {
+            const mockResponse = {
+                data: {
+                    eventsBlockTitle: '<p>Title</p>',
+                    pageDescription: '<p>Description</p>',
+                } satisfies EventsIntroSectionDto,
+            };
+            mockGet.mockResolvedValueOnce(mockResponse);
+
+            const result = await EventsApi.getEventsIntroSection(client);
+
+            expect(mockGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.BASE);
+            expect(result).toEqual(mockResponse.data);
+        });
     });
 
     describe('fetchEvents', () => {

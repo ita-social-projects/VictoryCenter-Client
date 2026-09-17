@@ -1,11 +1,38 @@
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 export const EVENTS_TEXT = {
+    MESSAGE: {
+        FAIL_TO_FETCH_PAGE_CONTENT: 'Виникла помилка, не вдалось завантажити вміст сторінки подій',
+    },
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
     },
     PLACEHOLDER: {
         SEARCH_EVENTS: 'Введіть назву',
+    },
+    PAGE_CONTENT: {
+        SECTION: {
+            PAGE_DESCRIPTION: {
+                ID: 'events-page-description' as const,
+                TITLE: 'Опис сторінки для користувачів',
+            },
+            EVENTS_BLOCK_TITLE: {
+                ID: 'events-block-title' as const,
+                TITLE: 'Заголовок блоку подій',
+            },
+        },
+        PLACEHOLDER: {
+            PAGE_DESCRIPTION: 'Введіть опис сторінки',
+            EVENTS_BLOCK_TITLE: 'Введіть заголовок блоку подій',
+        },
+        ARIA_LABEL: {
+            EDIT_SECTION: 'Редагувати секцію',
+            VIEW_SECTION: 'Переглянути секцію',
+        },
+        CHARACTER_LIMIT: {
+            PAGE_DESCRIPTION: 1000,
+            EVENTS_BLOCK_TITLE: 100,
+        },
     },
     FORM: {
         MODAL_TITLE: 'Додати матеріал',

@@ -6,6 +6,7 @@ import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/A
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -24,6 +25,7 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
 
 jest.mock('@/services/api/admin/events/events-api', () => ({
     EventsApi: {
+        getEventsIntroSection: jest.fn(),
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
     },
@@ -100,6 +102,28 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
     },
 }));
 
+jest.mock('./editable-header-section/EditableHeaderSection', () => ({
+    EditableHeaderSection: ({
+        sectionId,
+        mode,
+        onEnterEditMode,
+        initialPublishedHtml,
+    }: {
+        sectionId: string;
+        mode: 'edit' | 'view';
+        onEnterEditMode: () => void;
+        initialPublishedHtml: string;
+    }) => (
+        <section data-testid={`${sectionId}-section`}>
+            <span>{mode}</span>
+            <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
+            <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`}>
+                Edit section
+            </button>
+        </section>
+    ),
+}));
+
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
 jest.mock('@/services/api/admin/events/event-categories-api', () => ({
@@ -109,6 +133,7 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
 }));
 
 const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
+const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
 
 describe('EventsPageAdmin', () => {
     const categories: EventCategoryDto[] = [
@@ -127,6 +152,10 @@ describe('EventsPageAdmin', () => {
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
         mockedEventCategoriesApi.getAll.mockResolvedValue([]);
+        mockedEventsApi.getEventsIntroSection.mockResolvedValue({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+        });
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
@@ -148,6 +177,44 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT)).toBeInTheDocument();
     });
 
+    it('renders both content sections and changes edit mode for the selected section only', async () => {
+        const user = userEvent.setup();
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        });
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('view');
+
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('view');
+
+        await user.click(screen.getByRole('button', { name: `Редагувати ${titleId}` }));
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('edit');
+    });
+
+    it('loads intro content and passes each API value to its matching section', async () => {
+        render(<EventsPageAdmin />);
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+        await waitFor(() => {
+            expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalled();
+            expect(screen.getByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
+            expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
+        });
+    });
+
     it('does not render an error message when there is no error', async () => {
         const { container } = render(<EventsPageAdmin />);
 
@@ -166,6 +233,16 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
+    });
+
+    it('renders an events page content error when intro content fetch fails', async () => {
+        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Failed to fetch intro content'));
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_PAGE_CONTENT)).toBeInTheDocument();
         });
     });
 

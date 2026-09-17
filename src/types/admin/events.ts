@@ -24,3 +24,8 @@ export interface EventsDto {
     name: string;
     description: string;
 }
+
+export interface EventsIntroSectionDto {
+    eventsBlockTitle: string;
+    pageDescription: string;
+}

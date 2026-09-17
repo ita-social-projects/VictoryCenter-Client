@@ -37,6 +37,7 @@ export const EventsPageAdmin = () => {
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
+    const [isEventsIntroSectionPublishing, setIsEventsIntroSectionPublishing] = useState(false);
     const modalsStateControl = useModalsState<EventsNews>();
     const { openModalActions } = modalsStateControl;
 
@@ -161,10 +162,12 @@ export const EventsPageAdmin = () => {
 
     const publishSection = useCallback(
         async (sectionId: EditableHeaderSectionId, value: string) => {
-            if (!eventsIntroDraft) return;
+            if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
 
             const field = introSectionFieldById[sectionId];
             const updatedSection = { ...eventsIntroDraft, [field]: value };
+
+            setIsEventsIntroSectionPublishing(true);
 
             try {
                 const publishedSection = await EventsApi.updateEventsIntroSection(client, field, updatedSection);
@@ -173,9 +176,11 @@ export const EventsPageAdmin = () => {
                 setEditingSectionId(null);
             } catch {
                 setErrorState(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_PAGE_CONTENT, 'events');
+            } finally {
+                setIsEventsIntroSectionPublishing(false);
             }
         },
-        [client, eventsIntroDraft, setErrorState],
+        [client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
     );
 
     const cancelSectionEdit = useCallback(() => {
@@ -219,7 +224,8 @@ export const EventsPageAdmin = () => {
                     }
                     onCancelEdit={cancelSectionEdit}
                     onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)}
-                    disabled={isEventsIntroSectionLoading}
+                    isPublishDisabled={isEventsIntroSectionPublishing}
+                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
                 />
                 <EditableHeaderSection
@@ -235,7 +241,8 @@ export const EventsPageAdmin = () => {
                     }
                     onCancelEdit={cancelSectionEdit}
                     onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)}
-                    disabled={isEventsIntroSectionLoading}
+                    isPublishDisabled={isEventsIntroSectionPublishing}
+                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
                 />
             </div>

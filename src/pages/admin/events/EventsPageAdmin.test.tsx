@@ -108,13 +108,17 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
         sectionId,
         mode,
         onEnterEditMode,
+        onPublish,
         initialPublishedHtml,
+        isPublishDisabled,
         disabled,
     }: {
         sectionId: string;
         mode: 'edit' | 'view';
         onEnterEditMode: () => void;
+        onPublish: (value: string) => void;
         initialPublishedHtml: string;
+        isPublishDisabled?: boolean;
         disabled?: boolean;
     }) => (
         <section data-testid={`${sectionId}-section`}>
@@ -122,6 +126,14 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
             <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
             <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`} disabled={disabled}>
                 Edit section
+            </button>
+            <button
+                type="button"
+                onClick={() => onPublish('<p>Updated content</p>')}
+                aria-label={`Опублікувати ${sectionId}`}
+                disabled={isPublishDisabled}
+            >
+                Publish section
             </button>
         </section>
     ),
@@ -244,6 +256,43 @@ describe('EventsPageAdmin', () => {
         });
     });
 
+    it('prevents another intro section publish while a publish request is pending', async () => {
+        const user = userEvent.setup();
+        let resolvePublish: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolvePublish = resolve;
+            }),
+        );
+
+        render(<EventsPageAdmin />);
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeEnabled();
+        });
+
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+
+        expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeDisabled();
+        expect(screen.getByRole('button', { name: `Опублікувати ${titleId}` })).toBeDisabled();
+
+        await act(async () => {
+            resolvePublish!({
+                eventsBlockTitle: '<p>Loaded title</p>',
+                pageDescription: '<p>Updated content</p>',
+            });
+        });
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeEnabled();
+            expect(screen.getByRole('button', { name: `Опублікувати ${titleId}` })).toBeEnabled();
+        });
+    });
+
     it('does not render an error message when there is no error', async () => {
         const { container } = render(<EventsPageAdmin />);
 
@@ -273,6 +322,11 @@ describe('EventsPageAdmin', () => {
         await waitFor(() => {
             expect(screen.getByText(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_PAGE_CONTENT)).toBeInTheDocument();
         });
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+        expect(screen.getByRole('button', { name: `Редагувати ${descriptionId}` })).toBeDisabled();
+        expect(screen.getByRole('button', { name: `Редагувати ${titleId}` })).toBeDisabled();
     });
 
     it('renders add category context menu option', async () => {

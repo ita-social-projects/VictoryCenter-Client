@@ -181,12 +181,12 @@ describe('EditableHeaderSection', () => {
         expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
     });
 
-    it('calls the publish callback with the current draft after the value changes', () => {
+    it('calls the publish callback with the normalized draft after the value changes', () => {
         const onPublish = jest.fn();
         renderSection({ mode: 'edit', onPublish });
 
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
-        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'Оновлений опис' } });
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'Оновлений опис   ' } });
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
 

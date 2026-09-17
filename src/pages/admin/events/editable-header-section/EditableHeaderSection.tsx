@@ -165,7 +165,7 @@ export const EditableHeaderSection = ({
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            onClick={() => onPublish(draftValue)}
+                            onClick={() => onPublish(normalizedDraftValue)}
                             disabled={isPublishButtonDisabled}
                         >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}

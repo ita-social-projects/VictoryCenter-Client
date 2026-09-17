@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
 import { MainStatisticsSection } from './MainStatisticsSection';
 import { PublicImpactStatisticDto, MetricPrefix, MetricType, PublicMetricDto } from '@/types/public/main-page';
+import { TranslationStatus } from '@/types/common/language';
 
 let mockCurrentLanguage = 'uk';
 
@@ -178,7 +179,7 @@ describe('MainStatisticsSection', () => {
                         {
                             entityId: 1,
                             localizationInfoDto: { id: 1, code: 'uk' },
-                            translationStatus: 'Relevant' as any,
+                            translationStatus: TranslationStatus.Relevant,
                             name: 'партнерів (uk)',
                         },
                     ],
@@ -232,41 +233,16 @@ describe('MainStatisticsSection', () => {
         expect(figures).toHaveLength(4);
     });
 
-    it('uses the English title and metric names when the language is English', () => {
-        mockCurrentLanguage = 'en';
+    it('switches title, metric name and currency on UK → EN → UK', () => {
         const stats = makeStatistics({
             localizations: [
                 {
                     entityId: 1,
                     localizationInfoDto: { id: 2, code: 'en' },
-                    translationStatus: 'Relevant' as any,
+                    translationStatus: TranslationStatus.Relevant,
                     title: 'Changes you can measure',
                 },
             ],
-            metrics: [
-                {
-                    ...makeMetric(1, 20, 'партнерств', MetricType.Partners),
-                    localizations: [
-                        {
-                            entityId: 1,
-                            localizationInfoDto: { id: 2, code: 'en' },
-                            translationStatus: 'Relevant' as any,
-                            name: 'partners',
-                        },
-                    ],
-                },
-            ],
-        });
-
-        render(<MainStatisticsSection impactStatistics={stats} />);
-
-        expect(screen.getByText('Changes you can measure')).toBeInTheDocument();
-        expect(screen.getByText('partners')).toBeInTheDocument();
-    });
-
-    it('shows the dollar amount before the value for Raised in English', () => {
-        mockCurrentLanguage = 'en';
-        const stats = makeStatistics({
             metrics: [
                 {
                     ...makeMetric(3, 1249854, 'зібрано', MetricType.Raised),
@@ -274,7 +250,7 @@ describe('MainStatisticsSection', () => {
                         {
                             entityId: 3,
                             localizationInfoDto: { id: 2, code: 'en' },
-                            translationStatus: 'Relevant' as any,
+                            translationStatus: TranslationStatus.Relevant,
                             name: 'raised',
                             value: '48',
                         },
@@ -283,12 +259,27 @@ describe('MainStatisticsSection', () => {
             ],
         });
 
-        render(<MainStatisticsSection impactStatistics={stats} />);
+        const { rerender } = render(<MainStatisticsSection impactStatistics={stats} />);
         act(() => {
             (globalThis as any).__triggerVisible();
         });
 
+        expect(screen.getByText('Зміни, які можна виміряти')).toBeInTheDocument();
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
+
+        mockCurrentLanguage = 'en';
+        rerender(<MainStatisticsSection impactStatistics={stats} />);
+
+        expect(screen.getByText('Changes you can measure')).toBeInTheDocument();
+        expect(screen.getByText('raised')).toBeInTheDocument();
         expect(screen.getByText('$48')).toBeInTheDocument();
+
+        mockCurrentLanguage = 'uk';
+        rerender(<MainStatisticsSection impactStatistics={stats} />);
+
+        expect(screen.getByText('Зміни, які можна виміряти')).toBeInTheDocument();
+        expect(screen.getByText('зібрано')).toBeInTheDocument();
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
     });
 
     it('falls back to the hryvnia amount in English when there is no dollar value', () => {
@@ -300,6 +291,6 @@ describe('MainStatisticsSection', () => {
             (globalThis as any).__triggerVisible();
         });
 
-        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
+        expect(screen.getByText('1,249,854 грн')).toBeInTheDocument();
     });
 });

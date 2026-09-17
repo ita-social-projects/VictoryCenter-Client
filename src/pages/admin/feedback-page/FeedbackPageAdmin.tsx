@@ -14,6 +14,7 @@ import { DraggableListItem } from '@/components/admin/draggable-list-item/Dragga
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
 import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
+import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -78,6 +79,8 @@ export const FeedbackPageAdmin = () => {
         if (activeCategory === FeedbackCategory.HISTORY) {
             setHistoryToEdit(null);
             setIsAddHistoryModalOpen(true);
+        } else if (activeCategory === FeedbackCategory.REVIEWS) {
+            setIsAddReviewModalOpen(true);
         } else {
             handleNotImplemented();
         }
@@ -94,6 +97,8 @@ export const FeedbackPageAdmin = () => {
         },
         [activeCategory, handleNotImplemented],
     );
+
+    const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
@@ -116,6 +121,8 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
+
+
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -400,6 +407,7 @@ export const FeedbackPageAdmin = () => {
                 onEditHistory={handleEditHistorySuccess}
                 initialData={historyToEdit || undefined}
             />
+            <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
             <ToastContainer />
         </div>
     );

@@ -9,6 +9,7 @@ import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLo
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { HistoryQuadImages } from './HistoryQuadImages';
 import { HistoryDualImages } from './HistoryDualImages';
+import { HistoryTripleImages } from './HistoryTripleImages';
 import styles from './HistorySection.module.scss';
 
 interface HistorySectionProps {
@@ -97,6 +98,21 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
                 <div className={styles['section-images']}>
                     {section.template === SectionTemplate.QuadImagesBottom && <HistoryQuadImages images={images} />}
                     {section.template === SectionTemplate.DualImagesBottom && <HistoryDualImages images={images} />}
+                    {section.template === SectionTemplate.TripleImagesBottom && <HistoryTripleImages images={images} />}
+                    {section.template === SectionTemplate.SingleImageBottom &&
+                        (() => {
+                            const imageSrc = getImageSrc(images[0]);
+                            return (
+                                imageSrc && (
+                                    <img
+                                        src={imageSrc}
+                                        alt=""
+                                        className={styles['single-image-bottom']}
+                                        loading="lazy"
+                                    />
+                                )
+                            );
+                        })()}
                 </div>
             )}
         </section>

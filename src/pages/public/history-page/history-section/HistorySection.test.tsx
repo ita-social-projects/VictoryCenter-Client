@@ -14,6 +14,9 @@ jest.mock('./HistoryQuadImages', () => ({
 jest.mock('./HistoryDualImages', () => ({
     HistoryDualImages: () => <div data-testid="dual-images" />,
 }));
+jest.mock('./HistoryTripleImages', () => ({
+    HistoryTripleImages: () => <div data-testid="triple-images" />,
+}));
 
 const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 const mockedUseScrollAnimation = jest.mocked(useScrollAnimation);
@@ -69,6 +72,7 @@ describe('HistorySection', () => {
 
             expect(screen.queryByTestId('quad-images')).not.toBeInTheDocument();
             expect(screen.queryByTestId('dual-images')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('triple-images')).not.toBeInTheDocument();
         });
     });
 
@@ -161,6 +165,51 @@ describe('HistorySection', () => {
             render(<HistorySection section={section} />);
 
             expect(screen.getByTestId('dual-images')).toBeInTheDocument();
+        });
+    });
+
+    describe('TripleImagesBottom template', () => {
+        it('should render HistoryTripleImages component', () => {
+            const section = makeSection(SectionTemplate.TripleImagesBottom, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0),
+                    makeContent(11, ContentType.Description, 1),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByTestId('triple-images')).toBeInTheDocument();
+        });
+
+        it('should not render HistoryTripleImages when no images are provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.TripleImagesBottom)} />);
+
+            expect(screen.queryByTestId('triple-images')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('SingleImageBottom template', () => {
+        it('should render an image below the header when image is provided', () => {
+            const section = makeSection(SectionTemplate.SingleImageBottom, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Літо' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByRole('presentation')).toBeInTheDocument();
+            expect(screen.getByText('ЛІТО')).toBeInTheDocument();
+        });
+
+        it('should not render an image when no image is provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.SingleImageBottom)} />);
+
+            expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
         });
     });
 

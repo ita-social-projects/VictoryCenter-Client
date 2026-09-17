@@ -29,3 +29,5 @@ export interface EventsIntroSectionDto {
     eventsBlockTitle: string;
     pageDescription: string;
 }
+
+export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;

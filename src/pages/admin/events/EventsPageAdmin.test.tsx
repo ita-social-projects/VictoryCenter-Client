@@ -26,6 +26,7 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
 jest.mock('@/services/api/admin/events/events-api', () => ({
     EventsApi: {
         getEventsIntroSection: jest.fn(),
+        updateEventsIntroSection: jest.fn(),
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
     },
@@ -108,16 +109,18 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
         mode,
         onEnterEditMode,
         initialPublishedHtml,
+        disabled,
     }: {
         sectionId: string;
         mode: 'edit' | 'view';
         onEnterEditMode: () => void;
         initialPublishedHtml: string;
+        disabled?: boolean;
     }) => (
         <section data-testid={`${sectionId}-section`}>
             <span>{mode}</span>
             <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
-            <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`}>
+            <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`} disabled={disabled}>
                 Edit section
             </button>
         </section>
@@ -212,6 +215,32 @@ describe('EventsPageAdmin', () => {
             expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalled();
             expect(screen.getByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
             expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
+        });
+    });
+
+    it('disables intro section editing until the published content is loaded', async () => {
+        let resolveIntroSection: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveIntroSection = resolve;
+            }),
+        );
+
+        render(<EventsPageAdmin />);
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const editButton = screen.getByRole('button', { name: `Редагувати ${descriptionId}` });
+        expect(editButton).toBeDisabled();
+
+        await act(async () => {
+            resolveIntroSection!({
+                eventsBlockTitle: '<p>Loaded title</p>',
+                pageDescription: '<p>Loaded description</p>',
+            });
+        });
+
+        await waitFor(() => {
+            expect(editButton).toBeEnabled();
         });
     });
 

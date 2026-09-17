@@ -21,8 +21,11 @@ export interface EditableHeaderSectionProps {
     maxLength: number;
     mode: EditableHeaderSectionMode;
     onEnterEditMode: () => void;
-    onDraftChange?: (value: string) => void;
+    onDraftChange: (value: string) => void;
     onCancelEdit: () => void;
+    onPublish: (value: string) => void;
+    /** Allows temporarily disabling publishing independently from the draft state. */
+    isPublishDisabled?: boolean;
     disabled?: boolean;
     placeholder: string;
 }
@@ -49,11 +52,11 @@ export const normalizeEventsDraftHtml = (html: string, trimTrailingWhitespace = 
     });
 
     const firstTextNode = textNodes.find((textNode) => textNode.textContent?.trim());
-    firstTextNode?.replaceData(0, firstTextNode.length, (firstTextNode.textContent ?? '').replace(/^\s+/, ''));
+    firstTextNode?.replaceData(0, firstTextNode.length, (firstTextNode.textContent ?? '').trimStart());
 
     if (trimTrailingWhitespace) {
         const lastTextNode = [...textNodes].reverse().find((textNode) => textNode.textContent);
-        lastTextNode?.replaceData(0, lastTextNode.length, (lastTextNode.textContent ?? '').replace(/\s+$/, ''));
+        lastTextNode?.replaceData(0, lastTextNode.length, (lastTextNode.textContent ?? '').trimEnd());
     }
 
     return container.textContent?.trim() ? container.innerHTML : '';
@@ -69,6 +72,8 @@ export const EditableHeaderSection = ({
     onEnterEditMode,
     onDraftChange,
     onCancelEdit,
+    onPublish,
+    isPublishDisabled: isPublishForcedDisabled = false,
     disabled = false,
     placeholder,
 }: EditableHeaderSectionProps) => {
@@ -84,7 +89,7 @@ export const EditableHeaderSection = ({
         (value: string) => {
             const normalizedValue = normalizeEventsDraftHtml(value);
             setDraftValue(normalizedValue);
-            onDraftChange?.(normalizedValue);
+            onDraftChange(normalizedValue);
         },
         [onDraftChange],
     );
@@ -92,11 +97,15 @@ export const EditableHeaderSection = ({
     const handleBlur = useCallback(() => {
         const normalizedValue = normalizeEventsDraftHtml(draftValue, true);
         setDraftValue(normalizedValue);
-        onDraftChange?.(normalizedValue);
+        onDraftChange(normalizedValue);
     }, [draftValue, onDraftChange]);
 
     const isEditMode = mode === 'edit';
     const isDescriptionSection = sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+    const normalizedDraftValue = normalizeEventsDraftHtml(draftValue, true);
+    const normalizedInitialValue = normalizeEventsDraftHtml(initialPublishedHtml, true);
+    const isDraftChanged = normalizedDraftValue !== normalizedInitialValue;
+    const isPublishButtonDisabled = disabled || isPublishForcedDisabled || !isDraftChanged || !normalizedDraftValue;
     return (
         <section
             className={`editable-header-section ${
@@ -153,7 +162,12 @@ export const EditableHeaderSection = ({
                         <Button type="button" buttonStyle="secondary" onClick={onCancelEdit} disabled={disabled}>
                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                         </Button>
-                        <Button type="button" buttonStyle="primary" disabled>
+                        <Button
+                            type="button"
+                            buttonStyle="primary"
+                            onClick={() => onPublish(draftValue)}
+                            disabled={isPublishButtonDisabled}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>

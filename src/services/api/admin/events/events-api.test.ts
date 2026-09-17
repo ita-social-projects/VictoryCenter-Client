@@ -7,10 +7,41 @@ import { EventsIntroSectionDto } from '@/types/admin/events';
 
 describe('EventsApi', () => {
     const mockGet = jest.fn();
-    const client = { get: mockGet } as unknown as AxiosInstance;
+    const mockPut = jest.fn();
+    const client = { get: mockGet, put: mockPut } as unknown as AxiosInstance;
 
     beforeEach(() => {
         mockGet.mockReset();
+        mockPut.mockReset();
+    });
+
+    describe('updateEventsIntroSection', () => {
+        const introSection = {
+            eventsBlockTitle: '<p>Title</p>',
+            pageDescription: '<p>Description</p>',
+        } satisfies EventsIntroSectionDto;
+
+        it('updates only the page description through its dedicated endpoint', async () => {
+            mockPut.mockResolvedValueOnce({ data: introSection });
+
+            const result = await EventsApi.updateEventsIntroSection(client, 'pageDescription', introSection);
+
+            expect(mockPut).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.DESCRIPTION, {
+                pageDescription: introSection.pageDescription,
+            });
+            expect(result).toEqual(introSection);
+        });
+
+        it('updates only the events block title through its dedicated endpoint', async () => {
+            mockPut.mockResolvedValueOnce({ data: introSection });
+
+            const result = await EventsApi.updateEventsIntroSection(client, 'eventsBlockTitle', introSection);
+
+            expect(mockPut).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.EVENTS_BLOCK_TITLE, {
+                eventsBlockTitle: introSection.eventsBlockTitle,
+            });
+            expect(result).toEqual(introSection);
+        });
     });
 
     describe('getEventsIntroSection', () => {

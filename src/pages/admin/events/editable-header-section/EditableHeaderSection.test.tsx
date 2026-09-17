@@ -71,6 +71,7 @@ const defaultProps: EditableHeaderSectionProps = {
     onEnterEditMode: jest.fn(),
     onDraftChange: jest.fn(),
     onCancelEdit: jest.fn(),
+    onPublish: jest.fn(),
     placeholder: EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION,
 };
 
@@ -163,6 +164,9 @@ describe('EditableHeaderSection', () => {
         );
 
         fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'Оновлений опис' } });
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: '' } });
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
@@ -175,6 +179,18 @@ describe('EditableHeaderSection', () => {
         renderSection({ mode: 'edit' });
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
         expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the publish callback with the current draft after the value changes', () => {
+        const onPublish = jest.fn();
+        renderSection({ mode: 'edit', onPublish });
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'Оновлений опис' } });
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
+
+        expect(onPublish).toHaveBeenCalledWith('<p>Оновлений опис</p>');
     });
 
     it('normalizes leading and repeated whitespace in local draft changes', () => {

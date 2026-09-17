@@ -52,6 +52,7 @@ export const HistoryPageContent = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [canPublish, setCanPublish] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
     const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
@@ -116,7 +117,7 @@ export const HistoryPageContent = () => {
 
     const handleTemplateSelect = useCallback(
         (templateId: SectionTemplate) => {
-            const currentSections = normalizedSections;
+            const currentSections = historyFormRef.current?.getSections() ?? normalizedSections;
             if (sectionToReplace !== null) {
                 const sectionBeingReplaced = currentSections[sectionToReplace];
                 const newSection: HistorySectionDto = {
@@ -341,6 +342,7 @@ export const HistoryPageContent = () => {
                         ref={historyFormRef}
                         sections={filteredSections}
                         onReplaceSection={handleReplaceSection}
+                        onValidationChange={setIsFormValid}
                         onSectionsChange={(s) => {
                             setLocalSectionsCount(s.length);
                             setCanPublish(true);
@@ -369,7 +371,7 @@ export const HistoryPageContent = () => {
                             className={styles['btn-publish']}
                             onClick={() => setConfirmationModalOpen(true)}
                             buttonStyle="primary"
-                            disabled={!canPublish || isPublishing}
+                            disabled={!canPublish || !isFormValid || isPublishing}
                         >
                             {HISTORY_TEXT.BUTTON.PUBLISH}
                         </Button>

@@ -72,10 +72,15 @@ jest.mock('../history-form/HistoryForm', () => {
             onSectionDeleted,
             onReplaceSection,
             onSectionsChange,
+            onValidationChange,
             language,
         } = props;
 
         mockHistoryFormSections = sections;
+
+        React.useEffect(() => {
+            onValidationChange?.(true);
+        }, [onValidationChange]);
         mockHistoryFormProps({
             sections,
             onRequestCancelSection,

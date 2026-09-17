@@ -17,6 +17,11 @@
     background: colors.$grey-50;
 }
 
+.toast.success {
+    background: colors.$grey-50;
+    color: colors.$blue-500;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

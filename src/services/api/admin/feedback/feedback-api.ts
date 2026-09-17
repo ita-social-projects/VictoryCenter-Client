@@ -1,10 +1,8 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
+import { FeedbackCategory, FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-
-const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export interface FeedbackFetchParams {
     status?: VisibilityStatus;
@@ -54,20 +52,11 @@ export const FeedbackApi = {
         await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
     },
     fetchReviews: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackReviewDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackReviewDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            authorName: `Учасник ${i + 1}`,
-            text: `Текст відгуку ${i + 1}`,
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.authorName);
+        const response = await client.get<PaginationResult<FeedbackReviewDto>>(API_ROUTES.FEEDBACK_REVIEWS.BASE);
+        return filterAndPaginate(response.data.items, params, (item) => item.authorName);
     },
     fetchVideos: async (
         client: AxiosInstance,
@@ -76,8 +65,13 @@ export const FeedbackApi = {
         const response = await client.get<FeedbackVideoDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE);
         return filterAndPaginate(response.data, params, (item) => item.title);
     },
-    reorderFeedback: async (_client: AxiosInstance, _category: string, _orderedIds: number[]): Promise<void> => {
-        await mockDelay(500);
-        // Mock successful reorder
+    reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
+        const routes: Record<FeedbackCategory, string> = {
+            [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
+            [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
+            [FeedbackCategory.VIDEOS]: API_ROUTES.VIDEO_REVIEWS.BASE,
+        };
+
+        await client.put(`${routes[category]}/reorder`, { orderedIds });
     },
 };

@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import cn from 'classnames';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { ImageValues, Image } from '@/types/common/image';
@@ -69,6 +69,10 @@ export const ImagesBottomSection = ({
 }: ImagesBottomSectionProps) => {
     const idPrefix = useId();
     const [errors, setErrors] = useState<string[]>([]);
+
+    useEffect(() => {
+        setErrors([]);
+    }, [validationResetKey]);
 
     const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
     const displayedImageHandlers = useMemo(

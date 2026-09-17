@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { Image, ImageValues } from '@/types/common/image';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
+import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -88,6 +89,7 @@ const PartnerFormComponent = ({
     return (
         <div className={styles.root} data-testid={`partner-form-${cardHtmlId}`}>
             <div className={styles.header}>
+                <InputLabel htmlFor={`partner-form-image-${cardHtmlId}`} text="" isRequired={true} />
                 <IconButton
                     type="button"
                     className={styles['delete-button']}

@@ -131,7 +131,7 @@ describe('AddFeedbackHistoryModal', () => {
         fireEvent.focus(storyTextarea);
         fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
         fireEvent.blur(storyTextarea);
-        expect(screen.getAllByText('Не менше 10 символів').length).toBe(2);
+        expect(screen.getAllByText('Не менше 10 символів')).toHaveLength(2);
     });
 
     it('validates text fields in real-time during typing (onChange) without blur', () => {

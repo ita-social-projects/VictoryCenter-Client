@@ -39,6 +39,14 @@ export const FEEDBACK_TEXT = {
             LINK: 'Посилання на відео відгук',
         },
     },
+    ADD_REVIEW_MODAL: {
+        TITLE: 'Додати відгук',
+        PUBLISH: 'Опублікувати',
+        LABEL: {
+            AUTHOR_NAME: "Ім'я",
+            TEXT: 'Відгук',
+        },
+    },
 };
 
 export const VIDEO_REVIEW_VALIDATION = {
@@ -59,4 +67,25 @@ export const FEEDBACK_CATEGORIES: FeedbackCategoryItem[] = [
     { id: FeedbackCategory.VIDEOS, name: FEEDBACK_TEXT.TABS.VIDEOS },
 ];
 
+const AUTHOR_NAME_MIN = 2;
+const AUTHOR_NAME_MAX = 200;
+const REVIEW_TEXT_MIN = 10;
+const REVIEW_TEXT_MAX = 500;
+
+export const FEEDBACK_REVIEW_VALIDATION = {
+    authorName: {
+        min: AUTHOR_NAME_MIN,
+        max: AUTHOR_NAME_MAX,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => `Не менше ${AUTHOR_NAME_MIN} символів`,
+        getMaxError: () => `Не більше ${AUTHOR_NAME_MAX} символів`,
+    },
+    text: {
+        min: REVIEW_TEXT_MIN,
+        max: REVIEW_TEXT_MAX,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => `Не менше ${REVIEW_TEXT_MIN} символів`,
+        getMaxError: () => `Не більше ${REVIEW_TEXT_MAX} символів`,
+    },
+};
 export const FEEDBACK_PAGINATION_LIMIT = 7;

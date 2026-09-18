@@ -14,6 +14,7 @@ import { DraggableListItem } from '@/components/admin/draggable-list-item/Dragga
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
 import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
+import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -72,10 +73,13 @@ export const FeedbackPageAdmin = () => {
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
+    const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
 
     const handleAddClick = useCallback(() => {
         if (activeCategory === FeedbackCategory.VIDEOS) {
             setIsAddVideoReviewModalOpen(true);
+        } else if (activeCategory === FeedbackCategory.REVIEWS) {
+            setIsAddReviewModalOpen(true);
         } else {
             handleNotImplemented();
         }
@@ -360,6 +364,7 @@ export const FeedbackPageAdmin = () => {
                 onClose={() => setIsAddVideoReviewModalOpen(false)}
                 onSubmit={handleAddVideoReviewSubmit}
             />
+            <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
             <ToastContainer />
         </div>
     );

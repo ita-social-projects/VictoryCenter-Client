@@ -83,6 +83,23 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
         );
     }
 
+    if (section.template === SectionTemplate.SingleImageBottom && hasRealImages) {
+        const imageSrc = getImageSrc(images[0]);
+        return (
+            <section ref={ref} className={wrapperClass}>
+                {yearBadge}
+                {(displayTitle || description) && (
+                    <div className={styles['section-header']}>
+                        <div className={styles['title-area']}>
+                            {displayTitle && <h2 className={styles['section-title']}>{displayTitle}</h2>}
+                        </div>
+                        {description && <p className={styles['section-description']}>{description}</p>}
+                    </div>
+                )}
+                {imageSrc && <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />}
+            </section>
+        );
+    }
     return (
         <section ref={ref} className={wrapperClass}>
             {yearBadge}
@@ -99,20 +116,6 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
                     {section.template === SectionTemplate.QuadImagesBottom && <HistoryQuadImages images={images} />}
                     {section.template === SectionTemplate.DualImagesBottom && <HistoryDualImages images={images} />}
                     {section.template === SectionTemplate.TripleImagesBottom && <HistoryTripleImages images={images} />}
-                    {section.template === SectionTemplate.SingleImageBottom &&
-                        (() => {
-                            const imageSrc = getImageSrc(images[0]);
-                            return (
-                                imageSrc && (
-                                    <img
-                                        src={imageSrc}
-                                        alt=""
-                                        className={styles['single-image-bottom']}
-                                        loading="lazy"
-                                    />
-                                )
-                            );
-                        })()}
                 </div>
             )}
         </section>

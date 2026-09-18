@@ -214,9 +214,15 @@ export const PdfFilesSection = () => {
                 const blobUrl = URL.createObjectURL(pdfBlob);
                 const openedWindow = window.open(blobUrl, '_blank');
                 if (openedWindow) {
-                    setTimeout(() => {
-                        URL.revokeObjectURL(blobUrl);
+                    const interval = setInterval(() => {
+                        if (openedWindow.closed) {
+                            URL.revokeObjectURL(blobUrl);
+                            clearInterval(interval);
+                        }
                     }, 1500);
+                } else {
+                    // popup blocked - nothing will ever poll openedWindow.closed, so free the blob now
+                    URL.revokeObjectURL(blobUrl);
                 }
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);

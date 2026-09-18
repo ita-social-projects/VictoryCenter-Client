@@ -1,4 +1,5 @@
 import { forwardRef, useEffect } from 'react';
+import cn from 'classnames';
 import { useFormManager, FormManagerRef } from '@/hooks/admin/use-form-manager/useFormManager';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -28,6 +29,8 @@ export interface TranslateHistorySectionFormProps {
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
+    // Keeps title above description in one column, for templates whose image sits beside the text.
+    stacked?: boolean;
 }
 
 const DEFAULT_FORM_STATE: TranslateHistorySectionFormValues = {
@@ -49,6 +52,7 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
             formDisabled,
             onValidationChange,
             onDirtyChange,
+            stacked,
         }: TranslateHistorySectionFormProps,
         ref,
     ) => {
@@ -108,7 +112,7 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
         return (
             <form
                 onSubmit={(e) => e.preventDefault()}
-                className={styles.form}
+                className={cn(styles.form, stacked && styles['form--stacked'])}
                 data-testid="translate-history-section-form"
                 noValidate
             >

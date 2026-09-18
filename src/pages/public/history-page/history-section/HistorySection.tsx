@@ -17,6 +17,24 @@ interface HistorySectionProps {
     showYearLabel?: boolean;
 }
 
+interface HistorySectionHeaderProps {
+    displayTitle: string;
+    description?: string | null;
+}
+
+const HistorySectionHeader = ({ displayTitle, description }: HistorySectionHeaderProps) => {
+    if (!displayTitle && !description) return null;
+
+    return (
+        <div className={styles['section-header']}>
+            <div className={styles['title-area']}>
+                {displayTitle && <h2 className={styles['section-title']}>{displayTitle}</h2>}
+            </div>
+            {description && <p className={styles['section-description']}>{description}</p>}
+        </div>
+    );
+};
+
 export const HistorySection = ({ section, showYearLabel = true }: HistorySectionProps) => {
     const { t } = useTranslation('historyPage');
     const { ref, isVisible } = useScrollAnimation();
@@ -88,14 +106,7 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
         return (
             <section ref={ref} className={wrapperClass}>
                 {yearBadge}
-                {(displayTitle || description) && (
-                    <div className={styles['section-header']}>
-                        <div className={styles['title-area']}>
-                            {displayTitle && <h2 className={styles['section-title']}>{displayTitle}</h2>}
-                        </div>
-                        {description && <p className={styles['section-description']}>{description}</p>}
-                    </div>
-                )}
+                <HistorySectionHeader displayTitle={displayTitle} description={description} />
                 {imageSrc && <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />}
             </section>
         );
@@ -103,14 +114,7 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     return (
         <section ref={ref} className={wrapperClass}>
             {yearBadge}
-            {(displayTitle || description) && (
-                <div className={styles['section-header']}>
-                    <div className={styles['title-area']}>
-                        {displayTitle && <h2 className={styles['section-title']}>{displayTitle}</h2>}
-                    </div>
-                    {description && <p className={styles['section-description']}>{description}</p>}
-                </div>
-            )}
+            <HistorySectionHeader displayTitle={displayTitle} description={description} />
             {hasRealImages && (
                 <div className={styles['section-images']}>
                     {section.template === SectionTemplate.QuadImagesBottom && <HistoryQuadImages images={images} />}

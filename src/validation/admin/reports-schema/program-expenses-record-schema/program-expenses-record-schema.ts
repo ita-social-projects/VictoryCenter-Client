@@ -63,5 +63,5 @@ export const validateProgramExpenseProgram = ({
         return isSameId || isSameName;
     });
 
-    return hasDuplicate ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE : undefined;
+    return hasDuplicate ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED : undefined;
 };

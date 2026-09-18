@@ -524,9 +524,8 @@ describe('PdfFilesSection', () => {
         });
     });
 
-    it('should not revoke object URL while the opened tab is still open', async () => {
+    const renderAndOpenPdfWithOpenTab = async (mockPdfBlob: Blob) => {
         jest.useFakeTimers();
-        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
         const mockOpenedWindow = { closed: false };
         mockWindowOpen.mockReturnValueOnce(mockOpenedWindow);
 
@@ -542,29 +541,21 @@ describe('PdfFilesSection', () => {
         await waitFor(() => {
             expect(mockWindowOpen).toHaveBeenCalled();
         });
+
+        return { mockOpenedWindow, mockRevokeObjectURL };
+    };
+
+    it('should not revoke object URL while the opened tab is still open', async () => {
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        const { mockRevokeObjectURL } = await renderAndOpenPdfWithOpenTab(mockPdfBlob);
 
         jest.advanceTimersByTime(4500);
         expect(mockRevokeObjectURL).not.toHaveBeenCalled();
     });
 
     it('should revoke object URL only once the opened tab is closed and stop polling afterwards', async () => {
-        jest.useFakeTimers();
         const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
-        const mockOpenedWindow = { closed: false };
-        mockWindowOpen.mockReturnValueOnce(mockOpenedWindow);
-
-        setupDataFetchMock();
-
-        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
-        const mockRevokeObjectURL = jest.fn();
-        global.URL.revokeObjectURL = mockRevokeObjectURL;
-
-        render(<PdfFilesSection />);
-        fireEvent.click(screen.getByTestId('view-btn'));
-
-        await waitFor(() => {
-            expect(mockWindowOpen).toHaveBeenCalled();
-        });
+        const { mockOpenedWindow, mockRevokeObjectURL } = await renderAndOpenPdfWithOpenTab(mockPdfBlob);
 
         jest.advanceTimersByTime(3000);
         expect(mockRevokeObjectURL).not.toHaveBeenCalled();

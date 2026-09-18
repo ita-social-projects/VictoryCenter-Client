@@ -9,7 +9,6 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ToastType } from '@/types/admin/toast';
 import { ReportsMediaBlockProps } from '../block-component/ReportsMediaBlock';
-import { fetchDefaultImageAsImageValues } from '@/utils/functions/fetch-default-image/fetch-default-image';
 import { formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -49,7 +48,6 @@ jest.mock('@/services/api/admin/reports/reports-api');
 jest.mock('@/services/api/public/reports/reports-api');
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
-jest.mock('@/utils/functions/fetch-default-image/fetch-default-image');
 jest.mock('@/validation/admin/reports-schema/reports-media-settings/reports-media-settings-schema', () => ({
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
@@ -76,7 +74,6 @@ const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedReportsApi = ReportsApi as jest.Mocked<typeof ReportsApi>;
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 const mockedUseToast = useToast as jest.Mock;
-const mockedFetchDefaultImage = fetchDefaultImageAsImageValues as jest.Mock;
 
 const MOCK_PUBLIC_COLLECTED_TOTAL_UAH = 668999.78;
 
@@ -140,10 +137,6 @@ describe('MediaSettings', () => {
         mockedUseAdminClient.mockReturnValue('mock-client');
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
         mockDataFetch();
-        mockedFetchDefaultImage.mockResolvedValue({
-            base64: 'data:image/jpeg;base64,defaultImage',
-            mimeType: 'image/jpeg',
-        });
     });
 
     describe('Loading and Edge states', () => {
@@ -300,7 +293,7 @@ describe('MediaSettings', () => {
             expect(result).toBe(true);
         });
 
-        it('should fetch default image if no image or imageId is provided', async () => {
+        it('should keep image values empty and not upload a default image when none is provided', async () => {
             mockedReportsApi.updateMediaSettings.mockResolvedValue(defaultMediaSettingsData as any);
             mockDataFetch({
                 data: {
@@ -315,7 +308,13 @@ describe('MediaSettings', () => {
                 await ref.current?.submit();
             });
 
-            expect(mockedFetchDefaultImage).toHaveBeenCalledTimes(2);
+            expect(mockedReportsApi.updateMediaSettings).toHaveBeenCalledWith(
+                'mock-client',
+                expect.objectContaining({
+                    collectedFunds: expect.objectContaining({ image: null, imageId: null }),
+                    changedLives: expect.objectContaining({ image: null, imageId: null }),
+                }),
+            );
         });
 
         it('should return false without hitting API if validation fails', async () => {

@@ -448,6 +448,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 3,
                 amountUah: '7 265',
                 amountUsd: '4 200',
+                lastEditedField: 'amountUah',
             });
         });
 
@@ -602,6 +603,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 3,
                 amountUah: '7 300',
                 amountUsd: '4 250',
+                lastEditedField: 'amountUsd',
             });
         });
 
@@ -629,6 +631,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 2,
                 amountUah: '7 265,12',
                 amountUsd: '173,22',
+                lastEditedField: 'amountUah',
             });
         });
 

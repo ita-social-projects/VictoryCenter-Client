@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
@@ -18,6 +19,7 @@ interface FundsExpendituresRecordFormState {
     categoryId: number | undefined;
     amountUah: string;
     amountUsd: string;
+    lastEditedField: FundsExpendituresAmountField;
     errors: {
         reportingYear?: string;
         categoryId?: string;
@@ -37,6 +39,7 @@ interface UseFundsExpendituresRecordFormParams {
         reportingYear: string;
         amountUah: string;
         amountUsd: string;
+        lastEditedField: FundsExpendituresAmountField;
         type: FundsExpendituresTransactionType;
     }) => Promise<boolean>;
 }
@@ -46,6 +49,7 @@ const INITIAL_STATE: FundsExpendituresRecordFormState = {
     categoryId: undefined,
     amountUah: '',
     amountUsd: '',
+    lastEditedField: 'amountUah',
     errors: {},
 };
 
@@ -119,6 +123,7 @@ export const useFundsExpendituresRecordForm = ({
                 ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change', {
                     allowReverseConversion: false,
                 })(prev),
+                lastEditedField: field,
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -169,6 +174,7 @@ export const useFundsExpendituresRecordForm = ({
                 reportingYear: formState.reportingYear ?? '',
                 amountUah: normalizedAmountUah,
                 amountUsd: normalizedAmountUsd,
+                lastEditedField: formState.lastEditedField,
                 type: transactionType,
             }).catch(() => false);
 

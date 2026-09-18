@@ -211,14 +211,15 @@ describe('FundsExpendituresApi', () => {
                 reportingYear: '2026',
                 amountUah: '500',
                 amountUsd: '12',
+                lastEditedField: 'amountUah',
             });
 
             expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS, {
                 categoryId: 1,
                 type: 1,
                 reportingYear: 2026,
-                amountUah: 500,
-                amountUsd: 12,
+                amount: 500,
+                currency: 1,
             });
             expect(result).toEqual({
                 id: 11,
@@ -250,14 +251,15 @@ describe('FundsExpendituresApi', () => {
                 reportingYear: '2025',
                 amountUah: '350',
                 amountUsd: '9.5',
+                lastEditedField: 'amountUah',
             });
 
             expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/12`, {
                 categoryId: 2,
                 type: 2,
                 reportingYear: 2025,
-                amountUah: 350,
-                amountUsd: 9.5,
+                amount: 350,
+                currency: 1,
             });
             expect(result).toEqual({
                 id: 12,

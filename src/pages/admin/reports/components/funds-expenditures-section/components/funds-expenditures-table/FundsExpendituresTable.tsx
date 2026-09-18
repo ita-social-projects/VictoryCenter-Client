@@ -3,6 +3,7 @@ import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTa
 import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
@@ -59,7 +60,12 @@ interface FundsExpendituresTableProps {
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
-        data: { categoryId: number; amountUah: string; amountUsd: string },
+        data: {
+            categoryId: number;
+            amountUah: string;
+            amountUsd: string;
+            lastEditedField: FundsExpendituresAmountField;
+        },
     ) => boolean | Promise<boolean>;
     programAggregateRow?: ProgramAggregateRow | null;
     onProgramYearSave?: (reportingYear: string) => boolean | Promise<boolean>;
@@ -79,6 +85,7 @@ interface RowEditState {
     categoryId: number | undefined;
     amountUah: string;
     amountUsd: string;
+    lastEditedField: FundsExpendituresAmountField;
     errors: {
         category?: string;
         amountUah?: string;
@@ -280,6 +287,7 @@ export const FundsExpendituresTable = ({
                 categoryId: record.categoryId,
                 amountUah: record.amountUah,
                 amountUsd: record.amountUsd,
+                lastEditedField: 'amountUah',
                 errors: {},
                 usdMismatchMessage: undefined,
             });
@@ -437,6 +445,7 @@ export const FundsExpendituresTable = ({
                     categoryId: nextCategoryId,
                     amountUah: preparedAmountUah,
                     amountUsd: preparedAmountUsd,
+                    lastEditedField: rowEditState.lastEditedField,
                 });
 
                 if (isSaved === false) {

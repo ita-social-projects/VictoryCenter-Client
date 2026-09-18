@@ -28,6 +28,7 @@ export const REPORTS_TEXT = {
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         INVALID_VALUE: 'Поле може містити лише цілі цифри',
+        NO_CHANGES_FOUND: 'Змін не виявлено',
     },
     REPORT_AND_ANALYTICS: {
         TITLE: 'Управління фінансами',

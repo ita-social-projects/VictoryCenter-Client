@@ -150,7 +150,7 @@ export const ReportAnalytics = () => {
 
             await FundsExpendituresApi.publishRecords(adminClient);
 
-            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
             setHasUnpublishedChanges(false);
             setIsFundsEditing(false);
             setIsRowEditMode(false);

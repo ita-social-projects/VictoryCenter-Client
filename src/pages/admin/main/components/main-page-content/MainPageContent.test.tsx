@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MainPageContent } from './MainPageContent';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@hookform/resolvers/yup', () => ({
     yupResolver: () => async (data: any) => ({
@@ -1096,7 +1097,11 @@ describe('MainPageContent', () => {
             expect(MainPageApi.publish).toHaveBeenCalled();
         });
 
-        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            'success',
+            3000,
+        );
     });
 
     it('handles publish error', async () => {
@@ -1117,7 +1122,11 @@ describe('MainPageContent', () => {
             expect(MainPageApi.publish).toHaveBeenCalled();
         });
 
-        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            'success',
+            3000,
+        );
     });
 
     it.each([
@@ -1160,6 +1169,47 @@ describe('MainPageContent', () => {
         );
     });
 
+    it('resets form dirty state and disables publish button after successful publish', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        const publishBtn = await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                'success',
+                3000,
+            );
+        });
+
+        await waitFor(() => {
+            expect(publishBtn).toBeDisabled();
+            expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    it('clears currentMetrics after publish so subsequent publish does not re-send metrics patch', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => expect(MainPageApi.publish).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByTestId('tab-btn-title'));
+        await triggerFormDirtyAndOpenModal('publish-btn');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => expect(MainPageApi.publish).toHaveBeenCalledTimes(2));
+
+        const secondPatch = (MainPageApi.publish as jest.Mock).mock.calls[1][1];
+        expect(secondPatch.impactStatistics?.metrics).toEqual([]);
+    });
+
     it('does not publish when already publishing', async () => {
         let resolvePublish: (value: any) => void;
         const publishPromise = new Promise((resolve) => {
@@ -1181,7 +1231,11 @@ describe('MainPageContent', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                'success',
+                3000,
+            );
         });
     });
 

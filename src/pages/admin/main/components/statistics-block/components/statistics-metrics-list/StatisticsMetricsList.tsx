@@ -10,12 +10,14 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { ToastType } from '@/types/admin/toast';
-import { Metric, MetricType, UpdateSingleMetricDto } from '@/types/admin/main-page';
+import { Metric, MetricType, UpdateMetricResult, UpdateSingleMetricDto } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import { useState } from 'react';
 import { RaisedMetricEditPanel } from '../raised-metric-edit-panel/RaisedMetricEditPanel';
 import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/StatisticsMetricEditPanel';
 import styles from './StatisticsMetricsList.module.scss';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { REPORTS_TEXT } from '@/const/admin/reports';
 
 interface StatisticsMetricsListProps {
     metrics: Metric[];
@@ -93,24 +95,49 @@ export const StatisticsMetricsList = ({
             setPendingMetric(updatedMetric);
             const response = await MainPageApi.updateMetric(client, updatedMetric.id, patch as UpdateSingleMetricDto);
 
-            if (response.wasModified) {
-                const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? updatedMetric : m));
-                onMetricUpdate(newMetrics);
-                setEditingMetricId(null);
-                setPendingMetric(null);
-                addToast('Зміни збережено успішно', ToastType.Success, 3000);
-            } else {
-                setEditingMetricId(null);
-                setPendingMetric(null);
-                addToast('Змін не виявлено', ToastType.Info, 3000);
-            }
+            const syncedMetric = applyServerState(updatedMetric, response);
+            const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? syncedMetric : m));
+            onMetricUpdate(newMetrics);
+            setEditingMetricId(null);
+            setPendingMetric(null);
+
+            addToast(
+                response.wasModified
+                    ? REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY
+                    : REPORTS_TEXT.MESSAGE.NO_CHANGES_FOUND,
+                response.wasModified ? ToastType.Success : ToastType.Info,
+                3000,
+            );
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status === 409) {
-                addToast('Дані змінено іншим користувачем. Перезавантажте сторінку', ToastType.Warning, 3000);
+            setPendingMetric(null);
+
+            const isConcurrencyError =
+                axios.isAxiosError(error) &&
+                (error.response?.status === 409 ||
+                    (error.response?.status === 400 &&
+                        JSON.stringify(error.response?.data ?? '').includes('modified by another user')));
+
+            if (isConcurrencyError) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER, ToastType.Warning, 3000);
             } else {
-                addToast('Виникла помилка, спробуйте ще раз', ToastType.Error, 3000);
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
             }
         }
+    };
+
+    const applyServerState = (metric: Metric, response: UpdateMetricResult): Metric => {
+        const localizations = metric.localizations?.map((loc) =>
+            loc.languageId === 2 && response.localizationValue != null
+                ? { ...loc, value: response.localizationValue }
+                : loc,
+        );
+
+        return {
+            ...metric,
+            rowVersion: response.rowVersion ?? metric.rowVersion,
+            value: response.value ?? metric.value,
+            localizations,
+        };
     };
 
     const handleCancelEdit = () => {

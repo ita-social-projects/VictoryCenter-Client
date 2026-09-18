@@ -8,6 +8,8 @@ import { StatisticsMetricsList } from './StatisticsMetricsList';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
+import { REPORTS_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
@@ -193,7 +195,11 @@ describe('StatisticsMetricsList', () => {
         fireEvent.click(screen.getByTestId('save-edit'));
 
         await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith('Зміни збережено успішно', ToastType.Success, 3000);
+            expect(addToast).toHaveBeenCalledWith(
+                REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
+                ToastType.Success,
+                3000,
+            );
             expect(screen.queryByTestId('metric-edit-panel')).not.toBeInTheDocument();
         });
     });
@@ -229,7 +235,7 @@ describe('StatisticsMetricsList', () => {
         fireEvent.click(screen.getByTestId('save-edit'));
 
         await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith('Змін не виявлено', ToastType.Info, 3000);
+            expect(addToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.NO_CHANGES_FOUND, ToastType.Info, 3000);
             expect(screen.queryByTestId('metric-edit-panel')).not.toBeInTheDocument();
         });
     });
@@ -282,7 +288,7 @@ describe('StatisticsMetricsList', () => {
 
         await waitFor(() => {
             expect(addToast).toHaveBeenCalledWith(
-                'Дані змінено іншим користувачем. Перезавантажте сторінку',
+                COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER,
                 ToastType.Warning,
                 3000,
             );
@@ -300,7 +306,7 @@ describe('StatisticsMetricsList', () => {
         fireEvent.click(screen.getByTestId('save-edit'));
 
         await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith('Виникла помилка, спробуйте ще раз', ToastType.Error, 3000);
+            expect(addToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
         });
 
         jest.restoreAllMocks();
@@ -316,7 +322,7 @@ describe('StatisticsMetricsList', () => {
         fireEvent.click(screen.getByTestId('save-edit'));
 
         await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith('Виникла помилка, спробуйте ще раз', ToastType.Error, 3000);
+            expect(addToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
         });
 
         jest.restoreAllMocks();
@@ -473,5 +479,81 @@ describe('StatisticsMetricsList', () => {
     it('renders Raised metric type with dual currency values', () => {
         setup({ metrics: [metricRaised] });
         expect(screen.getByText('$125,000')).toBeInTheDocument();
+    });
+
+    it('applies server state (rowVersion, value and localizationValue) to metric on successful save', async () => {
+        const { onMetricUpdate } = setup();
+
+        (MainPageApi.updateMetric as jest.Mock).mockResolvedValue({
+            wasModified: true,
+            rowVersion: 'AAAAAABftM=',
+            value: 4743042,
+            localizationValue: '114705',
+            updatedFields: ['Value', 'AutoSyncedValues'],
+        });
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[1]);
+        fireEvent.click(screen.getByTestId('save-raised-edit'));
+
+        await waitFor(() => {
+            expect(onMetricUpdate).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        id: metrics[1].id,
+                        rowVersion: 'AAAAAABftM=',
+                        value: 4743042,
+                        localizations: expect.arrayContaining([
+                            expect.objectContaining({
+                                languageId: 2,
+                                value: '114705',
+                            }),
+                        ]),
+                    }),
+                ]),
+            );
+        });
+    });
+
+    it('shows warning toast when 400 error indicates metric was modified by another user', async () => {
+        const concurrencyError400 = {
+            response: {
+                status: 400,
+                data: 'Metric was modified by another user. Please refresh and try again.',
+            },
+        };
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        setup();
+        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(concurrencyError400);
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
+        fireEvent.click(screen.getByTestId('save-edit'));
+
+        await waitFor(() => {
+            expect(addToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER,
+                ToastType.Warning,
+                3000,
+            );
+        });
+
+        jest.restoreAllMocks();
+    });
+
+    it('clears pending metric and allows reopening edit panel after save failure', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(false);
+        setup();
+        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
+        fireEvent.click(screen.getByTestId('save-edit'));
+
+        await waitFor(() => {
+            expect(addToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
+        });
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
+        expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
+
+        jest.restoreAllMocks();
     });
 });

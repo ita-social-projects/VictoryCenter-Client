@@ -370,7 +370,6 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Категорія має бути унікальною',
         PROGRAM_ALREADY_ADDED: 'Така категорія вже додана. Оберіть іншу категорію',
     },
     FILTER: {

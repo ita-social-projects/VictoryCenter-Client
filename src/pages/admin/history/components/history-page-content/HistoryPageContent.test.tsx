@@ -822,9 +822,7 @@ describe('HistoryPageContent', () => {
             await user.click(screen.getByTestId('request-save-confirmation'));
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
-            expect(screen.getByTestId('question-title')).toHaveTextContent(
-                COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES,
-            );
+            expect(screen.getByTestId('question-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
             expect(mockSaveConfirmAction).not.toHaveBeenCalled();
         });
 

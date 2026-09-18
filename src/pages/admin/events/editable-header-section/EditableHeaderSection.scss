@@ -1,0 +1,198 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
+
+.editable-header-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    height: 120px;
+    padding: 12px 20px;
+    border: 1px solid colors.$grey-600;
+    border-radius: 5px;
+    background-color: colors.$grey-50;
+    box-shadow: 0 4px 4px rgba(colors.$black, 0.25);
+
+    &-heading-row,
+    &-actions,
+    &-form-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    &-heading-row {
+        justify-content: space-between;
+
+        h2 {
+            @include typography.small-text-medium;
+
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            height: 20px;
+            margin: 0;
+            color: colors.$graphite-black;
+            text-transform: uppercase;
+        }
+    }
+
+    &-required-mark {
+        color: colors.$error;
+    }
+
+    &-actions,
+    &-form-actions {
+        gap: 12px;
+    }
+
+    &-form-actions {
+        justify-content: center;
+        margin-top: 16px;
+    }
+
+    &-icon-button {
+        display: inline-flex;
+        padding: 4px;
+        border: 0;
+        background: transparent;
+        color: colors.$blue-900;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    &-content p {
+        @include typography.small-text-regular;
+
+        margin: 0;
+        color: colors.$blue-900;
+    }
+
+    &-content {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        box-sizing: border-box;
+        min-height: 44px;
+        margin-top: 8px;
+        padding: 0 20px;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    &--description &-content,
+    &--events-block-title &-content {
+        background-color: rgba(colors.$light-blue-150, 0.15);
+    }
+
+    &--description,
+    &--events-block-title {
+        height: 140px;
+    }
+
+    &--description &-content {
+        align-items: flex-start;
+        height: 72px;
+        min-height: 72px;
+        padding: 6px 20px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-color: colors.$grey-700 transparent;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: colors.$grey-700;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: colors.$grey-800;
+            }
+        }
+    }
+
+    &--events-block-title &-content {
+        height: 72px;
+        min-height: 72px;
+    }
+
+    &--edit {
+        height: auto;
+        min-height: 120px;
+        padding: 12px 20px 20px;
+        background-color: colors.$grey-50;
+
+        .input-group {
+            gap: 0;
+        }
+
+        .input-label {
+            @include typography.small-text-medium;
+
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            height: 20px;
+            margin: 0 0 8px;
+            color: colors.$graphite-black;
+            text-transform: uppercase;
+        }
+
+        .input-group > div:nth-child(2) {
+            position: relative;
+            box-sizing: border-box;
+            padding: 10px 20px;
+            border-color: colors.$grey-600;
+            border-radius: 6px;
+            background-color: colors.$white;
+            margin-bottom: 4px;
+        }
+
+        .input-group > div:last-child {
+            margin-top: 0;
+        }
+
+        [contenteditable='true'] {
+            padding-right: 28px;
+        }
+
+        .input-group > div:nth-child(2) > div:last-child {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 0;
+            border-top: 0;
+        }
+
+        &.editable-header-section--events-block-title [contenteditable='true'] {
+            min-height: 20px;
+        }
+
+        &.editable-header-section--description [contenteditable='true'] {
+            min-height: 60px;
+        }
+
+        .editable-header-section-form-actions {
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+
+            button {
+                box-sizing: border-box;
+                flex: 0 0 152px;
+                width: 152px;
+                height: 40px;
+            }
+        }
+    }
+}

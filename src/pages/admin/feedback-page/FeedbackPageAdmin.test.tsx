@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FeedbackPageAdmin, isFeedbackHistory } from './FeedbackPageAdmin';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
@@ -7,6 +7,7 @@ import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackCategory } from '@/types/admin/feedback';
 import { ToastType } from '@/types/admin/toast';
 import { VisibilityStatus } from '@/types/admin/common';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 beforeAll(() => {
     class MockResizeObserver {
@@ -26,7 +27,13 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 let mockLocalizationToolkitProps: any = null;
 const mockRetryFetchLanguages = jest.fn();
 
-let mockLocalizationValues = {
+let mockLocalizationValues: {
+    allLanguages: { id: number; code: string; name: string }[];
+    selectedLanguage: { id: number; code: string; name: string };
+    translationStatusFilter: TranslationStatusFilter | undefined;
+    onLanguageChange: jest.Mock;
+    onTranslationStatusFilterChange: jest.Mock;
+} = {
     allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
     selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
     translationStatusFilter: 0,
@@ -120,10 +127,15 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
 }));
 
 jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
-    InfiniteScrollList: ({ items, renderItem, onLoadMore, isLoading, emptyStateMessage }: any) => (
+    InfiniteScrollList: ({ items, renderItem, onLoadMore, isLoading, emptyStateMessage, emptyStateAction }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="infinite-scroll-loader">Loading...</div>}
-            {items.length === 0 && !isLoading && <div data-testid="empty-state">{emptyStateMessage}</div>}
+            {items.length === 0 && !isLoading && (
+                <div data-testid="empty-state">
+                    {emptyStateMessage}
+                    {emptyStateAction}
+                </div>
+            )}
             {items.map((item: any) => (
                 <div key={item.id} data-testid={`list-item-${item.id}`}>
                     {renderItem(item)}
@@ -134,6 +146,20 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
             </button>
         </div>
     ),
+}));
+
+jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => ({
+    AddVideoReviewModal: ({ isOpen, onClose, onSubmit }: any) =>
+        isOpen ? (
+            <div data-testid="add-video-review-modal">
+                <button data-testid="add-video-review-close" onClick={onClose}>
+                    Close
+                </button>
+                <button data-testid="add-video-review-submit" onClick={() => onSubmit?.({ title: 't', link: 'l' })}>
+                    Submit
+                </button>
+            </div>
+        ) : null,
 }));
 
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
@@ -267,6 +293,43 @@ describe('FeedbackPageAdmin', () => {
         fireEvent.click(addBtn);
 
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
+    });
+
+    const openAddVideoReviewModalOnVideosTab = async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+        await waitFor(() => {
+            expect(screen.getByText('Відео 20')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('toolbar-add-button'));
+        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+    };
+
+    it('should open AddVideoReviewModal when Add button is clicked on the videos tab', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        fireEvent.click(screen.getByTestId('add-video-review-submit'));
+        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should close AddVideoReviewModal when its onClose is called', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        fireEvent.click(screen.getByTestId('add-video-review-close'));
+        expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
     });
 
     it('should call addToast when Edit button on a card is clicked', async () => {
@@ -656,5 +719,34 @@ describe('FeedbackPageAdmin', () => {
         await waitFor(() => {
             expect(screen.getByTestId('empty-state')).toHaveTextContent(COMMON_TEXT_ADMIN.LIST.NOT_FOUND);
         });
+    });
+
+    it('should open AddVideoReviewModal from the empty-state "Додати матеріал" button on the videos tab', async () => {
+        const originalTranslationStatusFilter = mockLocalizationValues.translationStatusFilter;
+        mockLocalizationValues = { ...mockLocalizationValues, translationStatusFilter: undefined };
+        mockFeedbackApi.fetchVideos.mockResolvedValueOnce({ items: [], totalItemsCount: 0 });
+
+        try {
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+
+            const emptyState = await screen.findByTestId('empty-state');
+            expect(emptyState).toHaveTextContent(FEEDBACK_TEXT.LIST.NO_MATERIALS);
+
+            fireEvent.click(within(emptyState).getByText(FEEDBACK_TEXT.BUTTON.ADD_MATERIAL));
+
+            expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+            expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        } finally {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: originalTranslationStatusFilter,
+            };
+        }
     });
 });

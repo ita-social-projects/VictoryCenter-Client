@@ -13,6 +13,7 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
@@ -71,8 +72,23 @@ export const FeedbackPageAdmin = () => {
     }, [addToast]);
 
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
-
+    const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
+
+    const handleAddClick = useCallback(() => {
+        if (activeCategory === FeedbackCategory.VIDEOS) {
+            setIsAddVideoReviewModalOpen(true);
+        } else if (activeCategory === FeedbackCategory.REVIEWS) {
+            setIsAddReviewModalOpen(true);
+        } else {
+            handleNotImplemented();
+        }
+    }, [activeCategory, handleNotImplemented]);
+
+    const handleAddVideoReviewSubmit = useCallback(async () => {
+        handleNotImplemented();
+        return false;
+    }, [handleNotImplemented]);
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
@@ -95,14 +111,6 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
-
-    const handleAddMaterialClick = useCallback(() => {
-        if (activeCategory === FeedbackCategory.REVIEWS) {
-            setIsAddReviewModalOpen(true);
-            return;
-        }
-        handleNotImplemented();
-    }, [activeCategory, handleNotImplemented]);
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -296,7 +304,7 @@ export const FeedbackPageAdmin = () => {
                     onSearchClear={handleSearchClearSelection}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddItem={handleAddMaterialClick}
+                    onAddItem={handleAddClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
                     languages={allLanguages}
@@ -337,7 +345,7 @@ export const FeedbackPageAdmin = () => {
                     }
                     emptyStateAction={
                         !isFilteredView ? (
-                            <Button buttonStyle="secondary" onClick={handleNotImplemented}>
+                            <Button buttonStyle="secondary" onClick={handleAddClick}>
                                 {FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                             </Button>
                         ) : undefined
@@ -351,7 +359,11 @@ export const FeedbackPageAdmin = () => {
                 historyToDelete={historyToDelete}
                 onDeleteHistory={handleDeleteHistoryConfirm}
             />
-
+            <AddVideoReviewModal
+                isOpen={isAddVideoReviewModalOpen}
+                onClose={() => setIsAddVideoReviewModalOpen(false)}
+                onSubmit={handleAddVideoReviewSubmit}
+            />
             <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
             <ToastContainer />
         </div>

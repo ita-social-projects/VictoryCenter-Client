@@ -23,7 +23,7 @@ export const useCounterAnimation = (
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            setDisplayValue(Math.round(targetValue * progress));
+            setDisplayValue(progress < 1 ? Math.round(targetValue * progress) : targetValue);
 
             if (progress < 1) {
                 rafIdRef.current = requestAnimationFrame(animate);

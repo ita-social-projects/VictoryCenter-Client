@@ -72,6 +72,8 @@ export const COMMON_TEXT_ADMIN = {
         TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
         TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
         NAVIGATION_BLOCKED: 'Завершіть звіт перед переходом на іншу сторінку',
+        DATA_MODIFIED_BY_ANOTHER_USER: 'Дані змінено іншим користувачем. Перезавантажте сторінку',
+        ERROR_TRY_AGAIN: 'Виникла помилка, спробуйте ще раз',
     },
 
     BUTTON: {

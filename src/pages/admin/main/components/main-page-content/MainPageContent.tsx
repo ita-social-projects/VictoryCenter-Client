@@ -473,7 +473,7 @@ export const MainPageContent = () => {
             );
 
             const { page, languages: updatedLanguages } = await MainPageApi.publish(client, patch, languages);
-
+            await loadMainPageData(false);
             setOriginalData(page);
             const nextValues = mapMainPageToFormValues(page, updatedLanguages);
 
@@ -484,7 +484,7 @@ export const MainPageContent = () => {
             methods.reset(sanitizedNextValues, { keepDefaultValues: false });
             setCurrentMetrics([]);
 
-            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
         } catch (error) {
             addToast('Помилка під час публікації змін', ToastType.Error, 3000);
         } finally {

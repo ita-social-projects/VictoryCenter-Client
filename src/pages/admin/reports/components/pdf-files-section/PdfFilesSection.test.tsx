@@ -487,7 +487,7 @@ describe('PdfFilesSection', () => {
     it('should revoke object URL after opening PDF', async () => {
         jest.useFakeTimers();
         const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
-        mockWindowOpen.mockReturnValueOnce({});
+        mockWindowOpen.mockReturnValueOnce({ closed: true });
 
         setupDataFetchMock();
 
@@ -504,6 +504,68 @@ describe('PdfFilesSection', () => {
 
         jest.advanceTimersByTime(1500);
         expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url');
+    });
+
+    it('should revoke object URL immediately when popup is blocked', async () => {
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        mockWindowOpen.mockReturnValueOnce(null);
+
+        setupDataFetchMock();
+
+        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        const mockRevokeObjectURL = jest.fn();
+        global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('view-btn'));
+
+        await waitFor(() => {
+            expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url');
+        });
+    });
+
+    const renderAndOpenPdfWithOpenTab = async (mockPdfBlob: Blob) => {
+        jest.useFakeTimers();
+        const mockOpenedWindow = { closed: false };
+        mockWindowOpen.mockReturnValueOnce(mockOpenedWindow);
+
+        setupDataFetchMock();
+
+        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        const mockRevokeObjectURL = jest.fn();
+        global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('view-btn'));
+
+        await waitFor(() => {
+            expect(mockWindowOpen).toHaveBeenCalled();
+        });
+
+        return { mockOpenedWindow, mockRevokeObjectURL };
+    };
+
+    it('should not revoke object URL while the opened tab is still open', async () => {
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        const { mockRevokeObjectURL } = await renderAndOpenPdfWithOpenTab(mockPdfBlob);
+
+        jest.advanceTimersByTime(4500);
+        expect(mockRevokeObjectURL).not.toHaveBeenCalled();
+    });
+
+    it('should revoke object URL only once the opened tab is closed and stop polling afterwards', async () => {
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        const { mockOpenedWindow, mockRevokeObjectURL } = await renderAndOpenPdfWithOpenTab(mockPdfBlob);
+
+        jest.advanceTimersByTime(3000);
+        expect(mockRevokeObjectURL).not.toHaveBeenCalled();
+
+        mockOpenedWindow.closed = true;
+        jest.advanceTimersByTime(1500);
+        expect(mockRevokeObjectURL).toHaveBeenCalledTimes(1);
+
+        jest.advanceTimersByTime(3000);
+        expect(mockRevokeObjectURL).toHaveBeenCalledTimes(1);
     });
 
     it('should call reorder API and toast success on successful reorder', async () => {

@@ -442,7 +442,9 @@ describe('useProgramExpenseRecordForm', () => {
                 result.current.handleProgramChange(2);
             });
 
-            expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED);
+            expect(result.current.formState.errors.programId).toBe(
+                PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED,
+            );
         });
     });
 });

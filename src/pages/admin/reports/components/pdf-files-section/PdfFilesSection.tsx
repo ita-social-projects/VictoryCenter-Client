@@ -221,7 +221,6 @@ export const PdfFilesSection = () => {
                         }
                     }, 1500);
                 } else {
-                    // popup blocked - nothing will ever poll openedWindow.closed, so free the blob now
                     URL.revokeObjectURL(blobUrl);
                 }
             } catch {

@@ -88,6 +88,7 @@ describe('useFundsExpendituresRecordForm', () => {
             reportingYear: '2026',
             amountUah: '100',
             amountUsd: '10',
+            lastEditedField: 'amountUsd',
             type: 'income',
         });
         expect(result.current.formState.reportingYear).toBeUndefined();
@@ -201,6 +202,7 @@ describe('useFundsExpendituresRecordForm', () => {
             reportingYear: '2026',
             amountUah: '450',
             amountUsd: '10',
+            lastEditedField: 'amountUsd',
             type: 'income',
         });
     });

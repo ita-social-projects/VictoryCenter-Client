@@ -8,6 +8,7 @@ import './Select.scss';
 export type SelectProps<TValue> = {
     children: React.ReactNode;
     onValueChange: (value: TValue) => void;
+    onBlur?: (event: React.FocusEvent<HTMLDivElement>) => void;
     value?: TValue;
     selectContainerRef?: RefObject<HTMLDivElement | null>;
     placeholder?: string;
@@ -23,6 +24,7 @@ export type SelectProps<TValue> = {
 export const Select = <TValue,>({
     children,
     onValueChange,
+    onBlur,
     value,
     selectContainerRef,
     className,
@@ -66,8 +68,13 @@ export const Select = <TValue,>({
     }, [isOpen, containerRef]);
 
     const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-        if (isOpen && containerRef.current && !containerRef.current.contains(e.relatedTarget as Node)) {
+        const hasFocusLeftSelect = containerRef.current && !containerRef.current.contains(e.relatedTarget as Node);
+
+        if (isOpen && hasFocusLeftSelect) {
             setIsOpen(false);
+        }
+        if (hasFocusLeftSelect) {
+            onBlur?.(e);
         }
     };
 
@@ -145,6 +152,7 @@ export const Select = <TValue,>({
                                 className={classNames(optionClassName, {
                                     'select-options-selected': !isAutocomplete && value === optValue,
                                 })}
+                                onMouseDown={(event) => event.preventDefault()}
                                 onClick={(e) => handleOptionClick(e, optValue)}
                                 disabled={disabled}
                             >

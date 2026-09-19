@@ -46,7 +46,7 @@ describe('useFundsExpendituresRecordForm', () => {
         });
 
         expect(result.current.formState.errors.categoryId).toBe(
-            FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE,
+            FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE,
         );
     });
 

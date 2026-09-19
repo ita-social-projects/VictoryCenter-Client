@@ -175,6 +175,23 @@ describe('EditFundsExpendituresCategoryModal', () => {
         });
     });
 
+    describe('category field validation on blur', () => {
+        it('shows required error when category select loses focus without selection', () => {
+            renderModal();
+            fireEvent.blur(screen.getByRole('button', { name: CATEGORY_SELECT }));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+        });
+
+        it('clears required error when a category is selected', () => {
+            renderModal();
+            fireEvent.blur(screen.getByRole('button', { name: CATEGORY_SELECT }));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+
+            selectCategory(incomeCategory.name);
+            expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
     describe('confirmation save modal', () => {
         it('opens save confirmation when save button is clicked', () => {
             renderModal();

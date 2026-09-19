@@ -154,6 +154,10 @@
     height: 20px;
     cursor: pointer;
     accent-color: c.$blue-500;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
 }
 
 .header-checkbox {
@@ -161,6 +165,10 @@
     height: 20px;
     cursor: pointer;
     accent-color: c.$blue-500;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
 }
 
 .actions-th {

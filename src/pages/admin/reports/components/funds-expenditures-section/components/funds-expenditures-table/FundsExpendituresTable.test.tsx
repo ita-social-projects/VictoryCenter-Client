@@ -420,6 +420,7 @@ describe('FundsExpendituresTable', () => {
 
             expect(screen.getByLabelText('Edit record 2')).toBeDisabled();
             expect(screen.getByLabelText('Delete record 2')).toBeDisabled();
+            expect(screen.getByLabelText('Select all records')).toBeDisabled();
             expect(screen.getByLabelText('Select record 2')).toBeDisabled();
         });
 

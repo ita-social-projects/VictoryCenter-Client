@@ -541,6 +541,7 @@ export const FundsExpendituresTable = ({
                                         ref={headerCheckboxRef}
                                         className={styles['header-checkbox']}
                                         aria-label="Select all records"
+                                        disabled={isTableEditing || isRowActionsDisabled}
                                         checked={allEligibleSelected}
                                         onChange={(e) => onSelectAllToggle?.(e.target.checked)}
                                     />

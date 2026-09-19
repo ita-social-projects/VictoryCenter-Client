@@ -45,9 +45,7 @@ describe('useFundsExpendituresRecordForm', () => {
             result.current.handleCategoryChange(2);
         });
 
-        expect(result.current.formState.errors.categoryId).toBe(
-            FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE,
-        );
+        expect(result.current.formState.errors.categoryId).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
     });
 
     it('does not submit invalid form and closes confirmation state', async () => {

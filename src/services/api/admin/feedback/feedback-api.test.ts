@@ -125,6 +125,24 @@ describe('FeedbackApi', () => {
         });
     });
 
+    describe('updateHistory', () => {
+        it('should put updated history and return response data', async () => {
+            const updateHistoryPayload = {
+                title: 'Оновлена історія',
+                story: 'Текст оновленої історії',
+                imageId: 10,
+                status: VisibilityStatus.Published,
+            };
+            const mockResponse = { id: 42, ...updateHistoryPayload, image: null, priority: 1 };
+            mockClient.put = jest.fn().mockResolvedValue({ data: mockResponse });
+
+            const result = await FeedbackApi.updateHistory(mockClient, 42, updateHistoryPayload);
+
+            expect(mockClient.put).toHaveBeenCalledWith('FeedbackHistories/42', updateHistoryPayload);
+            expect(result).toEqual(mockResponse);
+        });
+    });
+
     describe('fetchReviews', () => {
         beforeEach(() => {
             mockClient.get.mockResolvedValue({

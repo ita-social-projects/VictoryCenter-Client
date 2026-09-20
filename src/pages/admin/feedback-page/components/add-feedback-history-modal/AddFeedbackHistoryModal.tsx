@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
@@ -9,14 +11,17 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, FEEDBACK_HISTORY_VALIDATION } from '@/const/admin/feedback';
 import { FeedbackHistoryDto } from '@/types/admin/feedback';
-import { Image, ImageValues } from '@/types/common/image';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
-import './AddFeedbackHistoryModal.scss';
+import {
+    FeedbackHistoryFormValues,
+    FeedbackHistoryValidationSchema,
+} from '@/validation/admin/feedback-history-schema/feedback-history-schema';
+import styles from './AddFeedbackHistoryModal.module.scss';
 
 export interface AddFeedbackHistoryModalProps {
     isOpen: boolean;
@@ -26,57 +31,11 @@ export interface AddFeedbackHistoryModalProps {
     initialData?: FeedbackHistoryDto;
 }
 
-interface FormState {
-    title: string;
-    story: string;
-    image: Image | ImageValues | null;
-}
-
-interface FormErrors {
-    title?: string;
-    story?: string;
-    image?: string;
-}
-
-const defaultFormState: FormState = {
-    title: '',
-    story: '',
-    image: null,
-};
-
 const mapImageInputError = (error: string | null): string | undefined => {
     if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
         return undefined;
     }
     return error;
-};
-
-const validateTitle = (value: string): string | undefined => {
-    const trimmed = value.trim();
-    if (!trimmed) {
-        return FEEDBACK_HISTORY_VALIDATION.title.getRequiredError();
-    }
-    if (trimmed.length < FEEDBACK_HISTORY_VALIDATION.title.min) {
-        return FEEDBACK_HISTORY_VALIDATION.title.getMinError();
-    }
-    if (trimmed.length > FEEDBACK_HISTORY_VALIDATION.title.max) {
-        return FEEDBACK_HISTORY_VALIDATION.title.getMaxError();
-    }
-    return undefined;
-};
-
-const validateStory = (value: string): string | undefined => {
-    const trimmed = value.trim();
-    if (!trimmed) {
-        return FEEDBACK_HISTORY_VALIDATION.story.getRequiredError();
-    }
-    if (trimmed.length < FEEDBACK_HISTORY_VALIDATION.story.min) {
-        return FEEDBACK_HISTORY_VALIDATION.story.getMinError();
-    }
-    if (trimmed.length > FEEDBACK_HISTORY_VALIDATION.story.max) {
-        return FEEDBACK_HISTORY_VALIDATION.story.getMaxError();
-    }
-    return undefined;
 };
 
 export const AddFeedbackHistoryModal = ({
@@ -87,94 +46,50 @@ export const AddFeedbackHistoryModal = ({
     initialData,
 }: AddFeedbackHistoryModalProps) => {
     const client = useAdminClient();
-    const [formState, setFormState] = useState<FormState>(defaultFormState);
-    const [errors, setErrors] = useState<FormErrors>({});
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [submitError, setSubmitError] = useState<string>('');
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState<boolean>(false);
     const [showPublishConfirmModal, setShowPublishConfirmModal] = useState<boolean>(false);
 
-    const resetForm = useCallback(() => {
-        if (initialData) {
-            setFormState({
-                title: initialData.title,
-                story: initialData.story,
-                image: initialData.image,
-            });
-        } else {
-            setFormState(defaultFormState);
-        }
-        setErrors({});
-        setSubmitError('');
-        setShowCloseConfirmModal(false);
-        setShowPublishConfirmModal(false);
-        setIsSubmitting(false);
-    }, [initialData]);
+    const {
+        control,
+        handleSubmit,
+        reset,
+        setError,
+        clearErrors,
+        formState: { errors, isDirty, isSubmitting, isValid },
+    } = useForm<FeedbackHistoryFormValues>({
+        resolver: yupResolver(FeedbackHistoryValidationSchema),
+        defaultValues: {
+            title: '',
+            story: '',
+            image: null,
+        },
+        mode: 'onChange',
+    });
 
     useEffect(() => {
         if (isOpen) {
-            resetForm();
-        } else {
-            setErrors({});
+            if (initialData) {
+                reset({
+                    title: initialData.title,
+                    story: initialData.story,
+                    image: initialData.image,
+                });
+            } else {
+                reset({ title: '', story: '', image: null });
+            }
             setSubmitError('');
             setShowCloseConfirmModal(false);
             setShowPublishConfirmModal(false);
-            setIsSubmitting(false);
+        } else {
+            reset({ title: '', story: '', image: null });
+            setSubmitError('');
+            setShowCloseConfirmModal(false);
+            setShowPublishConfirmModal(false);
         }
-    }, [isOpen, resetForm]);
+    }, [isOpen, initialData, reset]);
 
-    const isDirty = useMemo(() => {
-        if (initialData) {
-            const hasTitleChanged = formState.title.trim() !== initialData.title;
-            const hasStoryChanged = formState.story.trim() !== initialData.story;
-            const initialImageId = initialData.image && 'id' in initialData.image ? initialData.image.id : null;
-            let currentImageId: number | null | undefined;
-            if (formState.image && 'id' in formState.image) {
-                currentImageId = formState.image.id;
-            } else if (formState.image) {
-                currentImageId = undefined; // it's a new image (base64)
-            } else {
-                currentImageId = null;
-            }
-            const hasImageChanged = currentImageId !== initialImageId;
-            return hasTitleChanged || hasStoryChanged || hasImageChanged;
-        }
-        return Boolean(formState.title.trim() || formState.story.trim() || formState.image);
-    }, [formState.title, formState.story, formState.image, initialData]);
-
-    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        setFormState((prev) => ({ ...prev, title: val }));
-        setErrors((prev) => ({ ...prev, title: validateTitle(val) }));
-    }, []);
-
-    const handleTitleBlur = useCallback(() => {
-        setErrors((prev) => ({ ...prev, title: validateTitle(formState.title) }));
-    }, [formState.title]);
-
-    const handleStoryChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const val = e.target.value;
-        setFormState((prev) => ({ ...prev, story: val }));
-        setErrors((prev) => ({ ...prev, story: validateStory(val) }));
-    }, []);
-
-    const handleStoryBlur = useCallback(() => {
-        setErrors((prev) => ({ ...prev, story: validateStory(formState.story) }));
-    }, [formState.story]);
-
-    const handleImageChange = useCallback((img: ImageValues | null) => {
-        setFormState((prev) => ({ ...prev, image: img }));
-        setErrors((prev) => ({ ...prev, image: undefined }));
-    }, []);
-
-    const handleImageError = useCallback((err: string | null) => {
-        setErrors((prev) => ({
-            ...prev,
-            image: mapImageInputError(err),
-        }));
-    }, []);
-
-    const handleClose = useCallback(() => {
+    const handleClose = () => {
         if (isSubmitting) return;
 
         if (isDirty) {
@@ -182,75 +97,35 @@ export const AddFeedbackHistoryModal = ({
             return;
         }
 
-        resetForm();
         onClose();
-    }, [isSubmitting, isDirty, resetForm, onClose]);
+    };
 
-    const handleConfirmClose = useCallback(() => {
+    const handleConfirmClose = () => {
         setShowCloseConfirmModal(false);
-        resetForm();
         onClose();
-    }, [resetForm, onClose]);
+    };
 
-    const handleCancelClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-    }, []);
-
-    const validateForm = useCallback((): boolean => {
-        const newErrors: FormErrors = {
-            title: validateTitle(formState.title),
-            story: validateStory(formState.story),
-            image: !formState.image ? FEEDBACK_HISTORY_VALIDATION.image.getRequiredError() : undefined,
-        };
-
-        setErrors(newErrors);
-        return !newErrors.title && !newErrors.story && !newErrors.image;
-    }, [formState]);
-
-    const isSubmitDisabled = useMemo(() => {
-        const titleTrimmed = formState.title.trim();
-        const storyTrimmed = formState.story.trim();
-        const hasEmptyFields = !titleTrimmed || !storyTrimmed || !formState.image;
-        const hasInvalidLength =
-            titleTrimmed.length < FEEDBACK_HISTORY_VALIDATION.title.min ||
-            storyTrimmed.length < FEEDBACK_HISTORY_VALIDATION.story.min;
-        const hasValidationErrors = Boolean(errors.title || errors.story || errors.image);
-
-        if (initialData) {
-            return isSubmitting || hasEmptyFields || hasInvalidLength || hasValidationErrors || !isDirty;
-        }
-
-        return isSubmitting || hasEmptyFields || hasInvalidLength || hasValidationErrors;
-    }, [formState.title, formState.story, formState.image, errors, isSubmitting, initialData, isDirty]);
-
-    const executeSubmit = useCallback(async () => {
-        setIsSubmitting(true);
+    const executeSubmit = async (data: FeedbackHistoryFormValues) => {
         setSubmitError('');
         setShowPublishConfirmModal(false);
 
         try {
-            let imageId: number | null = null;
-            if (formState.image && 'base64' in formState.image) {
-                const imageResult = await ImageApi.post(client, formState.image);
-                imageId = imageResult.id;
-                setFormState((prev) => ({ ...prev, image: imageResult }));
-            } else if (formState.image && 'id' in formState.image) {
-                imageId = formState.image.id;
-            }
+            const initialImageId = initialData?.image && 'id' in initialData.image ? initialData.image.id : null;
+            const { finalImageId } = await ImageApi.getUpdateImageId(client, data.image, initialImageId);
 
             if (initialData) {
                 const updatedHistory = await FeedbackApi.updateHistory(client, initialData.id, {
-                    title: formState.title.trim(),
-                    story: formState.story.trim(),
-                    imageId,
+                    title: data.title.trim(),
+                    story: data.story.trim(),
+                    imageId: finalImageId,
                     status: VisibilityStatus.Published,
                 });
                 onEditHistory?.(updatedHistory);
             } else {
                 const newHistory = await FeedbackApi.createHistory(client, {
-                    title: formState.title.trim(),
-                    story: formState.story.trim(),
-                    imageId,
+                    title: data.title.trim(),
+                    story: data.story.trim(),
+                    imageId: finalImageId,
                     status: VisibilityStatus.Published,
                 });
                 onAddHistory?.(newHistory);
@@ -261,93 +136,122 @@ export const AddFeedbackHistoryModal = ({
             setSubmitError(
                 initialData ? FEEDBACK_TEXT.MESSAGE.FAIL_TO_EDIT_HISTORY : FEEDBACK_TEXT.MESSAGE.FAIL_TO_CREATE_HISTORY,
             );
-        } finally {
-            setIsSubmitting(false);
         }
-    }, [formState, client, initialData, onAddHistory, onEditHistory, onClose]);
+    };
 
-    const handlePreSubmit = useCallback(() => {
-        if (isSubmitDisabled) return;
-
-        const isValid = validateForm();
-        if (!isValid) return;
+    const handlePreSubmit = () => {
+        if (!isValid || isSubmitting) return;
 
         if (initialData) {
             setShowPublishConfirmModal(true);
         } else {
-            executeSubmit();
+            handleSubmit(executeSubmit)();
         }
-    }, [isSubmitDisabled, validateForm, initialData, executeSubmit]);
+    };
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleClose} className="add-feedback-history-modal">
+            <Modal isOpen={isOpen} onClose={handleClose} className={styles['add-feedback-history-modal']}>
                 <Modal.Title>
                     {initialData ? FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE : FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE}
                 </Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className="add-feedback-history-modal-form" noValidate>
-                        <div className="form-group">
-                            <InputWithCharacterLimitGroup
-                                id="history-title"
+                    <form
+                        onSubmit={(e) => e.preventDefault()}
+                        className={styles['add-feedback-history-modal-form']}
+                        noValidate
+                    >
+                        <div className={styles['form-group']}>
+                            <Controller
                                 name="title"
-                                label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
-                                value={formState.title}
-                                onChange={handleTitleChange}
-                                onBlur={handleTitleBlur}
-                                maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
-                                isRequired
-                                showCounterBelow
-                                maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.title.getMaxError()}
-                                error={errors.title}
-                                disabled={isSubmitting}
-                                normalizeValue={getNormalizedInputTextWhileTyping}
+                                control={control}
+                                render={({ field }) => (
+                                    <InputWithCharacterLimitGroup
+                                        id="history-title"
+                                        name={field.name}
+                                        label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        onBlur={field.onBlur}
+                                        maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
+                                        isRequired
+                                        showCounterBelow
+                                        maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.title.getMaxError()}
+                                        error={errors.title?.message}
+                                        disabled={isSubmitting}
+                                        normalizeValue={getNormalizedInputTextWhileTyping}
+                                    />
+                                )}
                             />
                         </div>
 
-                        <div className="form-group">
-                            <TextAreaWithCharacterLimitGroup
-                                id="history-story"
+                        <div className={styles['form-group']}>
+                            <Controller
                                 name="story"
-                                label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
-                                value={formState.story}
-                                onChange={handleStoryChange}
-                                onBlur={handleStoryBlur}
-                                maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
-                                isRequired
-                                maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.story.getMaxError()}
-                                rows={5}
-                                error={errors.story}
-                                disabled={isSubmitting}
-                                normalizeValue={getNormalizedInputTextWhileTyping}
+                                control={control}
+                                render={({ field }) => (
+                                    <TextAreaWithCharacterLimitGroup
+                                        id="history-story"
+                                        name={field.name}
+                                        label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        onBlur={field.onBlur}
+                                        maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
+                                        isRequired
+                                        maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.story.getMaxError()}
+                                        rows={5}
+                                        error={errors.story?.message}
+                                        disabled={isSubmitting}
+                                        normalizeValue={getNormalizedInputTextWhileTyping}
+                                    />
+                                )}
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className={styles['form-group']}>
                             <InputLabel
                                 htmlFor="history-image"
                                 text={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.PHOTO}
                                 isRequired
                             />
-                            <ImageInput
-                                id="history-image"
+                            <Controller
                                 name="image"
-                                value={formState.image}
-                                onChange={handleImageChange}
-                                setError={handleImageError}
-                                label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_LABEL}
-                                subText={FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_SUBTEXT}
-                                cropWidth={FEEDBACK_HISTORY_VALIDATION.image.cropWidth}
-                                cropHeight={FEEDBACK_HISTORY_VALIDATION.image.cropHeight}
-                                minWidth={FEEDBACK_HISTORY_VALIDATION.image.minWidth}
-                                minHeight={FEEDBACK_HISTORY_VALIDATION.image.minHeight}
-                                enableCrop
-                                disabled={isSubmitting}
+                                control={control}
+                                render={({ field }) => (
+                                    <ImageInput
+                                        id="history-image"
+                                        name={field.name}
+                                        value={field.value}
+                                        onChange={(img) => {
+                                            field.onChange(img);
+                                            clearErrors('image');
+                                        }}
+                                        setError={(err) => {
+                                            const mapped = mapImageInputError(err);
+                                            if (mapped) {
+                                                setError('image', { type: 'manual', message: mapped });
+                                            } else {
+                                                clearErrors('image');
+                                            }
+                                        }}
+                                        label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_LABEL}
+                                        subText={FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_SUBTEXT}
+                                        cropWidth={FEEDBACK_HISTORY_VALIDATION.image.cropWidth}
+                                        cropHeight={FEEDBACK_HISTORY_VALIDATION.image.cropHeight}
+                                        minWidth={FEEDBACK_HISTORY_VALIDATION.image.minWidth}
+                                        minHeight={FEEDBACK_HISTORY_VALIDATION.image.minHeight}
+                                        enableCrop
+                                        disabled={isSubmitting}
+                                    />
+                                )}
                             />
-                            {errors.image && <span className="error">{errors.image}</span>}
+                            {errors.image?.message && <span className={styles.error}>{errors.image.message}</span>}
                         </div>
 
-                        {submitError && <div className="add-feedback-history-modal-error-container">{submitError}</div>}
+                        {submitError && (
+                            <div className={styles['add-feedback-history-modal-error-container']}>{submitError}</div>
+                        )}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>
@@ -355,8 +259,8 @@ export const AddFeedbackHistoryModal = ({
                         type="button"
                         buttonStyle="primary"
                         onClick={handlePreSubmit}
-                        disabled={isSubmitDisabled}
-                        className="add-feedback-history-modal-submit-button"
+                        disabled={!isValid || isSubmitting || (!!initialData && !isDirty)}
+                        className={styles['add-feedback-history-modal-submit-button']}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
@@ -369,16 +273,16 @@ export const AddFeedbackHistoryModal = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onConfirm={handleConfirmClose}
-                onCancel={handleCancelClose}
-                onClose={handleCancelClose}
+                onCancel={() => setShowCloseConfirmModal(false)}
+                onClose={() => setShowCloseConfirmModal(false)}
             />
 
             <ConfirmationModal
                 isOpen={showPublishConfirmModal}
-                title="Опублікувати зміни?"
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onConfirm={executeSubmit}
+                onConfirm={handleSubmit(executeSubmit)}
                 onCancel={() => setShowPublishConfirmModal(false)}
                 onClose={() => setShowPublishConfirmModal(false)}
             />

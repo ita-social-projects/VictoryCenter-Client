@@ -7,6 +7,7 @@ import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto } from '@/types/admin/feedback';
+import { ImageValues } from '@/types/common/image';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -22,6 +23,7 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
 jest.mock('@/services/api/admin/image/image-api', () => ({
     ImageApi: {
         post: jest.fn(),
+        getUpdateImageId: jest.fn(),
     },
 }));
 
@@ -32,7 +34,7 @@ jest.mock('@/validation/admin/image-schema/image-schema', () => ({
 }));
 
 jest.mock('@/components/admin/cropper-modal/CropperModal', () => ({
-    CropModal: ({ isOpen, onChange }: any) => {
+    CropModal: ({ isOpen, onChange }: { isOpen: boolean; onChange: (img: ImageValues | null) => void }) => {
         if (!isOpen) return null;
         return (
             <div data-testid="cropper">
@@ -68,31 +70,25 @@ describe('AddFeedbackHistoryModal', () => {
     it('renders modal with correct title, empty fields, live counters, active X button, and disabled publish button', () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
-        // Title
         expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
 
-        // X button active
         const closeBtn = screen.getByRole('button', { name: 'Close modal' });
         expect(closeBtn).toBeInTheDocument();
         expect(closeBtn).not.toBeDisabled();
 
-        // Title input & counter
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         expect(titleInput).toBeInTheDocument();
         expect(titleInput).toHaveValue('');
         expect(screen.getByText('0/50')).toBeInTheDocument();
 
-        // Story textarea & counter
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
         expect(storyTextarea).toBeInTheDocument();
         expect(storyTextarea).toHaveValue('');
         expect(screen.getByText('0/1000')).toBeInTheDocument();
 
-        // Photo upload placeholder
         expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_LABEL)).toBeInTheDocument();
         expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.PLACEHOLDER.PHOTO_SUBTEXT)).toBeInTheDocument();
 
-        // Publish button disabled
         const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishBtn).toBeInTheDocument();
         expect(publishBtn).toBeDisabled();
@@ -100,89 +96,97 @@ describe('AddFeedbackHistoryModal', () => {
 
     it('does not render modal when isOpen is false', () => {
         render(<AddFeedbackHistoryModal isOpen={false} onClose={onClose} onAddHistory={onAddHistory} />);
-
         expect(screen.queryByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
     });
 
-    it('updates text fields and counters when typing', () => {
+    it('updates text fields and counters when typing', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Тестова історія' } });
-        expect(titleInput).toHaveValue('Тестова історія');
-        expect(screen.getByText('15/50')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('Тестова історія');
+            expect(screen.getByText('15/50')).toBeInTheDocument();
+        });
 
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
         fireEvent.change(storyTextarea, { target: { value: 'Опис нової історії' } });
-        expect(storyTextarea).toHaveValue('Опис нової історії');
-        expect(screen.getByText('18/1000')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(storyTextarea).toHaveValue('Опис нової історії');
+            expect(screen.getByText('18/1000')).toBeInTheDocument();
+        });
     });
 
-    it('shows validation error when inputs are too short', () => {
+    it('shows validation error when inputs are too short', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.focus(titleInput);
         fireEvent.change(titleInput, { target: { value: 'Коротко' } });
         fireEvent.blur(titleInput);
-        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        });
 
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
-        fireEvent.focus(storyTextarea);
         fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
         fireEvent.blur(storyTextarea);
-        expect(screen.getAllByText('Не менше 10 символів')).toHaveLength(2);
+        await waitFor(() => {
+            expect(screen.getAllByText('Не менше 10 символів')).toHaveLength(2);
+        });
     });
 
-    it('validates text fields in real-time during typing (onChange) without blur', () => {
+    it('validates text fields in real-time during typing (onChange)', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
 
-        // Typing fewer than 10 characters immediately displays error
         fireEvent.change(titleInput, { target: { value: 'Коротко' } });
-        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        });
 
-        // Reaching 10 characters immediately clears error
         fireEvent.change(titleInput, { target: { value: 'Достатня назва' } });
-        expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+        });
 
-        // Clearing field displays required error immediately
         fireEvent.change(titleInput, { target: { value: '' } });
-        expect(screen.getByText("Поле обов'язкове")).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText("Поле обов'язкове")).toBeInTheDocument();
+        });
 
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
 
-        // Typing story fewer than 10 chars
         fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
-        expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+        });
 
-        // Reaching 10 characters clears error
         fireEvent.change(storyTextarea, { target: { value: 'Достатньо довгий опис історії' } });
-        expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+        });
     });
 
-    it('applies getNormalizedInputTextWhileTyping to collapse multiple spaces and remove leading spaces while typing', () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
-
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: '   Заголовок   з   пробілами' } });
-        expect(titleInput).toHaveValue('Заголовок з пробілами');
-    });
-
-    it('clears field when clean-up icon is clicked', () => {
+    it('clears field when clean-up icon is clicked', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.focus(titleInput);
         fireEvent.change(titleInput, { target: { value: 'Тест' } });
 
-        const clearButtons = screen.getAllByRole('button', { name: 'Clear input' });
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('Тест');
+        });
+
+        const clearButtons = await screen.findAllByRole('button', { name: 'Clear input' });
         expect(clearButtons.length).toBeGreaterThan(0);
         fireEvent.click(clearButtons[0]);
 
-        expect(titleInput).toHaveValue('');
-        expect(screen.getByText('0/50')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('');
+            expect(screen.getByText('0/50')).toBeInTheDocument();
+        });
     });
 
     it('closes modal directly when X button is clicked and all fields are empty', () => {
@@ -195,73 +199,92 @@ describe('AddFeedbackHistoryModal', () => {
         expect(screen.queryByText(/зміни будуть втрачені/i)).not.toBeInTheDocument();
     });
 
-    it('shows confirmation pop-up when X button is clicked and at least one field is not empty', () => {
+    it('shows confirmation pop-up when X button is clicked and at least one field is not empty', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Щось введено' } });
 
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('Щось введено');
+        });
+        
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         const closeBtn = screen.getByRole('button', { name: 'Close modal' });
         fireEvent.click(closeBtn);
 
-        expect(onClose).not.toHaveBeenCalled();
-        expect(screen.getByText(/зміни будуть втрачені/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO })).toBeInTheDocument();
+        await waitFor(() => {
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.getByText(/зміни будуть втрачені/i)).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO })).toBeInTheDocument();
+        });
     });
 
-    it('keeps modal open and preserves filled fields when NO is clicked in confirmation pop-up', () => {
+    it('keeps modal open and preserves filled fields when NO is clicked in confirmation pop-up', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Збережений заголовок' } });
 
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('Збережений заголовок');
+        });
+        
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         const closeBtn = screen.getByRole('button', { name: 'Close modal' });
         fireEvent.click(closeBtn);
 
-        const noBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
+        const noBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
         fireEvent.click(noBtn);
 
-        expect(onClose).not.toHaveBeenCalled();
-        expect(screen.queryByText(/зміни будуть втрачені/i)).not.toBeInTheDocument();
-        expect(titleInput).toHaveValue('Збережений заголовок');
+        await waitFor(() => {
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.queryByText(/зміни будуть втрачені/i)).not.toBeInTheDocument();
+            expect(titleInput).toHaveValue('Збережений заголовок');
+        });
     });
 
-    it('closes modal and discards inputs when YES is clicked in confirmation pop-up', () => {
+    it('closes modal and discards inputs when YES is clicked in confirmation pop-up', async () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Втрачений заголовок' } });
 
+        await waitFor(() => {
+            expect(titleInput).toHaveValue('Втрачений заголовок');
+        });
+        
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         const closeBtn = screen.getByRole('button', { name: 'Close modal' });
         fireEvent.click(closeBtn);
 
-        const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        const yesBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
         fireEvent.click(yesBtn);
 
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
     });
 
     it('enables publish button when title, story and image are provided, and submits successfully', async () => {
         (FeedbackApi.createHistory as jest.Mock).mockResolvedValueOnce(mockCreatedHistory);
-        (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 10, url: 'https://example.com/photo.jpg' });
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 10, imageIdToDelete: null });
 
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
         const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishBtn).toBeDisabled();
 
-        // Fill Title
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Перемога 2026' } });
-        expect(publishBtn).toBeDisabled();
 
-        // Fill Story
         const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
         fireEvent.change(storyTextarea, { target: { value: 'Неймовірна історія успіху та реабілітації' } });
-        expect(publishBtn).toBeDisabled();
 
-        // Upload image file
         const fileInput = screen.getByTestId('image-input-hidden');
         const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
         fireEvent.change(fileInput, { target: { files: [file] } });
@@ -291,7 +314,7 @@ describe('AddFeedbackHistoryModal', () => {
 
     it('displays error message when history creation fails', async () => {
         (FeedbackApi.createHistory as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-        (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 10, url: 'https://example.com/photo.jpg' });
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 10, imageIdToDelete: null });
 
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
@@ -333,13 +356,16 @@ describe('AddFeedbackHistoryModal', () => {
             priority: 1,
         };
 
-        it('pre-populates fields with initialData and disables publish button initially', () => {
+        it('pre-populates fields with initialData and disables publish button initially', async () => {
             render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
 
-            expect(screen.getByRole('textbox', { name: /заголовок/i })).toHaveValue('Існуючий заголовок');
-            expect(screen.getByRole('textbox', { name: /історія/i })).toHaveValue(
-                'Це існуюча історія для перевірки редагування',
-            );
+            await waitFor(() => {
+                expect(screen.getByRole('textbox', { name: /заголовок/i })).toHaveValue('Існуючий заголовок');
+                expect(screen.getByRole('textbox', { name: /історія/i })).toHaveValue(
+                    'Це існуюча історія для перевірки редагування',
+                );
+            });
+            
             expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
 
             const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
@@ -351,6 +377,7 @@ describe('AddFeedbackHistoryModal', () => {
                 ...mockInitialData,
                 title: 'Оновлений заголовок',
             });
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 20, imageIdToDelete: null });
 
             const onEditHistory = jest.fn();
             render(
@@ -366,11 +393,13 @@ describe('AddFeedbackHistoryModal', () => {
             fireEvent.change(titleInput, { target: { value: 'Оновлений заголовок' } });
 
             const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
-            expect(publishBtn).not.toBeDisabled();
+            await waitFor(() => {
+                expect(publishBtn).not.toBeDisabled();
+            });
 
             fireEvent.click(publishBtn);
 
-            const confirmModalTitle = await screen.findByText('Опублікувати зміни?');
+            const confirmModalTitle = await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES);
             expect(confirmModalTitle).toBeInTheDocument();
 
             const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });

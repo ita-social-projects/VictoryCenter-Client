@@ -295,8 +295,6 @@ describe('FeedbackPageAdmin', () => {
         expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
     });
 
-
-
     const openAddVideoReviewModalOnVideosTab = async () => {
         render(<FeedbackPageAdmin />);
 

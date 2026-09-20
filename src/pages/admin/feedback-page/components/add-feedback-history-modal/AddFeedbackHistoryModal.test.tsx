@@ -329,11 +329,39 @@ describe('AddFeedbackHistoryModal', () => {
                     'Це існуюча історія для перевірки редагування',
                 );
             });
-            
+
             expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
 
             const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
             expect(publishBtn).toBeDisabled();
+        });
+
+        it('enables publish button when story is changed', async () => {
+            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+
+            const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+            fireEvent.change(storyTextarea, { target: { value: 'Оновлена історія' } });
+
+            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            await waitFor(() => {
+                expect(publishBtn).not.toBeDisabled();
+            });
+        });
+
+        it('enables publish button when image is changed', async () => {
+            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+
+            const fileInput = screen.getByTestId('image-input-hidden');
+            const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
+            fireEvent.change(fileInput, { target: { files: [file] } });
+
+            const cropConfirmBtn = await screen.findByTestId('crop-confirm-button');
+            fireEvent.click(cropConfirmBtn);
+
+            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            await waitFor(() => {
+                expect(publishBtn).not.toBeDisabled();
+            });
         });
 
         it('enables publish button when a field is changed, shows confirm modal and calls update API', async () => {
@@ -382,6 +410,36 @@ describe('AddFeedbackHistoryModal', () => {
                 );
                 expect(onEditHistory).toHaveBeenCalled();
                 expect(onClose).toHaveBeenCalledTimes(1);
+            });
+        });
+        it('keeps modal open and discards publish when NO is clicked in publish confirmation', async () => {
+            render(
+                <AddFeedbackHistoryModal
+                    isOpen={true}
+                    onClose={onClose}
+                    initialData={mockInitialData}
+                />,
+            );
+
+            const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+            fireEvent.change(titleInput, { target: { value: 'Оновлений заголовок' } });
+
+            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            await waitFor(() => {
+                expect(publishBtn).not.toBeDisabled();
+            });
+
+            fireEvent.click(publishBtn);
+
+            const confirmModalTitle = await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES);
+            expect(confirmModalTitle).toBeInTheDocument();
+
+            const noBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
+            fireEvent.click(noBtn);
+
+            await waitFor(() => {
+                expect(screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).not.toBeInTheDocument();
+                expect(FeedbackApi.updateHistory).not.toHaveBeenCalled();
             });
         });
     });

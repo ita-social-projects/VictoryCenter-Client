@@ -5,10 +5,17 @@ import userEvent from '@testing-library/user-event';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+
+// 1. Мокаємо імпорт файлу з тестовими даними
+jest.mock('@/utils/mock-data/admin/events/events-categories.mock', () => ({
+    MOCK_EVENT_CATEGORIES: [
+        { id: 1, name: 'Category 1', relatedEventNewsCount: 0, localizations: [] },
+        { id: 2, name: 'Category 2', relatedEventNewsCount: 0, localizations: [] },
+    ],
+}));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -17,6 +24,7 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
     useLocalizationToolkit: () => ({
         allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
+        translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
         onLanguageChange: jest.fn(),
         onTranslationStatusFilterChange: jest.fn(),
     }),
@@ -38,6 +46,11 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
     ),
 }));
 
+// Мокаємо компонент статусів локалізації
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: () => <span data-testid="localization-statuses-mock" />,
+}));
+
 const mockOpenAddCategoryModal = jest.fn();
 const mockOpenEditCategoryModal = jest.fn();
 const mockOpenAddItemModal = jest.fn();
@@ -52,20 +65,24 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     }),
 }));
 
+// Оновлено мок CategoryBar для підтримки renderCategoryExtra
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         contextMenuOptions,
         onContextMenuOptionSelected,
+        renderCategoryExtra,
     }: {
         categories: EventCategoryDto[];
         contextMenuOptions: { id: string; name: string }[];
         onContextMenuOptionSelected: (id: string) => void;
+        renderCategoryExtra?: (category: EventCategoryDto) => React.ReactNode;
     }) => (
         <div data-testid="category-bar">
             {categories.map((category) => (
                 <div key={category.id} data-testid={`category-${category.id}`}>
                     {category.name}
+                    {renderCategoryExtra && renderCategoryExtra(category)}
                 </div>
             ))}
 
@@ -102,31 +119,9 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock('@/services/api/admin/events/event-categories-api', () => ({
-    EventCategoriesApi: {
-        getAll: jest.fn(),
-    },
-}));
-
-const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
-
 describe('EventsPageAdmin', () => {
-    const categories: EventCategoryDto[] = [
-        {
-            id: 1,
-            name: 'Category 1',
-            relatedEventNewsCount: 0,
-        },
-        {
-            id: 2,
-            name: 'Category 2',
-            relatedEventNewsCount: 0,
-        },
-    ];
-
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
-        mockedEventCategoriesApi.getAll.mockResolvedValue([]);
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
@@ -139,7 +134,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
@@ -152,28 +147,29 @@ describe('EventsPageAdmin', () => {
         const { container } = render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
     });
 
-    it('renders an error message when categories fetch fails', async () => {
-        const errorMessage = COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES;
-        mockedEventCategoriesApi.getAll.mockRejectedValueOnce(new Error(errorMessage));
-
+    it('renders localization statuses indicators for categories', async () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
+
+        const indicators = screen.getAllByTestId('localization-statuses-mock');
+        // Оскільки у нас 2 категорії, має бути 2 індикатори
+        expect(indicators).toHaveLength(2);
     });
 
     it('renders add category context menu option', async () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY)).toBeInTheDocument();
@@ -183,7 +179,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
@@ -195,7 +191,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
@@ -209,7 +205,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
@@ -223,7 +219,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+            expect(screen.getByText('Category 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
@@ -232,8 +228,6 @@ describe('EventsPageAdmin', () => {
     });
 
     it('adds a new category to the categories list', async () => {
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
@@ -255,8 +249,6 @@ describe('EventsPageAdmin', () => {
     });
 
     it('updates an existing category in the categories list', async () => {
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
@@ -280,8 +272,6 @@ describe('EventsPageAdmin', () => {
     });
 
     it('deletes an existing category from the categories list', async () => {
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
         render(<EventsPageAdmin />);
 
         await waitFor(() => {

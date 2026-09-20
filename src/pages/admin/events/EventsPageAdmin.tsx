@@ -7,13 +7,14 @@ import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventsApi } from '@/services/api/admin/events/events-api';
-import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { MOCK_EVENT_CATEGORIES } from '@/utils/mock-data/admin/events/events-categories.mock';
 import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EventsNews } from '@/types/admin/events-news';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import './EventsPageAdmin.scss';
 
 export const EventsPageAdmin = () => {
@@ -27,9 +28,11 @@ export const EventsPageAdmin = () => {
     const client = useAdminClient();
 
     const setErrorState = useCallback((message: string, type: EventsErrorType) => setError({ message, type }), []);
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
+
+    const { allLanguages, translationLanguages, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
 
     const getEventSearchItems = useCallback(
         async (
@@ -46,12 +49,10 @@ export const EventsPageAdmin = () => {
         [client],
     );
 
-    // Toolbar handlers
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
     }, []);
 
-    // Category handlers
     const onContextMenuOptionSelected = useCallback(
         (id: string) => {
             if (id === 'add') {
@@ -74,16 +75,13 @@ export const EventsPageAdmin = () => {
         [],
     );
 
-    // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
         try {
-            const fetchedCategories = await EventCategoriesApi.getAll(client);
-
-            setCategories(fetchedCategories);
+            setCategories(MOCK_EVENT_CATEGORIES);
         } catch {
             setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
-    }, [client, setErrorState]);
+    }, [setErrorState]);
 
     useEffect(() => {
         fetchCategories();
@@ -151,6 +149,9 @@ export const EventsPageAdmin = () => {
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category as any} />
+                    )}
                 />
                 {error.message && <div className="error-message">{error.message}</div>}
             </div>

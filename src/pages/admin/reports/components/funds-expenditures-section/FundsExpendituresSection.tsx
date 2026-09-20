@@ -87,6 +87,7 @@ export interface FundsExpenditureSectionProps {
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
+    onSelectionChange?: (hasSelected: boolean) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -107,6 +108,7 @@ export const FundsExpenditureSection = ({
     onValidationChange,
     onCountsChange,
     onDataChange,
+    onSelectionChange,
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
@@ -409,6 +411,10 @@ export const FundsExpenditureSection = ({
     }, [filteredRecords, programCategoryLabel]);
 
     const hasSelectedRecords = selectedRecordIds.length > 0;
+
+    useEffect(() => {
+        onSelectionChange?.(hasSelectedRecords);
+    }, [hasSelectedRecords, onSelectionChange]);
 
     const isAddIncomeDisabled =
         summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||

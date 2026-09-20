@@ -51,6 +51,13 @@ export const FEEDBACK_TEXT = {
     EDIT_HISTORY_MODAL: {
         TITLE: 'Редагувати історію',
     },
+    ADD_VIDEO_REVIEW_MODAL: {
+        TITLE: 'Додати відео відгук',
+        LABEL: {
+            TITLE: 'Заголовок',
+            LINK: 'Посилання на відео відгук',
+        },
+    },
     ADD_REVIEW_MODAL: {
         TITLE: 'Додати відгук',
         PUBLISH: 'Опублікувати',
@@ -82,6 +89,18 @@ export const FEEDBACK_HISTORY_VALIDATION = {
         minWidth: 650,
         minHeight: 360,
         getRequiredError: () => "Фото обов'язкове",
+    },
+};
+
+export const VIDEO_REVIEW_VALIDATION = {
+    title: {
+        min: 5,
+        max: 200,
+    },
+    link: {
+        min: 10,
+        max: 10000,
+        getFormatError: () => 'Посилання має бути дійсною URL-адресою (http/https)',
     },
 };
 

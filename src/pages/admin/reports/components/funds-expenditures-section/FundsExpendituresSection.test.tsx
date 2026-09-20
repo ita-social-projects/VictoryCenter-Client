@@ -1673,3 +1673,47 @@ describe('FundsExpenditureSection add buttons disabled state based on selection'
         });
     });
 });
+
+describe('FundsExpenditureSection onSelectionChange callback', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            MOCK_FUNDS_EXPENDITURES_SUMMARY,
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('should call onSelectionChange with false initially', () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection onSelectionChange={mockOnSelectionChange} />);
+
+        expect(mockOnSelectionChange).toHaveBeenCalledWith(false);
+    });
+
+    it('should call onSelectionChange with true when a record is selected and false when unselected', () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection onSelectionChange={mockOnSelectionChange} />);
+        fireEvent.click(screen.getByTestId('select-row-1'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(true);
+        fireEvent.click(screen.getByTestId('select-row-1'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+    });
+
+    it('should call onSelectionChange with false when bulk delete modal is cancelled', async () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection isEditing={true} onSelectionChange={mockOnSelectionChange} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(true);
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+        });
+    });
+});

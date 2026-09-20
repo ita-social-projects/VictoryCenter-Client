@@ -81,4 +81,17 @@ describe('useCounterAnimation', () => {
         act(() => flush(0, 2000, 20));
         expect(result.current).toBe(48.5);
     });
+
+    it('switches to the new target value without animating again', () => {
+        const { result, rerender } = renderHook(({ target }) => useCounterAnimation(target, true), {
+            initialProps: { target: 1249854 },
+        });
+
+        act(() => flush(0, 2000, 20));
+        expect(result.current).toBe(1249854);
+
+        rerender({ target: 48 });
+
+        expect(result.current).toBe(48);
+    });
 });

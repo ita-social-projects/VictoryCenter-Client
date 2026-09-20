@@ -12,7 +12,13 @@ export const useCounterAnimation = (
     const rafIdRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (!isVisible || animatedRef.current) return;
+        if (!isVisible) return;
+
+        if (animatedRef.current) {
+            setDisplayValue(targetValue);
+            return;
+        }
+
         animatedRef.current = true;
 
         let startTime: number | null = null;

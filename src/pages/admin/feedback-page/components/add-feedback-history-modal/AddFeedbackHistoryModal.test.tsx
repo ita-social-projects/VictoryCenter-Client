@@ -67,6 +67,28 @@ describe('AddFeedbackHistoryModal', () => {
         (useAdminClient as jest.Mock).mockReturnValue({});
     });
 
+    const setupDirtyFormAndClose = async (titleValue: string) => {
+        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+        fireEvent.change(titleInput, { target: { value: titleValue } });
+        await waitFor(() => {
+            expect(titleInput).toHaveValue(titleValue);
+        });
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
+        return titleInput;
+    };
+
+    const fillValidForm = async (title: string, story: string) => {
+        fireEvent.change(screen.getByRole('textbox', { name: /заголовок/i }), { target: { value: title } });
+        fireEvent.change(screen.getByRole('textbox', { name: /історія/i }), { target: { value: story } });
+        const fileInput = screen.getByTestId('image-input-hidden');
+        const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
+        fireEvent.change(fileInput, { target: { files: [file] } });
+        const cropConfirmBtn = await screen.findByTestId('crop-confirm-button');
+        fireEvent.click(cropConfirmBtn);
+    };
+
     it('renders modal with correct title, empty fields, live counters, active X button, and disabled publish button', () => {
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
@@ -200,19 +222,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('shows confirmation pop-up when X button is clicked and at least one field is not empty', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
-
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Щось введено' } });
-
-        await waitFor(() => {
-            expect(titleInput).toHaveValue('Щось введено');
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 50));
-
-        const closeBtn = screen.getByRole('button', { name: 'Close modal' });
-        fireEvent.click(closeBtn);
+        await setupDirtyFormAndClose('Щось введено');
 
         await waitFor(() => {
             expect(onClose).not.toHaveBeenCalled();
@@ -223,19 +233,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('keeps modal open and preserves filled fields when NO is clicked in confirmation pop-up', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
-
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Збережений заголовок' } });
-
-        await waitFor(() => {
-            expect(titleInput).toHaveValue('Збережений заголовок');
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 50));
-
-        const closeBtn = screen.getByRole('button', { name: 'Close modal' });
-        fireEvent.click(closeBtn);
+        const titleInput = await setupDirtyFormAndClose('Збережений заголовок');
 
         const noBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
         fireEvent.click(noBtn);
@@ -248,19 +246,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('closes modal and discards inputs when YES is clicked in confirmation pop-up', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
-
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Втрачений заголовок' } });
-
-        await waitFor(() => {
-            expect(titleInput).toHaveValue('Втрачений заголовок');
-        });
-        
-        await new Promise((resolve) => setTimeout(resolve, 50));
-
-        const closeBtn = screen.getByRole('button', { name: 'Close modal' });
-        fireEvent.click(closeBtn);
+        await setupDirtyFormAndClose('Втрачений заголовок');
 
         const yesBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
         fireEvent.click(yesBtn);
@@ -279,18 +265,7 @@ describe('AddFeedbackHistoryModal', () => {
         const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishBtn).toBeDisabled();
 
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Перемога 2026' } });
-
-        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
-        fireEvent.change(storyTextarea, { target: { value: 'Неймовірна історія успіху та реабілітації' } });
-
-        const fileInput = screen.getByTestId('image-input-hidden');
-        const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
-        fireEvent.change(fileInput, { target: { files: [file] } });
-
-        const cropConfirmBtn = await screen.findByTestId('crop-confirm-button');
-        fireEvent.click(cropConfirmBtn);
+        await fillValidForm('Перемога 2026', 'Неймовірна історія успіху та реабілітації');
 
         await waitFor(() => {
             expect(publishBtn).not.toBeDisabled();
@@ -318,18 +293,7 @@ describe('AddFeedbackHistoryModal', () => {
 
         render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
 
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-        fireEvent.change(titleInput, { target: { value: 'Тестовий заголовок' } });
-
-        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
-        fireEvent.change(storyTextarea, { target: { value: 'Довгий опис для тестування' } });
-
-        const fileInput = screen.getByTestId('image-input-hidden');
-        const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
-        fireEvent.change(fileInput, { target: { files: [file] } });
-
-        const cropConfirmBtn = await screen.findByTestId('crop-confirm-button');
-        fireEvent.click(cropConfirmBtn);
+        await fillValidForm('Тестовий заголовок', 'Довгий опис для тестування');
 
         const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         await waitFor(() => {

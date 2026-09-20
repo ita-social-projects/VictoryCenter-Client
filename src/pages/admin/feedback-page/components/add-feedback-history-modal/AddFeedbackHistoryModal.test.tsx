@@ -364,14 +364,7 @@ describe('AddFeedbackHistoryModal', () => {
             });
         });
 
-        it('enables publish button when a field is changed, shows confirm modal and calls update API', async () => {
-            (FeedbackApi.updateHistory as jest.Mock).mockResolvedValueOnce({
-                ...mockInitialData,
-                title: 'Оновлений заголовок',
-            });
-            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 20, imageIdToDelete: null });
-
-            const onEditHistory = jest.fn();
+        const setupEditModeAndClickPublish = async (onEditHistory?: jest.Mock) => {
             render(
                 <AddFeedbackHistoryModal
                     isOpen={true}
@@ -393,6 +386,17 @@ describe('AddFeedbackHistoryModal', () => {
 
             const confirmModalTitle = await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES);
             expect(confirmModalTitle).toBeInTheDocument();
+        };
+
+        it('enables publish button when a field is changed, shows confirm modal and calls update API', async () => {
+            (FeedbackApi.updateHistory as jest.Mock).mockResolvedValueOnce({
+                ...mockInitialData,
+                title: 'Оновлений заголовок',
+            });
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 20, imageIdToDelete: null });
+
+            const onEditHistory = jest.fn();
+            await setupEditModeAndClickPublish(onEditHistory);
 
             const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
             fireEvent.click(yesBtn);
@@ -412,27 +416,9 @@ describe('AddFeedbackHistoryModal', () => {
                 expect(onClose).toHaveBeenCalledTimes(1);
             });
         });
+
         it('keeps modal open and discards publish when NO is clicked in publish confirmation', async () => {
-            render(
-                <AddFeedbackHistoryModal
-                    isOpen={true}
-                    onClose={onClose}
-                    initialData={mockInitialData}
-                />,
-            );
-
-            const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
-            fireEvent.change(titleInput, { target: { value: 'Оновлений заголовок' } });
-
-            const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
-            await waitFor(() => {
-                expect(publishBtn).not.toBeDisabled();
-            });
-
-            fireEvent.click(publishBtn);
-
-            const confirmModalTitle = await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES);
-            expect(confirmModalTitle).toBeInTheDocument();
+            await setupEditModeAndClickPublish();
 
             const noBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
             fireEvent.click(noBtn);

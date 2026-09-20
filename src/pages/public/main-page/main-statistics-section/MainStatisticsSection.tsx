@@ -5,9 +5,12 @@ import { useCounterAnimation } from '@/hooks/common/use-counter-animation/useCou
 import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricType } from '@/types/public/main-page';
 import { CURRENCY_LABELS } from '@/const/common/currency';
 import { DEFAULT_LOCALE, NUMBER_FORMAT_LOCALES } from '@/const/common/locales';
-import { applyMetricPrefix } from '@/utils/functions/formatters/metric-formatters';
+import {
+    applyMetricPrefix,
+    resolveMetricValue,
+    ResolvedMetricValue,
+} from '@/utils/functions/formatters/metric-formatters';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import fallbackImage from '@/assets/images/two-horses-gray.webp';
 import styles from './MainStatisticsSection.module.scss';
 
@@ -20,11 +23,11 @@ const getMetricLocalizedName = (metric: PublicMetricDto, currentLanguage: string
     return loc?.name ?? metric.name ?? '';
 };
 
-const getUsdValue = (metric: PublicMetricDto, currentLanguage: string): number | null => {
-    if (metric.type !== MetricType.Raised) return null;
+const getRaisedValue = (metric: PublicMetricDto, currentLanguage: string): ResolvedMetricValue => {
+    if (metric.type !== MetricType.Raised) return { value: metric.value, usedLocalizedValue: false };
 
     const loc = metric.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
-    return loc?.value ? parseFormattedNumber(loc.value) : null;
+    return resolveMetricValue(loc?.value, metric.value);
 };
 
 const formatMetricValue = (
@@ -53,9 +56,7 @@ interface AnimatedCounterProps {
 }
 
 const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ metric, currentLanguage, isVisible }) => {
-    const usdValue = getUsdValue(metric, currentLanguage);
-    const isUsd = usdValue !== null;
-    const targetValue = usdValue ?? metric.value;
+    const { value: targetValue, usedLocalizedValue: isUsd } = getRaisedValue(metric, currentLanguage);
     const displayValue = useCounterAnimation(targetValue, isVisible);
 
     const name = getMetricLocalizedName(metric, currentLanguage);

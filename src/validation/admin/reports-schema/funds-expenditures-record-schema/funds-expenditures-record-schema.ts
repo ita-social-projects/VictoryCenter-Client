@@ -134,5 +134,6 @@ export const validateFundsExpendituresCategory = ({
         return undefined;
     }
 
+    // Income duplicate and expense duplicate have the same validation message.
     return FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE;
 };

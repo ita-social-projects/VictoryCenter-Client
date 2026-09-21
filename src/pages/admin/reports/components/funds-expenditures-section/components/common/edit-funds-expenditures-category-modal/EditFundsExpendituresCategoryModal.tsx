@@ -164,7 +164,7 @@ export const EditFundsExpendituresCategoryModal = ({
                                             <Select.Option key={c.id} value={c.id} name={c.name} />
                                         ))}
                                     </Select>
-                                    {categoryError && <p className={styles.required}>{categoryError}</p>}
+                                    {categoryError && <p className={styles.error}>{categoryError}</p>}
                                 </div>
 
                                 <div className={styles.field}>

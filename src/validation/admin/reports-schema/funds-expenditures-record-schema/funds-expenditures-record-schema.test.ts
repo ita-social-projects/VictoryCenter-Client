@@ -181,7 +181,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
         });
 
-        it('should return expense-specific unique error for duplicate expense category', () => {
+        it('should return unique error for duplicate expense category in same type', () => {
             expect(
                 validateFundsExpendituresCategory({
                     recordId: 1,

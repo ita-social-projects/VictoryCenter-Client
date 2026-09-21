@@ -1,4 +1,3 @@
-import { EventCategoryDto } from '@/types/admin/event-category';
 import { TranslationStatus } from '@/types/common/language';
 
 export const MOCK_EVENT_CATEGORIES: any[] = [

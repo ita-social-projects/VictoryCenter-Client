@@ -9,7 +9,6 @@ import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-// 1. Мокаємо імпорт файлу з тестовими даними
 jest.mock('@/utils/mock-data/admin/events/events-categories.mock', () => ({
     MOCK_EVENT_CATEGORIES: [
         { id: 1, name: 'Category 1', relatedEventNewsCount: 0, localizations: [] },
@@ -46,7 +45,6 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
     ),
 }));
 
-// Мокаємо компонент статусів локалізації
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
     LocalizationStatuses: () => <span data-testid="localization-statuses-mock" />,
 }));
@@ -65,7 +63,6 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     }),
 }));
 
-// Оновлено мок CategoryBar для підтримки renderCategoryExtra
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
@@ -161,7 +158,6 @@ describe('EventsPageAdmin', () => {
         });
 
         const indicators = screen.getAllByTestId('localization-statuses-mock');
-        // Оскільки у нас 2 категорії, має бути 2 індикатори
         expect(indicators).toHaveLength(2);
     });
 

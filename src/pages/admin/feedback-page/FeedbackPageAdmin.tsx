@@ -5,7 +5,13 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { FeedbackCategory, FeedbackCategoryItem, FeedbackHistoryDto, FeedbackListItem } from '@/types/admin/feedback';
+import {
+    FeedbackCategory,
+    FeedbackCategoryItem,
+    FeedbackHistoryDto,
+    FeedbackListItem,
+    FeedbackReviewDto,
+} from '@/types/admin/feedback';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FEEDBACK_CATEGORIES, FEEDBACK_PAGINATION_LIMIT, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
@@ -15,6 +21,7 @@ import { FeedbackComponent } from './components/feedback-component/FeedbackCompo
 import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
 import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
+import { EditFeedbackReviewModal } from './components/edit-feedback-review-modal/EditFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -29,6 +36,9 @@ const SEARCH_PLACEHOLDERS: Record<FeedbackCategory, string> = {
 
 export const isFeedbackHistory = (item: FeedbackListItem): item is FeedbackHistoryDto =>
     typeof item === 'object' && item !== null && 'story' in item;
+
+export const isFeedbackReview = (item: FeedbackListItem): item is FeedbackReviewDto =>
+    typeof item === 'object' && item !== null && 'authorName' in item;
 
 export const FeedbackPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -74,6 +84,7 @@ export const FeedbackPageAdmin = () => {
     const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
+    const [reviewToEdit, setReviewToEdit] = useState<FeedbackReviewDto | null>(null);
 
     const handleAddClick = useCallback(() => {
         if (activeCategory === FeedbackCategory.VIDEOS) {
@@ -111,6 +122,29 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
+
+    const handleEditClick = useCallback(
+        (item: FeedbackListItem) => {
+            if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
+                setReviewToEdit(item);
+                return;
+            }
+            handleNotImplemented();
+        },
+        [activeCategory, handleNotImplemented],
+    );
+
+    const handleReviewUpdated = useCallback(
+        (updatedReview: FeedbackReviewDto) => {
+            setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
+            addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+        },
+        [addToast],
+    );
+
+    const handleReviewUpdateError = useCallback(() => {
+        addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+    }, [addToast]);
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -278,7 +312,7 @@ export const FeedbackPageAdmin = () => {
                         key={i.id}
                         item={i}
                         showPhoto={activeCategory === FeedbackCategory.HISTORY}
-                        onEdit={handleNotImplemented}
+                        onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
                     />
                 )}
@@ -287,7 +321,7 @@ export const FeedbackPageAdmin = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [itemsToRender, activeCategory, handleEntitiesReordered, handleNotImplemented, handleDeleteClick],
+        [itemsToRender, activeCategory, handleEntitiesReordered, handleEditClick, handleDeleteClick],
     );
 
     const isFilteredView =
@@ -365,6 +399,14 @@ export const FeedbackPageAdmin = () => {
                 onSubmit={handleAddVideoReviewSubmit}
             />
             <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
+
+            <EditFeedbackReviewModal
+                isOpen={!!reviewToEdit}
+                onClose={() => setReviewToEdit(null)}
+                reviewToEdit={reviewToEdit}
+                onReviewUpdated={handleReviewUpdated}
+                onUpdateError={handleReviewUpdateError}
+            />
             <ToastContainer />
         </div>
     );

@@ -217,4 +217,30 @@ describe('FeedbackApi', () => {
             expect(mockClient.put).toHaveBeenCalledWith('VideoReviews/reorder', { orderedIds: [1, 2, 3] });
         });
     });
+
+    describe('updateReview', () => {
+        it('should send put request with review id and data', async () => {
+            const updatedReview = {
+                id: 5,
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+                priority: 1,
+            };
+            mockClient.put.mockResolvedValue({ data: updatedReview });
+
+            const result = await FeedbackApi.updateReview(mockClient, 5, {
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+            });
+
+            expect(mockClient.put).toHaveBeenCalledWith('FeedbackReviews/5', {
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+            });
+            expect(result).toEqual(updatedReview);
+        });
+    });
 });

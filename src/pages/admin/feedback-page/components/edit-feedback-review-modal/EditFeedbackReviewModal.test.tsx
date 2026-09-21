@@ -1,3 +1,4 @@
+import '@/utils/test-mocks/feedback-review-modal-mocks-setup';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EditFeedbackReviewModal } from './EditFeedbackReviewModal';
@@ -9,30 +10,6 @@ import { FeedbackReviewDto } from '@/types/admin/feedback';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { getAuthorNameInput, getPublishButton, getTextInput } from '@/utils/test-mocks/feedback-review-form-mocks';
 
-jest.mock('@/components/common/modal/Modal', () => ({
-    Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
-}));
-
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: require('@/utils/test-mocks/events-modals-mocks').MockButton,
-}));
-
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: require('@/utils/test-mocks/events-modals-mocks').MockConfirmationModal,
-}));
-
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: require('@/utils/test-mocks/feedback-review-form-mocks')
-        .MockInputWithCharacterLimitGroup,
-}));
-
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: require('@/utils/test-mocks/feedback-review-form-mocks')
-            .MockTextAreaWithCharacterLimitGroup,
-    }),
-);
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));

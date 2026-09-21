@@ -1,6 +1,6 @@
 import { render, screen, waitFor, fireEvent, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FeedbackPageAdmin, isFeedbackHistory } from './FeedbackPageAdmin';
+import { FeedbackPageAdmin, isFeedbackHistory, isFeedbackReview, isFeedbackVideo } from './FeedbackPageAdmin';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
@@ -29,12 +29,17 @@ const mockRetryFetchLanguages = jest.fn();
 
 let mockLocalizationValues: {
     allLanguages: { id: number; code: string; name: string }[];
+    translationLanguages: { id: number; code: string; name: string }[];
     selectedLanguage: { id: number; code: string; name: string };
     translationStatusFilter: TranslationStatusFilter | undefined;
     onLanguageChange: jest.Mock;
     onTranslationStatusFilterChange: jest.Mock;
 } = {
-    allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
+    allLanguages: [
+        { id: 1, code: 'uk', name: 'Українська' },
+        { id: 2, code: 'en', name: 'English' },
+    ],
+    translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
     selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
     translationStatusFilter: 0,
     onLanguageChange: jest.fn(),
@@ -183,6 +188,7 @@ const mockHistoryData = {
             image: null,
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
         {
             id: 2,
@@ -191,6 +197,7 @@ const mockHistoryData = {
             image: null,
             status: VisibilityStatus.Published,
             priority: 1,
+            localizations: [],
         },
     ],
     totalItemsCount: 2,
@@ -204,6 +211,7 @@ const mockReviewsData = {
             text: 'Відгук учасника 10',
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
     ],
     totalItemsCount: 1,
@@ -217,6 +225,7 @@ const mockVideosData = {
             link: 'https://youtube.com/watch?v=20',
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
     ],
     totalItemsCount: 1,
@@ -451,6 +460,85 @@ describe('FeedbackPageAdmin', () => {
         expect(screen.queryByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
     });
 
+    it('should open the Add-translation modal when translate icon is clicked on a card without an existing EN localization', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+    });
+
+    it('should open the Update-translation modal when translate icon is clicked on a card with an existing EN localization', async () => {
+        mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
+            items: [
+                {
+                    id: 1,
+                    title: 'Історія 1',
+                    story: 'Опис історії 1',
+                    image: null,
+                    status: VisibilityStatus.Published,
+                    priority: 0,
+                    localizations: [
+                        { language: { id: 2, code: 'en' }, title: 'Story', story: 'Story text', translationStatus: 1 },
+                    ],
+                },
+            ],
+            totalItemsCount: 1,
+        });
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
+    });
+
+    it('should save a new translation, update the list, show a success toast and close the modal', async () => {
+        mockAdminClient.post.mockResolvedValueOnce({
+            data: {
+                entityId: 1,
+                title: 'Success Story',
+                story: 'English story text',
+                localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+                translationStatus: 1,
+            },
+        });
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+
+        fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Success Story' } });
+        fireEvent.change(screen.getByLabelText(/Історія/), { target: { value: 'English story text' } });
+
+        const saveBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
+        await waitFor(() => expect(saveBtn).toBeEnabled());
+        fireEvent.click(saveBtn);
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_TRANSLATE, ToastType.Success);
+        });
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
+    });
+
     it('isFeedbackHistory correctly identifies valid and invalid items', () => {
         expect(
             isFeedbackHistory({
@@ -460,6 +548,7 @@ describe('FeedbackPageAdmin', () => {
                 image: null,
                 priority: 0,
                 status: VisibilityStatus.Published,
+                localizations: [],
             }),
         ).toBe(true);
         expect(
@@ -469,10 +558,61 @@ describe('FeedbackPageAdmin', () => {
                 text: 'Txt',
                 priority: 0,
                 status: VisibilityStatus.Published,
+                localizations: [],
             }),
         ).toBe(false);
         expect(isFeedbackHistory(null as any)).toBe(false);
         expect(isFeedbackHistory(undefined as any)).toBe(false);
+    });
+
+    it('isFeedbackReview correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackReview({
+                id: 2,
+                authorName: 'A',
+                text: 'Txt',
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackReview({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(false);
+        expect(isFeedbackReview(null as any)).toBe(false);
+    });
+
+    it('isFeedbackVideo correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackVideo({
+                id: 3,
+                title: 'Відео',
+                link: 'https://youtube.com/watch?v=1',
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackVideo({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(false);
+        expect(isFeedbackVideo(null as any)).toBe(false);
     });
 
     it('should refetch items when status filter changes', async () => {
@@ -664,6 +804,7 @@ describe('FeedbackPageAdmin', () => {
                     image: null,
                     status: VisibilityStatus.Published,
                     priority: 2,
+                    localizations: [],
                 },
             ],
             totalItemsCount: 3,

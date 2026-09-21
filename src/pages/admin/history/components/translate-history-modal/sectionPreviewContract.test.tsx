@@ -8,7 +8,7 @@ import {
 import { ContentType } from '@/types/common/section-contents';
 import { SectionMode } from '@/types/common/sections';
 import { Image } from '@/types/common/image';
-import { IMAGE_FIRST_TEMPLATES } from './TranslateHistoryModal';
+import { getHistoryImagePosition } from './TranslateHistoryModal';
 
 const sampleImage: Image = { id: 1, url: 'sample.jpg', mimeType: 'image/jpeg' };
 
@@ -36,8 +36,8 @@ describe('history section preview: [data-section-text] contract', () => {
     );
 });
 
-describe('history section preview: IMAGE_FIRST_TEMPLATES matches template render order', () => {
-    it.each(IMAGE_TEMPLATES)('template %s render order agrees with IMAGE_FIRST_TEMPLATES', (templateId) => {
+describe('history section preview: image position matches template render order', () => {
+    it.each(IMAGE_TEMPLATES)('template %s render order agrees with its configured image position', (templateId) => {
         const view = renderHistorySection({
             templateId,
             mode: SectionMode.View,
@@ -52,6 +52,7 @@ describe('history section preview: IMAGE_FIRST_TEMPLATES matches template render
             textBlock.compareDocumentPosition(firstImage) & Node.DOCUMENT_POSITION_PRECEDING,
         );
 
-        expect(imageRendersBeforeText).toBe(IMAGE_FIRST_TEMPLATES.has(templateId));
+        // Only 'top' renders the image before the text; 'bottom' and 'right' render it after.
+        expect(imageRendersBeforeText).toBe(getHistoryImagePosition(templateId) === 'top');
     });
 });

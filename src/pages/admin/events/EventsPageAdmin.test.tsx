@@ -5,16 +5,10 @@ import userEvent from '@testing-library/user-event';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-
-jest.mock('@/utils/mock-data/admin/events/events-categories.mock', () => ({
-    MOCK_EVENT_CATEGORIES: [
-        { id: 1, name: 'Category 1', relatedEventNewsCount: 0, localizations: [] },
-        { id: 2, name: 'Category 2', relatedEventNewsCount: 0, localizations: [] },
-    ],
-}));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -33,6 +27,12 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
     EventsApi: {
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
+    },
+}));
+
+jest.mock('@/services/api/admin/events/event-categories-api', () => ({
+    EventCategoriesApi: {
+        getAll: jest.fn(),
     },
 }));
 
@@ -115,10 +115,17 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 }));
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
+const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventCategoriesApi>;
 
 describe('EventsPageAdmin', () => {
+    const categories: EventCategoryDto[] = [
+        { id: 1, name: 'Category 1', relatedEventNewsCount: 0 },
+        { id: 2, name: 'Category 2', relatedEventNewsCount: 0 },
+    ];
+
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
@@ -148,6 +155,17 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
+    });
+
+    it('renders an error message when categories fetch fails', async () => {
+        const errorMessage = COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES;
+        mockedEventCategoriesApi.getAll.mockRejectedValueOnce(new Error('Fetch failed'));
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
     });
 
     it('renders localization statuses indicators for categories', async () => {

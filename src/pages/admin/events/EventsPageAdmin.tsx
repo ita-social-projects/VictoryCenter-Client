@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, useEffect } from 'react';
+import { useCallback, useMemo, useEffect, useState } from 'react';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
@@ -7,7 +7,8 @@ import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventsApi } from '@/services/api/admin/events/events-api';
-import { MOCK_EVENT_CATEGORIES } from '@/utils/mock-data/admin/events/events-categories.mock';
+import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
@@ -20,8 +21,8 @@ import './EventsPageAdmin.scss';
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-    const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+
     const modalsStateControl = useModalsState<EventsNews>();
     const { openModalActions } = modalsStateControl;
 
@@ -29,10 +30,38 @@ export const EventsPageAdmin = () => {
 
     const setErrorState = useCallback((message: string, type: EventsErrorType) => setError({ message, type }), []);
 
-    const { allLanguages, translationLanguages, onLanguageChange, onTranslationStatusFilterChange } =
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
         useLocalizationToolkit({
             setErrorState,
         });
+
+    const getEventCategories = useCallback(async () => {
+        const fetchedCategories = await EventCategoriesApi.getAll(client);
+        return fetchedCategories;
+    }, [client]);
+
+    const {
+        data: categories,
+        error: categoriesError,
+        setData: updateCategories,
+    } = useDataFetch<EventCategoryDto[]>({
+        initialData: [],
+        fetchHandler: getEventCategories,
+        autoFetchDependencies: [],
+        autoFetchDisabled: false,
+    });
+
+    useEffect(() => {
+        if (categoriesError) {
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+        }
+    }, [categoriesError, setErrorState]);
+
+    useEffect(() => {
+        if (!selectedCategory && categories && categories.length > 0) {
+            setSelectedCategory(categories[0]);
+        }
+    }, [categories, selectedCategory]);
 
     const getEventSearchItems = useCallback(
         async (
@@ -75,21 +104,12 @@ export const EventsPageAdmin = () => {
         [],
     );
 
-    const fetchCategories = useCallback(async () => {
-        try {
-            setCategories(MOCK_EVENT_CATEGORIES);
-        } catch {
-            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
-        }
-    }, [setErrorState]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
-
-    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
+    const handleAddCategory = useCallback(
+        (newCategory: EventCategoryDto) => {
+            updateCategories((prev) => [...prev, newCategory]);
+        },
+        [updateCategories],
+    );
 
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
@@ -97,7 +117,7 @@ export const EventsPageAdmin = () => {
 
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
-            setCategories((prevCategories) =>
+            updateCategories((prevCategories) =>
                 prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
             );
 
@@ -105,18 +125,39 @@ export const EventsPageAdmin = () => {
                 setSelectedCategory(updatedCategory);
             }
         },
-        [selectedCategory?.id],
+        [selectedCategory?.id, updateCategories],
     );
 
     const handleDeleteCategory = useCallback(
         (categoryToDeleteId: number) => {
-            setCategories((prevCategories) => prevCategories.filter((category) => category.id !== categoryToDeleteId));
+            updateCategories((prevCategories) => {
+                const filtered = prevCategories.filter((category) => category.id !== categoryToDeleteId);
 
-            if (selectedCategory?.id === categoryToDeleteId) {
-                setSelectedCategory(null);
-            }
+                if (selectedCategory?.id === categoryToDeleteId && filtered.length > 0) {
+                    const currentCategoryIndex = prevCategories.findIndex(
+                        (category) => category.id === categoryToDeleteId,
+                    );
+                    const nextCategory = filtered[Math.min(currentCategoryIndex, filtered.length - 1)];
+                    setSelectedCategory(nextCategory);
+                } else if (filtered.length === 0) {
+                    setSelectedCategory(null);
+                }
+
+                return filtered;
+            });
         },
-        [selectedCategory?.id],
+        [selectedCategory?.id, updateCategories],
+    );
+
+    const getCategoryName = useCallback(
+        (category: any) => {
+            const localization = (category.localizations ?? []).find(
+                (loc: any) =>
+                    loc.language?.code === selectedLanguage?.code || loc.language?.id === selectedLanguage?.id,
+            );
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code, selectedLanguage?.id],
     );
 
     return (
@@ -144,7 +185,7 @@ export const EventsPageAdmin = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={setSelectedCategory}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}

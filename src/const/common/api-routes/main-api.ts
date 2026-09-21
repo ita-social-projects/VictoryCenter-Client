@@ -70,7 +70,7 @@ export const API_ROUTES = {
         PUBLIC: 'WhoWeArePage',
     },
     EVENTS: {
-        BASE: 'Events',
+        BASE: 'EventNews',
         SEARCH: 'Events/search',
         PUBLISHED: 'Events/published',
         BY_SLUG: 'Events/slug',

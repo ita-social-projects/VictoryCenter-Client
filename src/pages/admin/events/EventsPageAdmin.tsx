@@ -1,35 +1,71 @@
-import { useCallback, useState, useMemo, useEffect } from 'react';
+import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
+import { EventItemComponent } from './event-item-component/EventItemComponent';
+import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import { Button } from '@/components/admin/button/Button';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { EventsNews } from '@/types/admin/events-news';
-import { EVENTS_TEXT } from '@/const/admin/events';
+import { ToastType } from '@/types/admin/toast';
+import { EventsNews, EventItemDto, EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events-news';
+import { EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS, EVENTS_TEXT } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import './EventsPageAdmin.scss';
 
+const DEFAULT_LOAD_ITEMS_COUNT = 5;
+const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
+const EMPTY_ERROR: ErrorState = {
+    message: null,
+    type: null,
+};
+
 export const EventsPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
-    const [error, setError] = useState<ErrorState>({ message: null, type: null });
+    const [error, setError] = useState<ErrorState>(EMPTY_ERROR);
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
+    const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+    const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
     const modalsStateControl = useModalsState<EventsNews>();
-    const { openModalActions } = modalsStateControl;
+    const { addToast } = useToast();
+
+    const listContainerRef = useRef<HTMLDivElement>(null);
+    const requestIdRef = useRef(0);
+    const currentPageRef = useRef<number>(1);
+    const currentItemsCountRef = useRef(0);
+    const hasMoreRef = useRef(true);
+    const isEventItemsLoadingRef = useRef(false);
 
     const client = useAdminClient();
 
-    const setErrorState = useCallback((message: string, type: EventsErrorType) => setError({ message, type }), []);
+    const setErrorState = useCallback((message: string, type: EventsErrorType) => {
+        setError({
+            message,
+            type,
+        });
+    }, []);
+
+    const clearError = useCallback(() => {
+        setError(EMPTY_ERROR);
+    }, []);
+
     const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
         setErrorState,
     });
+    const { openModalActions } = modalsStateControl;
 
     const getEventSearchItems = useCallback(
         async (
@@ -76,14 +112,20 @@ export const EventsPageAdmin = () => {
 
     // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
+        clearError();
+
         try {
             const fetchedCategories = await EventCategoriesApi.getAll(client);
 
             setCategories(fetchedCategories);
+
+            if (fetchedCategories.length > 0) {
+                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+            }
         } catch {
             setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
-    }, [client, setErrorState]);
+    }, [client, clearError, setErrorState]);
 
     useEffect(() => {
         fetchCategories();
@@ -121,6 +163,153 @@ export const EventsPageAdmin = () => {
         [selectedCategory?.id],
     );
 
+    // Event items handlers
+    const updatePageSize = useCallback(() => {
+        if (!listContainerRef.current) {
+            return;
+        }
+
+        const calculatedPageSize = Math.floor(listContainerRef.current.clientHeight / LIST_ITEM_HEIGHT_IN_PIXELS) + 1;
+
+        setPageSize(Math.max(calculatedPageSize, DEFAULT_LOAD_ITEMS_COUNT));
+    }, []);
+
+    useEffect(() => {
+        const element = listContainerRef.current;
+
+        if (!element) {
+            return;
+        }
+
+        const resizeObserver = new ResizeObserver(updatePageSize);
+
+        resizeObserver.observe(element);
+        updatePageSize();
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, [updatePageSize]);
+
+    const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
+
+    const resetEventItemsState = useCallback(() => {
+        requestIdRef.current += 1;
+
+        setEventItems([]);
+        setHasMore(true);
+
+        currentPageRef.current = 0;
+        currentItemsCountRef.current = 0;
+        hasMoreRef.current = true;
+    }, []);
+
+    const handleEntitiesReordered = () => {
+        /*TODO: add implementation.*/
+    };
+
+    const renderEventItem = useCallback(
+        (item: EventItemDto) => (
+            <DraggableListItem
+                entity={item}
+                id={item.id}
+                renderEntityComponent={renderEntityComponent}
+                ariaLabel={EVENT_ITEMS_TEXT.ACTIONS.REORDER}
+                entities={eventItems}
+                idSelector={(item) => item.id}
+                onEntitiesReordered={handleEntitiesReordered}
+            ></DraggableListItem>
+        ),
+        [renderEntityComponent, eventItems, handleEntitiesReordered],
+    );
+
+    const fetchEventItems = useCallback(
+        async (categoryId: number, shouldResetList = false) => {
+            if (!shouldResetList && (isEventItemsLoadingRef.current || !hasMoreRef.current)) {
+                return;
+            }
+
+            const requestId = ++requestIdRef.current;
+
+            try {
+                isEventItemsLoadingRef.current = true;
+                setIsEventItemsLoading(true);
+
+                const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
+                const offset = pageToFetch * pageSize;
+
+                const response = await EventsApi.fetchEvents(client, categoryId, offset, pageSize);
+
+                if (requestId !== requestIdRef.current) {
+                    return;
+                }
+
+                if (shouldResetList) {
+                    setEventItems(response.items);
+                    currentItemsCountRef.current = response.items.length;
+                } else {
+                    setEventItems((prev) => [...prev, ...response.items]);
+                    currentItemsCountRef.current += response.items.length;
+                }
+
+                currentPageRef.current = pageToFetch + 1;
+
+                const hasMoreItems = currentItemsCountRef.current < response.totalItemsCount;
+
+                hasMoreRef.current = hasMoreItems;
+                setHasMore(hasMoreItems);
+            } catch {
+                if (requestId !== requestIdRef.current) {
+                    return;
+                }
+
+                addToast(
+                    EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_FETCH_ITEMS,
+                    ToastType.Error,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                );
+            } finally {
+                if (requestId === requestIdRef.current) {
+                    isEventItemsLoadingRef.current = false;
+                    setIsEventItemsLoading(false);
+                }
+            }
+        },
+        [client, pageSize, addToast],
+    );
+
+    useEffect(() => {
+        return () => {
+            requestIdRef.current += 1;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!selectedCategory) {
+            return;
+        }
+
+        fetchEventItems(selectedCategory.id, true);
+    }, [selectedCategory?.id, fetchEventItems]);
+
+    const handleCategorySelect = useCallback(
+        (category: EventCategoryDto) => {
+            if (selectedCategory?.id === category.id) {
+                return;
+            }
+
+            resetEventItemsState();
+            setSelectedCategory(category);
+        },
+        [selectedCategory?.id, resetEventItemsState],
+    );
+
+    const handleOnLoadMore = useCallback(() => {
+        if (selectedCategory) {
+            fetchEventItems(selectedCategory.id);
+        }
+    }, [fetchEventItems, selectedCategory]);
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -141,11 +330,11 @@ export const EventsPageAdmin = () => {
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
                 />
             </div>
-            <div className="events-page-list-container">
+            <div className="events-page-list-container" ref={listContainerRef}>
                 <CategoryBar<EventCategoryDto>
                     categories={categories}
                     selectedCategory={selectedCategory}
-                    onCategorySelect={setSelectedCategory}
+                    onCategorySelect={handleCategorySelect}
                     getCategoryDisplayName={(category) => category.name}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
@@ -153,6 +342,29 @@ export const EventsPageAdmin = () => {
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />
                 {error.message && <div className="error-message">{error.message}</div>}
+
+                {selectedCategory && (
+                    <InfiniteScrollList<EventItemDto>
+                        items={eventItems}
+                        renderItem={renderEventItem}
+                        onLoadMore={handleOnLoadMore}
+                        hasMore={hasMore}
+                        isLoading={isEventItemsLoading}
+                        emptyStateMessage={EVENT_ITEMS_TEXT.NO_RECORDS}
+                        emptyStateAction={
+                            <Button
+                                className="btn-add"
+                                onClick={() => {
+                                    /*TODO: add implementation.*/
+                                }}
+                                buttonStyle="secondary"
+                            >
+                                {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
+                                <PlusIcon className="plus-icon" />
+                            </Button>
+                        }
+                    />
+                )}
             </div>
 
             <EventsPageModals
@@ -163,6 +375,7 @@ export const EventsPageAdmin = () => {
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}
             />
+            <ToastContainer />
         </div>
     );
 };

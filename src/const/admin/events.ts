@@ -3,6 +3,7 @@ const getGenericRequiredError = () => `Поле обов'язкове`;
 export const EVENTS_TEXT = {
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
+        ADD_MATERIAL: 'Додати матеріал',
     },
     PLACEHOLDER: {
         SEARCH_EVENTS: 'Введіть назву',
@@ -100,4 +101,14 @@ export const EVENT_VALIDATION = {
 
 export const EVENT_NOTIFICATION_TIMERS = {
     SYNC_ERROR_MS: 3000,
+};
+
+export const EVENT_ITEMS_TEXT = {
+    MESSAGE: {
+        FAILED_TO_FETCH_ITEMS: 'Виникла помилка, не вдалось завантажити новини та події',
+    },
+    ACTIONS: {
+        REORDER: 'Змінити порядок елемента',
+    },
+    NO_RECORDS: 'Ще немає матеріалу',
 };

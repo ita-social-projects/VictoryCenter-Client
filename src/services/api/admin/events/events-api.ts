@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
-import { EventsDto, EventSearchItemData } from '@/types/admin/events';
+import { EventItemDto, EventSearchItemData } from '@/types/admin/events-news';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const EventsApi = {
@@ -12,8 +12,8 @@ export const EventsApi = {
         limit: number,
         translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus,
-    ): Promise<PaginationResult<EventsDto>> => {
-        const response = await client.get<PaginationResult<EventsDto>>(API_ROUTES.EVENTS.BASE, {
+    ): Promise<PaginationResult<EventItemDto>> => {
+        const response = await client.get<PaginationResult<EventItemDto>>(API_ROUTES.EVENTS.BASE, {
             params: {
                 categoryId,
                 offset,

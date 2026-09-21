@@ -22,5 +22,25 @@
         width: 100%;
         display: flex;
         flex-direction: column;
+
+        .item-data {
+            padding: 0;
+        }
+
+        .infinite-scroll-list-container {
+            margin-bottom: 102px;
+        }
+
+        .btn-add {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            max-width: 427px;
+        }
+
+        .plus-icon path {
+            stroke: colors.$blue-500;
+        }
     }
 }

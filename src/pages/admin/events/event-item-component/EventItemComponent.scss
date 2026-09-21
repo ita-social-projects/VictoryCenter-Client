@@ -1,0 +1,100 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/fonts';
+
+.event {
+    &-item {
+        font-family: fonts.$mulish-regular-font;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 80px;
+    }
+
+    &-info {
+        display: flex;
+        align-items: center;
+        width: 85%;
+        min-width: 0;
+    }
+
+    &-item-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        width: 30%;
+        min-width: 0;
+        padding: 0;
+    }
+
+    &-item-date {
+        margin: 8px;
+
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    &-info-title {
+        min-width: 0;
+
+        p {
+            margin: 8px 0 0 32px;
+
+            font-size: 16px;
+            line-height: 1.5;
+
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+    }
+
+    &-info-description {
+        width: 40%;
+        min-width: 0;
+        padding: 0;
+
+        p {
+            margin-top: 32px;
+
+            font-size: 16px;
+            line-height: 1.5;
+
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+    }
+
+    &-item-info-status {
+        margin-top: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 30%;
+        padding: 0;
+    }
+
+    &-item-actions {
+        margin-top: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        width: 15%;
+        gap: 10px;
+        padding-right: 24px;
+
+        button {
+            width: 24px;
+            height: 24px;
+            border: none;
+        }
+    }
+}

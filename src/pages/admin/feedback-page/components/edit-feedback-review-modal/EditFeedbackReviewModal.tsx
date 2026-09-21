@@ -1,26 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { FEEDBACK_REVIEW_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
+import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import {
     FeedbackReviewFormValues,
     FeedbackReviewValidationSchema,
 } from '@/validation/admin/feedback-review-schema/feedback-review-schema';
-import {
-    getNormalizedInputText,
-    getNormalizedInputTextWhileTyping,
-} from '@/utils/functions/formatters/text-formatters';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
 import './EditFeedbackReviewModal.scss';
+import { FeedbackReviewFormFields } from '@/pages/admin/feedback-page/components/feedback-review-form-fields/FeedbackReviewFormFields';
 
 export interface EditFeedbackReviewModalProps {
     isOpen: boolean;
@@ -101,53 +97,7 @@ export const EditFeedbackReviewModal = ({
                 <Modal.Title>{FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE}</Modal.Title>
 
                 <Modal.Content>
-                    <Controller
-                        name="authorName"
-                        control={control}
-                        render={({ field }) => (
-                            <InputWithCharacterLimitGroup
-                                name={field.name}
-                                value={field.value}
-                                onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
-                                onBlur={() => {
-                                    if (field.value) {
-                                        field.onChange(getNormalizedInputText(field.value));
-                                    }
-                                    field.onBlur();
-                                }}
-                                label={FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.AUTHOR_NAME}
-                                id="edit-feedback-review-author-name"
-                                maxLength={FEEDBACK_REVIEW_VALIDATION.authorName.max}
-                                error={errors.authorName?.message}
-                                isRequired
-                                showCounterBelow
-                            />
-                        )}
-                    />
-
-                    <Controller
-                        name="text"
-                        control={control}
-                        render={({ field }) => (
-                            <TextAreaWithCharacterLimitGroup
-                                name={field.name}
-                                value={field.value}
-                                onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
-                                onBlur={() => {
-                                    if (field.value) {
-                                        field.onChange(getNormalizedInputText(field.value));
-                                    }
-                                    field.onBlur();
-                                }}
-                                label={FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.TEXT}
-                                id="edit-feedback-review-text"
-                                maxLength={FEEDBACK_REVIEW_VALIDATION.text.max}
-                                error={errors.text?.message}
-                                isRequired
-                                rows={4}
-                            />
-                        )}
-                    />
+                    <FeedbackReviewFormFields control={control} errors={errors} idPrefix="edit-feedback-review" />
                 </Modal.Content>
 
                 <Modal.Actions>

@@ -214,4 +214,79 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
 
         expect(onSubmit).toHaveBeenCalledWith({ title: undefined, description: undefined });
     });
+
+    it('does not validate description before readiness timeout is resolved', () => {
+        jest.useFakeTimers();
+        renderForm();
+        const initialCalls = validationMock.validateText.mock.calls.length;
+
+        focusRichTextField('description');
+        changeRichTextField('description', '<p>Too early</p>');
+        blurRichTextField('description');
+
+        expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(initialCalls);
+        jest.useRealTimers();
+    });
+
+    it('does not validate title on focus if not touched', () => {
+        jest.useFakeTimers();
+        renderForm();
+        act(() => {
+            jest.runAllTimers();
+        });
+        const initialCalls = validationMock.validateText.mock.calls.length;
+        focusRichTextField('title');
+        expect(validationMock.validateText.mock.calls.length).toBe(initialCalls);
+        jest.useRealTimers();
+    });
+
+    it('does not validate description on focus if not touched', () => {
+        jest.useFakeTimers();
+        renderForm();
+        act(() => {
+            jest.runAllTimers();
+        });
+        const initialCalls = validationMock.validateText.mock.calls.length;
+        focusRichTextField('description');
+        expect(validationMock.validateText.mock.calls.length).toBe(initialCalls);
+        jest.useRealTimers();
+    });
+
+    it('handles description change before explicit touch assertion', () => {
+        jest.useFakeTimers();
+        renderForm();
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        const callsBeforeChange = validationMock.validateText.mock.calls.length;
+        changeRichTextField('description', '<p>Changed without blur</p>');
+
+        expect(screen.getByTestId('rich-text-description')).toHaveValue('<p>Changed without blur</p>');
+        expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(callsBeforeChange);
+        jest.useRealTimers();
+    });
+
+    it('handles blur and focus for undefined fields correctly', () => {
+        jest.useFakeTimers();
+        renderForm({
+            initialData: {
+                title: undefined as unknown as string,
+                description: undefined as unknown as string,
+            },
+        });
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        blurRichTextField('title');
+        blurRichTextField('description');
+
+        focusRichTextField('title');
+        focusRichTextField('description');
+
+        expect(validationMock.validateText).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
 });

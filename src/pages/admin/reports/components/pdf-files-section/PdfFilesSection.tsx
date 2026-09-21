@@ -223,6 +223,7 @@ export const PdfFilesSection = () => {
                 } else {
                     URL.revokeObjectURL(blobUrl);
                 }
+                await PdfReportsApi.openPreviewInNewTab(client, file.id, file.name);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);
             }

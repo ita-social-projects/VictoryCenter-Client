@@ -13,7 +13,7 @@ export const HistoryTripleImages = ({ images }: HistoryTripleImagesProps) => {
         <div className={styles.grid}>
             {images.slice(0, 3).map((image, index) => {
                 const src = getImageSrc(image);
-                if (!src) return <div key={index} className={styles.cell} />;
+                if (!src) return null;
                 return (
                     <div
                         key={index}

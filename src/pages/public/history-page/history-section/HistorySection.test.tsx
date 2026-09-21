@@ -55,7 +55,7 @@ const TEST_IMAGE = { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image
 const makeSectionWithImage = (
     template: SectionTemplate,
     title: string | null,
-    description: string | null = 'Опис',
+    description: string | null = null,
 ): HistorySectionModel =>
     makeSection(template, {
         contents: [

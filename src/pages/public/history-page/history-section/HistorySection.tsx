@@ -106,7 +106,9 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
         return (
             <section ref={ref} className={wrapperClass}>
                 {yearBadge}
-                <HistorySectionHeader displayTitle={displayTitle} description={description} />
+                {(displayTitle || description) && (
+                    <HistorySectionHeader displayTitle={displayTitle} description={description} />
+                )}
                 {imageSrc && <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />}
             </section>
         );
@@ -114,7 +116,9 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     return (
         <section ref={ref} className={wrapperClass}>
             {yearBadge}
-            <HistorySectionHeader displayTitle={displayTitle} description={description} />
+            {(displayTitle || description) && (
+                <HistorySectionHeader displayTitle={displayTitle} description={description} />
+            )}
             {hasRealImages && (
                 <div className={styles['section-images']}>
                     {section.template === SectionTemplate.QuadImagesBottom && <HistoryQuadImages images={images} />}

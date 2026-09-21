@@ -21,10 +21,6 @@ jest.mock('../event-modal/EventModal', () => ({
     EventModal: jest.fn(() => <div data-testid="event-modal" />),
 }));
 
-jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
-    ToastContainer: () => <div data-testid="toast-container" />,
-}));
-
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
 const mockedDeleteEventCategoryModal = DeleteEventCategoryModal as jest.Mock;
 const mockedEventModal = EventModal as jest.Mock;
@@ -223,20 +219,5 @@ describe('EventsPageModals', () => {
                 currentCategory,
             }),
         );
-    });
-
-    it('renders toast container', () => {
-        render(
-            <EventsPageModals
-                modalsStateControl={createModalsStateControl()}
-                categories={categories}
-                currentCategory={currentCategory}
-                onAddCategory={onAddCategory}
-                onUpdateCategory={onUpdateCategory}
-                onDeleteCategory={onDeleteCategory}
-            />,
-        );
-
-        expect(screen.getByTestId('toast-container')).toBeInTheDocument();
     });
 });

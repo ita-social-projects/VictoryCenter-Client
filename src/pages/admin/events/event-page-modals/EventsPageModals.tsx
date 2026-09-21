@@ -56,7 +56,6 @@ export const EventsPageModals = ({
                 onClose={closeModalActions.closeDeleteCategoryModal}
                 onConfirm={onDeleteCategory}
             />
-            <ToastContainer />
         </>
     );
 };

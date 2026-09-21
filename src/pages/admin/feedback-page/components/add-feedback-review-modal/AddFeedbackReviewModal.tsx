@@ -17,6 +17,7 @@ import {
     getNormalizedInputText,
     getNormalizedInputTextWhileTyping,
 } from '@/utils/functions/formatters/text-formatters';
+import './AddFeedbackReviewModal.scss';
 
 export interface AddFeedbackReviewModalProps {
     isOpen: boolean;
@@ -112,9 +113,11 @@ export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewMod
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <Button buttonStyle="primary" disabled={!isValid}>
-                        {FEEDBACK_TEXT.ADD_REVIEW_MODAL.PUBLISH}
-                    </Button>
+                    <div className="add-feedback-review-modal-actions">
+                        <Button buttonStyle="primary" disabled={!isValid}>
+                            {FEEDBACK_TEXT.ADD_REVIEW_MODAL.PUBLISH}
+                        </Button>
+                    </div>
                 </Modal.Actions>
             </Modal>
 

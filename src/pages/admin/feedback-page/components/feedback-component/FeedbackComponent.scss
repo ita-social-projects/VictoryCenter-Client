@@ -41,9 +41,13 @@
 
                 margin: 4px 0 0 0;
                 color: colors.$blue-900;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap;
+                overflow-wrap: anywhere;
+                word-break: normal;
             }
 
             &.feedback-truncate {
@@ -71,9 +75,13 @@
             margin: 0;
             padding-right: 40px;
             color: colors.$blue-900;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            overflow-wrap: anywhere;
+            word-break: normal;
         }
 
         a {

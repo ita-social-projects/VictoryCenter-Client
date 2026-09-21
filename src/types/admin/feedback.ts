@@ -23,6 +23,13 @@ export interface CreateFeedbackHistoryDto {
     status: VisibilityStatus;
 }
 
+export interface UpdateFeedbackHistoryDto {
+    title: string;
+    story: string;
+    imageId?: number | null;
+    status: VisibilityStatus;
+}
+
 export interface FeedbackReviewDto {
     id: number;
     authorName: string;

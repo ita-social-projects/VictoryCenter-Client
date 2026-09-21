@@ -1,9 +1,6 @@
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 export const EVENTS_TEXT = {
-    MESSAGE: {
-        FAIL_TO_FETCH_PAGE_CONTENT: 'Виникла помилка, не вдалось завантажити вміст сторінки подій',
-    },
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
     },

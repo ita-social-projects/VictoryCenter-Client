@@ -113,7 +113,7 @@ export const EventsPageAdmin = () => {
                 setEventsIntroSection(introSection);
                 setEventsIntroDraft(introSection);
             } catch {
-                setErrorState(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_PAGE_CONTENT, 'events');
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events');
             } finally {
                 setIsEventsIntroSectionLoading(false);
             }
@@ -175,7 +175,7 @@ export const EventsPageAdmin = () => {
                 setEventsIntroDraft(publishedSection);
                 setEditingSectionId(null);
             } catch {
-                setErrorState(EVENTS_TEXT.MESSAGE.FAIL_TO_FETCH_PAGE_CONTENT, 'events');
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events');
             } finally {
                 setIsEventsIntroSectionPublishing(false);
             }

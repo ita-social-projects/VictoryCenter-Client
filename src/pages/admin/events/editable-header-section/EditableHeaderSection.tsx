@@ -6,7 +6,7 @@ import { Button } from '@/components/admin/button/Button';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT } from '@/const/admin/events';
-import './EditableHeaderSection.scss';
+import styles from './EditableHeaderSection.module.scss';
 
 export type EditableHeaderSectionMode = 'view' | 'edit';
 export type EditableHeaderSectionId =
@@ -108,23 +108,23 @@ export const EditableHeaderSection = ({
     const isPublishButtonDisabled = disabled || isPublishForcedDisabled || !isDraftChanged || !normalizedDraftValue;
     return (
         <section
-            className={`editable-header-section ${
+            className={`${styles['editable-header-section']} ${
                 isDescriptionSection
-                    ? 'editable-header-section--description'
-                    : 'editable-header-section--events-block-title'
-            } ${isEditMode ? 'editable-header-section--edit' : ''}`}
+                    ? styles['editable-header-section--description']
+                    : styles['editable-header-section--events-block-title']
+            } ${isEditMode ? styles['editable-header-section--edit'] : ''}`}
             data-testid={`${sectionId}-section`}
         >
             {!isEditMode && (
-                <div className="editable-header-section-heading-row">
+                <div className={styles['editable-header-section-heading-row']}>
                     <h2>
-                        <span className="editable-header-section-required-mark">*</span>
+                        <span className={styles['editable-header-section-required-mark']}>*</span>
                         {heading}
                     </h2>
-                    <div className="editable-header-section-actions">
+                    <div className={styles['editable-header-section-actions']}>
                         <button
                             type="button"
-                            className="editable-header-section-icon-button"
+                            className={styles['editable-header-section-icon-button']}
                             aria-label={`${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.EDIT_SECTION}: ${heading}`}
                             onClick={onEnterEditMode}
                             disabled={disabled}
@@ -133,7 +133,7 @@ export const EditableHeaderSection = ({
                         </button>
                         <button
                             type="button"
-                            className="editable-header-section-icon-button"
+                            className={styles['editable-header-section-icon-button']}
                             aria-label={`${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: ${heading}`}
                             disabled={disabled}
                         >
@@ -158,7 +158,7 @@ export const EditableHeaderSection = ({
                         trimOnBlur
                         showCounterBelow
                     />
-                    <div className="editable-header-section-form-actions">
+                    <div className={styles['editable-header-section-form-actions']}>
                         <Button type="button" buttonStyle="secondary" onClick={onCancelEdit} disabled={disabled}>
                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                         </Button>
@@ -174,7 +174,7 @@ export const EditableHeaderSection = ({
                 </>
             ) : (
                 <div
-                    className="editable-header-section-content"
+                    className={styles['editable-header-section-content']}
                     dangerouslySetInnerHTML={{ __html: sanitizeViewHtml(initialPublishedHtml) }}
                 />
             )}

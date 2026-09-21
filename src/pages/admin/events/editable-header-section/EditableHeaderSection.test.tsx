@@ -118,6 +118,15 @@ describe('EditableHeaderSection', () => {
         expect(screen.queryByLabelText(defaultProps.inputLabel)).not.toBeInTheDocument();
     });
 
+    it('renders the complete long description in view mode', () => {
+        const longDescription =
+            'Довгий опис подій для перевірки відображення всього тексту без прихованої частини у режимі перегляду.';
+
+        renderSection({ initialPublishedHtml: `<p>${longDescription}</p>` });
+
+        expect(screen.getByText(longDescription)).toBeInTheDocument();
+    });
+
     it('shows both supplied sections and makes only the selected section editable', () => {
         render(<TwoSections />);
 

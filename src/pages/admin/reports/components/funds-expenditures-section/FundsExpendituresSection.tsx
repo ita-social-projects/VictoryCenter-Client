@@ -18,6 +18,7 @@ import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expendi
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ReportFundsExpendituresSettingsLocalizationsApi } from '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     FundsExpendituresSummary,
     ReportFundsExpendituresCategory,
@@ -468,7 +469,12 @@ export const FundsExpenditureSection = ({
     const handleRecordSave = useCallback(
         async (
             recordId: number,
-            data: { categoryId: number; amountUah: string; amountUsd: string },
+            data: {
+                categoryId: number;
+                amountUah: string;
+                amountUsd: string;
+                lastEditedField: FundsExpendituresAmountField;
+            },
         ): Promise<boolean> => {
             const existingRecord = recordsState.find((record) => record.id === recordId);
             if (!existingRecord) {
@@ -482,6 +488,7 @@ export const FundsExpenditureSection = ({
                     reportingYear: existingRecord.reportingYear,
                     amountUah: data.amountUah,
                     amountUsd: data.amountUsd,
+                    lastEditedField: data.lastEditedField,
                 });
 
                 setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
@@ -510,6 +517,7 @@ export const FundsExpenditureSection = ({
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
+            lastEditedField: FundsExpendituresAmountField;
             type: FundsExpendituresTransactionType;
         }): Promise<boolean> => {
             try {
@@ -518,6 +526,7 @@ export const FundsExpenditureSection = ({
                     reportingYear: data.reportingYear,
                     amountUah: data.amountUah,
                     amountUsd: data.amountUsd,
+                    lastEditedField: data.lastEditedField,
                     type: data.type,
                 });
 

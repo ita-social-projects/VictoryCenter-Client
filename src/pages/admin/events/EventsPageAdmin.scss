@@ -16,6 +16,20 @@
         flex-shrink: 0;
     }
 
+    &-content-sections {
+        display: grid;
+        grid-template-columns: minmax(0, 1.86fr) minmax(0, 1fr);
+        align-items: start;
+        gap: 64px;
+        width: 100%;
+        max-width: 1214px;
+        flex-shrink: 0;
+
+        &--editing {
+            margin-bottom: 72px;
+        }
+    }
+
     &-list-container {
         flex-grow: 1;
         min-height: 0;

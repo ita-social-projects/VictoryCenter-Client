@@ -107,6 +107,8 @@ export const FeedbackPageAdmin = () => {
             if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
                 setHistoryToEdit(item);
                 setIsAddHistoryModalOpen(true);
+            } else if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
+                setReviewToEdit(item);
             } else {
                 handleNotImplemented();
             }
@@ -139,17 +141,6 @@ export const FeedbackPageAdmin = () => {
             addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
         },
         [selectedSearchItem, addToast],
-    );
-
-    const handleEditClick = useCallback(
-        (item: FeedbackListItem) => {
-            if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
-                setReviewToEdit(item);
-                return;
-            }
-            handleNotImplemented();
-        },
-        [activeCategory, handleNotImplemented],
     );
 
     const handleReviewUpdated = useCallback(

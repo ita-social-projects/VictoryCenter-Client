@@ -2,7 +2,11 @@ import { createRef } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackVideoForm, TranslateFeedbackVideoFormRef } from './TranslateFeedbackVideoForm';
-import { expectFormPreventsDefaultSubmit } from '@/utils/test-mocks/test-mocks';
+import {
+    expectFormPreventsDefaultSubmit,
+    expectFormRefExposesDirtyState,
+    expectFieldsDisabledWhenFormDisabled,
+} from '@/utils/test-mocks/test-mocks';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackVideoFormRef>();
@@ -58,17 +62,15 @@ describe('TranslateFeedbackVideoForm', () => {
     it('exposes isDirty via ref', () => {
         const { ref } = renderForm();
 
-        expect(ref.current?.isDirty()).toBe(false);
-
-        fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Video title' } });
-
-        expect(ref.current?.isDirty()).toBe(true);
+        expectFormRefExposesDirtyState(ref, () =>
+            fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Video title' } }),
+        );
     });
 
     it('disables field when formDisabled is true', () => {
         renderForm({ formDisabled: true });
 
-        expect(screen.getByLabelText(/Заголовок/)).toBeDisabled();
+        expectFieldsDisabledWhenFormDisabled([/Заголовок/]);
     });
 
     it('truncates typed input at the character limit', () => {

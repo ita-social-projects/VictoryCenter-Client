@@ -1,6 +1,7 @@
-import { forwardRef, useEffect } from 'react';
+import { forwardRef } from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { useTranslationFormDirty } from '@/hooks/admin/use-translation-form-dirty/useTranslationFormDirty';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
@@ -66,10 +67,7 @@ export const TranslateFeedbackVideoForm = forwardRef<TranslateFeedbackVideoFormR
             onSubmit: (data) => onSubmit(data),
         });
 
-        useEffect(() => {
-            const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData ?? DEFAULT_FORM_STATE);
-            onDirtyChange?.(isDirty);
-        }, [formState, initialData, onDirtyChange]);
+        useTranslationFormDirty(formState, initialData, DEFAULT_FORM_STATE, onDirtyChange);
 
         const titleField = createTranslationFieldHandlers(
             (title) => setFormState((prev) => ({ ...prev, title })),

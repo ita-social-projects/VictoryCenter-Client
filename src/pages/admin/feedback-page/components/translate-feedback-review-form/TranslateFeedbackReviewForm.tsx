@@ -1,6 +1,7 @@
-import { forwardRef, useEffect } from 'react';
+import { forwardRef } from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { useTranslationFormDirty } from '@/hooks/admin/use-translation-form-dirty/useTranslationFormDirty';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FEEDBACK_REVIEW_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
@@ -70,10 +71,7 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
             onSubmit: (data) => onSubmit(data),
         });
 
-        useEffect(() => {
-            const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData ?? DEFAULT_FORM_STATE);
-            onDirtyChange?.(isDirty);
-        }, [formState, initialData, onDirtyChange]);
+        useTranslationFormDirty(formState, initialData, DEFAULT_FORM_STATE, onDirtyChange);
 
         const authorNameField = createTranslationFieldHandlers(
             (authorName) => setFormState((prev) => ({ ...prev, authorName })),

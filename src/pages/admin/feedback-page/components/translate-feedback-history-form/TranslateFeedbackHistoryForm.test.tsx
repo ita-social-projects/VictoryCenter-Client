@@ -2,7 +2,11 @@ import { createRef } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackHistoryForm, TranslateFeedbackHistoryFormRef } from './TranslateFeedbackHistoryForm';
-import { expectFormPreventsDefaultSubmit } from '@/utils/test-mocks/test-mocks';
+import {
+    expectFormPreventsDefaultSubmit,
+    expectFormRefExposesDirtyState,
+    expectFieldsDisabledWhenFormDisabled,
+} from '@/utils/test-mocks/test-mocks';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackHistoryFormRef>();
@@ -89,18 +93,15 @@ describe('TranslateFeedbackHistoryForm', () => {
     it('exposes isValid and isDirty via ref', () => {
         const { ref } = renderForm();
 
-        expect(ref.current?.isDirty()).toBe(false);
-
-        fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Title' } });
-
-        expect(ref.current?.isDirty()).toBe(true);
+        expectFormRefExposesDirtyState(ref, () =>
+            fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Title' } }),
+        );
     });
 
     it('disables fields when formDisabled is true', () => {
         renderForm({ formDisabled: true });
 
-        expect(screen.getByLabelText(/Заголовок/)).toBeDisabled();
-        expect(screen.getByLabelText(/Історія/)).toBeDisabled();
+        expectFieldsDisabledWhenFormDisabled([/Заголовок/, /Історія/]);
     });
 
     it('truncates typed input at the character limit instead of allowing it to exceed max', () => {

@@ -2,7 +2,11 @@ import { createRef } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackReviewForm, TranslateFeedbackReviewFormRef } from './TranslateFeedbackReviewForm';
-import { expectFormPreventsDefaultSubmit } from '@/utils/test-mocks/test-mocks';
+import {
+    expectFormPreventsDefaultSubmit,
+    expectFormRefExposesDirtyState,
+    expectFieldsDisabledWhenFormDisabled,
+} from '@/utils/test-mocks/test-mocks';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackReviewFormRef>();
@@ -89,18 +93,15 @@ describe('TranslateFeedbackReviewForm', () => {
     it('exposes isDirty via ref', () => {
         const { ref } = renderForm();
 
-        expect(ref.current?.isDirty()).toBe(false);
-
-        fireEvent.change(screen.getByLabelText(/Ім'я/), { target: { value: 'John' } });
-
-        expect(ref.current?.isDirty()).toBe(true);
+        expectFormRefExposesDirtyState(ref, () =>
+            fireEvent.change(screen.getByLabelText(/Ім'я/), { target: { value: 'John' } }),
+        );
     });
 
     it('disables fields when formDisabled is true', () => {
         renderForm({ formDisabled: true });
 
-        expect(screen.getByLabelText(/Ім'я/)).toBeDisabled();
-        expect(screen.getByLabelText(/Відгук/)).toBeDisabled();
+        expectFieldsDisabledWhenFormDisabled([/Ім'я/, /Відгук/]);
     });
 
     it('truncates typed input at the character limit', () => {

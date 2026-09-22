@@ -52,6 +52,7 @@ const mockedUseToast = useToast as jest.Mock;
 
 const mockHistoryFormProps = jest.fn();
 const mockToolbarProps = jest.fn();
+const mockSaveConfirmAction = jest.fn();
 const mockDeleteDiscardAction = jest.fn();
 const mockRevertDiscardAction = jest.fn();
 const mockAddSection = jest.fn();
@@ -68,6 +69,7 @@ jest.mock('../history-form/HistoryForm', () => {
         const {
             sections,
             onRequestCancelSection,
+            onRequestSaveSection,
             onSectionSaved,
             onSectionDeleted,
             onReplaceSection,
@@ -84,6 +86,7 @@ jest.mock('../history-form/HistoryForm', () => {
         mockHistoryFormProps({
             sections,
             onRequestCancelSection,
+            onRequestSaveSection,
             onSectionSaved,
             onSectionDeleted,
             onReplaceSection,
@@ -112,6 +115,17 @@ jest.mock('../history-form/HistoryForm', () => {
 
         return (
             <div data-testid="history-form">
+                <button
+                    type="button"
+                    data-testid="request-save-confirmation"
+                    onClick={() =>
+                        onRequestSaveSection?.({
+                            onConfirm: mockSaveConfirmAction,
+                        })
+                    }
+                >
+                    Request save confirmation
+                </button>
                 <button
                     type="button"
                     data-testid="request-delete-confirmation"
@@ -363,6 +377,7 @@ describe('HistoryPageContent', () => {
         jest.clearAllMocks();
         mockDeleteDiscardAction.mockClear();
         mockRevertDiscardAction.mockClear();
+        mockSaveConfirmAction.mockClear();
         mockAddSection.mockClear();
         mockReplaceSection.mockClear();
         mockGetSections.mockClear();
@@ -789,6 +804,76 @@ describe('HistoryPageContent', () => {
         });
     });
 
+    describe('Save section confirmation', () => {
+        it('passes onRequestSaveSection handler to HistoryForm', () => {
+            mockSingleSectionData();
+
+            render(<HistoryPageContent />);
+
+            expect(mockHistoryFormProps).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    onRequestSaveSection: expect.any(Function),
+                }),
+            );
+        });
+
+        it('shows save confirmation modal when a section requests save', async () => {
+            mockSingleSectionData();
+
+            render(<HistoryPageContent />);
+
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+
+            await user.click(screen.getByTestId('request-save-confirmation'));
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+            expect(mockSaveConfirmAction).not.toHaveBeenCalled();
+        });
+
+        it('calls the pending onConfirm and closes modal when save is confirmed', async () => {
+            mockSingleSectionData();
+
+            render(<HistoryPageContent />);
+
+            await user.click(screen.getByTestId('request-save-confirmation'));
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+            await user.click(screen.getByTestId('question-confirm'));
+
+            expect(mockSaveConfirmAction).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('does not call onConfirm and closes modal when save confirmation is cancelled', async () => {
+            mockSingleSectionData();
+
+            render(<HistoryPageContent />);
+
+            await user.click(screen.getByTestId('request-save-confirmation'));
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+            await user.click(screen.getByTestId('question-cancel'));
+
+            expect(mockSaveConfirmAction).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('does not leak onConfirm from a previous save request after cancel', async () => {
+            mockSingleSectionData();
+
+            render(<HistoryPageContent />);
+
+            await user.click(screen.getByTestId('request-save-confirmation'));
+            await user.click(screen.getByTestId('question-cancel'));
+
+            await user.click(screen.getByTestId('request-save-confirmation'));
+            await user.click(screen.getByTestId('question-confirm'));
+
+            expect(mockSaveConfirmAction).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe('Modal opening and closing', () => {
         const modalTestCases = [
             {
@@ -803,6 +888,12 @@ describe('HistoryPageContent', () => {
                     await user.click(screen.getByTestId('mark-saved'));
                     await user.click(screen.getByRole('button', { name: 'Publish' }));
                 },
+                modalId: 'question-modal',
+                closeAction: async () => await user.click(screen.getByTestId('question-cancel')),
+            },
+            {
+                name: 'closes save-section confirmation modal when cancel is clicked',
+                openAction: async () => await user.click(screen.getByTestId('request-save-confirmation')),
                 modalId: 'question-modal',
                 closeAction: async () => await user.click(screen.getByTestId('question-cancel')),
             },

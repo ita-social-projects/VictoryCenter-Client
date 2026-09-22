@@ -22,7 +22,6 @@ import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history
 import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
 import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
-import { EditFeedbackReviewModal } from './components/edit-feedback-review-modal/EditFeedbackReviewModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -109,6 +108,7 @@ export const FeedbackPageAdmin = () => {
                 setIsAddHistoryModalOpen(true);
             } else if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
                 setReviewToEdit(item);
+                setIsAddReviewModalOpen(true);
             } else {
                 handleNotImplemented();
             }
@@ -143,7 +143,7 @@ export const FeedbackPageAdmin = () => {
         [selectedSearchItem, addToast],
     );
 
-    const handleReviewUpdated = useCallback(
+    const handleEditReviewSuccess = useCallback(
         (updatedReview: FeedbackReviewDto) => {
             setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
             addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
@@ -151,7 +151,7 @@ export const FeedbackPageAdmin = () => {
         [addToast],
     );
 
-    const handleReviewUpdateError = useCallback(() => {
+    const handleEditReviewError = useCallback(() => {
         addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
     }, [addToast]);
 
@@ -443,14 +443,15 @@ export const FeedbackPageAdmin = () => {
                 onClose={() => setIsAddVideoReviewModalOpen(false)}
                 onSubmit={handleAddVideoReviewSubmit}
             />
-            <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
-
-            <EditFeedbackReviewModal
-                isOpen={!!reviewToEdit}
-                onClose={() => setReviewToEdit(null)}
-                reviewToEdit={reviewToEdit}
-                onReviewUpdated={handleReviewUpdated}
-                onUpdateError={handleReviewUpdateError}
+            <AddFeedbackReviewModal
+                isOpen={isAddReviewModalOpen}
+                onClose={() => {
+                    setIsAddReviewModalOpen(false);
+                    setReviewToEdit(null);
+                }}
+                onEditReview={handleEditReviewSuccess}
+                onEditError={handleEditReviewError}
+                initialData={reviewToEdit || undefined}
             />
             <ToastContainer />
         </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -11,12 +11,19 @@ import {
     FeedbackReviewFormValues,
     FeedbackReviewValidationSchema,
 } from '@/validation/admin/feedback-review-schema/feedback-review-schema';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
+import { FeedbackReviewDto } from '@/types/admin/feedback';
+import { FeedbackReviewFormFields } from '../feedback-review-form-fields/FeedbackReviewFormFields';
 import './AddFeedbackReviewModal.scss';
-import { FeedbackReviewFormFields } from '@/pages/admin/feedback-page/components/feedback-review-form-fields/FeedbackReviewFormFields';
 
 export interface AddFeedbackReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onEditReview?: (review: FeedbackReviewDto) => void;
+    onEditError?: () => void;
+    initialData?: FeedbackReviewDto;
 }
 
 const defaultFormState: FeedbackReviewFormValues = {
@@ -24,38 +31,81 @@ const defaultFormState: FeedbackReviewFormValues = {
     text: '',
 };
 
-export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewModalProps) => {
+export const AddFeedbackReviewModal = ({
+    isOpen,
+    onClose,
+    onEditReview,
+    onEditError,
+    initialData,
+}: AddFeedbackReviewModalProps) => {
+    const client = useAdminClient();
+    const isEditMode = Boolean(initialData);
+
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [showPublishConfirmModal, setShowPublishConfirmModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
         control,
         formState: { errors, isDirty, isValid },
         reset,
+        getValues,
     } = useForm<FeedbackReviewFormValues>({
         resolver: yupResolver(FeedbackReviewValidationSchema as Yup.ObjectSchema<FeedbackReviewFormValues>),
         defaultValues: defaultFormState,
         mode: 'onTouched',
     });
 
+    useEffect(() => {
+        if (isOpen) {
+            reset(initialData ? { authorName: initialData.authorName, text: initialData.text } : defaultFormState);
+        }
+    }, [isOpen, initialData, reset]);
+
     const handleClose = useCallback(() => {
         if (isDirty) {
             setShowCloseConfirmModal(true);
             return;
         }
-        reset(defaultFormState);
         onClose();
-    }, [isDirty, reset, onClose]);
+    }, [isDirty, onClose]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
-        reset(defaultFormState);
         onClose();
-    }, [reset, onClose]);
+    }, [onClose]);
+
+    const handleConfirmPublish = useCallback(async () => {
+        if (!initialData || isSubmitting) return;
+
+        const { authorName, text } = getValues();
+
+        try {
+            setIsSubmitting(true);
+            const updatedReview = await FeedbackApi.updateReview(client, initialData.id, {
+                authorName: getNormalizedInputText(authorName),
+                text: getNormalizedInputText(text),
+                status: initialData.status,
+            });
+            setShowPublishConfirmModal(false);
+            onEditReview?.(updatedReview);
+            onClose();
+        } catch {
+            setShowPublishConfirmModal(false);
+            onEditError?.();
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [initialData, isSubmitting, getValues, client, onEditReview, onClose, onEditError]);
+
+    const isPublishDisabled = isEditMode ? !isValid || !isDirty || isSubmitting : !isValid;
 
     return (
         <>
             <Modal isOpen={isOpen} onClose={handleClose}>
-                <Modal.Title>{FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE}</Modal.Title>
+                <Modal.Title>
+                    {isEditMode ? FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE : FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE}
+                </Modal.Title>
 
                 <Modal.Content>
                     <FeedbackReviewFormFields control={control} errors={errors} idPrefix="feedback-review" />
@@ -63,12 +113,27 @@ export const AddFeedbackReviewModal = ({ isOpen, onClose }: AddFeedbackReviewMod
 
                 <Modal.Actions>
                     <div className="add-feedback-review-modal-actions">
-                        <Button buttonStyle="primary" disabled={!isValid}>
+                        <Button
+                            buttonStyle="primary"
+                            disabled={isPublishDisabled}
+                            onClick={isEditMode ? () => setShowPublishConfirmModal(true) : undefined}
+                        >
                             {FEEDBACK_TEXT.ADD_REVIEW_MODAL.PUBLISH}
                         </Button>
                     </div>
                 </Modal.Actions>
             </Modal>
+
+            <ConfirmationModal
+                isOpen={showPublishConfirmModal}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isSubmitting}
+                onConfirm={handleConfirmPublish}
+                onCancel={() => setShowPublishConfirmModal(false)}
+                onClose={() => setShowPublishConfirmModal(false)}
+            />
 
             <ConfirmationModal
                 isOpen={showCloseConfirmModal}

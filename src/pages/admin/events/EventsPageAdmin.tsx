@@ -66,6 +66,17 @@ export const EventsPageAdmin = () => {
         setError(EMPTY_ERROR);
     }, []);
 
+    const resetEventItemsState = useCallback(() => {
+        requestIdRef.current += 1;
+
+        setEventItems([]);
+        setHasMore(true);
+
+        currentPageRef.current = 0;
+        currentItemsCountRef.current = 0;
+        hasMoreRef.current = true;
+    }, []);
+
     const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
         setErrorState,
     });
@@ -158,13 +169,18 @@ export const EventsPageAdmin = () => {
 
     const handleDeleteCategory = useCallback(
         (categoryToDeleteId: number) => {
-            setCategories((prevCategories) => prevCategories.filter((category) => category.id !== categoryToDeleteId));
+            const nextCategories = categories.filter((category) => category.id !== categoryToDeleteId);
 
-            if (selectedCategory?.id === categoryToDeleteId) {
-                setSelectedCategory(null);
+            setCategories(nextCategories);
+
+            if (selectedCategory?.id !== categoryToDeleteId) {
+                return;
             }
+
+            resetEventItemsState();
+            setSelectedCategory(nextCategories[0] ?? null);
         },
-        [selectedCategory?.id],
+        [categories, selectedCategory?.id, resetEventItemsState],
     );
 
     // Event items handlers
@@ -196,17 +212,6 @@ export const EventsPageAdmin = () => {
     }, [updatePageSize]);
 
     const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
-
-    const resetEventItemsState = useCallback(() => {
-        requestIdRef.current += 1;
-
-        setEventItems([]);
-        setHasMore(true);
-
-        currentPageRef.current = 0;
-        currentItemsCountRef.current = 0;
-        hasMoreRef.current = true;
-    }, []);
 
     const handleEntitiesReordered = () => {
         /*TODO: add implementation.*/

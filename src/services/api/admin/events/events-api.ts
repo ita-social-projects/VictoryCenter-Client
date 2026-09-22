@@ -32,7 +32,8 @@ export const EventsApi = {
         limit: number,
         signal?: AbortSignal,
     ): Promise<PaginationResult<EventSearchItemData>> => {
-        const response = await client.get<PaginationResult<EventSearchItemData>>(API_ROUTES.EVENTS.SEARCH, {
+        // TODO: add constant for existing search endpoint.
+        const response = await client.get<PaginationResult<EventSearchItemData>>(`${API_ROUTES.EVENTS.BASE}/search`, {
             params: {
                 searchTerm,
                 offset,

@@ -10,6 +10,6 @@ export const IMAGE_VALIDATION = {
     ImageDimensionsTooSmallError: 'Розмір зображення менший за рекомендований',
     ImageDimensionsTooLargeError: 'Зображення завелике. Це може вплинути на якість. Обріжте до рекомендованого.',
     UnexpectedError: () => 'Невідома помилка валідації зображення',
-    getFormatError: () => 'Невірний формат зображення, дозволено jpeg, jpg, png, webp',
+    getFormatError: () => 'Невірний формат зображення, дозволено jpeg, jpg, png, webp',
     getSizeError: (maxSizeMB: number) => `Зображення не більше ${maxSizeMB} MB`,
 };

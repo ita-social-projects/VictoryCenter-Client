@@ -328,7 +328,7 @@ export const EventsPageAdmin = () => {
             buttonStyle="secondary"
         >
             {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
-            <PlusIcon className="plus-icon" />
+            <PlusIcon className="plus-icon" aria-hidden="true" />
         </Button>
     );
 

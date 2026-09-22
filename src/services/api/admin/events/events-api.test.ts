@@ -17,7 +17,7 @@ describe('EventsApi', () => {
         it('calls the Events endpoint with all provided parameters and returns the data', async () => {
             const responseData = {
                 items: [],
-                total: 0,
+                totalItemsCount: 0,
             };
 
             mockGet.mockResolvedValueOnce({
@@ -50,7 +50,7 @@ describe('EventsApi', () => {
         it('calls the Events endpoint without optional parameters', async () => {
             const responseData = {
                 items: [],
-                total: 0,
+                totalItemsCount: 0,
             };
 
             mockGet.mockResolvedValueOnce({
@@ -76,7 +76,7 @@ describe('EventsApi', () => {
             mockGet.mockResolvedValueOnce({
                 data: {
                     items: [],
-                    total: 0,
+                    totalItemsCount: 0,
                 },
             });
 

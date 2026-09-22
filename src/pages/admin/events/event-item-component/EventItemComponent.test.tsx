@@ -12,9 +12,9 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
 }));
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
-    IconButton: ({ 'area-label': areaLabel, type }: { 'area-label': string; type?: 'button' | 'submit' | 'reset' }) => (
-        <button aria-label={areaLabel} type={type}>
-            {areaLabel}
+    IconButton: ({ 'aria-label': ariaLabel, type }: { 'aria-label': string; type?: 'button' | 'submit' | 'reset' }) => (
+        <button aria-label={ariaLabel} type={type}>
+            {ariaLabel}
         </button>
     ),
 }));

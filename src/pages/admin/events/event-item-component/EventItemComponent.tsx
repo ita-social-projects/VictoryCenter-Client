@@ -32,7 +32,7 @@ export const EventItemComponent = ({ item }: EventItemComponentProps) => {
 
             <div className="event-item-actions">
                 <IconButton
-                    area-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
+                    aria-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
                     type="button"
                     onClick={() => {
                         /*TODO: add implementation.*/
@@ -42,7 +42,7 @@ export const EventItemComponent = ({ item }: EventItemComponentProps) => {
                 />
 
                 <IconButton
-                    area-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
+                    aria-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
                     onClick={() => {
                         /*TODO: add implementation.*/

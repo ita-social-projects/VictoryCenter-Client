@@ -220,6 +220,7 @@ export const EventsPageAdmin = () => {
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
             <DraggableListItem
+                key={item.id}
                 entity={item}
                 id={item.id}
                 renderEntityComponent={renderEntityComponent}

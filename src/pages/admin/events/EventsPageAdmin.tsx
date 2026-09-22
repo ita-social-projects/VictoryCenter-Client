@@ -72,10 +72,14 @@ export const EventsPageAdmin = () => {
         setEventItems([]);
         setHasMore(true);
 
+        if (error.type === 'events') {
+            clearError();
+        }
+
         currentPageRef.current = 0;
         currentItemsCountRef.current = 0;
         hasMoreRef.current = true;
-    }, []);
+    }, [error.type, clearError]);
 
     const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
         setErrorState,
@@ -254,6 +258,10 @@ export const EventsPageAdmin = () => {
                     return;
                 }
 
+                if (error.type === 'events') {
+                    clearError();
+                }
+
                 if (shouldResetList) {
                     setEventItems(response.items);
                     currentItemsCountRef.current = response.items.length;
@@ -278,6 +286,8 @@ export const EventsPageAdmin = () => {
                     ToastType.Error,
                     EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
                 );
+
+                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_FETCH_ITEMS, 'events');
             } finally {
                 if (requestId === requestIdRef.current) {
                     isEventItemsLoadingRef.current = false;
@@ -364,9 +374,9 @@ export const EventsPageAdmin = () => {
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />
-                {error.message && <div className="error-message">{error.message}</div>}
+                {error.type === 'categories' && <div className="error-message">{error.message}</div>}
 
-                {selectedCategory && (
+                {selectedCategory && error.type !== 'events' && (
                     <InfiniteScrollList<EventItemDto>
                         items={eventItems}
                         renderItem={renderEventItem}

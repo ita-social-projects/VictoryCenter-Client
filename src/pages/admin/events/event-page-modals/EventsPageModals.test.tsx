@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';

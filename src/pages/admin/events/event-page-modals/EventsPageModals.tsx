@@ -1,7 +1,6 @@
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
-import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventsNews } from '@/types/admin/events-news';
 import { EventCategoryDto } from '@/types/admin/event-category';

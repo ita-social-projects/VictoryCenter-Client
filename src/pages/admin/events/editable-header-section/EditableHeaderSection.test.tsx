@@ -197,6 +197,7 @@ describe('EditableHeaderSection', () => {
 
         expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
         expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
+        expect(screen.getByLabelText(defaultProps.inputLabel)).toHaveValue('Опублікований опис');
     });
 
     it('confirms cancelling a changed draft', () => {

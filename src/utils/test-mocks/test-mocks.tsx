@@ -1,4 +1,15 @@
 import { useState } from 'react';
+import { screen, fireEvent, createEvent } from '@testing-library/react';
+
+export const expectFormPreventsDefaultSubmit = (formTestId: string) => {
+    const form = screen.getByTestId(formTestId);
+    const event = createEvent.submit(form);
+    event.preventDefault = jest.fn();
+
+    fireEvent(form, event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+};
 
 export const MockCategoryBar = ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
     <div data-testid="mock-category-bar">

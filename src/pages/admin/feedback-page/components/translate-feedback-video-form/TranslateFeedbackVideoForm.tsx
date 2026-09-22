@@ -8,10 +8,8 @@ import {
     FEEDBACK_VIDEO_TRANSLATION_VALIDATION_FUNCTIONS,
     FEEDBACK_VIDEO_TRANSLATION_BLUR_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/feedback-translation-schema/feedback-translation-schema';
-import {
-    getNormalizedInputText,
-    getNormalizedInputTextWhileTyping,
-} from '@/utils/functions/formatters/text-formatters';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import { createTranslationFieldHandlers } from '../translation-field-handlers/createTranslationFieldHandlers';
 import styles from './TranslateFeedbackVideoForm.module.scss';
 
 export interface TranslateFeedbackVideoFormValues {
@@ -73,23 +71,12 @@ export const TranslateFeedbackVideoForm = forwardRef<TranslateFeedbackVideoFormR
             onDirtyChange?.(isDirty);
         }, [formState, initialData, onDirtyChange]);
 
-        const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, title: value }));
-            setErrors((prev) => ({
-                ...prev,
-                title: FEEDBACK_VIDEO_TRANSLATION_VALIDATION_FUNCTIONS.validateTitle(value),
-            }));
-        };
-
-        const handleTitleBlur = () => {
-            const normalised = getNormalizedInputText(formState.title);
-            setFormState((prev) => ({ ...prev, title: normalised }));
-            setErrors((prev) => ({
-                ...prev,
-                title: FEEDBACK_VIDEO_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateTitle(normalised),
-            }));
-        };
+        const titleField = createTranslationFieldHandlers(
+            (title) => setFormState((prev) => ({ ...prev, title })),
+            (error) => setErrors((prev) => ({ ...prev, title: error })),
+            FEEDBACK_VIDEO_TRANSLATION_VALIDATION_FUNCTIONS.validateTitle,
+            FEEDBACK_VIDEO_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateTitle,
+        );
 
         return (
             <form
@@ -103,8 +90,8 @@ export const TranslateFeedbackVideoForm = forwardRef<TranslateFeedbackVideoFormR
                         label={FEEDBACK_TEXT.FORM.LABEL.TITLE}
                         isRequired
                         value={formState.title}
-                        onChange={handleTitleChange}
-                        onBlur={handleTitleBlur}
+                        onChange={titleField.handleChange}
+                        onBlur={titleField.handleBlur(formState.title)}
                         id="feedback-video-translation-title"
                         name="title"
                         maxLength={VIDEO_REVIEW_VALIDATION.title.max}

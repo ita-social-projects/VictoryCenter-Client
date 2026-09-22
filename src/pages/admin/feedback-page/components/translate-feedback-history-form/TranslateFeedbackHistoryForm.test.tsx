@@ -1,7 +1,8 @@
 import { createRef } from 'react';
-import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackHistoryForm, TranslateFeedbackHistoryFormRef } from './TranslateFeedbackHistoryForm';
+import { expectFormPreventsDefaultSubmit } from '@/utils/test-mocks/test-mocks';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackHistoryFormRef>();
@@ -127,13 +128,7 @@ describe('TranslateFeedbackHistoryForm', () => {
 
     it('prevents default behavior on native form submit', () => {
         renderForm();
-        const form = screen.getByTestId('translate-feedback-history-form');
 
-        const event = createEvent.submit(form);
-        event.preventDefault = jest.fn();
-
-        fireEvent(form, event);
-
-        expect(event.preventDefault).toHaveBeenCalled();
+        expectFormPreventsDefaultSubmit('translate-feedback-history-form');
     });
 });

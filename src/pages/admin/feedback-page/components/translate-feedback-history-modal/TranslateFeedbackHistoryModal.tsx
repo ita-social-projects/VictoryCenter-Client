@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import {
     TranslateFeedbackHistoryForm,
     TranslateFeedbackHistoryFormRef,
@@ -6,11 +6,9 @@ import {
 } from '../translate-feedback-history-form/TranslateFeedbackHistoryForm';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { useTranslateFeedbackHistory } from '@/hooks/admin/use-translate-feedback-history/useTranslateFeedbackHistory';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { FeedbackHistoryDto } from '@/types/admin/feedback';
+import { useTranslationModal } from '@/hooks/admin/use-translation-modal/useTranslationModal';
+import { FeedbackHistoryDto, FeedbackHistoryLocalization } from '@/types/admin/feedback';
 import { LocalizationLanguage } from '@/types/common/language';
-import { ModalMode } from '@/types/admin/common';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 
 interface TranslateFeedbackHistoryModalProps {
@@ -28,26 +26,24 @@ export const TranslateFeedbackHistoryModal = ({
     onTranslateHistory,
     translatedLanguages,
 }: TranslateFeedbackHistoryModalProps) => {
-    const formRef = useRef<TranslateFeedbackHistoryFormRef>(null);
-
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [isDirty, setIsDirty] = useState(false);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
-
-    useEffect(() => {
-        if (translatedLanguages.length > 0 && !language) {
-            const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
-            setLanguage(defaultEnglish);
-        }
-    }, [translatedLanguages, language]);
-
-    const existingLocalization = useMemo(() => {
-        if (!historyToTranslate?.localizations || !language) return null;
-        return historyToTranslate?.localizations?.find((loc) => loc.language.id === language?.id);
-    }, [historyToTranslate?.localizations, language]);
-
-    const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
-    const isEditMode = mode === ModalMode.Edit;
+    const {
+        formRef,
+        isFormValid,
+        setIsFormValid,
+        isDirty,
+        setIsDirty,
+        language,
+        setLanguage,
+        existingLocalization,
+        mode,
+        isEditMode,
+        modalTitle,
+        handleSaveClick,
+        checkIsDirty,
+    } = useTranslationModal<FeedbackHistoryLocalization, TranslateFeedbackHistoryFormRef>({
+        localizations: historyToTranslate?.localizations,
+        translatedLanguages,
+    });
 
     const initialData = useMemo<TranslateFeedbackHistoryFormValues | null>(() => {
         if (!isEditMode || !existingLocalization) return null;
@@ -68,24 +64,11 @@ export const TranslateFeedbackHistoryModal = ({
         mode,
     });
 
-    const handleSaveClick = () => {
-        if (!formRef.current?.isValid()) return;
-        formRef.current.submit();
-    };
-
-    const checkIsDirty = () => {
-        return formRef.current?.isDirty() ?? false;
-    };
-
     const handleFormSubmit = async (data: TranslateFeedbackHistoryFormValues) => {
         await translateHistory(data);
     };
 
     if (!historyToTranslate) return null;
-
-    const modalTitle = isEditMode
-        ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
-        : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
 
     return (
         <LocalizationModal

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import {
     TranslateFeedbackReviewForm,
     TranslateFeedbackReviewFormRef,
@@ -6,11 +6,9 @@ import {
 } from '../translate-feedback-review-form/TranslateFeedbackReviewForm';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { useTranslateFeedbackReview } from '@/hooks/admin/use-translate-feedback-review/useTranslateFeedbackReview';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { FeedbackReviewDto } from '@/types/admin/feedback';
+import { useTranslationModal } from '@/hooks/admin/use-translation-modal/useTranslationModal';
+import { FeedbackReviewDto, FeedbackReviewLocalization } from '@/types/admin/feedback';
 import { LocalizationLanguage } from '@/types/common/language';
-import { ModalMode } from '@/types/admin/common';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 
 interface TranslateFeedbackReviewModalProps {
@@ -28,26 +26,24 @@ export const TranslateFeedbackReviewModal = ({
     onTranslateReview,
     translatedLanguages,
 }: TranslateFeedbackReviewModalProps) => {
-    const formRef = useRef<TranslateFeedbackReviewFormRef>(null);
-
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [isDirty, setIsDirty] = useState(false);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
-
-    useEffect(() => {
-        if (translatedLanguages.length > 0 && !language) {
-            const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
-            setLanguage(defaultEnglish);
-        }
-    }, [translatedLanguages, language]);
-
-    const existingLocalization = useMemo(() => {
-        if (!reviewToTranslate?.localizations || !language) return null;
-        return reviewToTranslate?.localizations?.find((loc) => loc.language.id === language?.id);
-    }, [reviewToTranslate?.localizations, language]);
-
-    const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
-    const isEditMode = mode === ModalMode.Edit;
+    const {
+        formRef,
+        isFormValid,
+        setIsFormValid,
+        isDirty,
+        setIsDirty,
+        language,
+        setLanguage,
+        existingLocalization,
+        mode,
+        isEditMode,
+        modalTitle,
+        handleSaveClick,
+        checkIsDirty,
+    } = useTranslationModal<FeedbackReviewLocalization, TranslateFeedbackReviewFormRef>({
+        localizations: reviewToTranslate?.localizations,
+        translatedLanguages,
+    });
 
     const initialData = useMemo<TranslateFeedbackReviewFormValues | null>(() => {
         if (!isEditMode || !existingLocalization) return null;
@@ -68,24 +64,11 @@ export const TranslateFeedbackReviewModal = ({
         mode,
     });
 
-    const handleSaveClick = () => {
-        if (!formRef.current?.isValid()) return;
-        formRef.current.submit();
-    };
-
-    const checkIsDirty = () => {
-        return formRef.current?.isDirty() ?? false;
-    };
-
     const handleFormSubmit = async (data: TranslateFeedbackReviewFormValues) => {
         await translateReview(data);
     };
 
     if (!reviewToTranslate) return null;
-
-    const modalTitle = isEditMode
-        ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
-        : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
 
     return (
         <LocalizationModal

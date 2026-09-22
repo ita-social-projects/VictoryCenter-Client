@@ -7,28 +7,9 @@ import { useTranslateFeedbackVideo } from '@/hooks/admin/use-translate-feedback-
 import { VisibilityStatus } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
+jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
+    LocalizationModal: (props: unknown) => require('@/utils/test-mocks/test-mocks').MockLocalizationModal(props),
 }));
-
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockConfirmationModal(props),
-}));
-
-jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, children, onClose }: any) =>
-        isOpen ? (
-            <div data-testid="modal" onClick={onClose} role="dialog" aria-modal="true">
-                {children}
-            </div>
-        ) : null;
-
-    Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
-    Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
-    Modal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
-
-    return { Modal };
-});
 
 jest.mock('../translate-feedback-video-form/TranslateFeedbackVideoForm', () => {
     const React = require('react');

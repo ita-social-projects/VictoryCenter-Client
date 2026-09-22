@@ -1,7 +1,8 @@
 import { createRef } from 'react';
-import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackVideoForm, TranslateFeedbackVideoFormRef } from './TranslateFeedbackVideoForm';
+import { expectFormPreventsDefaultSubmit } from '@/utils/test-mocks/test-mocks';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackVideoFormRef>();
@@ -95,13 +96,7 @@ describe('TranslateFeedbackVideoForm', () => {
 
     it('prevents default behavior on native form submit', () => {
         renderForm();
-        const form = screen.getByTestId('translate-feedback-video-form');
 
-        const event = createEvent.submit(form);
-        event.preventDefault = jest.fn();
-
-        fireEvent(form, event);
-
-        expect(event.preventDefault).toHaveBeenCalled();
+        expectFormPreventsDefaultSubmit('translate-feedback-video-form');
     });
 });

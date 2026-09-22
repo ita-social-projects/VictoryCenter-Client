@@ -8,10 +8,8 @@ import {
     FEEDBACK_REVIEW_TRANSLATION_VALIDATION_FUNCTIONS,
     FEEDBACK_REVIEW_TRANSLATION_BLUR_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/feedback-translation-schema/feedback-translation-schema';
-import {
-    getNormalizedInputText,
-    getNormalizedInputTextWhileTyping,
-} from '@/utils/functions/formatters/text-formatters';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import { createTranslationFieldHandlers } from '../translation-field-handlers/createTranslationFieldHandlers';
 import styles from './TranslateFeedbackReviewForm.module.scss';
 
 export interface TranslateFeedbackReviewFormValues {
@@ -77,41 +75,19 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
             onDirtyChange?.(isDirty);
         }, [formState, initialData, onDirtyChange]);
 
-        const handleAuthorNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, authorName: value }));
-            setErrors((prev) => ({
-                ...prev,
-                authorName: FEEDBACK_REVIEW_TRANSLATION_VALIDATION_FUNCTIONS.validateAuthorName(value),
-            }));
-        };
+        const authorNameField = createTranslationFieldHandlers(
+            (authorName) => setFormState((prev) => ({ ...prev, authorName })),
+            (error) => setErrors((prev) => ({ ...prev, authorName: error })),
+            FEEDBACK_REVIEW_TRANSLATION_VALIDATION_FUNCTIONS.validateAuthorName,
+            FEEDBACK_REVIEW_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateAuthorName,
+        );
 
-        const handleAuthorNameBlur = () => {
-            const normalised = getNormalizedInputText(formState.authorName);
-            setFormState((prev) => ({ ...prev, authorName: normalised }));
-            setErrors((prev) => ({
-                ...prev,
-                authorName: FEEDBACK_REVIEW_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateAuthorName(normalised),
-            }));
-        };
-
-        const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, text: value }));
-            setErrors((prev) => ({
-                ...prev,
-                text: FEEDBACK_REVIEW_TRANSLATION_VALIDATION_FUNCTIONS.validateText(value),
-            }));
-        };
-
-        const handleTextBlur = () => {
-            const normalised = getNormalizedInputText(formState.text);
-            setFormState((prev) => ({ ...prev, text: normalised }));
-            setErrors((prev) => ({
-                ...prev,
-                text: FEEDBACK_REVIEW_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateText(normalised),
-            }));
-        };
+        const textField = createTranslationFieldHandlers(
+            (text) => setFormState((prev) => ({ ...prev, text })),
+            (error) => setErrors((prev) => ({ ...prev, text: error })),
+            FEEDBACK_REVIEW_TRANSLATION_VALIDATION_FUNCTIONS.validateText,
+            FEEDBACK_REVIEW_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateText,
+        );
 
         return (
             <form
@@ -125,8 +101,8 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
                         label={FEEDBACK_TEXT.FORM.LABEL.NAME}
                         isRequired
                         value={formState.authorName}
-                        onChange={handleAuthorNameChange}
-                        onBlur={handleAuthorNameBlur}
+                        onChange={authorNameField.handleChange}
+                        onBlur={authorNameField.handleBlur(formState.authorName)}
                         id="feedback-review-translation-author-name"
                         name="authorName"
                         maxLength={FEEDBACK_REVIEW_VALIDATION.authorName.max}
@@ -144,8 +120,8 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
                         id="feedback-review-translation-text"
                         name="text"
                         value={formState.text}
-                        onChange={handleTextChange}
-                        onBlur={handleTextBlur}
+                        onChange={textField.handleChange}
+                        onBlur={textField.handleBlur(formState.text)}
                         rows={6}
                         disabled={isSubmitting || formDisabled}
                         maxLength={FEEDBACK_REVIEW_VALIDATION.text.max}

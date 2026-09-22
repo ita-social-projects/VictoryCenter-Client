@@ -8,10 +8,8 @@ import {
     FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS,
     FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/feedback-translation-schema/feedback-translation-schema';
-import {
-    getNormalizedInputText,
-    getNormalizedInputTextWhileTyping,
-} from '@/utils/functions/formatters/text-formatters';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import { createTranslationFieldHandlers } from '../translation-field-handlers/createTranslationFieldHandlers';
 import styles from './TranslateFeedbackHistoryForm.module.scss';
 
 export interface TranslateFeedbackHistoryFormValues {
@@ -80,41 +78,19 @@ export const TranslateFeedbackHistoryForm = forwardRef<
             onDirtyChange?.(isDirty);
         }, [formState, initialData, onDirtyChange]);
 
-        const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, title: value }));
-            setErrors((prev) => ({
-                ...prev,
-                title: FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateTitle(value),
-            }));
-        };
+        const titleField = createTranslationFieldHandlers(
+            (title) => setFormState((prev) => ({ ...prev, title })),
+            (error) => setErrors((prev) => ({ ...prev, title: error })),
+            FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateTitle,
+            FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateTitle,
+        );
 
-        const handleTitleBlur = () => {
-            const normalised = getNormalizedInputText(formState.title);
-            setFormState((prev) => ({ ...prev, title: normalised }));
-            setErrors((prev) => ({
-                ...prev,
-                title: FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateTitle(normalised),
-            }));
-        };
-
-        const handleStoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, story: value }));
-            setErrors((prev) => ({
-                ...prev,
-                story: FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateStory(value),
-            }));
-        };
-
-        const handleStoryBlur = () => {
-            const normalised = getNormalizedInputText(formState.story);
-            setFormState((prev) => ({ ...prev, story: normalised }));
-            setErrors((prev) => ({
-                ...prev,
-                story: FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateStory(normalised),
-            }));
-        };
+        const storyField = createTranslationFieldHandlers(
+            (story) => setFormState((prev) => ({ ...prev, story })),
+            (error) => setErrors((prev) => ({ ...prev, story: error })),
+            FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateStory,
+            FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateStory,
+        );
 
         return (
             <form
@@ -128,8 +104,8 @@ export const TranslateFeedbackHistoryForm = forwardRef<
                         label={FEEDBACK_TEXT.FORM.LABEL.TITLE}
                         isRequired
                         value={formState.title}
-                        onChange={handleTitleChange}
-                        onBlur={handleTitleBlur}
+                        onChange={titleField.handleChange}
+                        onBlur={titleField.handleBlur(formState.title)}
                         id="feedback-history-translation-title"
                         name="title"
                         maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
@@ -147,8 +123,8 @@ export const TranslateFeedbackHistoryForm = forwardRef<
                         id="feedback-history-translation-story"
                         name="story"
                         value={formState.story}
-                        onChange={handleStoryChange}
-                        onBlur={handleStoryBlur}
+                        onChange={storyField.handleChange}
+                        onBlur={storyField.handleBlur(formState.story)}
                         rows={6}
                         disabled={isSubmitting || formDisabled}
                         maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}

@@ -82,6 +82,7 @@ export const useProgramExpenseRecordForm = ({
                 programName,
                 records,
                 trigger,
+                isEditing: recordToEdit !== null,
             }),
         [records, recordToEdit],
     );

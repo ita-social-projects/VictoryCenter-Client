@@ -2,6 +2,7 @@ import { VisibilityStatusLabel } from '@/components/admin/visibility-status-labe
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { EventItemDto } from '@/types/admin/events-news';
+import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 import './EventItemComponent.scss';
 
 export interface EventItemComponentProps {
@@ -31,17 +32,21 @@ export const EventItemComponent = ({ item }: EventItemComponentProps) => {
 
             <div className="event-item-actions">
                 <IconButton
-                    area-label="edit"
+                    area-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
                     type="button"
-                    onClick={() => {}}
+                    onClick={() => {
+                        /*TODO: add implementation.*/
+                    }}
                     DefaultIcon={ACTION_ICONS.edit.default}
                     FilledIcon={ACTION_ICONS.edit.hover}
                 />
 
                 <IconButton
-                    area-label="delete"
+                    area-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
-                    onClick={() => {}}
+                    onClick={() => {
+                        /*TODO: add implementation.*/
+                    }}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}
                 />

@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { EventItemComponent } from './EventItemComponent';
 import { VisibilityStatus } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events-news';
+import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: number }) => (
@@ -11,13 +12,7 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
 }));
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
-    IconButton: ({
-        'area-label': areaLabel,
-        type,
-    }: {
-        'area-label': string;
-        type?: 'button' | 'submit' | 'reset';
-    }) => (
+    IconButton: ({ 'area-label': areaLabel, type }: { 'area-label': string; type?: 'button' | 'submit' | 'reset' }) => (
         <button aria-label={areaLabel} type={type}>
             {areaLabel}
         </button>
@@ -56,29 +51,38 @@ describe('EventItemComponent', () => {
     it('renders the visibility status', () => {
         render(<EventItemComponent item={item} />);
 
-        expect(screen.getByTestId('visibility-status-label')).toHaveTextContent(
-            String(VisibilityStatus.Published),
-        );
+        expect(screen.getByTestId('visibility-status-label')).toHaveTextContent(String(VisibilityStatus.Published));
     });
 
     it('renders the edit and delete buttons', () => {
         render(<EventItemComponent item={item} />);
 
-        expect(screen.getByRole('button', { name: 'edit' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.EDIT,
+            }),
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.DELETE,
+            }),
+        ).toBeInTheDocument();
     });
 
     it('renders both buttons with type button', () => {
         render(<EventItemComponent item={item} />);
 
-        expect(screen.getByRole('button', { name: 'edit' })).toHaveAttribute(
-            'type',
-            'button',
-        );
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.EDIT,
+            }),
+        ).toHaveAttribute('type', 'button');
 
-        expect(screen.getByRole('button', { name: 'delete' })).toHaveAttribute(
-            'type',
-            'button',
-        );
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.DELETE,
+            }),
+        ).toHaveAttribute('type', 'button');
     });
 });

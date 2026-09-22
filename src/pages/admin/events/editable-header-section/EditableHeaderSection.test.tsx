@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { useState } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, getDefaultNormalizer, render, screen } from '@testing-library/react';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT } from '@/const/admin/events';
@@ -187,6 +187,38 @@ describe('EditableHeaderSection', () => {
 
         renderSection({ mode: 'edit' });
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+        expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels immediately without opening a confirmation modal when the draft has not changed', () => {
+        renderSection({ mode: 'edit' });
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+        expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
+    });
+
+    it('confirms cancelling a changed draft', () => {
+        renderSection({ mode: 'edit' });
+
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'Оновлений опис' } });
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+        expect(
+            screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+            }),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
+        expect(screen.getByLabelText(defaultProps.inputLabel)).toHaveValue('Оновлений опис');
+        expect(defaultProps.onCancelEdit).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
         expect(defaultProps.onCancelEdit).toHaveBeenCalledTimes(1);
     });
 

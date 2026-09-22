@@ -108,6 +108,8 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
         sectionId,
         mode,
         onEnterEditMode,
+        onDraftChange,
+        onCancelEdit,
         onPublish,
         initialPublishedHtml,
         isPublishDisabled,
@@ -116,6 +118,8 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
         sectionId: string;
         mode: 'edit' | 'view';
         onEnterEditMode: () => void;
+        onDraftChange: (value: string) => void;
+        onCancelEdit: () => void;
         onPublish: (value: string) => void;
         initialPublishedHtml: string;
         isPublishDisabled?: boolean;
@@ -127,6 +131,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
             <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`} disabled={disabled}>
                 Edit section
             </button>
+            {mode === 'edit' && (
+                <>
+                    <input
+                        aria-label={`Змінити ${sectionId}`}
+                        onChange={(event) => onDraftChange(`<p>${event.target.value}</p>`)}
+                    />
+                    <button type="button" onClick={onCancelEdit} aria-label={`Скасувати редагування ${sectionId}`} />
+                </>
+            )}
             <button
                 type="button"
                 onClick={() => onPublish('<p>Updated content</p>')}
@@ -292,6 +305,27 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeEnabled();
             expect(screen.getByRole('button', { name: `Опублікувати ${titleId}` })).toBeEnabled();
         });
+    });
+
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, '<p>Loaded description</p>'],
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, '<p>Loaded title</p>'],
+    ])('restores published content after cancelling edits for %s', async (sectionId, publishedContent) => {
+        const user = userEvent.setup();
+
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: `Редагувати ${sectionId}` })).toBeEnabled();
+        });
+
+        await user.click(screen.getByRole('button', { name: `Редагувати ${sectionId}` }));
+        await user.type(screen.getByRole('textbox', { name: `Змінити ${sectionId}` }), 'Оновлений текст');
+        await user.click(screen.getByRole('button', { name: `Скасувати редагування ${sectionId}` }));
+
+        expect(screen.getByTestId(`${sectionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${sectionId}-html`)).toHaveTextContent(publishedContent);
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
     });
 
     it('does not render an error message when there is no error', async () => {

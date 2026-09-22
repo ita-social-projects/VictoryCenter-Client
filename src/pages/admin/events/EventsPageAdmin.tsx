@@ -18,7 +18,7 @@ import { EventCategoriesApi } from '@/services/api/admin/events/event-categories
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
-import { EventsNews, EventItemDto, EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events-news';
+import { EventItemDto, EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events-news';
 import {
     EVENT_ITEMS_TEXT,
     EVENT_NOTIFICATION_TIMERS,
@@ -43,7 +43,7 @@ export const EventsPageAdmin = () => {
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
-    const modalsStateControl = useModalsState<EventsNews>();
+    const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
 
     const listContainerRef = useRef<HTMLDivElement>(null);

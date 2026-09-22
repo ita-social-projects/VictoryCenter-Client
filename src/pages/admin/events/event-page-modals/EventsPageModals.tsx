@@ -2,12 +2,12 @@ import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteE
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
-import { EventsNews } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events-news';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 
 export interface EventsPageModalsProps {
-    modalsStateControl: UseModalsStateResult<EventsNews>;
+    modalsStateControl: UseModalsStateResult<EventItemDto>;
     categories: EventCategoryDto[];
     currentCategory: EventCategoryDto | null;
     onAddCategory(category: EventCategoryDto): void;

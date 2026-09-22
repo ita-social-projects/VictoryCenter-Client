@@ -1,12 +1,6 @@
 import { Image, ImageValues } from '../common/image';
 import { VisibilityStatus } from './common';
 
-export interface EventsNews {
-    resource: string;
-    publishedAt: string;
-    status: number;
-}
-
 export interface EventItemDto {
     id: number;
     resource: string;

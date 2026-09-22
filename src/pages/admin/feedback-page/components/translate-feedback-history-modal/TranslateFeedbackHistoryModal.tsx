@@ -56,7 +56,7 @@ export const TranslateFeedbackHistoryModal = ({
 
     const { translateHistory, isSubmitting, error } = useTranslateFeedbackHistory({
         history: historyToTranslate,
-        language: language!,
+        language,
         onSuccess: (updatedHistory) => {
             onTranslateHistory(updatedHistory);
             onClose();

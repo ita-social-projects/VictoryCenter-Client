@@ -10,7 +10,7 @@ import { ModalMode } from '@/types/admin/common';
 
 interface UseTranslateFeedbackHistoryParams {
     history: FeedbackHistoryDto | null;
-    language: LocalizationLanguage;
+    language: LocalizationLanguage | null;
     onSuccess: (updatedHistory: FeedbackHistoryDto) => void;
     mode: ModalMode;
 }
@@ -28,7 +28,7 @@ export const useTranslateFeedbackHistory = ({
     const isEditMode = mode === ModalMode.Edit;
 
     const translateHistory = async (data: TranslateFeedbackHistoryFormValues) => {
-        if (!history) return;
+        if (!history || !language) return;
 
         try {
             setIsSubmitting(true);

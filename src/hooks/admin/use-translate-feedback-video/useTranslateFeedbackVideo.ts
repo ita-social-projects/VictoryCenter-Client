@@ -10,7 +10,7 @@ import { ModalMode } from '@/types/admin/common';
 
 interface UseTranslateFeedbackVideoParams {
     video: FeedbackVideoDto | null;
-    language: LocalizationLanguage;
+    language: LocalizationLanguage | null;
     onSuccess: (updatedVideo: FeedbackVideoDto) => void;
     mode: ModalMode;
 }
@@ -23,7 +23,7 @@ export const useTranslateFeedbackVideo = ({ video, language, onSuccess, mode }: 
     const isEditMode = mode === ModalMode.Edit;
 
     const translateVideo = async (data: TranslateFeedbackVideoFormValues) => {
-        if (!video) return;
+        if (!video || !language) return;
 
         try {
             setIsSubmitting(true);

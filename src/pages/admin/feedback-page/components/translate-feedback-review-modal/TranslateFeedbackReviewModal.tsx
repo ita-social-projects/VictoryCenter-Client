@@ -56,7 +56,7 @@ export const TranslateFeedbackReviewModal = ({
 
     const { translateReview, isSubmitting, error } = useTranslateFeedbackReview({
         review: reviewToTranslate,
-        language: language!,
+        language,
         onSuccess: (updatedReview) => {
             onTranslateReview(updatedReview);
             onClose();

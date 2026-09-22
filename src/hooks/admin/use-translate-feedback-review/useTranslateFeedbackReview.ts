@@ -10,7 +10,7 @@ import { ModalMode } from '@/types/admin/common';
 
 interface UseTranslateFeedbackReviewParams {
     review: FeedbackReviewDto | null;
-    language: LocalizationLanguage;
+    language: LocalizationLanguage | null;
     onSuccess: (updatedReview: FeedbackReviewDto) => void;
     mode: ModalMode;
 }
@@ -23,7 +23,7 @@ export const useTranslateFeedbackReview = ({ review, language, onSuccess, mode }
     const isEditMode = mode === ModalMode.Edit;
 
     const translateReview = async (data: TranslateFeedbackReviewFormValues) => {
-        if (!review) return;
+        if (!review || !language) return;
 
         try {
             setIsSubmitting(true);

@@ -55,7 +55,7 @@ export const TranslateFeedbackVideoModal = ({
 
     const { translateVideo, isSubmitting, error } = useTranslateFeedbackVideo({
         video: videoToTranslate,
-        language: language!,
+        language,
         onSuccess: (updatedVideo) => {
             onTranslateVideo(updatedVideo);
             onClose();

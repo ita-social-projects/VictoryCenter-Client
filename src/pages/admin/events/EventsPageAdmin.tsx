@@ -314,6 +314,19 @@ export const EventsPageAdmin = () => {
         }
     }, [fetchEventItems, selectedCategory]);
 
+    const addMaterialButton = (
+        <Button
+            className="btn-add"
+            onClick={() => {
+                /*TODO: add implementation.*/
+            }}
+            buttonStyle="secondary"
+        >
+            {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
+            <PlusIcon className="plus-icon" />
+        </Button>
+    );
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -355,18 +368,7 @@ export const EventsPageAdmin = () => {
                         hasMore={hasMore}
                         isLoading={isEventItemsLoading}
                         emptyStateMessage={EVENT_ITEMS_TEXT.NO_RECORDS}
-                        emptyStateAction={
-                            <Button
-                                className="btn-add"
-                                onClick={() => {
-                                    /*TODO: add implementation.*/
-                                }}
-                                buttonStyle="secondary"
-                            >
-                                {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
-                                <PlusIcon className="plus-icon" />
-                            </Button>
-                        }
+                        emptyStateAction={addMaterialButton}
                     />
                 )}
             </div>

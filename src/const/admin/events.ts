@@ -103,6 +103,9 @@ export const EVENT_NOTIFICATION_TIMERS = {
     SYNC_ERROR_MS: 3000,
 };
 
+export const DEFAULT_LOAD_ITEMS_COUNT = 5;
+export const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
+
 export const EVENT_ITEMS_TEXT = {
     MESSAGE: {
         FAILED_TO_FETCH_ITEMS: 'Виникла помилка, не вдалось завантажити новини та події',

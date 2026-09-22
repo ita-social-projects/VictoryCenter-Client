@@ -19,12 +19,16 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
 import { EventsNews, EventItemDto, EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events-news';
-import { EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS, EVENTS_TEXT } from '@/const/admin/events';
+import {
+    EVENT_ITEMS_TEXT,
+    EVENT_NOTIFICATION_TIMERS,
+    EVENTS_TEXT,
+    DEFAULT_LOAD_ITEMS_COUNT,
+    LIST_ITEM_HEIGHT_IN_PIXELS,
+} from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import './EventsPageAdmin.scss';
 
-const DEFAULT_LOAD_ITEMS_COUNT = 5;
-const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 const EMPTY_ERROR: ErrorState = {
     message: null,
     type: null,

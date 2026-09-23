@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EventsPageAdmin } from './EventsPageAdmin';
@@ -390,14 +390,14 @@ describe('EventsPageAdmin', () => {
 
         expect(editButton).toBeDisabled();
 
-        await act(async () => {
+        await waitFor(() => {
             resolveIntroSection({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
             });
-
-            await introSectionPromise;
         });
+
+        await introSectionPromise;
 
         await waitFor(() => {
             expect(editButton).toBeEnabled();
@@ -451,14 +451,14 @@ describe('EventsPageAdmin', () => {
             }),
         ).toBeDisabled();
 
-        await act(async () => {
+        await waitFor(() => {
             resolvePublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
             });
-
-            await publishPromise;
         });
+
+        await publishPromise;
 
         await waitFor(() => {
             expect(
@@ -614,11 +614,8 @@ describe('EventsPageAdmin', () => {
             relatedEventNewsCount: 0,
         };
 
-        act(() => {
-            mockOnAddCategory(newCategory);
-        });
-
         await waitFor(() => {
+            mockOnAddCategory(newCategory);
             expect(screen.getByText('Category 3')).toBeInTheDocument();
         });
     });
@@ -639,11 +636,8 @@ describe('EventsPageAdmin', () => {
             relatedEventNewsCount: 0,
         };
 
-        act(() => {
-            mockOnUpdateCategory(updatedCategory);
-        });
-
         await waitFor(() => {
+            mockOnUpdateCategory(updatedCategory);
             expect(screen.getByText('Updated Category')).toBeInTheDocument();
             expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
@@ -660,11 +654,8 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
-        act(() => {
-            mockOnDeleteCategory(1);
-        });
-
         await waitFor(() => {
+            mockOnDeleteCategory(1);
             expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });

@@ -32,6 +32,7 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'accept-icon-button': 'accept-icon-button',
     'close-icon-button': 'close-icon-button',
     'action-icon': 'action-icon',
+    'category-td': 'category-td',
     'category-edit-td': 'category-edit-td',
     'category-edit-wrapper': 'category-edit-wrapper',
     'category-edit-select': 'category-edit-select',
@@ -732,6 +733,20 @@ describe('FundsExpendituresTable', () => {
 
             expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('8040');
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
+        it('should apply category-td class and title in view mode, and switch to category-edit-td without title when editing', () => {
+            renderTable({ isEditing: true });
+
+            const categoryCell = screen.getByText('Грантові кошти').closest('td');
+            expect(categoryCell).toHaveClass('category-td');
+            expect(categoryCell).not.toHaveClass('category-edit-td');
+            expect(categoryCell).toHaveAttribute('title', 'Грантові кошти');
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            expect(categoryCell).toHaveClass('category-edit-td');
+            expect(categoryCell).not.toHaveClass('category-td');
+            expect(categoryCell).not.toHaveAttribute('title');
         });
     });
 

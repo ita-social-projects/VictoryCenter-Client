@@ -1,4 +1,4 @@
-import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '@testing-library/react';
 import { VisitorPagesProvider, useVisitorPages } from './VisitorPagesProvider';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
@@ -65,19 +65,24 @@ describe('VisitorPagesProvider', () => {
     });
 
     it('refetchPages updates pages', async () => {
+        const user = userEvent.setup();
+
         (FaqApi.getPages as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce(mockPages);
+
         render(
             <VisitorPagesProvider>
                 <TestComponent />
             </VisitorPagesProvider>,
         );
+
         await waitFor(() => {
-            expect(screen.getByTestId('pages').textContent).toBe('');
+            expect(screen.getByTestId('pages')).toHaveTextContent('');
         });
-        (FaqApi.getPages as jest.Mock).mockResolvedValue(mockPages);
-        screen.getByTestId('refetch').click();
+
+        await user.click(screen.getByTestId('refetch'));
+
         await waitFor(() => {
-            expect(screen.getByTestId('pages').textContent).toBe('Page A,Page B');
+            expect(screen.getByTestId('pages')).toHaveTextContent('Page A,Page B');
         });
     });
 

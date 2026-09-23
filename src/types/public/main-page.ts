@@ -25,6 +25,7 @@ export interface PublicMainPageLocalizationDto {
     title?: string;
     description?: string;
     name?: string;
+    value?: string | null;
 }
 
 export interface PublicMetricDto {

@@ -116,10 +116,11 @@ describe('useSignalR', () => {
         renderHook(() => useSignalR('http://test-url.com'));
 
         for (let i = 0; i < 10; i++) {
-            await act(async () => {
-                await Promise.resolve();
+            await act(() => {
                 jest.runOnlyPendingTimers();
             });
+
+            await Promise.resolve();
         }
 
         await waitFor(() => {

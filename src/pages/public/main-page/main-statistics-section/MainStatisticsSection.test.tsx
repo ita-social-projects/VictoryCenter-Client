@@ -1,9 +1,12 @@
 import { render, screen, act } from '@testing-library/react';
 import { MainStatisticsSection } from './MainStatisticsSection';
 import { PublicImpactStatisticDto, MetricPrefix, MetricType, PublicMetricDto } from '@/types/public/main-page';
+import { TranslationStatus } from '@/types/common/language';
+
+let mockCurrentLanguage = 'uk';
 
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
-    useLocale: () => ({ currentLanguage: 'uk' }),
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
 }));
 
 jest.mock('@/hooks/common/use-scroll-animation/useScrollAnimation', () => ({
@@ -70,6 +73,7 @@ const makeStatistics = (overrides: Partial<PublicImpactStatisticDto> = {}): Publ
 describe('MainStatisticsSection', () => {
     afterEach(() => {
         jest.clearAllMocks();
+        mockCurrentLanguage = 'uk';
     });
 
     it('renders nothing when impactStatistics is null', () => {
@@ -175,7 +179,7 @@ describe('MainStatisticsSection', () => {
                         {
                             entityId: 1,
                             localizationInfoDto: { id: 1, code: 'uk' },
-                            translationStatus: 'Relevant' as any,
+                            translationStatus: TranslationStatus.Relevant,
                             name: 'партнерів (uk)',
                         },
                     ],
@@ -227,5 +231,66 @@ describe('MainStatisticsSection', () => {
         render(<MainStatisticsSection impactStatistics={makeStatistics()} />);
         const figures = screen.getAllByRole('figure');
         expect(figures).toHaveLength(4);
+    });
+
+    it('switches title, metric name and currency on UK → EN → UK', () => {
+        const stats = makeStatistics({
+            localizations: [
+                {
+                    entityId: 1,
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                    title: 'Changes you can measure',
+                },
+            ],
+            metrics: [
+                {
+                    ...makeMetric(3, 1249854, 'зібрано', MetricType.Raised),
+                    localizations: [
+                        {
+                            entityId: 3,
+                            localizationInfoDto: { id: 2, code: 'en' },
+                            translationStatus: TranslationStatus.Relevant,
+                            name: 'raised',
+                            value: '48',
+                        },
+                    ],
+                },
+            ],
+        });
+
+        const { rerender } = render(<MainStatisticsSection impactStatistics={stats} />);
+        act(() => {
+            (globalThis as any).__triggerVisible();
+        });
+
+        expect(screen.getByText('Зміни, які можна виміряти')).toBeInTheDocument();
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
+
+        mockCurrentLanguage = 'en';
+        rerender(<MainStatisticsSection impactStatistics={stats} />);
+
+        expect(screen.getByText('Changes you can measure')).toBeInTheDocument();
+        expect(screen.getByText('raised')).toBeInTheDocument();
+        expect(screen.getByText('$48')).toBeInTheDocument();
+
+        mockCurrentLanguage = 'uk';
+        rerender(<MainStatisticsSection impactStatistics={stats} />);
+
+        expect(screen.getByText('Зміни, які можна виміряти')).toBeInTheDocument();
+        expect(screen.getByText('зібрано')).toBeInTheDocument();
+        expect(screen.getByText(/1\s?249\s?854 грн/)).toBeInTheDocument();
+    });
+
+    it('falls back to the hryvnia amount in English when there is no dollar value', () => {
+        mockCurrentLanguage = 'en';
+        const stats = makeStatistics({ metrics: [makeMetric(3, 1249854, 'зібрано', MetricType.Raised)] });
+
+        render(<MainStatisticsSection impactStatistics={stats} />);
+        act(() => {
+            (globalThis as any).__triggerVisible();
+        });
+
+        expect(screen.getByText('1,249,854 грн')).toBeInTheDocument();
     });
 });

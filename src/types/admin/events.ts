@@ -12,7 +12,7 @@ export interface EventItemDto {
     backgroundImage: Image | ImageValues | null;
 }
 
-export type EventsErrorType = 'categories' | 'events' | 'search';
+export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search';
 
 export interface ErrorState {
     message: string | null;

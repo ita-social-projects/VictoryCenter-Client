@@ -80,8 +80,8 @@ export const EventsPageAdmin = () => {
         });
     }, []);
 
-    const clearError = useCallback(() => {
-        setError(EMPTY_ERROR);
+    const clearError = useCallback((type: EventsErrorType) => {
+        setError((currentError) => (currentError.type === type ? EMPTY_ERROR : currentError));
     }, []);
 
     const resetEventItemsState = useCallback(() => {
@@ -90,8 +90,8 @@ export const EventsPageAdmin = () => {
         setEventItems([]);
         setHasMore(true);
 
-        if (error.type === 'events') {
-            clearError();
+        if (error.type === 'events-items') {
+            clearError('events-items');
         }
 
         currentPageRef.current = 0;
@@ -149,7 +149,7 @@ export const EventsPageAdmin = () => {
 
     // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
-        clearError();
+        clearError('categories');
 
         try {
             const fetchedCategories = await EventCategoriesApi.getAll(client);
@@ -175,7 +175,7 @@ export const EventsPageAdmin = () => {
                 setEventsIntroSection(introSection);
                 setEventsIntroDraft(introSection);
             } catch {
-                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events');
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events-intro');
             } finally {
                 setIsEventsIntroSectionLoading(false);
             }
@@ -292,7 +292,7 @@ export const EventsPageAdmin = () => {
                     return;
                 }
 
-                setError((currentError) => (currentError.type === 'events' ? EMPTY_ERROR : currentError));
+                setError((currentError) => (currentError.type === 'events-items' ? EMPTY_ERROR : currentError));
 
                 if (shouldResetList) {
                     setEventItems(response.items);
@@ -319,7 +319,7 @@ export const EventsPageAdmin = () => {
                     EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
                 );
 
-                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_FETCH_ITEMS, 'events');
+                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_FETCH_ITEMS, 'events-items');
             } finally {
                 if (requestId === requestIdRef.current) {
                     isEventItemsLoadingRef.current = false;
@@ -398,7 +398,7 @@ export const EventsPageAdmin = () => {
                 setEventsIntroDraft(publishedSection);
                 setEditingSectionId(null);
             } catch {
-                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events');
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events-intro');
             } finally {
                 setIsEventsIntroSectionPublishing(false);
             }
@@ -482,7 +482,7 @@ export const EventsPageAdmin = () => {
                 />
                 {error.type === 'categories' && <div className="error-message">{error.message}</div>}
 
-                {selectedCategory && error.type !== 'events' && (
+                {selectedCategory && error.type !== 'events-items' && (
                     <InfiniteScrollList<EventItemDto>
                         items={eventItems}
                         renderItem={renderEventItem}

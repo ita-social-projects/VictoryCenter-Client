@@ -86,11 +86,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
             ))}
 
             {contextMenuOptions.map((option) => (
-                <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => onContextMenuOptionSelected(option.id)}
-                >
+                <button key={option.id} type="button" onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
                 </button>
             ))}
@@ -198,12 +194,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
                 ))
             )}
 
-            <button
-                type="button"
-                data-testid="load-more-events"
-                onClick={onLoadMore}
-                disabled={!hasMore || isLoading}
-            >
+            <button type="button" data-testid="load-more-events" onClick={onLoadMore} disabled={!hasMore || isLoading}>
                 Load more
             </button>
         </div>
@@ -235,11 +226,7 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     }: {
         entity: EventItemDto;
         renderEntityComponent: (item: EventItemDto) => React.ReactNode;
-    }) => (
-        <div data-testid={`draggable-event-${entity.id}`}>
-            {renderEntityComponent(entity)}
-        </div>
-    ),
+    }) => <div data-testid={`draggable-event-${entity.id}`}>{renderEntityComponent(entity)}</div>,
 }));
 
 class ResizeObserverMock {
@@ -457,9 +444,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('disables intro section editing when intro content fetch fails', async () => {
-        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(
-            new Error('Failed to fetch intro content'),
-        );
+        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Failed to fetch intro content'));
 
         render(<EventsPageAdmin />);
 
@@ -477,9 +462,7 @@ describe('EventsPageAdmin', () => {
     it('allows another publish attempt after a publish failure', async () => {
         const user = userEvent.setup();
 
-        mockedEventsApi.updateEventsIntroSection.mockRejectedValueOnce(
-            new Error('Failed to publish intro content'),
-        );
+        mockedEventsApi.updateEventsIntroSection.mockRejectedValueOnce(new Error('Failed to publish intro content'));
 
         render(<EventsPageAdmin />);
 
@@ -638,12 +621,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith(
-                {},
-                categories[0].id,
-                0,
-                5,
-            );
+            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith({}, categories[0].id, 0, 5);
         });
 
         expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
@@ -695,13 +673,7 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('load-more-events'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
-                2,
-                {},
-                categories[0].id,
-                5,
-                5,
-            );
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[0].id, 5, 5);
         });
 
         expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
@@ -772,13 +744,7 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
-                2,
-                {},
-                categories[1].id,
-                0,
-                5,
-            );
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[1].id, 0, 5);
         });
 
         expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();

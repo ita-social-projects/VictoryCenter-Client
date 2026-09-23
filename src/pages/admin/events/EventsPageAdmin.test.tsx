@@ -2,7 +2,6 @@ import '@testing-library/jest-dom';
 import { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
@@ -19,6 +18,7 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
     useLocalizationToolkit: () => ({
         allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
         translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
+        selectedLanguage: { code: 'en', id: 2 },
         onLanguageChange: jest.fn(),
         onTranslationStatusFilterChange: jest.fn(),
     }),
@@ -40,10 +40,22 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
 }));
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
-    AdminPanelToolbar: ({ placeholder, AddItemButtonText, onAddItem }: AdminPanelToolbarProps<any>) => (
+    AdminPanelToolbar: ({
+        placeholder,
+        AddItemButtonText,
+        onAddItem,
+        onSearchClear,
+        onSuggestionSelect,
+        onStatusFilterChange,
+        fetchSearchItems,
+    }: any) => (
         <div data-testid="events-toolbar">
             <span>{placeholder}</span>
             <button onClick={onAddItem}>{AddItemButtonText}</button>
+            <button onClick={onSearchClear}>Clear Search</button>
+            <button onClick={() => onSuggestionSelect({})}>Select Suggestion</button>
+            <button onClick={() => onStatusFilterChange('ACTIVE')}>Filter Status</button>
+            <button onClick={() => fetchSearchItems('query', { offset: 0, limit: 10 })}>Fetch Search</button>
         </div>
     ),
 }));
@@ -54,6 +66,7 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
 
 const mockOpenAddCategoryModal = jest.fn();
 const mockOpenEditCategoryModal = jest.fn();
+const mockOpenDeleteCategoryModal = jest.fn();
 const mockOpenAddItemModal = jest.fn();
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
@@ -61,6 +74,7 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
         openModalActions: {
             openAddCategoryModal: mockOpenAddCategoryModal,
             openEditCategoryModal: mockOpenEditCategoryModal,
+            openDeleteCategoryModal: mockOpenDeleteCategoryModal,
             openAddItemModal: mockOpenAddItemModal,
         },
     }),
@@ -72,25 +86,23 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
         contextMenuOptions,
         onContextMenuOptionSelected,
         renderCategoryExtra,
-    }: {
-        categories: EventCategoryDto[];
-        contextMenuOptions: { id: string; name: string }[];
-        onContextMenuOptionSelected: (id: string) => void;
-        renderCategoryExtra?: (category: EventCategoryDto) => React.ReactNode;
-    }) => (
+        getCategoryDisplayName,
+    }: any) => (
         <div data-testid="category-bar">
-            {categories.map((category) => (
+            {categories.map((category: any) => (
                 <div key={category.id} data-testid={`category-${category.id}`}>
-                    {category.name}
+                    {getCategoryDisplayName ? getCategoryDisplayName(category) : category.name}
                     {renderCategoryExtra && renderCategoryExtra(category)}
                 </div>
             ))}
 
-            {contextMenuOptions.map((option) => (
+            {contextMenuOptions.map((option: any) => (
                 <button key={option.id} onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
                 </button>
             ))}
+
+            <button onClick={() => onContextMenuOptionSelected('unknown')}>Unknown Option</button>
         </div>
     ),
 }));
@@ -126,15 +138,9 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
         initialPublishedHtml,
         isPublishDisabled,
         disabled,
-    }: {
-        sectionId: string;
-        mode: 'edit' | 'view';
-        onEnterEditMode: () => void;
-        onPublish: (value: string) => void;
-        initialPublishedHtml: string;
-        isPublishDisabled?: boolean;
-        disabled?: boolean;
-    }) => (
+        onDraftChange,
+        onCancelEdit,
+    }: any) => (
         <section data-testid={`${sectionId}-section`}>
             <span>{mode}</span>
             <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
@@ -149,6 +155,12 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => ({
             >
                 Publish section
             </button>
+            <button type="button" onClick={() => onDraftChange && onDraftChange('<p>Draft content</p>')}>
+                Draft
+            </button>
+            <button type="button" onClick={() => onCancelEdit && onCancelEdit()}>
+                Cancel
+            </button>
         </section>
     ),
 }));
@@ -158,8 +170,13 @@ const mockedEventCategoriesApi = EventCategoriesApi as jest.Mocked<typeof EventC
 const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
 
 describe('EventsPageAdmin', () => {
-    const categories: EventCategoryDto[] = [
-        { id: 1, name: 'Category 1', relatedEventNewsCount: 0 },
+    const categories: any[] = [
+        {
+            id: 1,
+            name: 'Category 1',
+            relatedEventNewsCount: 0,
+            localizations: [{ language: { code: 'en' }, name: 'Localized Cat 1' }],
+        },
         { id: 2, name: 'Category 2', relatedEventNewsCount: 0 },
     ];
 
@@ -173,6 +190,7 @@ describe('EventsPageAdmin', () => {
         });
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
+        mockOpenDeleteCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
@@ -183,7 +201,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
@@ -228,6 +246,22 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
             expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
         });
+    });
+
+    it('drafts content and cancels edit mode successfully', async () => {
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+        await waitFor(() => expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalled());
+
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
+
+        await user.click(screen.getAllByText('Draft')[0]);
+        await user.click(screen.getAllByText('Cancel')[0]);
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
     });
 
     it('disables intro section editing until the published content is loaded', async () => {
@@ -293,11 +327,29 @@ describe('EventsPageAdmin', () => {
         });
     });
 
+    it('executes toolbar inline callbacks without errors', async () => {
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        await user.click(screen.getByText('Clear Search'));
+        await user.click(screen.getByText('Select Suggestion'));
+        await user.click(screen.getByText('Filter Status'));
+        await user.click(screen.getByText('Fetch Search'));
+
+        expect(mockedEventsApi.fetchEventSearchItems).toHaveBeenCalledWith(
+            expect.anything(),
+            'query',
+            0,
+            10,
+            undefined,
+        );
+    });
+
     it('does not render an error message when there is no error', async () => {
         const { container } = render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         expect(container.querySelector('.error-message')).not.toBeInTheDocument();
@@ -351,7 +403,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY)).toBeInTheDocument();
@@ -361,7 +413,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
@@ -373,7 +425,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
@@ -387,12 +439,24 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
         expect(mockOpenEditCategoryModal).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing when an unknown context menu option is selected', async () => {
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        await waitFor(() => expect(screen.getByText('Localized Cat 1')).toBeInTheDocument());
+        await user.click(screen.getByText('Unknown Option'));
+
+        expect(mockOpenAddCategoryModal).not.toHaveBeenCalled();
+        expect(mockOpenEditCategoryModal).not.toHaveBeenCalled();
+        expect(mockOpenDeleteCategoryModal).not.toHaveBeenCalled();
     });
 
     it('opens add event modal when add event button is clicked', async () => {
@@ -401,7 +465,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
         });
 
         await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
@@ -413,11 +477,11 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
-        const newCategory: EventCategoryDto = {
+        const newCategory: any = {
             id: 3,
             name: 'Category 3',
             relatedEventNewsCount: 0,
@@ -434,11 +498,11 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
-        const updatedCategory: EventCategoryDto = {
+        const updatedCategory: any = {
             id: 1,
             name: 'Updated Category',
             relatedEventNewsCount: 0,
@@ -449,15 +513,31 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.getByText('Updated Category')).toBeInTheDocument();
-        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+        expect(screen.queryByText('Localized Cat 1')).not.toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
+
+    it('updates a non-selected category without changing the selected category state', async () => {
+        render(<EventsPageAdmin />);
+        await waitFor(() => expect(screen.getByText('Localized Cat 1')).toBeInTheDocument());
+
+        const updatedCategory2: any = {
+            id: 2,
+            name: 'Updated Category 2',
+            relatedEventNewsCount: 0,
+        };
+
+        await act(async () => mockOnUpdateCategory(updatedCategory2));
+
+        expect(screen.getByText('Updated Category 2')).toBeInTheDocument();
+        expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
     });
 
     it('deletes an existing category from the categories list', async () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument();
+            expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
@@ -465,7 +545,30 @@ describe('EventsPageAdmin', () => {
             mockOnDeleteCategory(1);
         });
 
-        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+        expect(screen.queryByText('Localized Cat 1')).not.toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
+
+    it('deletes a non-selected category without changing the list integrity', async () => {
+        render(<EventsPageAdmin />);
+        await waitFor(() => expect(screen.getByText('Localized Cat 1')).toBeInTheDocument());
+
+        await act(async () => mockOnDeleteCategory(2));
+
+        expect(screen.queryByText('Category 2')).not.toBeInTheDocument();
+        expect(screen.getByText('Localized Cat 1')).toBeInTheDocument();
+    });
+
+    it('deletes the last category and clears the selection state gracefully', async () => {
+        render(<EventsPageAdmin />);
+        await waitFor(() => expect(screen.getByText('Localized Cat 1')).toBeInTheDocument());
+
+        await act(async () => {
+            mockOnDeleteCategory(1);
+            mockOnDeleteCategory(2);
+        });
+
+        expect(screen.queryByText('Localized Cat 1')).not.toBeInTheDocument();
+        expect(screen.queryByText('Category 2')).not.toBeInTheDocument();
     });
 });

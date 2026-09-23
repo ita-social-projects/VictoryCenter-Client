@@ -184,7 +184,10 @@ export const EventsPageAdmin = () => {
         (category: any) => {
             const localization = (category.localizations ?? []).find(
                 (loc: any) =>
-                    loc.language?.code === selectedLanguage?.code || loc.language?.id === selectedLanguage?.id,
+                    loc.language?.code === selectedLanguage?.code ||
+                    loc.language?.id === selectedLanguage?.id ||
+                    loc.localizationInfoDto?.code === selectedLanguage?.code ||
+                    loc.localizationInfoDto?.id === selectedLanguage?.id,
             );
             return localization?.name || category.name;
         },

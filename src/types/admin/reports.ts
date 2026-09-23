@@ -133,20 +133,22 @@ export interface ReportFundsExpendituresRecordDto {
     amountUsd: number;
 }
 
+export type ReportFundsExpendituresCurrencyDto = 1 | 2;
+
 export interface CreateReportFundsExpendituresRecordDto {
     categoryId: number;
     type: ReportFundsExpendituresTypeDto;
     reportingYear: number;
-    amountUah: number;
-    amountUsd: number;
+    amount: number;
+    currency: ReportFundsExpendituresCurrencyDto;
 }
 
 export interface UpdateReportFundsExpendituresRecordDto {
     categoryId: number;
     type: ReportFundsExpendituresTypeDto;
     reportingYear: number;
-    amountUah: number;
-    amountUsd: number;
+    amount: number;
+    currency: ReportFundsExpendituresCurrencyDto;
 }
 
 export interface ReportFundsExpendituresSummaryDto {
@@ -229,6 +231,13 @@ export interface ReportFundsExpendituresRecord {
     amountUah: string;
     amountUsd: string;
 }
+
+export type FundsExpendituresAmountField = 'amountUah' | 'amountUsd';
+
+export type ReportFundsExpendituresRecordFormValues = Pick<
+    ReportFundsExpendituresRecord,
+    'categoryId' | 'type' | 'reportingYear' | 'amountUah' | 'amountUsd'
+> & { lastEditedField: FundsExpendituresAmountField };
 
 export interface FundsExpendituresSummary {
     totalCollectedUah: number;

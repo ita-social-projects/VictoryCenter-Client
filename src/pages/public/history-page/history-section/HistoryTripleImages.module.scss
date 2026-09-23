@@ -1,0 +1,26 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    width: 100%;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.cell {
+    overflow: hidden;
+}
+
+.cell.elevated {
+    @media (min-width: 768px) {
+        margin-top: 99px;
+    }
+}
+
+.image {
+    width: 100%;
+    aspect-ratio: 480 / 480;
+    object-fit: cover;
+    display: block;
+}

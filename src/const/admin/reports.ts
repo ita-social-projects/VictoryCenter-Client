@@ -46,7 +46,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     collectedAmount: {
         max: 10,
@@ -61,7 +61,7 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     changedLives: {
         min: 2,
@@ -370,7 +370,8 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Категорія має бути унікальною',
+        PROGRAM_ALREADY_ADDED: 'Така категорія вже додана. Оберіть іншу категорію',
+        PROGRAM_MUST_BE_UNIQUE: 'Категорія має бути унікальною',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',

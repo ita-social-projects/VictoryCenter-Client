@@ -18,6 +18,7 @@ interface ValidateProgramExpenseProgramParams {
     programName?: string;
     records: ProgramExpensesRecord[];
     trigger?: ProgramExpenseProgramValidationTrigger;
+    isEditing?: boolean;
 }
 
 export const normalizeProgramExpenseAmountInput = normalizeFundsExpendituresAmountInput;
@@ -38,6 +39,7 @@ export const validateProgramExpenseProgram = ({
     programName = '',
     records,
     trigger = 'change',
+    isEditing = false,
 }: ValidateProgramExpenseProgramParams): string | undefined => {
     const trimmedProgramName = programName.trim().replace(/\s+/g, ' ');
 
@@ -63,5 +65,9 @@ export const validateProgramExpenseProgram = ({
         return isSameId || isSameName;
     });
 
-    return hasDuplicate ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE : undefined;
+    if (!hasDuplicate) return undefined;
+
+    return isEditing
+        ? PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_MUST_BE_UNIQUE
+        : PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED;
 };

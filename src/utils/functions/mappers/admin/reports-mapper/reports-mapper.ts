@@ -8,6 +8,7 @@ import {
     ReportFundsExpendituresCategoryLocalization,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresRecordDto,
+    ReportFundsExpendituresRecordFormValues,
     ReportFundsExpendituresSettings,
     ReportFundsExpendituresSettingsDto,
     ReportFundsExpendituresSummaryDto,
@@ -125,25 +126,26 @@ export const mapReportFundsExpendituresRecordDtoToRecord = (
     amountUsd: formatNumberDecimalComma(dto.amountUsd),
 });
 
-type ReportFundsExpendituresRecordRequestPayload = Pick<
-    ReportFundsExpendituresRecord,
-    'categoryId' | 'type' | 'reportingYear' | 'amountUah' | 'amountUsd'
->;
+const parseAmountValue = (value: string): number => Number.parseFloat(value.replaceAll(' ', '').replace(',', '.')) || 0;
 
-const mapReportFundsExpendituresRecordToRequestDto = (record: ReportFundsExpendituresRecordRequestPayload) => ({
-    categoryId: record.categoryId,
-    type: mapFundsExpendituresTransactionTypeToTypeDto(record.type),
-    reportingYear: Number.parseInt(record.reportingYear, 10) || new Date().getFullYear(),
-    amountUah: Number.parseFloat(record.amountUah.replaceAll(' ', '').replace(',', '.')) || 0,
-    amountUsd: Number.parseFloat(record.amountUsd.replaceAll(' ', '').replace(',', '.')) || 0,
-});
+const mapReportFundsExpendituresRecordToRequestDto = (record: ReportFundsExpendituresRecordFormValues) => {
+    const isUsdSource = record.lastEditedField === 'amountUsd';
+
+    return {
+        categoryId: record.categoryId,
+        type: mapFundsExpendituresTransactionTypeToTypeDto(record.type),
+        reportingYear: Number.parseInt(record.reportingYear, 10) || new Date().getFullYear(),
+        amount: parseAmountValue(isUsdSource ? record.amountUsd : record.amountUah),
+        currency: isUsdSource ? (2 as const) : (1 as const),
+    };
+};
 
 export const mapReportFundsExpendituresRecordToCreateDto = (
-    record: ReportFundsExpendituresRecordRequestPayload,
+    record: ReportFundsExpendituresRecordFormValues,
 ): CreateReportFundsExpendituresRecordDto => mapReportFundsExpendituresRecordToRequestDto(record);
 
 export const mapReportFundsExpendituresRecordToUpdateDto = (
-    record: ReportFundsExpendituresRecordRequestPayload,
+    record: ReportFundsExpendituresRecordFormValues,
 ): UpdateReportFundsExpendituresRecordDto => mapReportFundsExpendituresRecordToRequestDto(record);
 
 export const mapReportFundsExpendituresSummaryDtoToSummary = (

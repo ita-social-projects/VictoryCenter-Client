@@ -486,6 +486,51 @@ describe('TranslateHistoryModal', () => {
             expect(form.compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
         });
 
+        it('renders the images preview beside the translation form for right-image templates', () => {
+            const rightImageSection: HistorySectionDto[] = [
+                {
+                    id: 8,
+                    template: 7,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 80,
+                            sectionId: 8,
+                            contentType: ContentType.Title,
+                            title: 'UA Title',
+                            order: 0,
+                            localizations: [],
+                        },
+                        {
+                            id: 81,
+                            sectionId: 8,
+                            contentType: ContentType.Image,
+                            order: 2,
+                            image: { id: 1, url: 'right-image', mimeType: 'image/jpeg' },
+                            localizations: [],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={rightImageSection}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            const row = screen.getByTestId('translate-section-row');
+            const form = screen.getByTestId('translate-history-section-form');
+            const preview = screen.getByTestId('history-section-images-preview');
+
+            expect(row).toHaveAttribute('data-image-position', 'right');
+            expect(form.compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        });
+
         it('renders a section row when section has image content', () => {
             const sectionWithImage: HistorySectionDto[] = [
                 {

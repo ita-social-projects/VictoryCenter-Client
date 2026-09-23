@@ -1,4 +1,5 @@
 import { COMMON_TEXT_ADMIN } from './common';
+import { CURRENCY_LABELS } from '@/const/common/currency';
 
 export const MAIN_PAGE_TEXT = {
     TABS: {
@@ -23,8 +24,8 @@ export const MAIN_PAGE_TEXT = {
             TITLE_EN_LABEL: 'Заголовок (ENG)',
             PREVIEW_TITLE: 'PREVIEW МЕТРИК',
             METRICS_TITLE: 'МЕТРИКИ',
-            CURRENCY_UAH: 'грн',
-            CURRENCY_USD: '$',
+            CURRENCY_UAH: CURRENCY_LABELS.UAH,
+            CURRENCY_USD: CURRENCY_LABELS.USD,
             LANG: {
                 UKR: 'UKR',
                 ENG: 'ENG',

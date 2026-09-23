@@ -15,7 +15,6 @@ import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
-import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
     EventItemDto,
     EventSearchItemData,
@@ -102,65 +101,12 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
     const { openModalActions } = modalsStateControl;
 
-    useEffect(() => {
-        if (categoriesError) {
-            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
-        }
-    }, [categoriesError, setErrorState]);
-
-    useEffect(() => {
-        if (!selectedCategory && categories && categories.length > 0) {
-            setSelectedCategory(categories[0]);
-        }
-    }, [categories, selectedCategory]);
-
-    const getEventSearchItems = useCallback(
-        async (
-            searchTerm: string,
-            paginationRequest: PaginationRequestParams,
-        ): Promise<PaginationResult<EventSearchItemData>> =>
-            EventsApi.fetchEventSearchItems(
-                client,
-                searchTerm,
-                paginationRequest.offset as number,
-                paginationRequest.limit as number,
-                paginationRequest.requestOptions?.cancellationSignal,
-            ),
-        [client],
-    );
-
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
-    }, []);
-
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            }
-        },
-        [openModalActions],
-    );
-
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-        ],
-        [],
-    );
-
-    // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
         clearError('categories');
 
@@ -201,9 +147,13 @@ export const EventsPageAdmin = () => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
 
+    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
+
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
-            updateCategories((prevCategories) =>
+            setCategories((prevCategories) =>
                 prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
             );
 
@@ -211,7 +161,7 @@ export const EventsPageAdmin = () => {
                 setSelectedCategory(updatedCategory);
             }
         },
-        [selectedCategory?.id, updateCategories],
+        [selectedCategory?.id],
     );
 
     const handleDeleteCategory = useCallback(
@@ -230,7 +180,17 @@ export const EventsPageAdmin = () => {
         [categories, selectedCategory?.id, resetEventItemsState],
     );
 
-    // Event items handlers
+    const getCategoryName = useCallback(
+        (category: any) => {
+            const localization = (category.localizations ?? []).find(
+                (loc: any) =>
+                    loc.language?.code === selectedLanguage?.code || loc.language?.id === selectedLanguage?.id,
+            );
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code, selectedLanguage?.id],
+    );
+
     const updatePageSize = useCallback(() => {
         if (!listContainerRef.current) {
             return;
@@ -386,6 +346,47 @@ export const EventsPageAdmin = () => {
         </Button>
     );
 
+    const getEventSearchItems = useCallback(
+        async (
+            searchTerm: string,
+            paginationRequest: PaginationRequestParams,
+        ): Promise<PaginationResult<EventSearchItemData>> =>
+            EventsApi.fetchEventSearchItems(
+                client,
+                searchTerm,
+                paginationRequest.offset as number,
+                paginationRequest.limit as number,
+                paginationRequest.requestOptions?.cancellationSignal,
+            ),
+        [client],
+    );
+
+    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
+        setStatusFilter(status);
+    }, []);
+
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
+
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
+    );
+
     const handleSectionDraftChange = useCallback((sectionId: EditableHeaderSectionId, value: string) => {
         const field = introSectionFieldById[sectionId];
 
@@ -483,7 +484,7 @@ export const EventsPageAdmin = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}

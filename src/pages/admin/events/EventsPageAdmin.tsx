@@ -251,9 +251,9 @@ export const EventsPageAdmin = () => {
 
     const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
 
-    const handleEntitiesReordered = () => {
+    const handleEntitiesReordered = useCallback(() => {
         /*TODO: add implementation.*/
-    };
+    }, []);
 
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
@@ -292,9 +292,7 @@ export const EventsPageAdmin = () => {
                     return;
                 }
 
-                if (error.type === 'events') {
-                    clearError();
-                }
+                setError((currentError) => (currentError.type === 'events' ? EMPTY_ERROR : currentError));
 
                 if (shouldResetList) {
                     setEventItems(response.items);
@@ -329,7 +327,7 @@ export const EventsPageAdmin = () => {
                 }
             }
         },
-        [client, pageSize, addToast],
+        [client, pageSize, addToast, setErrorState],
     );
 
     useEffect(() => {
@@ -338,24 +336,26 @@ export const EventsPageAdmin = () => {
         };
     }, []);
 
+    const selectedCategoryId = selectedCategory?.id;
+
     useEffect(() => {
-        if (!selectedCategory) {
+        if (!selectedCategoryId) {
             return;
         }
 
-        fetchEventItems(selectedCategory.id, true);
-    }, [selectedCategory?.id, fetchEventItems]);
+        fetchEventItems(selectedCategoryId, true);
+    }, [selectedCategoryId, fetchEventItems]);
 
     const handleCategorySelect = useCallback(
         (category: EventCategoryDto) => {
-            if (selectedCategory?.id === category.id) {
+            if (selectedCategoryId === category.id) {
                 return;
             }
 
             resetEventItemsState();
             setSelectedCategory(category);
         },
-        [selectedCategory?.id, resetEventItemsState],
+        [selectedCategoryId, resetEventItemsState],
     );
 
     const handleOnLoadMore = useCallback(() => {

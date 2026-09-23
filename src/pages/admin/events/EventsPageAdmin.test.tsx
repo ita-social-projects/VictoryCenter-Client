@@ -114,43 +114,87 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
     },
 }));
 
-jest.mock('./editable-header-section/EditableHeaderSection', () => ({
-    EditableHeaderSection: ({
-        sectionId,
-        mode,
-        onEnterEditMode,
-        onPublish,
-        initialPublishedHtml,
-        isPublishDisabled,
-        disabled,
-    }: {
-        sectionId: string;
-        mode: 'edit' | 'view';
-        onEnterEditMode: () => void;
-        onPublish: (value: string) => void;
-        initialPublishedHtml: string;
-        isPublishDisabled?: boolean;
-        disabled?: boolean;
-    }) => (
-        <section data-testid={`${sectionId}-section`}>
-            <span>{mode}</span>
-            <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
+jest.mock('./editable-header-section/EditableHeaderSection', () => {
+    const mockReact = require('react');
 
-            <button type="button" onClick={onEnterEditMode} aria-label={`Редагувати ${sectionId}`} disabled={disabled}>
-                Edit section
-            </button>
+    return {
+        EditableHeaderSection: ({
+            sectionId,
+            mode,
+            onEnterEditMode,
+            onDraftChange,
+            onCancelEdit,
+            onPublish,
+            initialPublishedHtml,
+            isPublishDisabled,
+            disabled,
+        }: {
+            sectionId: string;
+            mode: 'edit' | 'view';
+            onEnterEditMode: () => void;
+            onDraftChange: (value: string) => void;
+            onCancelEdit: () => void;
+            onPublish: (value: string) => void;
+            initialPublishedHtml: string;
+            isPublishDisabled?: boolean;
+            disabled?: boolean;
+        }) => {
+            const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
-            <button
-                type="button"
-                onClick={() => onPublish('<p>Updated content</p>')}
-                aria-label={`Опублікувати ${sectionId}`}
-                disabled={isPublishDisabled}
-            >
-                Publish section
-            </button>
-        </section>
-    ),
-}));
+            return (
+                <section data-testid={`${sectionId}-section`}>
+                    <span>{mode}</span>
+                    <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
+
+                    <button
+                        type="button"
+                        onClick={onEnterEditMode}
+                        aria-label={`Редагувати ${sectionId}`}
+                        disabled={disabled}
+                    >
+                        Edit section
+                    </button>
+
+                    {mode === 'edit' && (
+                        <>
+                            <input
+                                aria-label={`Змінити ${sectionId}`}
+                                onChange={(event) => onDraftChange(`<p>${event.target.value}</p>`)}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setIsCancelConfirmationOpen(true)}
+                                aria-label={`Скасувати редагування ${sectionId}`}
+                            />
+                        </>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={() => onPublish('<p>Updated content</p>')}
+                        aria-label={`Опублікувати ${sectionId}`}
+                        disabled={isPublishDisabled}
+                    >
+                        Publish section
+                    </button>
+
+                    {isCancelConfirmationOpen && (
+                        <div data-testid={`${sectionId}-cancel-confirmation-modal`}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsCancelConfirmationOpen(false);
+                                    onCancelEdit();
+                                }}
+                                aria-label={`Підтвердити скасування ${sectionId}`}
+                            />
+                        </div>
+                    )}
+                </section>
+            );
+        },
+    };
+});
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
@@ -473,6 +517,29 @@ describe('EventsPageAdmin', () => {
                 }),
             ).toBeEnabled();
         });
+    });
+
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, '<p>Loaded description</p>'],
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, '<p>Loaded title</p>'],
+    ])('restores published content after confirming cancellation for %s', async (sectionId, publishedContent) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+
+        await user.click(screen.getByRole('button', { name: `Редагувати ${sectionId}` }));
+        await user.type(screen.getByRole('textbox', { name: `Змінити ${sectionId}` }), 'Оновлений текст');
+        await user.click(screen.getByRole('button', { name: `Скасувати редагування ${sectionId}` }));
+
+        expect(screen.getByTestId(`${sectionId}-cancel-confirmation-modal`)).toBeInTheDocument();
+        expect(screen.getByTestId(`${sectionId}-section`)).toHaveTextContent('edit');
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+
+        await user.click(screen.getByRole('button', { name: `Підтвердити скасування ${sectionId}` }));
+
+        expect(screen.getByTestId(`${sectionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${sectionId}-html`)).toHaveTextContent(publishedContent);
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
     });
 
     it('does not render an error message when there is no error', async () => {

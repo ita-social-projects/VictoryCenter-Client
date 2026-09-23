@@ -1,6 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { act } from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -90,25 +91,23 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
         contextMenuOptions,
         onContextMenuOptionSelected,
         onCategorySelect,
-    }: {
-        categories: EventCategoryDto[];
-        contextMenuOptions: { id: string; name: string }[];
-        onContextMenuOptionSelected: (id: string) => void;
-        onCategorySelect: (category: EventCategoryDto) => void;
-    }) => (
+        getCategoryDisplayName,
+        renderCategoryExtra,
+    }: any) => (
         <div data-testid="category-bar">
-            {categories.map((category) => (
+            {categories.map((category: any) => (
                 <button
                     key={category.id}
                     type="button"
                     data-testid={`category-${category.id}`}
-                    onClick={() => onCategorySelect(category)}
+                    onClick={() => onCategorySelect && onCategorySelect(category)}
                 >
-                    {category.name}
+                    {getCategoryDisplayName ? getCategoryDisplayName(category) : category.name}
+                    {renderCategoryExtra && renderCategoryExtra(category)}
                 </button>
             ))}
 
-            {contextMenuOptions.map((option) => (
+            {contextMenuOptions.map((option: any) => (
                 <button key={option.id} type="button" onClick={() => onContextMenuOptionSelected(option.id)}>
                     {option.name}
                 </button>
@@ -313,7 +312,7 @@ describe('EventsPageAdmin', () => {
 
         mockedUseAdminClient.mockReturnValue({});
 
-        mockedEventCategoriesApi.getAll.mockResolvedValue([]);
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
 
         mockedEventsApi.fetchEvents.mockResolvedValue({
             items: [],
@@ -883,10 +882,18 @@ describe('EventsPageAdmin', () => {
 
         await act(async () => {
             mockOnDeleteCategory(1);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Localized Cat 1')).not.toBeInTheDocument();
+        });
+
+        await act(async () => {
             mockOnDeleteCategory(2);
         });
 
-        expect(screen.queryByText('Localized Cat 1')).not.toBeInTheDocument();
-        expect(screen.queryByText('Category 2')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText('Category 2')).not.toBeInTheDocument();
+        });
     });
 });

@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import {
-    EventsDto,
+    EventItemDto,
     EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
@@ -36,8 +36,8 @@ export const EventsApi = {
         limit: number,
         translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus,
-    ): Promise<PaginationResult<EventsDto>> => {
-        const response = await client.get<PaginationResult<EventsDto>>(API_ROUTES.EVENTS.BASE, {
+    ): Promise<PaginationResult<EventItemDto>> => {
+        const response = await client.get<PaginationResult<EventItemDto>>(API_ROUTES.EVENTS.BASE, {
             params: {
                 categoryId,
                 offset,
@@ -55,7 +55,8 @@ export const EventsApi = {
         limit: number,
         signal?: AbortSignal,
     ): Promise<PaginationResult<EventSearchItemData>> => {
-        const response = await client.get<PaginationResult<EventSearchItemData>>(API_ROUTES.EVENTS.SEARCH, {
+        // TODO: add constant for existing search endpoint.
+        const response = await client.get<PaginationResult<EventSearchItemData>>(`${API_ROUTES.EVENTS.BASE}/search`, {
             params: {
                 searchTerm,
                 offset,

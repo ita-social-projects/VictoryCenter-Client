@@ -11,6 +11,13 @@ import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
+type SaveErrorScenario = {
+    isAxiosErrorMock: boolean;
+    rejectedValue: unknown;
+    expectedToastMessage: string;
+    expectedToastType: ToastType;
+};
+
 const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
@@ -116,6 +123,26 @@ describe('StatisticsMetricsList', () => {
             onMetricUpdate: finalProps.onMetricUpdate,
             onRaisedFundsSyncErrorChange: (finalProps as any).onRaisedFundsSyncErrorChange,
         };
+    };
+
+    const runSaveErrorScenario = async ({
+        isAxiosErrorMock,
+        rejectedValue,
+        expectedToastMessage,
+        expectedToastType,
+    }: SaveErrorScenario) => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(isAxiosErrorMock);
+        setup();
+        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(rejectedValue);
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
+        fireEvent.click(screen.getByTestId('save-edit'));
+
+        await waitFor(() => {
+            expect(addToast).toHaveBeenCalledWith(expectedToastMessage, expectedToastType, 3000);
+        });
+
+        jest.restoreAllMocks();
     };
 
     it('renders metrics list correctly', () => {
@@ -278,54 +305,30 @@ describe('StatisticsMetricsList', () => {
     });
 
     it('shows warning toast on 409 conflict error', async () => {
-        const conflictError = { response: { status: 409 } };
-        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
-        setup();
-        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(conflictError);
-
-        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
-        fireEvent.click(screen.getByTestId('save-edit'));
-
-        await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith(
-                COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER,
-                ToastType.Warning,
-                3000,
-            );
+        await runSaveErrorScenario({
+            isAxiosErrorMock: true,
+            rejectedValue: { response: { status: 409 } },
+            expectedToastMessage: COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER,
+            expectedToastType: ToastType.Warning,
         });
-
-        jest.restoreAllMocks();
     });
 
     it('shows error toast on generic API failure', async () => {
-        jest.spyOn(axios, 'isAxiosError').mockReturnValue(false);
-        setup();
-        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(new Error('Network error'));
-
-        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
-        fireEvent.click(screen.getByTestId('save-edit'));
-
-        await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
+        await runSaveErrorScenario({
+            isAxiosErrorMock: false,
+            rejectedValue: new Error('Network error'),
+            expectedToastMessage: COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN,
+            expectedToastType: ToastType.Error,
         });
-
-        jest.restoreAllMocks();
     });
 
     it('shows error toast when axios error is not 409', async () => {
-        const serverError = { response: { status: 500 } };
-        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
-        setup();
-        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(serverError);
-
-        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
-        fireEvent.click(screen.getByTestId('save-edit'));
-
-        await waitFor(() => {
-            expect(addToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
+        await runSaveErrorScenario({
+            isAxiosErrorMock: true,
+            rejectedValue: { response: { status: 500 } },
+            expectedToastMessage: COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN,
+            expectedToastType: ToastType.Error,
         });
-
-        jest.restoreAllMocks();
     });
 
     it('closes edit panels on cancel when no pending save', () => {
@@ -514,16 +517,16 @@ describe('StatisticsMetricsList', () => {
         });
     });
 
-    it('shows warning toast when 400 error indicates metric was modified by another user', async () => {
-        const concurrencyError400 = {
+    it('shows warning toast when when concurrency conflict (409) occurs', async () => {
+        const concurrencyError409 = {
             response: {
-                status: 400,
+                status: 409,
                 data: 'Metric was modified by another user. Please refresh and try again.',
             },
         };
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
         setup();
-        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(concurrencyError400);
+        (MainPageApi.updateMetric as jest.Mock).mockRejectedValue(concurrencyError409);
 
         fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         fireEvent.click(screen.getByTestId('save-edit'));

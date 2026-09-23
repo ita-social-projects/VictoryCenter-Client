@@ -472,18 +472,9 @@ export const MainPageContent = () => {
                 currentMetrics.length ? currentMetrics : undefined,
             );
 
-            const { page, languages: updatedLanguages } = await MainPageApi.publish(client, patch, languages);
+            await MainPageApi.publish(client, patch, languages);
             await loadMainPageData(false);
-            setOriginalData(page);
-            const nextValues = mapMainPageToFormValues(page, updatedLanguages);
-
-            const sanitizedNextValues = sanitizeMainPageFormValues(nextValues);
-
-            savedValuesRef.current = sanitizedNextValues;
-
-            methods.reset(sanitizedNextValues, { keepDefaultValues: false });
             setCurrentMetrics([]);
-
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
         } catch (error) {
             addToast('Помилка під час публікації змін', ToastType.Error, 3000);

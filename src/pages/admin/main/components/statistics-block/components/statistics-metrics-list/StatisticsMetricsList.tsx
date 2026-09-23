@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as EyeClosedIcon } from '@/assets/icons/eye-closed.svg';
 import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
@@ -18,6 +17,9 @@ import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/Stati
 import styles from './StatisticsMetricsList.module.scss';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { REPORTS_TEXT } from '@/const/admin/reports';
+import { TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
+import { isConcurrencyError } from '@/utils/functions/is-concurrency-error/is-concurrency-error';
 
 interface StatisticsMetricsListProps {
     metrics: Metric[];
@@ -94,10 +96,11 @@ export const StatisticsMetricsList = ({
         try {
             setPendingMetric(updatedMetric);
             const response = await MainPageApi.updateMetric(client, updatedMetric.id, patch as UpdateSingleMetricDto);
-
-            const syncedMetric = applyServerState(updatedMetric, response);
-            const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? syncedMetric : m));
-            onMetricUpdate(newMetrics);
+            if (response.wasModified) {
+                const syncedMetric = applyServerState(updatedMetric, response);
+                const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? syncedMetric : m));
+                onMetricUpdate(newMetrics);
+            }
             setEditingMetricId(null);
             setPendingMetric(null);
 
@@ -110,14 +113,7 @@ export const StatisticsMetricsList = ({
             );
         } catch (error) {
             setPendingMetric(null);
-
-            const isConcurrencyError =
-                axios.isAxiosError(error) &&
-                (error.response?.status === 409 ||
-                    (error.response?.status === 400 &&
-                        JSON.stringify(error.response?.data ?? '').includes('modified by another user')));
-
-            if (isConcurrencyError) {
+            if (isConcurrencyError(error)) {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER, ToastType.Warning, 3000);
             } else {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
@@ -126,11 +122,25 @@ export const StatisticsMetricsList = ({
     };
 
     const applyServerState = (metric: Metric, response: UpdateMetricResult): Metric => {
-        const localizations = metric.localizations?.map((loc) =>
-            loc.languageId === 2 && response.localizationValue != null
-                ? { ...loc, value: response.localizationValue }
-                : loc,
-        );
+        const hasExisting = metric.localizations?.some((loc) => loc.languageId === DEFAULT_ENGLISH_LANGUAGE_ID);
+        let localizations =
+            metric.localizations?.map((loc) =>
+                loc.languageId === DEFAULT_ENGLISH_LANGUAGE_ID && response.localizationValue != null
+                    ? { ...loc, value: response.localizationValue }
+                    : loc,
+            ) ?? [];
+
+        if (!hasExisting && response.localizationValue != null) {
+            localizations = [
+                ...localizations,
+                {
+                    languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                    value: response.localizationValue,
+                    language: { id: DEFAULT_ENGLISH_LANGUAGE_ID, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ];
+        }
 
         return {
             ...metric,

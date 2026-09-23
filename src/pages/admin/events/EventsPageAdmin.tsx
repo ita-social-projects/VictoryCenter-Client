@@ -127,20 +127,6 @@ export const EventsPageAdmin = () => {
         },
         [updateCategories],
     );
-  
-    const fetchCategories = useCallback(async () => {
-        try {
-            const fetchedCategories = await EventCategoriesApi.getAll(client);
-
-            setCategories(fetchedCategories);
-        } catch {
-            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
-        }
-    }, [client, setErrorState]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
 
     useEffect(() => {
         const fetchEventsIntroSection = async () => {
@@ -157,10 +143,6 @@ export const EventsPageAdmin = () => {
 
         fetchEventsIntroSection();
     }, [client, setErrorState]);
-
-    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
 
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();

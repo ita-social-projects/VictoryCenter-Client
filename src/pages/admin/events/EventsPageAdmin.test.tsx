@@ -165,7 +165,7 @@ describe('EventsPageAdmin', () => {
 
     beforeEach(() => {
         mockedUseAdminClient.mockReturnValue({});
-        mockedEventCategoriesApi.getAll.mockResolvedValue([]);
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
         mockedEventsApi.updateEventsIntroSection.mockReset();
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',

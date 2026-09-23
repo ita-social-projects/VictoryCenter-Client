@@ -301,11 +301,14 @@ describe('EventsPageAdmin', () => {
 
         mockAddToast.mockClear();
 
+        mockedEventsApi.getEventsIntroSection.mockReset();
         mockedEventsApi.updateEventsIntroSection.mockReset();
+
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
         });
+
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
@@ -359,6 +362,7 @@ describe('EventsPageAdmin', () => {
 
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
         const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
         await waitFor(() => {
             expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalled();
             expect(screen.getByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
@@ -368,6 +372,7 @@ describe('EventsPageAdmin', () => {
 
     it('disables intro section editing until the published content is loaded', async () => {
         let resolveIntroSection: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+
         mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(
             new Promise((resolve) => {
                 resolveIntroSection = resolve;
@@ -395,6 +400,7 @@ describe('EventsPageAdmin', () => {
     it('prevents another intro section publish while a publish request is pending', async () => {
         const user = userEvent.setup();
         let resolvePublish: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+
         mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(
             new Promise((resolve) => {
                 resolvePublish = resolve;
@@ -450,28 +456,35 @@ describe('EventsPageAdmin', () => {
         });
     });
 
-    it('renders an events page content error when intro content fetch fails', async () => {
-        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Failed to fetch intro content'));
+    it('disables intro section editing when intro content fetch fails', async () => {
+        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(
+            new Error('Failed to fetch intro content'),
+        );
 
         render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
-        });
 
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
         const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
-        expect(screen.getByRole('button', { name: `Редагувати ${descriptionId}` })).toBeDisabled();
-        expect(screen.getByRole('button', { name: `Редагувати ${titleId}` })).toBeDisabled();
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: `Редагувати ${descriptionId}` })).toBeDisabled();
+            expect(screen.getByRole('button', { name: `Редагувати ${titleId}` })).toBeDisabled();
+        });
+
+        expect(mockAddToast).not.toHaveBeenCalled();
     });
 
-    it('renders a publish error when the intro section update fails', async () => {
+    it('allows another publish attempt after a publish failure', async () => {
         const user = userEvent.setup();
-        mockedEventsApi.updateEventsIntroSection.mockRejectedValueOnce(new Error('Failed to publish intro content'));
+
+        mockedEventsApi.updateEventsIntroSection.mockRejectedValueOnce(
+            new Error('Failed to publish intro content'),
+        );
 
         render(<EventsPageAdmin />);
 
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+
         await waitFor(() => {
             expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeEnabled();
         });
@@ -479,8 +492,11 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
 
         await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES)).toBeInTheDocument();
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` })).toBeEnabled();
         });
+
+        expect(mockAddToast).not.toHaveBeenCalled();
     });
 
     it('renders add category context menu option', async () => {

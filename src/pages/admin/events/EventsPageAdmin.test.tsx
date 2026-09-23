@@ -247,6 +247,15 @@ Object.defineProperty(global, 'ResizeObserver', {
     value: ResizeObserverMock,
 });
 
+const renderEventsPage = async () => {
+    render(<EventsPageAdmin />);
+
+    await waitFor(() => {
+        expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
+        expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalled();
+    });
+};
+
 describe('EventsPageAdmin', () => {
     const categories: EventCategoryDto[] = [
         {
@@ -279,6 +288,8 @@ describe('EventsPageAdmin', () => {
     ];
 
     beforeEach(() => {
+        jest.clearAllMocks();
+
         mockedUseAdminClient.mockReturnValue({});
         mockedEventCategoriesApi.getAll.mockResolvedValue([]);
         mockedEventsApi.fetchEvents.mockResolvedValue({
@@ -286,16 +297,17 @@ describe('EventsPageAdmin', () => {
             totalItemsCount: 0,
         });
 
-        mockAddToast.mockClear();
-
-        mockedEventsApi.getEventsIntroSection.mockReset();
-        mockedEventsApi.updateEventsIntroSection.mockReset();
-
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
         });
 
+        mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+        });
+
+        mockAddToast.mockClear();
         mockOpenAddCategoryModal.mockClear();
         mockOpenEditCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
@@ -306,11 +318,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         expect(screen.getByTestId('events-page-content')).toBeInTheDocument();
         expect(screen.getByTestId('events-toolbar')).toBeInTheDocument();
@@ -321,11 +329,7 @@ describe('EventsPageAdmin', () => {
     it('renders both content sections and changes edit mode for the selected section only', async () => {
         const user = userEvent.setup();
 
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
         const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
@@ -358,7 +362,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('disables intro section editing until the published content is loaded', async () => {
-        let resolveIntroSection: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+        let resolveIntroSection!: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
 
         mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(
             new Promise((resolve) => {
@@ -370,10 +374,11 @@ describe('EventsPageAdmin', () => {
 
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
         const editButton = screen.getByRole('button', { name: `Редагувати ${descriptionId}` });
+
         expect(editButton).toBeDisabled();
 
         await act(async () => {
-            resolveIntroSection!({
+            resolveIntroSection({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
             });
@@ -386,7 +391,7 @@ describe('EventsPageAdmin', () => {
 
     it('prevents another intro section publish while a publish request is pending', async () => {
         const user = userEvent.setup();
-        let resolvePublish: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
+        let resolvePublish!: (section: { eventsBlockTitle: string; pageDescription: string }) => void;
 
         mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(
             new Promise((resolve) => {
@@ -410,7 +415,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByRole('button', { name: `Опублікувати ${titleId}` })).toBeDisabled();
 
         await act(async () => {
-            resolvePublish!({
+            resolvePublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
             });
@@ -483,21 +488,13 @@ describe('EventsPageAdmin', () => {
     });
 
     it('renders add category context menu option', async () => {
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY)).toBeInTheDocument();
     });
 
     it('renders edit category context menu option', async () => {
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY)).toBeInTheDocument();
     });
@@ -505,11 +502,7 @@ describe('EventsPageAdmin', () => {
     it('opens add category modal when add option is selected', async () => {
         const user = userEvent.setup();
 
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY));
 
@@ -519,11 +512,7 @@ describe('EventsPageAdmin', () => {
     it('opens edit category modal when edit option is selected', async () => {
         const user = userEvent.setup();
 
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         await user.click(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY));
 
@@ -533,11 +522,7 @@ describe('EventsPageAdmin', () => {
     it('opens add event modal when add event button is clicked', async () => {
         const user = userEvent.setup();
 
-        render(<EventsPageAdmin />);
-
-        await waitFor(() => {
-            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalled();
-        });
+        await renderEventsPage();
 
         await user.click(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
 
@@ -745,9 +730,9 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[1].id, 0, 5);
+            expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
         });
 
-        expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 });

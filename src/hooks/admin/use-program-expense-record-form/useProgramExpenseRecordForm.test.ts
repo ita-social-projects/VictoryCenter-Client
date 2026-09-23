@@ -443,7 +443,7 @@ describe('useProgramExpenseRecordForm', () => {
             });
 
             expect(result.current.formState.errors.programId).toBe(
-                PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED,
+                PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_MUST_BE_UNIQUE,
             );
         });
     });

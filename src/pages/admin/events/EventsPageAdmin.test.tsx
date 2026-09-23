@@ -1,6 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { act } from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -190,7 +191,9 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                                 type="button"
                                 onClick={() => setIsCancelConfirmationOpen(true)}
                                 aria-label={`Скасувати редагування ${sectionId}`}
-                            />
+                            >
+                                Draft
+                            </button>
                         </>
                     )}
 
@@ -203,6 +206,10 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         Publish section
                     </button>
 
+                    <button type="button" onClick={() => onCancelEdit && onCancelEdit()}>
+                        Cancel
+                    </button>
+
                     {isCancelConfirmationOpen && (
                         <div data-testid={`${sectionId}-cancel-confirmation-modal`}>
                             <button
@@ -212,7 +219,9 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                                     onCancelEdit();
                                 }}
                                 aria-label={`Підтвердити скасування ${sectionId}`}
-                            />
+                            >
+                                Confirm Cancel
+                            </button>
                         </div>
                     )}
                 </section>
@@ -435,7 +444,6 @@ describe('EventsPageAdmin', () => {
         await user.click(await screen.findByRole('button', { name: `Редагувати ${descriptionId}` }));
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
 
-        await user.click(screen.getAllByText('Draft')[0]);
         await user.click(screen.getAllByText('Cancel')[0]);
 
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');

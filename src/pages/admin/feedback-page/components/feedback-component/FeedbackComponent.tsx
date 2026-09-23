@@ -53,17 +53,17 @@ export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }:
                         <img src={imageUrl} alt={title} onError={() => setImgError(true)} />
                     ))}
                 <div className={`feedback-profile-data${isVideo ? ' feedback-truncate' : ''}`}>
-                    <p>{title}</p>
+                    <p title={title}>{title}</p>
                 </div>
             </div>
 
             <div className={`feedback-position${isVideo ? ' feedback-truncate' : ''}`}>
                 {isVideo ? (
-                    <a href={description} target="_blank" rel="noreferrer">
+                    <a href={description} target="_blank" rel="noreferrer" title={description}>
                         {description}
                     </a>
                 ) : (
-                    <p>{description}</p>
+                    <p title={description}>{description}</p>
                 )}
             </div>
 

@@ -1,7 +1,7 @@
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { EventItemDto } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 import './EventItemComponent.scss';
 

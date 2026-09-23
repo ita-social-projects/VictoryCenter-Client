@@ -25,7 +25,6 @@ import {
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS,
     REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/reports-schema/reports-media-settings/reports-media-settings-schema';
-import { fetchDefaultImageAsImageValues } from '@/utils/functions/fetch-default-image/fetch-default-image';
 import { Image, ImageValues } from '@/types/common/image';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -202,34 +201,12 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
         const onSubmit = useCallback(
             async (data: MediaSettingsFormValues) => {
                 try {
-                    let collectedFundsImage = data.collectedFunds.image;
-                    let collectedFundsImageId = data.collectedFunds.imageId;
-
-                    if (!collectedFundsImage && !collectedFundsImageId) {
-                        collectedFundsImage = await fetchDefaultImageAsImageValues(
-                            CollectedFundsImage,
-                            REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.width,
-                            REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.height,
-                        );
-                    }
-
-                    let changedLivesImage = data.changedLives.image;
-                    let changedLivesImageId = data.changedLives.imageId;
-
-                    if (!changedLivesImage && !changedLivesImageId) {
-                        changedLivesImage = await fetchDefaultImageAsImageValues(
-                            ChangedLivesImage,
-                            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.width,
-                            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.height,
-                        );
-                    }
-
                     await ReportsApi.updateMediaSettings(client, {
                         collectedFunds: {
                             title: data.collectedFunds.title,
                             titleEn: data.collectedFunds.titleEn,
-                            image: collectedFundsImage,
-                            imageId: collectedFundsImageId,
+                            image: data.collectedFunds.image,
+                            imageId: data.collectedFunds.imageId,
                         },
                         changedLives: {
                             title: data.changedLives.title,
@@ -239,8 +216,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 if (isNaN(parsed)) throw new Error('changedLives is not a valid integer');
                                 return parsed;
                             })(),
-                            image: changedLivesImage,
-                            imageId: changedLivesImageId,
+                            image: data.changedLives.image,
+                            imageId: data.changedLives.imageId,
                         },
                     });
 
@@ -293,13 +270,17 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 value: any,
                 blurValidationField?: keyof MediaSettingsFormErrors,
             ) => {
-                setFormState((prev) => ({
-                    ...prev,
-                    [block]: {
-                        ...prev[block],
-                        [field]: value,
-                    },
-                }));
+                setFormState((prev) => {
+                    if (prev[block][field] === value) return prev;
+
+                    return {
+                        ...prev,
+                        [block]: {
+                            ...prev[block],
+                            [field]: value,
+                        },
+                    };
+                });
                 if (blurValidationField) {
                     const newFormState = {
                         ...formState,
@@ -382,7 +363,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 onImageChange={(v) => {
                                     setFormState((prev) => ({
                                         ...prev,
-                                        collectedFunds: { ...prev.collectedFunds, image: v, imageId: null },
+                                        collectedFunds: { ...prev.collectedFunds, image: v },
                                     }));
                                     setErrors((prev) => ({ ...prev, collectedFundsImage: undefined }));
                                 }}
@@ -416,7 +397,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 onImageChange={(v) => {
                                     setFormState((prev) => ({
                                         ...prev,
-                                        changedLives: { ...prev.changedLives, image: v, imageId: null },
+                                        changedLives: { ...prev.changedLives, image: v },
                                     }));
                                     setErrors((prev) => ({ ...prev, changedLivesImage: undefined }));
                                 }}

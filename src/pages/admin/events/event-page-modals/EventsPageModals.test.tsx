@@ -7,7 +7,7 @@ import { EventModal } from '../event-modal/EventModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
-import { EventItemDto } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events';
 
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),

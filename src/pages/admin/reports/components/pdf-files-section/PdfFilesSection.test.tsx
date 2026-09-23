@@ -130,7 +130,13 @@ describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
     const mockSectionData = { title: 'Test Title', description: 'Test Desc', localizations: [] };
-    const mockFilesResponse = { items: [{ id: 1 }, { id: 2 }], totalItemsCount: 2 };
+    const mockFilesResponse = {
+        items: [
+            { id: 1, name: 'file1.pdf' },
+            { id: 2, name: 'file2.pdf' },
+        ],
+        totalItemsCount: 2,
+    };
     const mockRefetch = jest.fn();
     const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
     const mockWindowOpen = jest.fn();
@@ -291,12 +297,10 @@ describe('PdfFilesSection', () => {
         });
     });
 
-    it('should fetch and open PDF file when view button is clicked', async () => {
-        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
-
+    it('should open PDF file when view button is clicked', async () => {
         setupDataFetchMock();
 
-        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        (PdfReportsApi.openPreviewInNewTab as jest.Mock).mockResolvedValueOnce(undefined);
 
         render(<PdfFilesSection />);
 
@@ -304,16 +308,18 @@ describe('PdfFilesSection', () => {
         fireEvent.click(viewBtn);
 
         await waitFor(() => {
-            expect(PdfReportsApi.fetchById).toHaveBeenCalledWith(mockClient, mockFilesResponse.items[0].id);
-            expect(mockCreateObjectURL).toHaveBeenCalledWith(mockPdfBlob);
-            expect(mockWindowOpen).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url', '_blank');
+            expect(PdfReportsApi.openPreviewInNewTab).toHaveBeenCalledWith(
+                mockClient,
+                mockFilesResponse.items[0].id,
+                mockFilesResponse.items[0].name,
+            );
         });
     });
 
-    it('should show error toast when PDF download fails', async () => {
+    it('should show error toast when PDF preview fails', async () => {
         setupDataFetchMock();
 
-        (PdfReportsApi.fetchById as jest.Mock).mockRejectedValueOnce(new Error('Download failed'));
+        (PdfReportsApi.openPreviewInNewTab as jest.Mock).mockRejectedValueOnce(new Error('Preview failed'));
 
         render(<PdfFilesSection />);
 
@@ -482,28 +488,6 @@ describe('PdfFilesSection', () => {
         await waitFor(() => {
             expect(mockRefetch).toHaveBeenCalled();
         });
-    });
-
-    it('should revoke object URL after opening PDF', async () => {
-        jest.useFakeTimers();
-        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
-        mockWindowOpen.mockReturnValueOnce({});
-
-        setupDataFetchMock();
-
-        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
-        const mockRevokeObjectURL = jest.fn();
-        global.URL.revokeObjectURL = mockRevokeObjectURL;
-
-        render(<PdfFilesSection />);
-        fireEvent.click(screen.getByTestId('view-btn'));
-
-        await waitFor(() => {
-            expect(mockWindowOpen).toHaveBeenCalled();
-        });
-
-        jest.advanceTimersByTime(1500);
-        expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url');
     });
 
     it('should call reorder API and toast success on successful reorder', async () => {

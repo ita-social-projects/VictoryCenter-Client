@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 
 import { EventItemComponent } from './EventItemComponent';
 import { VisibilityStatus } from '@/types/admin/common';
-import { EventItemDto } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({

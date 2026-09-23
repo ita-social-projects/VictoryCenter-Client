@@ -73,6 +73,11 @@ export const API_ROUTES = {
         BASE: 'EventNews',
         PUBLISHED: 'EventNews/published',
     },
+    EVENTS_PAGE: {
+        BASE: 'EventsPage',
+        DESCRIPTION: 'EventsPage/description',
+        EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
+    },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
     },

@@ -7,6 +7,7 @@ import { InputWithCharacterLimit } from '@/components/admin/input-with-character
 import { Select } from '@/components/common/select/Select';
 import { FundsExpendituresRecordModal } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-expenditures-record-modal/FundsExpendituresRecordModal';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
@@ -28,6 +29,7 @@ interface AddFundsExpendituresRecordModalProps {
         reportingYear: string;
         amountUah: string;
         amountUsd: string;
+        lastEditedField: FundsExpendituresAmountField;
         type: FundsExpendituresTransactionType;
     }) => Promise<boolean>;
 }

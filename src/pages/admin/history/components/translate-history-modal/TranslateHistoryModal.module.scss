@@ -11,6 +11,16 @@
     gap: 16px;
 }
 
+.section-row--right {
+    flex-direction: row;
+    align-items: stretch;
+
+    > * {
+        flex: 1 1 50%;
+        min-width: 0;
+    }
+}
+
 .section-preview {
     pointer-events: none;
     user-select: none;

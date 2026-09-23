@@ -51,7 +51,7 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
                 programId: 1,
                 records,
             }),
-        ).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
+        ).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED);
     });
 
     it('passes unique program category and ignores current record', () => {

@@ -15,10 +15,17 @@ import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
+import {
+    EventItemDto,
+    EventSearchItemData,
+    ErrorState,
+    EventsErrorType,
+    EventsIntroSectionDto,
+    EventsIntroSectionUpdateField,
+} from '@/types/admin/events';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
-import { EventItemDto, EventSearchItemData, ErrorState, EventsErrorType } from '@/types/admin/events-news';
 import {
     EVENT_ITEMS_TEXT,
     EVENT_NOTIFICATION_TIMERS,
@@ -27,6 +34,7 @@ import {
     LIST_ITEM_HEIGHT_IN_PIXELS,
 } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
 import './EventsPageAdmin.scss';
 
 const EMPTY_ERROR: ErrorState = {
@@ -34,12 +42,22 @@ const EMPTY_ERROR: ErrorState = {
     type: null,
 };
 
+const introSectionFieldById: Record<EditableHeaderSectionId, EventsIntroSectionUpdateField> = {
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: 'pageDescription',
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: 'eventsBlockTitle',
+};
+
 export const EventsPageAdmin = () => {
+    const [editingSectionId, setEditingSectionId] = useState<EditableHeaderSectionId | null>(null);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>(EMPTY_ERROR);
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+    const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
+    const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
+    const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
+    const [isEventsIntroSectionPublishing, setIsEventsIntroSectionPublishing] = useState(false);
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
@@ -149,6 +167,22 @@ export const EventsPageAdmin = () => {
     useEffect(() => {
         fetchCategories();
     }, [fetchCategories]);
+
+    useEffect(() => {
+        const fetchEventsIntroSection = async () => {
+            try {
+                const introSection = await EventsApi.getEventsIntroSection(client);
+                setEventsIntroSection(introSection);
+                setEventsIntroDraft(introSection);
+            } catch {
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events');
+            } finally {
+                setIsEventsIntroSectionLoading(false);
+            }
+        };
+
+        fetchEventsIntroSection();
+    }, [client, setErrorState]);
 
     const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
         setCategories((prev) => [...prev, newCategory]);
@@ -343,6 +377,40 @@ export const EventsPageAdmin = () => {
         </Button>
     );
 
+    const handleSectionDraftChange = useCallback((sectionId: EditableHeaderSectionId, value: string) => {
+        const field = introSectionFieldById[sectionId];
+
+        setEventsIntroDraft((currentDraft) => (currentDraft ? { ...currentDraft, [field]: value } : currentDraft));
+    }, []);
+
+    const publishSection = useCallback(
+        async (sectionId: EditableHeaderSectionId, value: string) => {
+            if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
+
+            const field = introSectionFieldById[sectionId];
+            const updatedSection = { ...eventsIntroDraft, [field]: value };
+
+            setIsEventsIntroSectionPublishing(true);
+
+            try {
+                const publishedSection = await EventsApi.updateEventsIntroSection(client, field, updatedSection);
+                setEventsIntroSection(publishedSection);
+                setEventsIntroDraft(publishedSection);
+                setEditingSectionId(null);
+            } catch {
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events');
+            } finally {
+                setIsEventsIntroSectionPublishing(false);
+            }
+        },
+        [client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
+    );
+
+    const cancelSectionEdit = useCallback(() => {
+        setEventsIntroDraft(eventsIntroSection);
+        setEditingSectionId(null);
+    }, [eventsIntroSection]);
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -361,6 +429,44 @@ export const EventsPageAdmin = () => {
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
+                />
+            </div>
+            <div
+                className={`events-page-content-sections ${editingSectionId ? 'events-page-content-sections--editing' : ''}`}
+            >
+                <EditableHeaderSection
+                    sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID}
+                    heading={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
+                    inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
+                    initialPublishedHtml={eventsIntroSection?.pageDescription ?? ''}
+                    maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION}
+                    mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? 'edit' : 'view'}
+                    onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
+                    onDraftChange={(value) =>
+                        handleSectionDraftChange(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)
+                    }
+                    onCancelEdit={cancelSectionEdit}
+                    onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)}
+                    isPublishDisabled={isEventsIntroSectionPublishing}
+                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
+                    placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
+                />
+                <EditableHeaderSection
+                    sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}
+                    heading={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}
+                    inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}
+                    initialPublishedHtml={eventsIntroSection?.eventsBlockTitle ?? ''}
+                    maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE}
+                    mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID ? 'edit' : 'view'}
+                    onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
+                    onDraftChange={(value) =>
+                        handleSectionDraftChange(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)
+                    }
+                    onCancelEdit={cancelSectionEdit}
+                    onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)}
+                    isPublishDisabled={isEventsIntroSectionPublishing}
+                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
+                    placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
                 />
             </div>
             <div className="events-page-list-container" ref={listContainerRef}>

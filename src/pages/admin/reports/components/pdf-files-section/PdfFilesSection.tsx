@@ -210,14 +210,7 @@ export const PdfFilesSection = () => {
     const handleViewFile = useCallback(
         async (file: PdfReportDto) => {
             try {
-                const pdfBlob = await PdfReportsApi.fetchById(client, file.id);
-                const blobUrl = URL.createObjectURL(pdfBlob);
-                const openedWindow = window.open(blobUrl, '_blank');
-                if (openedWindow) {
-                    setTimeout(() => {
-                        URL.revokeObjectURL(blobUrl);
-                    }, 1500);
-                }
+                await PdfReportsApi.openPreviewInNewTab(client, file.id, file.name);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);
             }

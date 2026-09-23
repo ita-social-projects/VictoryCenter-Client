@@ -64,7 +64,7 @@ describe('useProgramExpenseRecordForm', () => {
             result.current.handleAmountFieldChange('amountUsd')('10');
         });
 
-        expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
+        expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED);
         expect(result.current.isSubmitDisabled).toBe(true);
     });
 
@@ -442,7 +442,9 @@ describe('useProgramExpenseRecordForm', () => {
                 result.current.handleProgramChange(2);
             });
 
-            expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
+            expect(result.current.formState.errors.programId).toBe(
+                PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED,
+            );
         });
     });
 });

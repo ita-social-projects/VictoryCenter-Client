@@ -298,6 +298,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                             id={getFieldId('name')}
                             maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
                             disabled={isSubmitting}
+                            showCounterBelow
                         />
 
                         {isDuplicateName && (

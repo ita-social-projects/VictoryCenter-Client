@@ -27,10 +27,80 @@ export const FEEDBACK_TEXT = {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
         FAIL_TO_REORDER: 'Виникла помилка, не вдалося змінити порядок елемента',
         SUCCESS_DELETE_HISTORY: 'Історію успішно видалено',
+        SUCCESS_ADD_HISTORY: 'Історію успішно додано',
+        FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
+        SUCCESS_EDIT_HISTORY: 'Зміни успішно опубліковано',
+        FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
     },
     DELETE_HISTORY_MODAL: {
         TITLE: 'Видалити історію?',
         FAIL_TO_DELETE: 'Виникла помилка під час видалення історії',
+    },
+    ADD_HISTORY_MODAL: {
+        TITLE: 'Додати історію',
+        LABEL: {
+            TITLE: 'Заголовок',
+            STORY: 'Історія',
+            PHOTO: 'Фото',
+        },
+        PLACEHOLDER: {
+            PHOTO_LABEL: 'Додайте файл сюди',
+            PHOTO_SUBTEXT: 'Розмір: 650х360',
+        },
+    },
+    EDIT_HISTORY_MODAL: {
+        TITLE: 'Редагувати історію',
+    },
+    ADD_VIDEO_REVIEW_MODAL: {
+        TITLE: 'Додати відео відгук',
+        LABEL: {
+            TITLE: 'Заголовок',
+            LINK: 'Посилання на відео відгук',
+        },
+    },
+    ADD_REVIEW_MODAL: {
+        TITLE: 'Додати відгук',
+        PUBLISH: 'Опублікувати',
+        LABEL: {
+            AUTHOR_NAME: "Ім'я",
+            TEXT: 'Відгук',
+        },
+    },
+};
+
+export const FEEDBACK_HISTORY_VALIDATION = {
+    title: {
+        min: 10,
+        max: 50,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 10 символів',
+        getMaxError: () => 'Не більше 50 символів',
+    },
+    story: {
+        min: 10,
+        max: 1000,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 10 символів',
+        getMaxError: () => 'Не більше 1000 символів',
+    },
+    image: {
+        cropWidth: 650,
+        cropHeight: 360,
+        minWidth: 650,
+        minHeight: 360,
+        getRequiredError: () => "Фото обов'язкове",
+    },
+};
+
+export const VIDEO_REVIEW_VALIDATION = {
+    title: {
+        min: 5,
+        max: 200,
+    },
+    link: {
+        min: 10,
+        max: 10000,
+        getFormatError: () => 'Посилання має бути дійсною URL-адресою (http/https)',
     },
 };
 
@@ -40,4 +110,25 @@ export const FEEDBACK_CATEGORIES: FeedbackCategoryItem[] = [
     { id: FeedbackCategory.VIDEOS, name: FEEDBACK_TEXT.TABS.VIDEOS },
 ];
 
+const AUTHOR_NAME_MIN = 2;
+const AUTHOR_NAME_MAX = 200;
+const REVIEW_TEXT_MIN = 10;
+const REVIEW_TEXT_MAX = 500;
+
+export const FEEDBACK_REVIEW_VALIDATION = {
+    authorName: {
+        min: AUTHOR_NAME_MIN,
+        max: AUTHOR_NAME_MAX,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => `Не менше ${AUTHOR_NAME_MIN} символів`,
+        getMaxError: () => `Не більше ${AUTHOR_NAME_MAX} символів`,
+    },
+    text: {
+        min: REVIEW_TEXT_MIN,
+        max: REVIEW_TEXT_MAX,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => `Не менше ${REVIEW_TEXT_MIN} символів`,
+        getMaxError: () => `Не більше ${REVIEW_TEXT_MAX} символів`,
+    },
+};
 export const FEEDBACK_PAGINATION_LIMIT = 7;

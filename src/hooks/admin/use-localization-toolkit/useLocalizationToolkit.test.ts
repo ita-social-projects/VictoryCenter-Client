@@ -22,11 +22,14 @@ const languagesMock = [
 
 describe('useLocalizationToolkit', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks();
+
         mockedAxios.isCancel = jest.fn().mockReturnValue(false) as any;
     });
 
     it('should initialize with default state', () => {
+        mockedFetch.mockReturnValue(new Promise(() => {}));
+
         const { result } = renderHook(() =>
             useLocalizationToolkit({
                 setErrorState: mockSetErrorState,
@@ -48,12 +51,16 @@ describe('useLocalizationToolkit', () => {
             }),
         );
 
-        await waitFor(() => expect(result.current.allLanguages.length).toBeGreaterThan(0));
+        await waitFor(() => {
+            expect(result.current.allLanguages).toEqual(languagesMock);
+        });
 
-        expect(result.current.allLanguages).toEqual(languagesMock);
-        const defaultLang = languagesMock.find((l) => l.code === DEFAULT_LOCALE);
+        const defaultLang = languagesMock.find((language) => language.code === DEFAULT_LOCALE);
+
         expect(result.current.selectedLanguage).toEqual(defaultLang);
-        expect(result.current.translationLanguages).toEqual(languagesMock.filter((l) => l.code !== DEFAULT_LOCALE));
+        expect(result.current.translationLanguages).toEqual(
+            languagesMock.filter((language) => language.code !== DEFAULT_LOCALE),
+        );
     });
 
     it('should call setErrorState when fetch fails', async () => {
@@ -65,16 +72,21 @@ describe('useLocalizationToolkit', () => {
             }),
         );
 
-        await waitFor(() =>
+        await waitFor(() => {
             expect(mockSetErrorState).toHaveBeenCalledWith(
                 COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES,
                 'languages',
-            ),
-        );
+            );
+        });
     });
 
     it('should ignore canceled error', async () => {
-        mockedFetch.mockRejectedValue({ name: 'CanceledError' });
+        const canceledError = Object.assign(new Error('Request canceled'), {
+            name: 'CanceledError',
+        });
+
+        mockedAxios.isCancel = jest.fn().mockReturnValue(true) as any;
+        mockedFetch.mockRejectedValue(canceledError);
 
         renderHook(() =>
             useLocalizationToolkit({
@@ -82,7 +94,10 @@ describe('useLocalizationToolkit', () => {
             }),
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 50));
+        await act(async () => {
+            await Promise.resolve();
+            await Promise.resolve();
+        });
 
         expect(mockSetErrorState).not.toHaveBeenCalled();
     });
@@ -96,7 +111,9 @@ describe('useLocalizationToolkit', () => {
             }),
         );
 
-        await waitFor(() => expect(result.current.allLanguages.length).toBeGreaterThan(0));
+        await waitFor(() => {
+            expect(result.current.allLanguages).toEqual(languagesMock);
+        });
 
         act(() => {
             result.current.onLanguageChange(languagesMock[2]);
@@ -106,6 +123,8 @@ describe('useLocalizationToolkit', () => {
     });
 
     it('should update translation status filter via onTranslationStatusFilterChange', () => {
+        mockedFetch.mockReturnValue(new Promise(() => {}));
+
         const { result } = renderHook(() =>
             useLocalizationToolkit({
                 setErrorState: mockSetErrorState,
@@ -120,10 +139,12 @@ describe('useLocalizationToolkit', () => {
     });
 
     it('should fallback to first language when DEFAULT_LOCALE not found', async () => {
-        mockedFetch.mockResolvedValue([
+        const languagesWithoutDefaultLocale = [
             { id: 2, code: 'en', name: 'Англійська' },
             { id: 3, code: 'es', name: 'Іспанська' },
-        ]);
+        ];
+
+        mockedFetch.mockResolvedValue(languagesWithoutDefaultLocale);
 
         const { result } = renderHook(() =>
             useLocalizationToolkit({
@@ -131,12 +152,16 @@ describe('useLocalizationToolkit', () => {
             }),
         );
 
-        await waitFor(() => expect(result.current.allLanguages.length).toBeGreaterThan(0));
+        await waitFor(() => {
+            expect(result.current.allLanguages).toEqual(languagesWithoutDefaultLocale);
+        });
 
         expect(result.current.selectedLanguage).toEqual({
             id: 2,
             code: 'en',
             name: 'Англійська',
         });
+
+        expect(result.current.translationLanguages).toEqual(languagesWithoutDefaultLocale);
     });
 });

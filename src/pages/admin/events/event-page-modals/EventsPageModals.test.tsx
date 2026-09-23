@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
@@ -7,7 +7,7 @@ import { EventModal } from '../event-modal/EventModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
-import { EventsNews } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events';
 
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),
@@ -19,10 +19,6 @@ jest.mock('../delete-event-category-modal/DeleteEventCategoryModal', () => ({
 
 jest.mock('../event-modal/EventModal', () => ({
     EventModal: jest.fn(() => <div data-testid="event-modal" />),
-}));
-
-jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
-    ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
@@ -62,7 +58,7 @@ describe('EventsPageModals', () => {
         isEditCategoryModalOpen = false,
         isAddModalOpen = false,
         isDeleteCategoryModalOpen = false,
-    ): UseModalsStateResult<EventsNews> =>
+    ): UseModalsStateResult<EventItemDto> =>
         ({
             modalState: {
                 isAddCategoryModalOpen,
@@ -76,7 +72,7 @@ describe('EventsPageModals', () => {
                 closeAddItemModal,
                 closeDeleteCategoryModal,
             },
-        }) as unknown as UseModalsStateResult<EventsNews>;
+        }) as unknown as UseModalsStateResult<EventItemDto>;
 
     const getModalPropsByMode = (mode: ModalMode) =>
         mockedEventCategoryModal.mock.calls.map(([props]) => props).find((props) => props.mode === mode);
@@ -223,20 +219,5 @@ describe('EventsPageModals', () => {
                 currentCategory,
             }),
         );
-    });
-
-    it('renders toast container', () => {
-        render(
-            <EventsPageModals
-                modalsStateControl={createModalsStateControl()}
-                categories={categories}
-                currentCategory={currentCategory}
-                onAddCategory={onAddCategory}
-                onUpdateCategory={onUpdateCategory}
-                onDeleteCategory={onDeleteCategory}
-            />,
-        );
-
-        expect(screen.getByTestId('toast-container')).toBeInTheDocument();
     });
 });

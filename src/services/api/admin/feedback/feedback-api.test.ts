@@ -1,6 +1,7 @@
 import { FeedbackApi } from './feedback-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackCategory } from '@/types/admin/feedback';
+import { TranslationStatus, TranslationStatusFilter } from '@/types/common/language';
 
 describe('FeedbackApi', () => {
     const mockHistoryList = Array.from({ length: 21 }).map((_, i) => ({
@@ -50,11 +51,42 @@ describe('FeedbackApi', () => {
         it('should fetch history with default pagination when no params provided', async () => {
             const result = await FeedbackApi.fetchHistory(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith('FeedbackHistories');
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackHistories', { params: {} });
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].id).toBe(1);
             expect(result.items[0].title).toBe('Історія 1');
+        });
+
+        it('should send translationStatusFilter as a query param when set', async () => {
+            await FeedbackApi.fetchHistory(mockClient, { translationStatusFilter: TranslationStatusFilter.Missing });
+
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackHistories', {
+                params: { translationStatusFilter: TranslationStatusFilter.Missing },
+            });
+        });
+
+        it('should map localizationInfoDto to language on fetched items', async () => {
+            const localizationInfoDto = { id: 2, code: 'en' };
+            mockClient.get.mockResolvedValue({
+                data: [
+                    {
+                        ...mockHistoryList[0],
+                        localizations: [
+                            {
+                                localizationInfoDto,
+                                translationStatus: TranslationStatus.Relevant,
+                                title: 'Story',
+                                story: 'Text',
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            const result = await FeedbackApi.fetchHistory(mockClient);
+
+            expect(result.items[0].localizations[0].language).toEqual(localizationInfoDto);
         });
 
         it('should fetch history with custom take and skip', async () => {
@@ -121,7 +153,7 @@ describe('FeedbackApi', () => {
             const result = await FeedbackApi.createHistory(mockClient, newHistoryPayload);
 
             expect(mockClient.post).toHaveBeenCalledWith('FeedbackHistories', newHistoryPayload);
-            expect(result).toEqual(mockResponse);
+            expect(result).toEqual({ ...mockResponse, localizations: [] });
         });
     });
 
@@ -139,7 +171,38 @@ describe('FeedbackApi', () => {
             const result = await FeedbackApi.updateHistory(mockClient, 42, updateHistoryPayload);
 
             expect(mockClient.put).toHaveBeenCalledWith('FeedbackHistories/42', updateHistoryPayload);
-            expect(result).toEqual(mockResponse);
+            expect(result).toEqual({ ...mockResponse, localizations: [] });
+        });
+
+        it('should map localizations in the update response so outdated statuses keep their language', async () => {
+            const localizationInfoDto = { id: 2, code: 'en' };
+            mockClient.put = jest.fn().mockResolvedValue({
+                data: {
+                    id: 42,
+                    title: 'T',
+                    story: 'S',
+                    image: null,
+                    priority: 1,
+                    status: VisibilityStatus.Published,
+                    localizations: [
+                        { localizationInfoDto, translationStatus: TranslationStatus.Outdated, title: 'T', story: 'S' },
+                    ],
+                },
+            });
+
+            const result = await FeedbackApi.updateHistory(mockClient, 42, {
+                title: 'T',
+                story: 'S',
+                imageId: 1,
+                status: VisibilityStatus.Published,
+            });
+
+            expect(result.localizations[0]).toEqual({
+                language: localizationInfoDto,
+                translationStatus: TranslationStatus.Outdated,
+                title: 'T',
+                story: 'S',
+            });
         });
     });
 
@@ -153,10 +216,18 @@ describe('FeedbackApi', () => {
         it('should fetch reviews with default pagination when no params provided', async () => {
             const result = await FeedbackApi.fetchReviews(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith('FeedbackReviews');
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackReviews', { params: {} });
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].authorName).toBe('Учасник 1');
+        });
+
+        it('should send translationStatusFilter as a query param when set', async () => {
+            await FeedbackApi.fetchReviews(mockClient, { translationStatusFilter: TranslationStatusFilter.Outdated });
+
+            expect(mockClient.get).toHaveBeenCalledWith('FeedbackReviews', {
+                params: { translationStatusFilter: TranslationStatusFilter.Outdated },
+            });
         });
 
         it('should fetch reviews with custom take and skip', async () => {
@@ -197,11 +268,19 @@ describe('FeedbackApi', () => {
         it('should fetch videos with default pagination when no params provided', async () => {
             const result = await FeedbackApi.fetchVideos(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith('VideoReviews');
+            expect(mockClient.get).toHaveBeenCalledWith('VideoReviews', { params: {} });
             expect(result.items).toHaveLength(7);
             expect(result.totalItemsCount).toBe(21);
             expect(result.items[0].title).toBe('Відео 1');
             expect(result.items[0].link).toBe('https://www.youtube.com/watch?v=video-1');
+        });
+
+        it('should send translationStatusFilter as a query param when set', async () => {
+            await FeedbackApi.fetchVideos(mockClient, { translationStatusFilter: TranslationStatusFilter.All });
+
+            expect(mockClient.get).toHaveBeenCalledWith('VideoReviews', {
+                params: { translationStatusFilter: TranslationStatusFilter.All },
+            });
         });
 
         it('should fetch videos with custom take and skip', async () => {
@@ -276,7 +355,7 @@ describe('FeedbackApi', () => {
                 text: 'Дуже вдячна центру за підтримку',
                 status: VisibilityStatus.Published,
             });
-            expect(result).toEqual(updatedReview);
+            expect(result).toEqual({ ...updatedReview, localizations: [] });
         });
     });
 });

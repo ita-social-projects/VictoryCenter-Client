@@ -23,8 +23,7 @@ import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/loc
 
 export interface FeedbackFetchParams {
     status?: VisibilityStatus;
-    language?: string;
-    translationStatus?: TranslationStatusFilter;
+    translationStatusFilter?: TranslationStatusFilter;
     skip?: number;
     take?: number;
     offset?: number;
@@ -57,35 +56,54 @@ const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     return { items: data, totalItemsCount };
 };
 
+const buildRequestParams = (params: FeedbackFetchParams | undefined): Record<string, unknown> => {
+    const requestParams: Record<string, unknown> = {};
+    if (params?.translationStatusFilter !== undefined && params.translationStatusFilter !== null) {
+        requestParams.translationStatusFilter = params.translationStatusFilter;
+    }
+    return requestParams;
+};
+
+const mapHistory = (item: FeedbackHistoryResponseDto): FeedbackHistoryDto =>
+    mapEntityWithLocalizations<FeedbackHistoryResponseDto, FeedbackHistoryLocalizationDto, FeedbackHistoryLocalization>(
+        item,
+    );
+
+const mapReview = (item: FeedbackReviewResponseDto): FeedbackReviewDto =>
+    mapEntityWithLocalizations<FeedbackReviewResponseDto, FeedbackReviewLocalizationDto, FeedbackReviewLocalization>(
+        item,
+    );
+
+const mapVideo = (item: FeedbackVideoResponseDto): FeedbackVideoDto =>
+    mapEntityWithLocalizations<FeedbackVideoResponseDto, FeedbackVideoLocalizationDto, FeedbackVideoLocalization>(item);
+
 export const FeedbackApi = {
     fetchHistory: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackHistoryDto>> => {
-        const response = await client.get<FeedbackHistoryResponseDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
-        const items = response.data.map((item) =>
-            mapEntityWithLocalizations<
-                FeedbackHistoryResponseDto,
-                FeedbackHistoryLocalizationDto,
-                FeedbackHistoryLocalization
-            >(item),
-        );
-        return filterAndPaginate(items, params, (item) => item.title);
+        const response = await client.get<FeedbackHistoryResponseDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE, {
+            params: buildRequestParams(params),
+        });
+        return filterAndPaginate(response.data.map(mapHistory), params, (item) => item.title);
     },
     deleteHistory: async (client: AxiosInstance, id: number): Promise<void> => {
         await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
     },
     createHistory: async (client: AxiosInstance, data: CreateFeedbackHistoryDto): Promise<FeedbackHistoryDto> => {
-        const response = await client.post<FeedbackHistoryDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);
-        return response.data;
+        const response = await client.post<FeedbackHistoryResponseDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);
+        return mapHistory(response.data);
     },
     updateHistory: async (
         client: AxiosInstance,
         id: number,
         data: UpdateFeedbackHistoryDto,
     ): Promise<FeedbackHistoryDto> => {
-        const response = await client.put<FeedbackHistoryDto>(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`, data);
-        return response.data;
+        const response = await client.put<FeedbackHistoryResponseDto>(
+            `${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`,
+            data,
+        );
+        return mapHistory(response.data);
     },
     fetchReviews: async (
         client: AxiosInstance,
@@ -93,37 +111,29 @@ export const FeedbackApi = {
     ): Promise<PaginationResult<FeedbackReviewDto>> => {
         const response = await client.get<PaginationResult<FeedbackReviewResponseDto>>(
             API_ROUTES.FEEDBACK_REVIEWS.BASE,
+            { params: buildRequestParams(params) },
         );
-        const items = response.data.items.map((item) =>
-            mapEntityWithLocalizations<
-                FeedbackReviewResponseDto,
-                FeedbackReviewLocalizationDto,
-                FeedbackReviewLocalization
-            >(item),
-        );
-        return filterAndPaginate(items, params, (item) => item.authorName);
+        return filterAndPaginate(response.data.items.map(mapReview), params, (item) => item.authorName);
     },
     updateReview: async (
         client: AxiosInstance,
         id: number,
         review: { authorName: string; text: string; status: VisibilityStatus },
     ): Promise<FeedbackReviewDto> => {
-        const response = await client.put<FeedbackReviewDto>(`${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`, review);
-        return response.data;
+        const response = await client.put<FeedbackReviewResponseDto>(
+            `${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`,
+            review,
+        );
+        return mapReview(response.data);
     },
     fetchVideos: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackVideoDto>> => {
-        const response = await client.get<FeedbackVideoResponseDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE);
-        const items = response.data.map((item) =>
-            mapEntityWithLocalizations<
-                FeedbackVideoResponseDto,
-                FeedbackVideoLocalizationDto,
-                FeedbackVideoLocalization
-            >(item),
-        );
-        return filterAndPaginate(items, params, (item) => item.title);
+        const response = await client.get<FeedbackVideoResponseDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE, {
+            params: buildRequestParams(params),
+        });
+        return filterAndPaginate(response.data.map(mapVideo), params, (item) => item.title);
     },
     reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
         const routes: Record<FeedbackCategory, string> = {

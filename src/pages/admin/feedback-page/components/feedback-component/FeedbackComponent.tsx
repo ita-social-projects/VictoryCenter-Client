@@ -1,37 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ReactComponent as BlankUserImage } from '@/assets/icons/blank-user.svg';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { FeedbackListItem } from '@/types/admin/feedback';
+import { EntityLocalization, EntityWithLocalizations, LocalizationLanguage } from '@/types/common/language';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import './FeedbackComponent.scss';
 
 export interface FeedbackComponentProps {
     item: FeedbackListItem;
     showPhoto?: boolean;
+    language?: LocalizationLanguage;
+    translationLanguages?: LocalizationLanguage[];
     onEdit?: (item: FeedbackListItem) => void;
     onDelete?: (item: FeedbackListItem) => void;
     onTranslate?: (item: FeedbackListItem) => void;
 }
 
-const getFeedbackDescription = (item: FeedbackListItem): string => {
-    if ('story' in item) return item.story;
-    if ('text' in item) return item.text;
-    if ('link' in item) return item.link;
+type FeedbackLocalizableFields = Partial<Record<'title' | 'story' | 'authorName' | 'text', string>>;
+
+const getFeedbackTitle = (item: FeedbackListItem, loc: FeedbackLocalizableFields | null): string => {
+    if ('title' in item) return loc?.title || item.title || '';
+    return loc?.authorName || item.authorName || '';
+};
+
+const getFeedbackDescription = (item: FeedbackListItem, loc: FeedbackLocalizableFields | null): string => {
+    if ('story' in item) return loc?.story || item.story || '';
+    if ('text' in item) return loc?.text || item.text || '';
+    if ('link' in item) return item.link || '';
     return '';
 };
 
 export const FeedbackComponent = ({
     item,
     showPhoto = false,
+    language,
+    translationLanguages = [],
     onEdit,
     onDelete,
     onTranslate,
 }: FeedbackComponentProps) => {
     const [imgError, setImgError] = useState(false);
     const isVideo = 'link' in item;
-    const title = ('title' in item ? item.title : item.authorName) || '';
-    const description = getFeedbackDescription(item) || '';
+
+    const displayedLocalization = useMemo(() => {
+        if (!language || !item.localizations) return null;
+        return returnDisplayedLocalization(
+            item as EntityWithLocalizations<EntityLocalization & FeedbackLocalizableFields>,
+            language.code,
+        );
+    }, [item, language]);
+
+    const title = getFeedbackTitle(item, displayedLocalization);
+    const description = getFeedbackDescription(item, displayedLocalization);
     const imageUrl = 'image' in item && item.image && 'url' in item.image ? item.image.url : null;
 
     useEffect(() => {
@@ -67,6 +90,7 @@ export const FeedbackComponent = ({
                     ))}
                 <div className={`feedback-profile-data${isVideo ? ' feedback-truncate' : ''}`}>
                     <p title={title}>{title}</p>
+                    <LocalizationStatuses<EntityLocalization> languages={translationLanguages} localizedEntity={item} />
                 </div>
             </div>
 

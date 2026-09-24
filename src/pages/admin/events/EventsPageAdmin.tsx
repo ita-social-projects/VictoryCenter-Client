@@ -269,7 +269,7 @@ export const EventsPageAdmin = () => {
                 reorderDisabled={statusFilter !== undefined}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered],
+        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],
     );
 
     const fetchEventItems = useCallback(

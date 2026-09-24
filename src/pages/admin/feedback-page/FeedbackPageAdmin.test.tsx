@@ -173,7 +173,7 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchReviews: jest.fn(),
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
-        deleteHistory: jest.fn(),
+        deleteFeedback: jest.fn(),
     },
 }));
 
@@ -238,7 +238,7 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.fetchReviews.mockResolvedValue(mockReviewsData);
         mockFeedbackApi.fetchVideos.mockResolvedValue(mockVideosData);
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
-        mockFeedbackApi.deleteHistory.mockResolvedValue();
+        mockFeedbackApi.deleteFeedback.mockResolvedValue();
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -416,7 +416,7 @@ describe('FeedbackPageAdmin', () => {
     });
 
     it('should open delete modal when Delete button is clicked on history card and delete item upon confirmation', async () => {
-        mockFeedbackApi.deleteHistory.mockResolvedValueOnce(undefined);
+        mockFeedbackApi.deleteFeedback.mockResolvedValueOnce(undefined);
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -426,61 +426,49 @@ describe('FeedbackPageAdmin', () => {
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
 
-        expect(screen.getByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(FEEDBACK_TEXT.DELETE_MODAL.TITLE)).toBeInTheDocument();
 
         const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
         fireEvent.click(yesBtn);
 
         await waitFor(() => {
-            expect(mockFeedbackApi.deleteHistory).toHaveBeenCalledWith(mockAdminClient, 1);
+            expect(mockFeedbackApi.deleteFeedback).toHaveBeenCalledWith(mockAdminClient, FeedbackCategory.HISTORY, 1);
             expect(screen.queryByText('Історія 1')).not.toBeInTheDocument();
-            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
         });
     });
 
-    it('should call addToast when Delete button is clicked on non-history card', async () => {
+    it('should open delete modal when Delete button is clicked on a non-history card and delete item upon confirmation', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
-        const reviewsTab = screen.getByText(FEEDBACK_TEXT.TABS.REVIEWS);
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
         fireEvent.click(reviewsTab);
 
         await waitFor(() => {
-            expect(screen.getByText('Учасник 10')).toBeInTheDocument();
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
         });
 
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
-    });
 
-    it('should call addToast and not open modal when item in history tab is not a valid FeedbackHistoryDto', async () => {
-        mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
-            items: [
-                {
-                    id: 99,
-                    title: 'Invalid History',
-                    status: VisibilityStatus.Published,
-                    priority: 0,
-                } as any,
-            ],
-            totalItemsCount: 1,
-        });
+        expect(screen.getByText(FEEDBACK_TEXT.DELETE_MODAL.TITLE)).toBeInTheDocument();
 
-        render(<FeedbackPageAdmin />);
+        const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(yesBtn);
 
         await waitFor(() => {
-            expect(screen.getByText('Invalid History')).toBeInTheDocument();
+            expect(mockFeedbackApi.deleteFeedback).toHaveBeenCalledWith(
+                mockAdminClient,
+                FeedbackCategory.REVIEWS,
+                mockReviewsData.items[0].id,
+            );
+            expect(screen.queryByText('Відгук учасника 10')).not.toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
         });
-
-        const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
-        fireEvent.click(deleteBtns[0]);
-
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
-        expect(screen.queryByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
     });
 
     it('should open the Add-translation modal when translate icon is clicked on a card without an existing EN localization', async () => {

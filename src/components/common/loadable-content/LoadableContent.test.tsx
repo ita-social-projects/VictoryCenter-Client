@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { LoadableContent } from './LoadableContent';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('react-i18next', () => {
     const globalUk = require('@/locales/uk/global.json');
@@ -32,7 +33,7 @@ describe('LoadableContent', () => {
         expect(screen.queryByTestId('loader')).toBeNull();
         const error = screen.getByTestId('error-message');
         expect(error).toBeInTheDocument();
-        expect(error).toHaveTextContent('Помилка завантаження даних');
+        expect(error).toHaveTextContent(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA);
         expect(screen.queryByText('Test Content')).toBeNull();
     });
 

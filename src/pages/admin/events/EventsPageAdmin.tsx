@@ -372,7 +372,7 @@ export const EventsPageAdmin = () => {
         }
     }, [fetchEventItems, selectedCategory]);
 
-    const addMaterialButton = !statusFilter && (
+    const addMaterialButton = statusFilter === undefined && (
         <Button
             className="btn-add"
             onClick={() => {

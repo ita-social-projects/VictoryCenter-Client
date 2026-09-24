@@ -5,12 +5,14 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import {
     FeedbackCategory,
     FeedbackCategoryItem,
     FeedbackHistoryDto,
     FeedbackListItem,
     FeedbackReviewDto,
+    FeedbackVideoDto,
 } from '@/types/admin/feedback';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FEEDBACK_CATEGORIES, FEEDBACK_PAGINATION_LIMIT, FEEDBACK_TEXT } from '@/const/admin/feedback';
@@ -22,6 +24,9 @@ import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history
 import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
 import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
+import { TranslateFeedbackHistoryModal } from './components/translate-feedback-history-modal/TranslateFeedbackHistoryModal';
+import { TranslateFeedbackReviewModal } from './components/translate-feedback-review-modal/TranslateFeedbackReviewModal';
+import { TranslateFeedbackVideoModal } from './components/translate-feedback-video-modal/TranslateFeedbackVideoModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -39,6 +44,9 @@ export const isFeedbackHistory = (item: FeedbackListItem): item is FeedbackHisto
 
 export const isFeedbackReview = (item: FeedbackListItem): item is FeedbackReviewDto =>
     typeof item === 'object' && item !== null && 'authorName' in item;
+
+export const isFeedbackVideo = (item: FeedbackListItem): item is FeedbackVideoDto =>
+    typeof item === 'object' && item !== null && 'link' in item;
 
 export const FeedbackPageAdmin = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -63,6 +71,7 @@ export const FeedbackPageAdmin = () => {
     const setErrorState = useCallback((message: string, type: string) => setError({ message, type }), []);
     const {
         allLanguages,
+        translationLanguages,
         selectedLanguage,
         translationStatusFilter,
         onLanguageChange,
@@ -71,6 +80,9 @@ export const FeedbackPageAdmin = () => {
     } = useLocalizationToolkit({
         setErrorState: setErrorState as any,
     });
+
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
+    const { modalState, openModalActions, closeModalActions, isAnyModalOpened } = useModalsState<FeedbackListItem>();
 
     const selectedCategoryItem = useMemo(
         () => FEEDBACK_CATEGORIES.find((c) => c.id === activeCategory) || FEEDBACK_CATEGORIES[0],
@@ -155,6 +167,38 @@ export const FeedbackPageAdmin = () => {
     const handleEditReviewError = useCallback(() => {
         addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
     }, [addToast]);
+
+    const handleTranslateClick = useCallback(
+        (item: FeedbackListItem) => {
+            if (isAnyModalOpened) return;
+
+            const hasTranslation = item.localizations?.some((l) => l.language?.id === englishLanguage?.id);
+
+            if (hasTranslation) {
+                openModalActions.openEditTranslationModal(item);
+            } else {
+                openModalActions.openTranslateItemModal(item);
+            }
+        },
+        [isAnyModalOpened, openModalActions, englishLanguage],
+    );
+
+    const handleCloseTranslateModal = useCallback(() => {
+        closeModalActions.closeTranslateItemModal();
+        closeModalActions.closeEditTranslationModal();
+    }, [closeModalActions]);
+
+    const handleTranslateSuccess = useCallback(
+        (updatedItem: FeedbackListItem) => {
+            setItems((prev) => prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)));
+            if (selectedSearchItem?.id === updatedItem.id) {
+                setSelectedSearchItem(updatedItem);
+            }
+            handleCloseTranslateModal();
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_TRANSLATE, ToastType.Success);
+        },
+        [selectedSearchItem, handleCloseTranslateModal, addToast],
+    );
 
     const searchPlaceholder = SEARCH_PLACEHOLDERS[activeCategory];
 
@@ -324,6 +368,11 @@ export const FeedbackPageAdmin = () => {
         }
     }, [error, retryFetchLanguages, client, activeCategory, fetchCategoryItems]);
 
+    const itemToTranslate = modalState.itemToTranslate ?? modalState.itemToEditTranslation;
+    const historyToTranslate = itemToTranslate && isFeedbackHistory(itemToTranslate) ? itemToTranslate : null;
+    const reviewToTranslate = itemToTranslate && isFeedbackReview(itemToTranslate) ? itemToTranslate : null;
+    const videoToTranslate = itemToTranslate && isFeedbackVideo(itemToTranslate) ? itemToTranslate : null;
+
     const itemsToRender = useMemo(() => {
         if (selectedSearchItem) {
             return [selectedSearchItem];
@@ -350,6 +399,7 @@ export const FeedbackPageAdmin = () => {
                         showPhoto={activeCategory === FeedbackCategory.HISTORY}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
+                        onTranslate={handleTranslateClick}
                     />
                 )}
                 entities={itemsToRender}
@@ -357,7 +407,14 @@ export const FeedbackPageAdmin = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             />
         ),
-        [itemsToRender, activeCategory, handleEntitiesReordered, handleEditClick, handleDeleteClick],
+        [
+            itemsToRender,
+            activeCategory,
+            handleEntitiesReordered,
+            handleEditClick,
+            handleDeleteClick,
+            handleTranslateClick,
+        ],
     );
 
     const isFilteredView =
@@ -453,6 +510,27 @@ export const FeedbackPageAdmin = () => {
                 onEditReview={handleEditReviewSuccess}
                 onEditError={handleEditReviewError}
                 initialData={reviewToEdit || undefined}
+            />
+            <TranslateFeedbackHistoryModal
+                isOpen={!!historyToTranslate}
+                onClose={handleCloseTranslateModal}
+                historyToTranslate={historyToTranslate}
+                onTranslateHistory={handleTranslateSuccess}
+                translatedLanguages={translationLanguages}
+            />
+            <TranslateFeedbackReviewModal
+                isOpen={!!reviewToTranslate}
+                onClose={handleCloseTranslateModal}
+                reviewToTranslate={reviewToTranslate}
+                onTranslateReview={handleTranslateSuccess}
+                translatedLanguages={translationLanguages}
+            />
+            <TranslateFeedbackVideoModal
+                isOpen={!!videoToTranslate}
+                onClose={handleCloseTranslateModal}
+                videoToTranslate={videoToTranslate}
+                onTranslateVideo={handleTranslateSuccess}
+                translatedLanguages={translationLanguages}
             />
             <ToastContainer />
         </div>

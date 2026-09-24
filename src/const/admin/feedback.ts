@@ -22,6 +22,15 @@ export const FEEDBACK_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати',
         DELETE: 'Видалити',
+        TRANSLATE: 'Перекласти',
+    },
+    FORM: {
+        LABEL: {
+            TITLE: 'Заголовок',
+            STORY: 'Історія',
+            NAME: "Ім'я",
+            REVIEW: 'Відгук',
+        },
     },
     MESSAGE: {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
@@ -31,6 +40,8 @@ export const FEEDBACK_TEXT = {
         FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
         SUCCESS_EDIT_HISTORY: 'Зміни успішно опубліковано',
         FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
+        SUCCESS_TRANSLATE: 'Переклад успішно збережено',
+        FAIL_TO_TRANSLATE: 'Виникла помилка під час збереження перекладу',
     },
     DELETE_HISTORY_MODAL: {
         TITLE: 'Видалити історію?',

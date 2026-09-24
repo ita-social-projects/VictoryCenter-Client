@@ -28,6 +28,7 @@ describe('DeleteFeedbackHistoryModal', () => {
         image: null,
         status: VisibilityStatus.Published,
         priority: 1,
+        localizations: [],
     };
 
     beforeEach(() => {

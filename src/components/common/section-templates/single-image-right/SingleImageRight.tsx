@@ -54,7 +54,7 @@ export const SingleImageRight = ({
         resetKey: validationResetKey,
     });
 
-    const { error, handleSetError } = useImageError();
+    const { error, handleSetError } = useImageError({ resetKey: validationResetKey });
 
     const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
     const descriptionMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Description);

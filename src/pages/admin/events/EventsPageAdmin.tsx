@@ -120,11 +120,14 @@ export const EventsPageAdmin = () => {
     );
 
     // Toolbar handlers
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
+    const onStatusFilterChange = useCallback(
+        (status: VisibilityStatus | undefined) => {
+            setStatusFilter(status);
 
-        resetEventItemsState();
-    }, [resetEventItemsState]);
+            resetEventItemsState();
+        },
+        [resetEventItemsState],
+    );
 
     // Category handlers
     const onContextMenuOptionSelected = useCallback(

@@ -142,11 +142,7 @@ export const AddFeedbackHistoryModal = ({
     const handlePreSubmit = () => {
         if (!isValid || isSubmitting) return;
 
-        if (initialData) {
-            setShowPublishConfirmModal(true);
-        } else {
-            handleSubmit(executeSubmit)();
-        }
+        setShowPublishConfirmModal(true);
     };
 
     return (
@@ -279,7 +275,7 @@ export const AddFeedbackHistoryModal = ({
 
             <ConfirmationModal
                 isOpen={showPublishConfirmModal}
-                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                title={initialData ? COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES : FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onConfirm={handleSubmit(executeSubmit)}

@@ -156,12 +156,20 @@ export const FeedbackPageAdmin = () => {
         (updatedReview: FeedbackReviewDto) => {
             setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
             setSelectedSearchItem((prev) => (prev && prev.id === updatedReview.id ? updatedReview : prev));
-            addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         },
         [addToast],
     );
 
-    const handleEditReviewError = useCallback(() => {
+    const handleAddReviewSuccess = useCallback(
+        (newReview: FeedbackReviewDto) => {
+            setItems((prev) => [...prev, newReview]);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+        },
+        [addToast],
+    );
+
+    const handleReviewSubmitError = useCallback(() => {
         addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
     }, [addToast]);
 
@@ -254,7 +262,7 @@ export const FeedbackPageAdmin = () => {
         (_newHistory: FeedbackHistoryDto) => {
             setSelectedSearchItem(null);
             fetchCategoryItems(activeCategory, 0);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
         },
         [fetchCategoryItems, activeCategory, addToast],
     );
@@ -271,7 +279,7 @@ export const FeedbackPageAdmin = () => {
             } else {
                 setItems((prev) => prev.filter((item) => item.id !== updatedHistory.id));
             }
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_EDIT_HISTORY, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         },
         [selectedSearchItem, statusFilter, addToast],
     );
@@ -505,8 +513,9 @@ export const FeedbackPageAdmin = () => {
                     setIsAddReviewModalOpen(false);
                     setReviewToEdit(null);
                 }}
+                onAddReview={handleAddReviewSuccess}
                 onEditReview={handleEditReviewSuccess}
-                onEditError={handleEditReviewError}
+                onSubmitError={handleReviewSubmitError}
                 initialData={reviewToEdit || undefined}
             />
             <TranslateFeedbackHistoryModal

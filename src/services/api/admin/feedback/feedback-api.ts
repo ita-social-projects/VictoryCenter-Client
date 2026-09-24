@@ -109,6 +109,13 @@ export const FeedbackApi = {
         );
         return filterAndPaginate(items, params, (item) => item.authorName);
     },
+    createReview: async (
+        client: AxiosInstance,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.post<FeedbackReviewDto>(API_ROUTES.FEEDBACK_REVIEWS.BASE, review);
+        return response.data;
+    },
     updateReview: async (
         client: AxiosInstance,
         id: number,

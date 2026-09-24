@@ -1,4 +1,5 @@
 @use "@/assets/sass/variables/colors" as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .overlay {
     position: fixed;
@@ -81,19 +82,16 @@
 }
 
 .title {
-    font-size: 24px;
-    font-family: 'Mulish', sans-serif;
-    font-weight: 700;
-    line-height: 1.2;
+    @include type.subtitle-1-bold;
     color: c.$blue-900;
     text-transform: uppercase;
 
     @media (min-width: 560px) {
-        font-size: 28px;
+        @include type.h4-bold-uppercase;
     }
 
     @media (min-width: 1440px) {
-        font-size: 32px;
+        @include type.h3-bold-uppercase;
     }
 }
 

@@ -292,8 +292,20 @@ describe('EditableHeaderSection', () => {
         fireEvent.blur(input);
         expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
 
-        rerender(<EditableHeaderSection {...defaultProps} mode="view" initialPublishedHtml="<p>Достатньо довгий текст</p>" />);
-        rerender(<EditableHeaderSection {...defaultProps} mode="edit" initialPublishedHtml="<p>Достатньо довгий текст</p>" />);
+        rerender(
+            <EditableHeaderSection
+                {...defaultProps}
+                mode="view"
+                initialPublishedHtml="<p>Достатньо довгий текст</p>"
+            />,
+        );
+        rerender(
+            <EditableHeaderSection
+                {...defaultProps}
+                mode="edit"
+                initialPublishedHtml="<p>Достатньо довгий текст</p>"
+            />,
+        );
 
         expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
     });

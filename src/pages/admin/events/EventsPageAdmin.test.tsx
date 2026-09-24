@@ -468,8 +468,16 @@ describe('EventsPageAdmin', () => {
         expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
     });
     it.each([
-        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, 'pageDescription', { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' }],
-        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, 'eventsBlockTitle', { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' }],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
+            'pageDescription',
+            { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' },
+        ],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            'eventsBlockTitle',
+            { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' },
+        ],
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
         const user = userEvent.setup();
 

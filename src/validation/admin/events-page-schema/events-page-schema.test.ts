@@ -26,7 +26,9 @@ describe('Events page text validation', () => {
     it('uses the common Ukrainian title validation messages', () => {
         const titleRule = EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE;
 
-        expect(getEventsPageTextValidationError('', titleRule)).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        expect(getEventsPageTextValidationError('', titleRule)).toBe(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        );
         expect(getEventsPageTextValidationError('a'.repeat(9), titleRule)).toBe(
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
         );

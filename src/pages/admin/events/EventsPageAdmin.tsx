@@ -122,6 +122,8 @@ export const EventsPageAdmin = () => {
     // Toolbar handlers
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
+
+        resetEventItemsState();
     }, []);
 
     // Category handlers

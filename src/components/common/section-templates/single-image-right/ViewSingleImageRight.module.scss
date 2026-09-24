@@ -44,7 +44,8 @@ $img-height: 600px;
 
 .title {
     @include type.h3-semibold-uppercase;
-    overflow-wrap: break-word;
+    min-width: 0;
+    overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;
 }
@@ -61,7 +62,8 @@ $img-height: 600px;
 
 .description {
     @include type.body-1-medium;
-    overflow-wrap: break-word;
+    min-width: 0;
+    overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;
 }

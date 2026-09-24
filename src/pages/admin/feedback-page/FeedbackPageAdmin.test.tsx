@@ -359,6 +359,26 @@ describe('FeedbackPageAdmin', () => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
+        const videosTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.VIDEOS });
+        fireEvent.click(videosTab);
+
+        await waitFor(() => {
+            expect(screen.getByText(mockVideosData.items[0].title)).toBeInTheDocument();
+        });
+
+        const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
+        fireEvent.click(editBtns[0]);
+
+        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should open EditFeedbackReviewModal when Edit button is clicked on a review card', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
         const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
         fireEvent.click(reviewsTab);
 
@@ -369,7 +389,10 @@ describe('FeedbackPageAdmin', () => {
         const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtns[0]);
 
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        await waitFor(() => {
+            expect(screen.getByText(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+        });
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
     it('should open AddFeedbackReviewModal when Add button in toolbar is clicked in REVIEWS tab', async () => {

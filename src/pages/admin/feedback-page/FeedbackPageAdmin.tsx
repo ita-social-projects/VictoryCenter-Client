@@ -98,6 +98,7 @@ export const FeedbackPageAdmin = () => {
     const [isAddHistoryModalOpen, setIsAddHistoryModalOpen] = useState<boolean>(false);
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
+    const [reviewToEdit, setReviewToEdit] = useState<FeedbackReviewDto | null>(null);
 
     const handleAddItemClick = useCallback(() => {
         if (activeCategory === FeedbackCategory.HISTORY) {
@@ -117,6 +118,9 @@ export const FeedbackPageAdmin = () => {
             if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
                 setHistoryToEdit(item);
                 setIsAddHistoryModalOpen(true);
+            } else if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
+                setReviewToEdit(item);
+                setIsAddReviewModalOpen(true);
             } else {
                 handleNotImplemented();
             }
@@ -150,6 +154,19 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, addToast],
     );
+
+    const handleEditReviewSuccess = useCallback(
+        (updatedReview: FeedbackReviewDto) => {
+            setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
+            setSelectedSearchItem((prev) => (prev && prev.id === updatedReview.id ? updatedReview : prev));
+            addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+        },
+        [addToast],
+    );
+
+    const handleEditReviewError = useCallback(() => {
+        addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+    }, [addToast]);
 
     const handleTranslateClick = useCallback(
         (item: FeedbackListItem) => {
@@ -484,7 +501,16 @@ export const FeedbackPageAdmin = () => {
                 onClose={() => setIsAddVideoReviewModalOpen(false)}
                 onSubmit={handleAddVideoReviewSubmit}
             />
-            <AddFeedbackReviewModal isOpen={isAddReviewModalOpen} onClose={() => setIsAddReviewModalOpen(false)} />
+            <AddFeedbackReviewModal
+                isOpen={isAddReviewModalOpen}
+                onClose={() => {
+                    setIsAddReviewModalOpen(false);
+                    setReviewToEdit(null);
+                }}
+                onEditReview={handleEditReviewSuccess}
+                onEditError={handleEditReviewError}
+                initialData={reviewToEdit || undefined}
+            />
             <TranslateFeedbackHistoryModal
                 isOpen={!!historyToTranslate}
                 onClose={handleCloseTranslateModal}

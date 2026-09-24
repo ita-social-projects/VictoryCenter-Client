@@ -1,5 +1,5 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { formatMetricValue, getMetricName } from './metric-formatters';
+import { formatMetricValue, getMetricName, resolveMetricValue } from './metric-formatters';
 
 const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
@@ -133,6 +133,16 @@ describe('metric-formatters', () => {
                 const metric = createRaisedMetric(5000000, usdValue);
                 expect(formatMetricValue(metric, 'EN')).toBe(expectedValue);
             });
+        });
+    });
+
+    describe('resolveMetricValue', () => {
+        it('should use the localized value when it can be parsed', () => {
+            expect(resolveMetricValue('1 200', 500)).toEqual({ value: 1200, usedLocalizedValue: true });
+        });
+
+        it('should fall back to the base value when there is no localized value', () => {
+            expect(resolveMetricValue(undefined, 500)).toEqual({ value: 500, usedLocalizedValue: false });
         });
     });
 });

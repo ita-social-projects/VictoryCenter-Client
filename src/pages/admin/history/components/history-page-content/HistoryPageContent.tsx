@@ -51,6 +51,8 @@ export const HistoryPageContent = () => {
     const pendingSectionRef = useRef<HistorySectionDto | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [isSectionSaveModalOpen, setIsSectionSaveModalOpen] = useState(false);
+    const pendingSaveConfirmRef = useRef<(() => void) | null>(null);
     const [canPublish, setCanPublish] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
@@ -146,6 +148,16 @@ export const HistoryPageContent = () => {
             setSectionToReplace(null);
         },
         [sectionToReplace, normalizedSections],
+    );
+
+    const handleRequestSaveSection = useCallback(
+        ({ onConfirm }: { onConfirm: () => void }) => {
+            // ignore new requests while the modal is already open to avoid silently overwriting the pending callback
+            if (isSectionSaveModalOpen) return;
+            pendingSaveConfirmRef.current = onConfirm;
+            setIsSectionSaveModalOpen(true);
+        },
+        [isSectionSaveModalOpen],
     );
 
     useEffect(() => {
@@ -351,6 +363,7 @@ export const HistoryPageContent = () => {
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}
                         onRequestCancelSection={handleRequestCancelSection}
+                        onRequestSaveSection={handleRequestSaveSection}
                         language={selectedLanguage}
                     />
                 )}
@@ -410,6 +423,22 @@ export const HistoryPageContent = () => {
                 title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
                 onConfirm={handlePublish}
                 onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <ConfirmationModal
+                isOpen={isSectionSaveModalOpen}
+                onClose={() => setIsSectionSaveModalOpen(false)}
+                title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
+                onConfirm={() => {
+                    setIsSectionSaveModalOpen(false);
+                    if (pendingSaveConfirmRef.current) {
+                        pendingSaveConfirmRef.current();
+                        pendingSaveConfirmRef.current = null;
+                    }
+                }}
+                onCancel={() => {
+                    setIsSectionSaveModalOpen(false);
+                    pendingSaveConfirmRef.current = null;
+                }}
             />
             {isTranslateModalOpen && (
                 <TranslateHistoryModal

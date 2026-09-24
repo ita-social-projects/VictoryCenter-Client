@@ -1,15 +1,31 @@
-// this is a test type most probably will need adjustments in the future
-export type EventsErrorType = 'categories' | 'events' | 'search';
+import { Image, ImageValues } from '../common/image';
+import { VisibilityStatus } from './common';
+
+export interface EventItemDto {
+    id: number;
+    resource: string;
+    publishedAt: string;
+    title: string;
+    description: string;
+    status: VisibilityStatus;
+    previewImage: Image | ImageValues | null;
+    backgroundImage: Image | ImageValues | null;
+}
+
+export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search';
+
 export interface ErrorState {
     message: string | null;
     type: EventsErrorType | null;
 }
+
 // this is a test interface and most probably will need adjustments in the future
 export interface EventSearchItemData {
     id: number;
     name: string;
     categories: string[];
 }
+
 // this is a test interface and most probably will need adjustments in the future
 export interface EventsLocalizableFields {
     name: string;
@@ -18,9 +34,10 @@ export interface EventsLocalizableFields {
     participantsCount: string;
     meetingsCount: string;
 }
-// this is a test interface and most probably will need adjustments in the future
-export interface EventsDto {
-    id: number;
-    name: string;
-    description: string;
+
+export interface EventsIntroSectionDto {
+    eventsBlockTitle: string;
+    pageDescription: string;
 }
+
+export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;

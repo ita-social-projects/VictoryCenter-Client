@@ -139,6 +139,7 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
                         rows={5}
+                        autoGrow
                         disabled={isSubmitting || formDisabled}
                         maxLength={HISTORY_TRANSLATION_VALIDATION.description.max}
                         error={errors.description}

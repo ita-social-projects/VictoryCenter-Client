@@ -3,9 +3,34 @@ const getGenericRequiredError = () => `Поле обов'язкове`;
 export const EVENTS_TEXT = {
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
+        ADD_MATERIAL: 'Додати матеріал',
     },
     PLACEHOLDER: {
         SEARCH_EVENTS: 'Введіть назву',
+    },
+    PAGE_CONTENT: {
+        SECTION: {
+            PAGE_DESCRIPTION: {
+                ID: 'events-page-description' as const,
+                TITLE: 'Опис сторінки для користувачів',
+            },
+            EVENTS_BLOCK_TITLE: {
+                ID: 'events-block-title' as const,
+                TITLE: 'Заголовок блоку подій',
+            },
+        },
+        PLACEHOLDER: {
+            PAGE_DESCRIPTION: 'Введіть опис сторінки',
+            EVENTS_BLOCK_TITLE: 'Введіть заголовок блоку подій',
+        },
+        ARIA_LABEL: {
+            EDIT_SECTION: 'Редагувати секцію',
+            VIEW_SECTION: 'Переглянути секцію',
+        },
+        CHARACTER_LIMIT: {
+            PAGE_DESCRIPTION: 1000,
+            EVENTS_BLOCK_TITLE: 100,
+        },
     },
     FORM: {
         MODAL_TITLE: 'Додати матеріал',
@@ -100,4 +125,19 @@ export const EVENT_VALIDATION = {
 
 export const EVENT_NOTIFICATION_TIMERS = {
     SYNC_ERROR_MS: 3000,
+};
+
+export const DEFAULT_LOAD_ITEMS_COUNT = 5;
+export const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
+
+export const EVENT_ITEMS_TEXT = {
+    MESSAGE: {
+        FAILED_TO_FETCH_ITEMS: 'Виникла помилка, не вдалось завантажити новини та події',
+    },
+    ACTIONS: {
+        REORDER: 'Змінити порядок елемента',
+        EDIT: 'Редагувати матеріал',
+        DELETE: 'Видалити матеріал',
+    },
+    NO_RECORDS: 'Ще немає матеріалу',
 };

@@ -563,7 +563,11 @@ describe('ReportAnalytics', () => {
 
             await waitFor(() => {
                 expect(mockPublishRecords).toHaveBeenCalled();
-                expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                    'success',
+                    3000,
+                );
             });
             expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument(); // should exit edit mode
         });

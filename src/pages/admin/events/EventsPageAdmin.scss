@@ -16,11 +16,45 @@
         flex-shrink: 0;
     }
 
+    &-content-sections {
+        display: grid;
+        grid-template-columns: minmax(0, 1.86fr) minmax(0, 1fr);
+        align-items: start;
+        gap: 64px;
+        width: 100%;
+        max-width: 1214px;
+        flex-shrink: 0;
+
+        &--editing {
+            margin-bottom: 72px;
+        }
+    }
+
     &-list-container {
         flex-grow: 1;
         min-height: 0;
         width: 100%;
         display: flex;
         flex-direction: column;
+
+        .item-data {
+            padding: 0;
+        }
+
+        .infinite-scroll-list-container {
+            margin-bottom: 102px;
+        }
+
+        .btn-add {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            max-width: 427px;
+        }
+
+        .plus-icon path {
+            stroke: colors.$blue-500;
+        }
     }
 }

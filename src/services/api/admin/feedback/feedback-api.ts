@@ -103,6 +103,14 @@ export const FeedbackApi = {
         );
         return filterAndPaginate(items, params, (item) => item.authorName);
     },
+    updateReview: async (
+        client: AxiosInstance,
+        id: number,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.put<FeedbackReviewDto>(`${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`, review);
+        return response.data;
+    },
     fetchVideos: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,

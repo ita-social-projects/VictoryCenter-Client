@@ -203,9 +203,9 @@ export const ReportsMediaBlock = ({
                             }}
                             deleteConfirmationText={REPORTS_TEXT.DELETE_IMAGE.TITLE}
                         />
-                        <div className={styles['image-error']}>
-                            <InputError error={imageError} />
-                        </div>
+                    </div>
+                    <div className={styles['image-error']}>
+                        <InputError error={imageError} />
                     </div>
                 </div>
             </div>

@@ -767,7 +767,13 @@ export const FundsExpendituresTable = ({
                                                 {TYPE_LABEL_MAP[record.type]}
                                             </span>
                                         </td>
-                                        <td className={cn(styles.td, { [styles['category-edit-td']]: isEditedRow })}>
+                                        <td
+                                            className={cn(styles.td, {
+                                                [styles['category-edit-td']]: isEditedRow,
+                                                [styles['category-td']]: !isEditedRow,
+                                            })}
+                                            title={!isEditedRow ? record.categoryName : undefined}
+                                        >
                                             {isEditedRow ? (
                                                 <div
                                                     className={styles['category-edit-wrapper']}

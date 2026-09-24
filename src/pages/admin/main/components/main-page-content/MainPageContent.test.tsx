@@ -422,6 +422,26 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByTestId('confirm-publish'));
     };
 
+    const fillAndSubmitTranslation = async (title = 'Valid title text', description = 'Valid description text') => {
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+        await screen.findByText('Додати переклад');
+
+        fireEvent.change(getTranslationTitleInput(), { target: { value: title } });
+        fireEvent.change(getTranslationDescriptionInput(), { target: { value: description } });
+
+        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
+        fireEvent.click(getSaveTranslationButton());
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
+        });
+    };
+
+    const saveValidTranslation = async (title = 'Valid title text', description = 'Valid description text') => {
+        await renderAndLoadContent();
+        await fillAndSubmitTranslation(title, description);
+    };
+
     it('renders loader initially while data is "fetching"', () => {
         (MainPageApi.get as jest.Mock).mockReturnValueOnce(new Promise(() => undefined));
 
@@ -1036,22 +1056,14 @@ describe('MainPageContent', () => {
             },
         });
 
-        await renderAndLoadContent();
-
-        fireEvent.click(screen.getByLabelText('Додати переклад'));
-        await screen.findByText('Додати переклад');
-        fireEvent.change(getTranslationTitleInput(), { target: { value: 'Valid title text' } });
-        fireEvent.change(getTranslationDescriptionInput(), { target: { value: 'Valid description text' } });
-
-        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
-        fireEvent.click(getSaveTranslationButton());
+        await saveValidTranslation();
 
         await waitFor(() => {
-            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
-        });
-
-        await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith('Переклад опубліковано успішно', 'success', 3000);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+                ToastType.Success,
+                3000,
+            );
         });
 
         expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(
@@ -1411,20 +1423,7 @@ describe('MainPageContent', () => {
             .mockResolvedValueOnce(mockPageData)
             .mockRejectedValueOnce(new Error('Refresh failed'));
 
-        await renderAndLoadContent();
-
-        fireEvent.click(screen.getByLabelText('Додати переклад'));
-        await screen.findByText('Додати переклад');
-
-        fireEvent.change(getTranslationTitleInput(), { target: { value: 'Valid title text' } });
-        fireEvent.change(getTranslationDescriptionInput(), { target: { value: 'Valid description text' } });
-
-        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
-        fireEvent.click(getSaveTranslationButton());
-
-        await waitFor(() => {
-            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
-        });
+        await saveValidTranslation();
 
         await waitFor(() => {
             expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument();

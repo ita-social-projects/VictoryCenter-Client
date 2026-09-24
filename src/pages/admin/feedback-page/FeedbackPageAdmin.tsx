@@ -146,6 +146,7 @@ export const FeedbackPageAdmin = () => {
     const handleEditReviewSuccess = useCallback(
         (updatedReview: FeedbackReviewDto) => {
             setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
+            setSelectedSearchItem((prev) => (prev && prev.id === updatedReview.id ? updatedReview : prev));
             addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
         },
         [addToast],

@@ -16,7 +16,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
 import { FeedbackReviewFormFields } from '../feedback-review-form-fields/FeedbackReviewFormFields';
-import './AddFeedbackReviewModal.scss';
+import styles from './AddFeedbackReviewModal.module.scss';
 
 export interface AddFeedbackReviewModalProps {
     isOpen: boolean;
@@ -102,7 +102,7 @@ export const AddFeedbackReviewModal = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleClose}>
+            <Modal isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal} onClose={handleClose}>
                 <Modal.Title>
                     {isEditMode ? FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE : FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE}
                 </Modal.Title>
@@ -112,7 +112,7 @@ export const AddFeedbackReviewModal = ({
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <div className="add-feedback-review-modal-actions">
+                    <div className={styles.actions}>
                         <Button
                             buttonStyle="primary"
                             disabled={isPublishDisabled}

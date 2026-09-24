@@ -257,14 +257,14 @@ export const MainPageContent = () => {
     });
 
     const loadMainPageData = useCallback(
-        async (showLoader = true) => {
+        async (showLoader = true): Promise<boolean> => {
             if (showLoader) {
                 setIsLoading(true);
             }
 
             try {
                 const { page, languages } = await MainPageApi.get(client);
-                if (!isMountedRef.current) return;
+                if (!isMountedRef.current) return false;
 
                 setHasLoadError(false);
                 setOriginalData(page);
@@ -274,11 +274,12 @@ export const MainPageContent = () => {
 
                 savedValuesRef.current = sanitizedValues;
                 methods.reset(sanitizedValues, { keepDefaultValues: false });
+                return true;
             } catch (error) {
-                if (!isMountedRef.current) return;
-
+                if (!isMountedRef.current) return false;
                 setHasLoadError(true);
-                addToast('Помилка завантаження даних', ToastType.Error, 3000);
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
+                return false;
             } finally {
                 if (showLoader && isMountedRef.current) {
                     setIsLoading(false);
@@ -473,7 +474,10 @@ export const MainPageContent = () => {
             );
 
             await MainPageApi.publish(client, patch, languages);
-            await loadMainPageData(false);
+            const refreshed = await loadMainPageData(false);
+            if (!refreshed) {
+                return;
+            }
             setCurrentMetrics([]);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
         } catch (error) {
@@ -513,9 +517,11 @@ export const MainPageContent = () => {
     };
 
     const handleTranslationSuccess = async () => {
-        await loadMainPageData(false);
+        const refreshed = await loadMainPageData(false);
         setTranslationBlock(null);
-        addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
+        if (refreshed) {
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
+        }
     };
 
     const isReadOnlyLanguage = selectedLanguage ? selectedLanguage.code !== DEFAULT_LOCALE : false;

@@ -74,6 +74,7 @@ export const COMMON_TEXT_ADMIN = {
         NAVIGATION_BLOCKED: 'Завершіть звіт перед переходом на іншу сторінку',
         DATA_MODIFIED_BY_ANOTHER_USER: 'Дані змінено іншим користувачем. Перезавантажте сторінку',
         ERROR_TRY_AGAIN: 'Виникла помилка, спробуйте ще раз',
+        ERROR_LOAD_DATA: 'Помилка завантаження даних',
     },
 
     BUTTON: {

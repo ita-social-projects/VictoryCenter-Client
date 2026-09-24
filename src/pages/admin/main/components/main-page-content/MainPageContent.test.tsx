@@ -9,6 +9,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import axios from 'axios';
 import { MainPageContent } from './MainPageContent';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ToastType } from '@/types/admin/toast';
 
 jest.mock('@hookform/resolvers/yup', () => ({
     yupResolver: () => async (data: any) => ({
@@ -436,6 +437,7 @@ describe('MainPageContent', () => {
             expect(MainPageApi.get).toHaveBeenCalled();
         });
         expect(await screen.findByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).toBeInTheDocument();
+        expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
@@ -1372,6 +1374,101 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByTestId('publish-btn-clean-text'));
         await waitFor(() => {
             expect(translateIcon).not.toBeDisabled();
+        });
+    });
+
+    it('does not show success toast and does not clear currentMetrics when refresh fails after publish', async () => {
+        await renderAndLoadContent();
+
+        (MainPageApi.publish as jest.Mock).mockImplementationOnce(async () => {
+            (MainPageApi.get as jest.Mock).mockRejectedValueOnce(new Error('Refresh failed'));
+            return mockPublishedData;
+        });
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
+        });
+
+        expect(mockAddToast).not.toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            ToastType.Success,
+            3000,
+        );
+    });
+
+    it('closes translation modal but suppresses success toast when refresh fails after translation save', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        (MainPageApi.get as jest.Mock)
+            .mockResolvedValueOnce(mockPageData)
+            .mockRejectedValueOnce(new Error('Refresh failed'));
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+        await screen.findByText('Додати переклад');
+
+        fireEvent.change(getTranslationTitleInput(), { target: { value: 'Valid title text' } });
+        fireEvent.change(getTranslationDescriptionInput(), { target: { value: 'Valid description text' } });
+
+        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
+        fireEvent.click(getSaveTranslationButton());
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument();
+        });
+
+        expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
+        expect(mockAddToast).not.toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+            ToastType.Success,
+            3000,
+        );
+    });
+
+    it('does not display PageLoader during background refresh on publish', async () => {
+        await renderAndLoadContent();
+
+        let resolveRefresh: (value: any) => void;
+        const refreshPromise = new Promise((resolve) => {
+            resolveRefresh = resolve;
+        });
+
+        (MainPageApi.publish as jest.Mock).mockImplementationOnce(async () => {
+            (MainPageApi.get as jest.Mock).mockReturnValueOnce(refreshPromise);
+            return mockPublishedData;
+        });
+
+        await triggerFormDirtyAndOpenModal('publish-btn');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        expect(screen.queryByTestId('page-loader')).not.toBeInTheDocument();
+
+        await act(async () => {
+            resolveRefresh!(mockPageData);
+        });
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                ToastType.Success,
+                3000,
+            );
         });
     });
 

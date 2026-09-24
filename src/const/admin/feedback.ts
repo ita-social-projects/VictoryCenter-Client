@@ -66,6 +66,11 @@ export const FEEDBACK_TEXT = {
             TEXT: 'Відгук',
         },
     },
+    EDIT_REVIEW_MODAL: {
+        TITLE: 'Редагувати відгук',
+        SUCCESS_UPDATE: 'Зміни успішно опубліковано',
+        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
+    },
 };
 
 export const FEEDBACK_HISTORY_VALIDATION = {

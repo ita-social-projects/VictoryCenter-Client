@@ -406,7 +406,7 @@ describe('FeedbackPageAdmin', () => {
         });
     });
 
-    it('should open delete modal when Delete button is clicked on a non-history card', async () => {
+    it('should open delete modal when Delete button is clicked on a non-history card and delete item upon confirmation', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -424,7 +424,19 @@ describe('FeedbackPageAdmin', () => {
         fireEvent.click(deleteBtns[0]);
 
         expect(screen.getByText(FEEDBACK_TEXT.DELETE_MODAL.TITLE)).toBeInTheDocument();
-        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+
+        const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(yesBtn);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.deleteFeedback).toHaveBeenCalledWith(
+                mockAdminClient,
+                FeedbackCategory.REVIEWS,
+                mockReviewsData.items[0].id,
+            );
+            expect(screen.queryByText('Відгук учасника 10')).not.toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
+        });
     });
 
     it('isFeedbackHistory correctly identifies valid and invalid items', () => {

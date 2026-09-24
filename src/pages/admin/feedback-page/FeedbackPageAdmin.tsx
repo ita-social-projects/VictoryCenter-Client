@@ -72,7 +72,9 @@ export const FeedbackPageAdmin = () => {
         addToast('Функція не реалізована', ToastType.Info);
     }, [addToast]);
 
-    const [itemToDelete, setItemToDelete] = useState<FeedbackListItem | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<{ item: FeedbackListItem; category: FeedbackCategory } | null>(
+        null,
+    );
     const [historyToEdit, setHistoryToEdit] = useState<FeedbackHistoryDto | null>(null);
     const [isAddHistoryModalOpen, setIsAddHistoryModalOpen] = useState<boolean>(false);
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
@@ -108,10 +110,12 @@ export const FeedbackPageAdmin = () => {
         return false;
     }, [handleNotImplemented]);
 
-    const handleDeleteClick = useCallback((item: FeedbackListItem) => {
-        setItemToDelete(item);
-    }, []);
-
+    const handleDeleteClick = useCallback(
+        (item: FeedbackListItem) => {
+            setItemToDelete({ item, category: activeCategory });
+        },
+        [activeCategory],
+    );
     const handleDeleteConfirm = useCallback(
         (deletedItem: FeedbackListItem) => {
             setItems((prev) => prev.filter((item) => item.id !== deletedItem.id));
@@ -393,8 +397,8 @@ export const FeedbackPageAdmin = () => {
             <DeleteFeedbackModal
                 isOpen={!!itemToDelete}
                 onClose={() => setItemToDelete(null)}
-                category={activeCategory}
-                itemToDelete={itemToDelete}
+                category={itemToDelete?.category ?? activeCategory}
+                itemToDelete={itemToDelete?.item ?? null}
                 onDeleteItem={handleDeleteConfirm}
             />
             <AddFeedbackHistoryModal

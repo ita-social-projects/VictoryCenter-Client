@@ -195,6 +195,7 @@ describe('AddFeedbackReviewModal', () => {
             text: 'Дуже вдячна центру за підтримку',
             status: VisibilityStatus.Published,
             priority: 1,
+            localizations: [],
         };
 
         const defaultProps = {

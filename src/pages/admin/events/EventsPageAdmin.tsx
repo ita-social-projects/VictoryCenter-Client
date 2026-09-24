@@ -99,9 +99,10 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, translationLanguages, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
     const { openModalActions } = modalsStateControl;
 
     const getEventSearchItems = useCallback(
@@ -505,6 +506,7 @@ export const EventsPageAdmin = () => {
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}
+                translationLanguages={translationLanguages}
             />
             <ToastContainer />
         </div>

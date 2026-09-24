@@ -55,7 +55,9 @@ export const LocalizationModal = ({
     return (
         <>
             <Modal isOpen={isOpen} onClose={handleRequestClose} maxWidth={maxWidth}>
-                <Modal.Title>{title}</Modal.Title>
+                <Modal.Title>
+                    <div className={styles['modal-title-wrapper']}>{title}</div>
+                </Modal.Title>
                 <Modal.Content>{children}</Modal.Content>
                 <Modal.Actions>
                     <div className={cn(styles['modal-scope'], 'localization-modal')}>

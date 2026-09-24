@@ -6,6 +6,7 @@ import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsSt
 import { EventItemDto } from '@/types/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventItemDto>;
@@ -14,6 +15,7 @@ export interface EventsPageModalsProps {
     onAddCategory(category: EventCategoryDto): void;
     onUpdateCategory(category: EventCategoryDto): void;
     onDeleteCategory(categoryId: number): void;
+    translationLanguages: LocalizationLanguage[];
 }
 
 export const EventsPageModals = ({
@@ -23,6 +25,7 @@ export const EventsPageModals = ({
     onAddCategory,
     onUpdateCategory,
     onDeleteCategory,
+    translationLanguages,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
@@ -61,6 +64,7 @@ export const EventsPageModals = ({
                 isOpen={modalState.isCategoryToTranslate}
                 categories={categories}
                 onClose={closeModalActions.closeTranslateCategoryModal}
+                translationLanguages={translationLanguages}
             />
         </>
     );

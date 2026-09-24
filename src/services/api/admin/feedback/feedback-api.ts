@@ -55,8 +55,14 @@ export const FeedbackApi = {
         const response = await client.get<FeedbackHistoryDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
         return filterAndPaginate(response.data, params, (item) => item.title);
     },
-    deleteHistory: async (client: AxiosInstance, id: number): Promise<void> => {
-        await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
+    deleteFeedback: async (client: AxiosInstance, category: FeedbackCategory, id: number): Promise<void> => {
+        const routes: Record<FeedbackCategory, string> = {
+            [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
+            [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
+            [FeedbackCategory.VIDEOS]: API_ROUTES.VIDEO_REVIEWS.BASE,
+        };
+
+        await client.delete(`${routes[category]}/${id}`);
     },
     createHistory: async (client: AxiosInstance, data: CreateFeedbackHistoryDto): Promise<FeedbackHistoryDto> => {
         const response = await client.post<FeedbackHistoryDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);

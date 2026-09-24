@@ -99,14 +99,25 @@ describe('FeedbackApi', () => {
         });
     });
 
-    describe('deleteHistory', () => {
-        it('should send delete request with correct id', async () => {
-            await FeedbackApi.deleteHistory(mockClient, 42);
+    describe('deleteFeedback', () => {
+        it('should send delete request for histories', async () => {
+            await FeedbackApi.deleteFeedback(mockClient, FeedbackCategory.HISTORY, 42);
 
             expect(mockClient.delete).toHaveBeenCalledWith('FeedbackHistories/42');
         });
-    });
 
+        it('should send delete request for reviews', async () => {
+            await FeedbackApi.deleteFeedback(mockClient, FeedbackCategory.REVIEWS, 7);
+
+            expect(mockClient.delete).toHaveBeenCalledWith('FeedbackReviews/7');
+        });
+
+        it('should send delete request for videos', async () => {
+            await FeedbackApi.deleteFeedback(mockClient, FeedbackCategory.VIDEOS, 9);
+
+            expect(mockClient.delete).toHaveBeenCalledWith('VideoReviews/9');
+        });
+    });
     describe('createHistory', () => {
         it('should post new history and return response data', async () => {
             const newHistoryPayload = {

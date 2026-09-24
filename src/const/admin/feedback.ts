@@ -26,15 +26,15 @@ export const FEEDBACK_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
         FAIL_TO_REORDER: 'Виникла помилка, не вдалося змінити порядок елемента',
-        SUCCESS_DELETE_HISTORY: 'Історію успішно видалено',
+        SUCCESS_DELETE: 'Матеріал успішно видалено',
         SUCCESS_ADD_HISTORY: 'Історію успішно додано',
         FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
         SUCCESS_EDIT_HISTORY: 'Зміни успішно опубліковано',
         FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
     },
-    DELETE_HISTORY_MODAL: {
-        TITLE: 'Видалити історію?',
-        FAIL_TO_DELETE: 'Виникла помилка під час видалення історії',
+    DELETE_MODAL: {
+        TITLE: 'Видалити матеріал?',
+        FAIL_TO_DELETE: 'Виникла помилка під час видалення матеріалу',
     },
     ADD_HISTORY_MODAL: {
         TITLE: 'Додати історію',

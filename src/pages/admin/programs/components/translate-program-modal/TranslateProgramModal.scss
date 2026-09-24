@@ -3,7 +3,7 @@
 .translate-program-modal {
     --title-block-width: 22rem;
 
-    .modal-header {
+    > .modal-header {
         margin-bottom: 0;
 
         .close-icon {
@@ -43,7 +43,7 @@
         }
     }
 
-    .modal-body {
+    > .modal-body {
         margin-bottom: 0;
         margin-top: -2.35rem;
         position: relative;
@@ -132,7 +132,7 @@
     .translate-program-modal {
         --title-block-width: 100%;
 
-        .modal-header {
+        > .modal-header {
             padding-right: 0;
 
             .modal-header-text {

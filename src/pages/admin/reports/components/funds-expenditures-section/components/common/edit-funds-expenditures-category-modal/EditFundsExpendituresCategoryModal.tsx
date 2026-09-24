@@ -75,7 +75,9 @@ export const EditFundsExpendituresCategoryModal = ({
     );
 
     const handleCategoryBlur = useCallback(() => {
-        setCategoryError(selectedCategoryId ? undefined : COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        setCategoryError(
+            selectedCategoryId === undefined ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined,
+        );
     }, [selectedCategoryId]);
 
     const handleNameBlur = useCallback(() => {
@@ -141,7 +143,7 @@ export const EditFundsExpendituresCategoryModal = ({
                                 <div className={styles.field}>
                                     <div className={styles.labelRow}>
                                         <label className={styles.label}>
-                                            <span className={styles.required}>*</span>
+                                            <span className={styles.error}>*</span>
                                             {FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_LABEL}
                                         </label>
                                         {selectedCategory && (

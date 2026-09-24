@@ -68,9 +68,8 @@ export const Select = <TValue,>({
     }, [isOpen, containerRef]);
 
     const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
-        const hasFocusLeftSelect = containerRef.current
-            ? !containerRef.current.contains(e.relatedTarget as Node)
-            : false;
+        const hasFocusLeftSelect =
+            containerRef.current && e.relatedTarget ? !containerRef.current.contains(e.relatedTarget as Node) : false;
 
         if (isOpen && hasFocusLeftSelect) {
             setIsOpen(false);

@@ -1,6 +1,7 @@
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
+import { TranslateEventCategoryModal } from '../translate-event-category-modal/TranslateEventCategoryModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventItemDto } from '@/types/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
@@ -54,6 +55,12 @@ export const EventsPageModals = ({
                 categories={categories}
                 onClose={closeModalActions.closeDeleteCategoryModal}
                 onConfirm={onDeleteCategory}
+            />
+
+            <TranslateEventCategoryModal
+                isOpen={modalState.isCategoryToTranslate}
+                categories={categories}
+                onClose={closeModalActions.closeTranslateCategoryModal}
             />
         </>
     );

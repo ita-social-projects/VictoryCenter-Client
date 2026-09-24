@@ -1,0 +1,95 @@
+@use '../../../../assets/sass/mixins/typography.mixins' as type;
+@use '../../../../assets/sass/variables/colors' as c;
+
+.translate-category-modal {
+    // Примусово розтягуємо футер та кнопку всередині на всю ширину
+    :global(.modal-footer) {
+        display: flex;
+        width: 100%;
+
+        button {
+            flex: 1;
+            width: 100%;
+        }
+    }
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 16px;
+}
+
+.language-selector-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: -8px; // Трохи підтягуємо до заголовка, як на макеті
+    margin-bottom: 8px;
+
+    .language-select-head {
+        @include type.body-2-medium;
+        display: inline-flex;
+        align-items: center;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        color: c.$blue-900;
+        cursor: pointer;
+
+        &::before {
+            content: '';
+            width: 1.25rem;
+            height: 1.25rem;
+            display: inline-block;
+            margin: 0 0.375rem 0 0;
+            background-image: url('~@/assets/icons/globe.svg');
+            background-size: contain;
+            background-position: center;
+            flex-shrink: 0;
+        }
+    }
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+
+    .input-label {
+        @include type.body-2-medium;
+        display: block;
+        margin-bottom: 8px;
+        color: c.$blue-400;
+
+        .required-asterisk {
+            color: c.$error;
+        }
+    }
+
+    .text-input {
+        @include type.body-2-regular;
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid c.$blue-100;
+        outline: none;
+        color: c.$blue-900;
+        transition: border-color 0.2s ease-in-out;
+
+        &:focus {
+            border-color: c.$blue-200;
+        }
+    }
+
+    .char-counter {
+        @include type.small-text-regular;
+        text-align: right;
+        margin-top: 4px;
+        color: c.$blue-300;
+    }
+}
+
+.submit-button {
+    width: 100%;
+}

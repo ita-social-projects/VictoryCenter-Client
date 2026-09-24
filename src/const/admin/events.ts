@@ -68,6 +68,12 @@ export const EVENT_CATEGORY_TEXT = {
             CATEGORY: 'Категорія',
         },
         NAME_PLACEHOLDER: 'Введіть назву категорії',
+        CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+    },
+    TRANSLATION_MODAL: {
+        TITLE: 'Переклад категорії',
+        LANGUAGE_EN: 'Англійська',
+        SAVE_BUTTON: 'Зберегти переклад',
     },
 };
 

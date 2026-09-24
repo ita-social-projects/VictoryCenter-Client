@@ -133,6 +133,8 @@ export const EventsPageAdmin = () => {
                 openModalActions.openEditCategoryModal();
             } else if (id === 'delete') {
                 openModalActions.openDeleteCategoryModal();
+            } else if (id === 'translate') {
+                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],
@@ -143,6 +145,7 @@ export const EventsPageAdmin = () => {
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
             { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );

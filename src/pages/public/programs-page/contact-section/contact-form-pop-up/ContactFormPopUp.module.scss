@@ -25,7 +25,7 @@
     overflow-y: auto;
     animation: slideInRight 0.3s ease-out forwards;
 
-    @media (min-width: 560px) {
+    @media (min-width: 576px) {
         width: 432px;
         padding: 48px;
     }
@@ -37,9 +37,7 @@
 
     @media (min-width: 1440px) {
         width: 544px;
-        height: 969px;
         max-width: 544px;
-        max-height: 969px;
         padding: 49px 56px 48px 56px;
     }
 }

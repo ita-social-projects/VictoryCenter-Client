@@ -124,7 +124,7 @@ export const EventsPageAdmin = () => {
         setStatusFilter(status);
 
         resetEventItemsState();
-    }, []);
+    }, [resetEventItemsState]);
 
     // Category handlers
     const onContextMenuOptionSelected = useCallback(

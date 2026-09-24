@@ -20,18 +20,10 @@ const resolveImageValue = async <T extends HippotherapyImageValue>(client: Axios
     return { ...value, imageId: finalImageId };
 };
 
-const resolveGalleryCards = async (
+const resolveGalleryCards = (
     client: AxiosInstance,
     cards: HippotherapyGalleryCardContent[],
-): Promise<HippotherapyGalleryCardContent[]> => {
-    const resolved: HippotherapyGalleryCardContent[] = [];
-
-    for (const card of cards) {
-        resolved.push(await resolveImageValue(client, card));
-    }
-
-    return resolved;
-};
+): Promise<HippotherapyGalleryCardContent[]> => Promise.all(cards.map((card) => resolveImageValue(client, card)));
 
 const stripReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReference[],
@@ -78,13 +70,23 @@ export const HippotherapyPageApi = {
         client: AxiosInstance,
         content: HippotherapyPageContentModel,
     ): Promise<HippotherapyPageContentModel> => {
-        const introSection = await resolveImageValue(client, content.introSection);
-        const quoteSection = await resolveImageValue(client, content.quoteSection);
-        const hippoventionCenterSection = await resolveImageValue(client, content.hippoventionCenterSection);
-        const advantagesCards = await resolveGalleryCards(client, content.advantagesSection.cards);
-        const anotherQuoteSection = await resolveImageValue(client, content.anotherQuoteSection);
-        const participantsCards = await resolveGalleryCards(client, content.participantsSection.cards);
-        const ethicsSection = await resolveImageValue(client, content.ethicsSection);
+        const [
+            introSection,
+            quoteSection,
+            hippoventionCenterSection,
+            advantagesCards,
+            anotherQuoteSection,
+            participantsCards,
+            ethicsSection,
+        ] = await Promise.all([
+            resolveImageValue(client, content.introSection),
+            resolveImageValue(client, content.quoteSection),
+            resolveImageValue(client, content.hippoventionCenterSection),
+            resolveGalleryCards(client, content.advantagesSection.cards),
+            resolveImageValue(client, content.anotherQuoteSection),
+            resolveGalleryCards(client, content.participantsSection.cards),
+            resolveImageValue(client, content.ethicsSection),
+        ]);
 
         const payload: HippotherapyPageContentDto = {
             ...content,

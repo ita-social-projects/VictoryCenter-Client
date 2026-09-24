@@ -224,7 +224,7 @@ describe('HippotherapyPageApi', () => {
             );
         });
 
-        it('uploads images one at a time so the backend rate limit is not hit', async () => {
+        it('uploads changed images in parallel', async () => {
             const content = buildContent();
             const newImage: ImageValues = { base64: 'mock-base64', mimeType: 'image/png' };
             content.introSection.image = newImage;
@@ -246,7 +246,7 @@ describe('HippotherapyPageApi', () => {
             await HippotherapyPageApi.update(mockClient, content);
 
             expect(ImageApi.getUpdateImageId).toHaveBeenCalledTimes(3);
-            expect(maxInFlight).toBe(1);
+            expect(maxInFlight).toBe(3);
         });
     });
 });

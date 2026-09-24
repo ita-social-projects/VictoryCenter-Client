@@ -3,13 +3,23 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import {
     CreateFeedbackHistoryDto,
     UpdateFeedbackHistoryDto,
-    FeedbackHistoryDto,
-    FeedbackReviewDto,
-    FeedbackVideoDto,
     FeedbackCategory,
+    FeedbackHistoryDto,
+    FeedbackHistoryLocalization,
+    FeedbackHistoryLocalizationDto,
+    FeedbackHistoryResponseDto,
+    FeedbackReviewDto,
+    FeedbackReviewLocalization,
+    FeedbackReviewLocalizationDto,
+    FeedbackReviewResponseDto,
+    FeedbackVideoDto,
+    FeedbackVideoLocalization,
+    FeedbackVideoLocalizationDto,
+    FeedbackVideoResponseDto,
 } from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export interface FeedbackFetchParams {
     status?: VisibilityStatus;
@@ -58,8 +68,15 @@ export const FeedbackApi = {
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackHistoryDto>> => {
-        const response = await client.get<FeedbackHistoryDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
-        return filterAndPaginate(response.data, params, (item) => item.title);
+        const response = await client.get<FeedbackHistoryResponseDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
+        const items = response.data.map((item) =>
+            mapEntityWithLocalizations<
+                FeedbackHistoryResponseDto,
+                FeedbackHistoryLocalizationDto,
+                FeedbackHistoryLocalization
+            >(item),
+        );
+        return filterAndPaginate(items, params, (item) => item.title);
     },
     deleteFeedback: async (client: AxiosInstance, category: FeedbackCategory, id: number): Promise<void> => {
         await client.delete(`${CATEGORY_ROUTES[category]}/${id}`);
@@ -80,15 +97,39 @@ export const FeedbackApi = {
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackReviewDto>> => {
-        const response = await client.get<PaginationResult<FeedbackReviewDto>>(API_ROUTES.FEEDBACK_REVIEWS.BASE);
-        return filterAndPaginate(response.data.items, params, (item) => item.authorName);
+        const response = await client.get<PaginationResult<FeedbackReviewResponseDto>>(
+            API_ROUTES.FEEDBACK_REVIEWS.BASE,
+        );
+        const items = response.data.items.map((item) =>
+            mapEntityWithLocalizations<
+                FeedbackReviewResponseDto,
+                FeedbackReviewLocalizationDto,
+                FeedbackReviewLocalization
+            >(item),
+        );
+        return filterAndPaginate(items, params, (item) => item.authorName);
+    },
+    updateReview: async (
+        client: AxiosInstance,
+        id: number,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.put<FeedbackReviewDto>(`${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`, review);
+        return response.data;
     },
     fetchVideos: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackVideoDto>> => {
-        const response = await client.get<FeedbackVideoDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE);
-        return filterAndPaginate(response.data, params, (item) => item.title);
+        const response = await client.get<FeedbackVideoResponseDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE);
+        const items = response.data.map((item) =>
+            mapEntityWithLocalizations<
+                FeedbackVideoResponseDto,
+                FeedbackVideoLocalizationDto,
+                FeedbackVideoLocalization
+            >(item),
+        );
+        return filterAndPaginate(items, params, (item) => item.title);
     },
     reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
         await client.put(`${CATEGORY_ROUTES[category]}/reorder`, { orderedIds });

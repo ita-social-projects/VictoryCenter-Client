@@ -28,6 +28,7 @@ describe('DeleteFeedbackModal', () => {
         image: null,
         status: VisibilityStatus.Published,
         priority: 1,
+        localizations: [],
     };
 
     const defaultProps = {

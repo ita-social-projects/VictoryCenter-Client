@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
 import { SectionMode } from '@/types/common/sections';
@@ -323,5 +325,21 @@ describe('SingleImageRight', () => {
 
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
+    });
+});
+
+describe('ViewSingleImageRight styles', () => {
+    const scss = fs.readFileSync(path.join(__dirname, 'ViewSingleImageRight.module.scss'), 'utf-8');
+
+    const getRuleBody = (selector: string) => {
+        const start = scss.indexOf(`\n${selector} {`);
+        return start === -1 ? '' : scss.slice(start, scss.indexOf('}', start));
+    };
+
+    it.each(['.title', '.description'])('%s wraps long unbroken words within its flex container', (selector) => {
+        const body = getRuleBody(selector);
+
+        expect(body).toMatch(/overflow-wrap:\s*anywhere;/);
+        expect(body).toMatch(/min-width:\s*0;/);
     });
 });

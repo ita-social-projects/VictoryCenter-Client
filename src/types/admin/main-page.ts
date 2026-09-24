@@ -462,6 +462,9 @@ export type UpdateSingleMetricDto = (
 export interface UpdateMetricResult {
     wasModified: boolean;
     updatedFields: string[];
+    rowVersion?: string | null;
+    value?: number | null;
+    localizationValue?: string | null;
 }
 
 // Form Values & Defaults

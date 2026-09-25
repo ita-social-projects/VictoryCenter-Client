@@ -25,6 +25,7 @@ export const EditFundsExpendituresCategoryModal = ({
     onSubmit,
 }: EditFundsExpendituresCategoryModalProps) => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
+    const [categoryError, setCategoryError] = useState<string | undefined>(undefined);
     const [name, setName] = useState('');
     const [nameError, setNameError] = useState<string | undefined>(undefined);
     const [hasNameBeenBlurred, setHasNameBeenBlurred] = useState(false);
@@ -51,6 +52,7 @@ export const EditFundsExpendituresCategoryModal = ({
 
     const resetForm = useCallback(() => {
         setSelectedCategoryId(undefined);
+        setCategoryError(undefined);
         setName('');
         setNameError(undefined);
         setHasNameBeenBlurred(false);
@@ -62,6 +64,7 @@ export const EditFundsExpendituresCategoryModal = ({
     const handleCategoryChange = useCallback(
         (id: number) => {
             setSelectedCategoryId(id);
+            setCategoryError(undefined);
             if (hasNameBeenBlurred) {
                 const newSelected = categories.find((c) => c.id === id);
                 const others = categories.filter((c) => c.id !== id);
@@ -70,6 +73,12 @@ export const EditFundsExpendituresCategoryModal = ({
         },
         [hasNameBeenBlurred, name, categories],
     );
+
+    const handleCategoryBlur = useCallback(() => {
+        setCategoryError(
+            selectedCategoryId === undefined ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined,
+        );
+    }, [selectedCategoryId]);
 
     const handleNameBlur = useCallback(() => {
         setHasNameBeenBlurred(true);
@@ -134,7 +143,7 @@ export const EditFundsExpendituresCategoryModal = ({
                                 <div className={styles.field}>
                                     <div className={styles.labelRow}>
                                         <label className={styles.label}>
-                                            <span className={styles.required}>*</span>
+                                            <span className={styles.error}>*</span>
                                             {FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_LABEL}
                                         </label>
                                         {selectedCategory && (
@@ -148,6 +157,7 @@ export const EditFundsExpendituresCategoryModal = ({
                                     <Select<number | undefined>
                                         value={selectedCategoryId}
                                         onValueChange={(val) => handleCategoryChange(val as number)}
+                                        onBlur={handleCategoryBlur}
                                         placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER}
                                         className={styles.selectContainer}
                                         headClassName={styles.selectHead}
@@ -156,6 +166,7 @@ export const EditFundsExpendituresCategoryModal = ({
                                             <Select.Option key={c.id} value={c.id} name={c.name} />
                                         ))}
                                     </Select>
+                                    {categoryError && <p className={styles.error}>{categoryError}</p>}
                                 </div>
 
                                 <div className={styles.field}>

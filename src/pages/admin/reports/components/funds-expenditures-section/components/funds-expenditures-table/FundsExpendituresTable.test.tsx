@@ -460,7 +460,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Благодійні внески-2'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -491,7 +491,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 

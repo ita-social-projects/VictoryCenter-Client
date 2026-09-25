@@ -101,12 +101,14 @@ export const FeedbackPageAdmin = () => {
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
     const [reviewToEdit, setReviewToEdit] = useState<FeedbackReviewDto | null>(null);
+    const [videoToEdit, setVideoToEdit] = useState<FeedbackVideoDto | null>(null);
 
     const handleAddItemClick = useCallback(() => {
         if (activeCategory === FeedbackCategory.HISTORY) {
             setHistoryToEdit(null);
             setIsAddHistoryModalOpen(true);
         } else if (activeCategory === FeedbackCategory.VIDEOS) {
+            setVideoToEdit(null);
             setIsAddVideoReviewModalOpen(true);
         } else if (activeCategory === FeedbackCategory.REVIEWS) {
             setIsAddReviewModalOpen(true);
@@ -123,6 +125,9 @@ export const FeedbackPageAdmin = () => {
             } else if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
                 setReviewToEdit(item);
                 setIsAddReviewModalOpen(true);
+            } else if (activeCategory === FeedbackCategory.VIDEOS && isFeedbackVideo(item)) {
+                setVideoToEdit(item);
+                setIsAddVideoReviewModalOpen(true);
             } else {
                 handleNotImplemented();
             }
@@ -275,6 +280,21 @@ export const FeedbackPageAdmin = () => {
         },
         [selectedSearchItem, statusFilter, addToast],
     );
+
+    const handleEditVideoReviewSuccess = useCallback(
+        (updatedVideo: FeedbackVideoDto) => {
+            if (selectedSearchItem?.id === updatedVideo.id) {
+                setSelectedSearchItem(updatedVideo);
+            }
+            setItems((prev) => prev.map((item) => (item.id === updatedVideo.id ? updatedVideo : item)));
+            addToast(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+        },
+        [selectedSearchItem, addToast],
+    );
+
+    const handleEditVideoReviewError = useCallback(() => {
+        addToast(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+    }, [addToast]);
 
     const getFeedbackSearchItems = useCallback(
         async (
@@ -496,8 +516,14 @@ export const FeedbackPageAdmin = () => {
             />
             <AddVideoReviewModal
                 isOpen={isAddVideoReviewModalOpen}
-                onClose={() => setIsAddVideoReviewModalOpen(false)}
+                onClose={() => {
+                    setIsAddVideoReviewModalOpen(false);
+                    setVideoToEdit(null);
+                }}
                 onSubmit={handleAddVideoReviewSubmit}
+                initialData={videoToEdit || undefined}
+                onEditVideoReview={handleEditVideoReviewSuccess}
+                onEditError={handleEditVideoReviewError}
             />
             <AddFeedbackReviewModal
                 isOpen={isAddReviewModalOpen}

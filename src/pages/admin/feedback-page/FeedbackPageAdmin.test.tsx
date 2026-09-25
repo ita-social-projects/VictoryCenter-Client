@@ -154,14 +154,24 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => ({
-    AddVideoReviewModal: ({ isOpen, onClose, onSubmit }: any) =>
+    AddVideoReviewModal: ({ isOpen, onClose, onSubmit, initialData, onEditVideoReview, onEditError }: any) =>
         isOpen ? (
             <div data-testid="add-video-review-modal">
+                {initialData && <span data-testid="add-video-review-initial-title">{initialData.title}</span>}
                 <button data-testid="add-video-review-close" onClick={onClose}>
                     Close
                 </button>
                 <button data-testid="add-video-review-submit" onClick={() => onSubmit?.({ title: 't', link: 'l' })}>
                     Submit
+                </button>
+                <button
+                    data-testid="add-video-review-confirm-edit"
+                    onClick={() => onEditVideoReview?.({ ...initialData, title: 'Updated title' })}
+                >
+                    Confirm Edit
+                </button>
+                <button data-testid="add-video-review-edit-error" onClick={() => onEditError?.()}>
+                    Trigger Edit Error
                 </button>
             </div>
         ) : null,
@@ -174,6 +184,7 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
         deleteFeedback: jest.fn(),
+        updateVideo: jest.fn(),
     },
 }));
 
@@ -352,26 +363,6 @@ describe('FeedbackPageAdmin', () => {
         expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
     });
 
-    it('should call addToast when Edit button is clicked on a non-history card', async () => {
-        render(<FeedbackPageAdmin />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Історія 1')).toBeInTheDocument();
-        });
-
-        const videosTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.VIDEOS });
-        fireEvent.click(videosTab);
-
-        await waitFor(() => {
-            expect(screen.getByText(mockVideosData.items[0].title)).toBeInTheDocument();
-        });
-
-        const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
-        fireEvent.click(editBtns[0]);
-
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
-    });
-
     it('should open EditFeedbackReviewModal when Edit button is clicked on a review card', async () => {
         render(<FeedbackPageAdmin />);
 
@@ -393,6 +384,74 @@ describe('FeedbackPageAdmin', () => {
             expect(screen.getByText(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE)).toBeInTheDocument();
         });
         expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    describe('editing a video review (#3467)', () => {
+        const openEditVideoReviewModal = async () => {
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+            await waitFor(() => {
+                expect(screen.getByText('Відео 20')).toBeInTheDocument();
+            });
+
+            const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
+            fireEvent.click(editBtns[0]);
+        };
+
+        it('opens AddVideoReviewModal with the clicked record as initialData instead of showing a toast', async () => {
+            await openEditVideoReviewModal();
+
+            expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('add-video-review-initial-title')).toHaveTextContent(
+                mockVideosData.items[0].title,
+            );
+            expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        });
+
+        it('replaces the record in the list and shows a success toast when the edit is confirmed', async () => {
+            await openEditVideoReviewModal();
+
+            fireEvent.click(screen.getByTestId('add-video-review-confirm-edit'));
+
+            const list = screen.getByTestId('infinite-scroll-list');
+            await waitFor(() => {
+                expect(within(list).getByText('Updated title')).toBeInTheDocument();
+            });
+            expect(within(list).queryByText(mockVideosData.items[0].title)).not.toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.SUCCESS_UPDATE,
+                ToastType.Success,
+            );
+        });
+
+        it('shows a failure toast and keeps the original record when the edit request fails', async () => {
+            await openEditVideoReviewModal();
+
+            fireEvent.click(screen.getByTestId('add-video-review-edit-error'));
+
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.FAIL_TO_UPDATE,
+                ToastType.Error,
+            );
+            expect(
+                within(screen.getByTestId('infinite-scroll-list')).getByText(mockVideosData.items[0].title),
+            ).toBeInTheDocument();
+        });
+
+        it('resets the edited record when the modal is closed without saving', async () => {
+            await openEditVideoReviewModal();
+
+            fireEvent.click(screen.getByTestId('add-video-review-close'));
+            expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('toolbar-add-button'));
+            expect(screen.queryByTestId('add-video-review-initial-title')).not.toBeInTheDocument();
+        });
     });
 
     it('should open AddFeedbackReviewModal when Add button in toolbar is clicked in REVIEWS tab', async () => {

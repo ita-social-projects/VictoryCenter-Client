@@ -1,10 +1,12 @@
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
+import { TranslateEventCategoryModal } from '../translate-event-category-modal/TranslateEventCategoryModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventItemDto } from '@/types/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface EventsPageModalsProps {
     modalsStateControl: UseModalsStateResult<EventItemDto>;
@@ -13,6 +15,7 @@ export interface EventsPageModalsProps {
     onAddCategory(category: EventCategoryDto): void;
     onUpdateCategory(category: EventCategoryDto): void;
     onDeleteCategory(categoryId: number): void;
+    translationLanguages: LocalizationLanguage[];
 }
 
 export const EventsPageModals = ({
@@ -22,6 +25,7 @@ export const EventsPageModals = ({
     onAddCategory,
     onUpdateCategory,
     onDeleteCategory,
+    translationLanguages,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
@@ -54,6 +58,13 @@ export const EventsPageModals = ({
                 categories={categories}
                 onClose={closeModalActions.closeDeleteCategoryModal}
                 onConfirm={onDeleteCategory}
+            />
+
+            <TranslateEventCategoryModal
+                isOpen={modalState.isCategoryToTranslate}
+                categories={categories}
+                onClose={closeModalActions.closeTranslateCategoryModal}
+                translationLanguages={translationLanguages}
             />
         </>
     );

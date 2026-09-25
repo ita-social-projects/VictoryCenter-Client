@@ -1,4 +1,5 @@
 @use "@/assets/sass/variables/colors" as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .overlay {
     position: fixed;
@@ -15,13 +16,30 @@
 
 .popup {
     width: 100%;
-    max-width: 544px;
     height: 100vh;
     background-color: c.$grey-50;
     position: relative;
+    display: flex;
+    flex-direction: column;
     padding: 60px 56px;
     overflow-y: auto;
     animation: slideInRight 0.3s ease-out forwards;
+
+    @media (min-width: 576px) {
+        width: 432px;
+        padding: 48px;
+    }
+
+    @media (min-width: 768px) {
+        width: 480px;
+        padding: 49px 56px 48px 56px;
+    }
+
+    @media (min-width: 1440px) {
+        width: 544px;
+        max-width: 544px;
+        padding: 49px 56px 48px 56px;
+    }
 }
 
 .closeBtn {
@@ -44,16 +62,35 @@
 }
 
 .content {
-    margin-top: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+
+    @media (min-width: 560px) {
+        gap: 56px;
+    }
+
+    @media (min-width: 768px) {
+        gap: 64px;
+    }
+
+    @media (min-width: 1440px) {
+        gap: 72px;
+    }
 }
 
 .title {
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.2;
+    @include type.subtitle-1-bold;
     color: c.$blue-900;
-    margin-bottom: 40px;
     text-transform: uppercase;
+
+    @media (min-width: 560px) {
+        @include type.h4-bold-uppercase;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.h3-bold-uppercase;
+    }
 }
 
 @keyframes slideInRight {
@@ -63,15 +100,5 @@
 
     to {
         transform: translateX(0);
-    }
-}
-
-@media (max-width: 576px) {
-    .popup {
-        padding: 40px 20px;
-    }
-
-    .title {
-        font-size: 24px;
     }
 }

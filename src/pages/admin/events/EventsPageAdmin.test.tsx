@@ -466,6 +466,11 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByRole('button', { name: `Опублікувати невалідне ${sectionId}` }));
 
         expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            ToastType.Error,
+            EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+        );
     });
     it.each([
         [

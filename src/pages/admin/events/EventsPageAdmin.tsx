@@ -395,7 +395,12 @@ export const EventsPageAdmin = () => {
         async (sectionId: EditableHeaderSectionId, value: string) => {
             if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
 
-            if (getEventsPageTextValidationError(value, introSectionValidationById[sectionId])) return;
+            const validationError = getEventsPageTextValidationError(value, introSectionValidationById[sectionId]);
+
+            if (validationError) {
+                addToast(validationError, ToastType.Error, EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+                return;
+            }
 
             const field = introSectionFieldById[sectionId];
             const updatedSection = { ...eventsIntroDraft, [field]: value };
@@ -413,7 +418,7 @@ export const EventsPageAdmin = () => {
                 setIsEventsIntroSectionPublishing(false);
             }
         },
-        [client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
+        [addToast, client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
     );
 
     const cancelSectionEdit = useCallback(() => {

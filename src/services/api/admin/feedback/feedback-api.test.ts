@@ -245,6 +245,23 @@ describe('FeedbackApi', () => {
         });
     });
 
+    describe('updateVideo', () => {
+        it('should put updated video review and return response data', async () => {
+            const updateVideoPayload = {
+                title: 'Оновлене відео',
+                link: 'https://www.youtube.com/watch?v=updated',
+                status: VisibilityStatus.Published,
+            };
+            const mockResponse = { id: 7, ...updateVideoPayload, priority: 2 };
+            mockClient.put = jest.fn().mockResolvedValue({ data: mockResponse });
+
+            const result = await FeedbackApi.updateVideo(mockClient, 7, updateVideoPayload);
+
+            expect(mockClient.put).toHaveBeenCalledWith('VideoReviews/7', updateVideoPayload);
+            expect(result).toEqual(mockResponse);
+        });
+    });
+
     describe('reorderFeedback', () => {
         it('should send reorder request for histories', async () => {
             await FeedbackApi.reorderFeedback(mockClient, FeedbackCategory.HISTORY, [1, 2, 3]);

@@ -131,6 +131,14 @@ export const FeedbackApi = {
         );
         return filterAndPaginate(items, params, (item) => item.title);
     },
+    updateVideo: async (
+        client: AxiosInstance,
+        id: number,
+        data: { title: string; link: string; status: VisibilityStatus },
+    ): Promise<FeedbackVideoDto> => {
+        const response = await client.put<FeedbackVideoDto>(`${API_ROUTES.VIDEO_REVIEWS.BASE}/${id}`, data);
+        return response.data;
+    },
     reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
         await client.put(`${CATEGORY_ROUTES[category]}/reorder`, { orderedIds });
     },

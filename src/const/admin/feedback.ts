@@ -69,6 +69,11 @@ export const FEEDBACK_TEXT = {
             LINK: 'Посилання на відео відгук',
         },
     },
+    EDIT_VIDEO_REVIEW_MODAL: {
+        TITLE: 'Редагувати відео відгук',
+        SUCCESS_UPDATE: 'Зміни успішно опубліковано',
+        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
+    },
     ADD_REVIEW_MODAL: {
         TITLE: 'Додати відгук',
         PUBLISH: 'Опублікувати',

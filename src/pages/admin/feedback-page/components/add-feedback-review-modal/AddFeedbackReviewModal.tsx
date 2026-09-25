@@ -15,9 +15,9 @@ import { getNormalizedInputText } from '@/utils/functions/formatters/text-format
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
+import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackReviewFormFields } from '../feedback-review-form-fields/FeedbackReviewFormFields';
 import styles from './AddFeedbackReviewModal.module.scss';
-import { VisibilityStatus } from '@/types/admin/common';
 
 export interface AddFeedbackReviewModalProps {
     isOpen: boolean;
@@ -36,10 +36,10 @@ const defaultFormState: FeedbackReviewFormValues = {
 export const AddFeedbackReviewModal = ({
     isOpen,
     onClose,
+    onAddReview,
     onEditReview,
     onSubmitError,
     initialData,
-    onAddReview,
 }: AddFeedbackReviewModalProps) => {
     const client = useAdminClient();
     const isEditMode = Boolean(initialData);

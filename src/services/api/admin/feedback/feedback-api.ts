@@ -124,6 +124,13 @@ export const FeedbackApi = {
         const response = await client.put<FeedbackReviewDto>(`${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`, review);
         return response.data;
     },
+    createVideoReview: async (
+        client: AxiosInstance,
+        video: { title: string; link: string; status: VisibilityStatus },
+    ): Promise<FeedbackVideoDto> => {
+        const response = await client.post<FeedbackVideoDto>(API_ROUTES.VIDEO_REVIEWS.BASE, video);
+        return response.data;
+    },
     fetchVideos: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,

@@ -130,10 +130,23 @@ export const FeedbackPageAdmin = () => {
         [activeCategory, handleNotImplemented],
     );
 
-    const handleAddVideoReviewSubmit = useCallback(async () => {
-        handleNotImplemented();
-        return false;
-    }, [handleNotImplemented]);
+    const handleAddVideoReviewSubmit = useCallback(
+        async (data: { title: string; link: string }) => {
+            try {
+                const newVideo = await FeedbackApi.createVideoReview(client, {
+                    ...data,
+                    status: VisibilityStatus.Published,
+                });
+                setItems((prev) => [...prev, newVideo]);
+                addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
+                return false;
+            }
+        },
+        [client, addToast],
+    );
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
@@ -170,7 +183,7 @@ export const FeedbackPageAdmin = () => {
     );
 
     const handleReviewSubmitError = useCallback(() => {
-        addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+        addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
     }, [addToast]);
 
     const handleTranslateClick = useCallback(

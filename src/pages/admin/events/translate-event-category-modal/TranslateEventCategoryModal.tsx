@@ -11,8 +11,6 @@ import {
     TranslateEventCategoryFormValues,
 } from '../translate-event-category-form/TranslateEventCategoryForm';
 
-import styles from './TranslateEventCategoryModal.module.scss';
-
 export interface TranslateEventCategoryModalProps {
     isOpen: boolean;
     categories: EventCategoryDto[];

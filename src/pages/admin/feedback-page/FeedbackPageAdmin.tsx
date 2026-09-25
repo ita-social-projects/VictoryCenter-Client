@@ -21,7 +21,7 @@ import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
-import { DeleteFeedbackHistoryModal } from './components/delete-feedback-history-modal/DeleteFeedbackHistoryModal';
+import { DeleteFeedbackModal } from './components/delete-feedback-modal/DeleteFeedbackModal';
 import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
 import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
 import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
@@ -94,7 +94,9 @@ export const FeedbackPageAdmin = () => {
         addToast('Функція не реалізована', ToastType.Info);
     }, [addToast]);
 
-    const [historyToDelete, setHistoryToDelete] = useState<FeedbackHistoryDto | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<{ item: FeedbackListItem; category: FeedbackCategory } | null>(
+        null,
+    );
     const [historyToEdit, setHistoryToEdit] = useState<FeedbackHistoryDto | null>(null);
     const [isAddHistoryModalOpen, setIsAddHistoryModalOpen] = useState<boolean>(false);
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
@@ -136,22 +138,17 @@ export const FeedbackPageAdmin = () => {
 
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
-            if (activeCategory === FeedbackCategory.HISTORY && isFeedbackHistory(item)) {
-                setHistoryToDelete(item);
-            } else {
-                handleNotImplemented();
-            }
+            setItemToDelete({ item, category: activeCategory });
         },
-        [activeCategory, handleNotImplemented],
+        [activeCategory],
     );
-
-    const handleDeleteHistoryConfirm = useCallback(
-        (deletedHistory: FeedbackHistoryDto) => {
-            setItems((prev) => prev.filter((item) => item.id !== deletedHistory.id));
-            if (selectedSearchItem?.id === deletedHistory.id) {
+    const handleDeleteConfirm = useCallback(
+        (deletedItem: FeedbackListItem) => {
+            setItems((prev) => prev.filter((item) => item.id !== deletedItem.id));
+            if (selectedSearchItem?.id === deletedItem.id) {
                 setSelectedSearchItem(null);
             }
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
         },
         [selectedSearchItem, addToast],
     );
@@ -492,11 +489,12 @@ export const FeedbackPageAdmin = () => {
                 />
             </div>
 
-            <DeleteFeedbackHistoryModal
-                isOpen={!!historyToDelete}
-                onClose={() => setHistoryToDelete(null)}
-                historyToDelete={historyToDelete}
-                onDeleteHistory={handleDeleteHistoryConfirm}
+            <DeleteFeedbackModal
+                isOpen={!!itemToDelete}
+                onClose={() => setItemToDelete(null)}
+                category={itemToDelete?.category ?? activeCategory}
+                itemToDelete={itemToDelete?.item ?? null}
+                onDeleteItem={handleDeleteConfirm}
             />
             <AddFeedbackHistoryModal
                 isOpen={isAddHistoryModalOpen}

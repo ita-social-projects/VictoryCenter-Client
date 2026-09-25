@@ -2,43 +2,45 @@ import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
-import { FeedbackHistoryDto } from '@/types/admin/feedback';
+import { FeedbackCategory, FeedbackListItem } from '@/types/admin/feedback';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { Button } from '@/components/admin/button/Button';
-import './DeleteFeedbackHistoryModal.scss';
+import styles from './DeleteFeedbackModal.module.scss';
 
-export interface DeleteFeedbackHistoryModalProps {
+export interface DeleteFeedbackModalProps {
     isOpen: boolean;
     onClose: () => void;
-    historyToDelete: FeedbackHistoryDto | null;
-    onDeleteHistory: (history: FeedbackHistoryDto) => void;
+    category: FeedbackCategory;
+    itemToDelete: FeedbackListItem | null;
+    onDeleteItem: (item: FeedbackListItem) => void;
 }
 
-export const DeleteFeedbackHistoryModal = ({
+export const DeleteFeedbackModal = ({
     isOpen,
     onClose,
-    historyToDelete,
-    onDeleteHistory,
-}: DeleteFeedbackHistoryModalProps) => {
+    category,
+    itemToDelete,
+    onDeleteItem,
+}: DeleteFeedbackModalProps) => {
     const client = useAdminClient();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
     const handleConfirmDelete = async () => {
-        if (isSubmitting || !historyToDelete) return;
+        if (isSubmitting || !itemToDelete) return;
 
         try {
             setIsSubmitting(true);
             setError('');
 
-            await FeedbackApi.deleteHistory(client, historyToDelete.id);
-            onDeleteHistory(historyToDelete);
+            await FeedbackApi.deleteFeedback(client, category, itemToDelete.id);
+            onDeleteItem(itemToDelete);
             onClose();
         } catch (error) {
             // eslint-disable-next-line no-console
-            console.error('Failed to delete feedback history:', error);
-            setError(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.FAIL_TO_DELETE);
+            console.error('Failed to delete feedback item:', error);
+            setError(FEEDBACK_TEXT.DELETE_MODAL.FAIL_TO_DELETE);
         } finally {
             setIsSubmitting(false);
         }
@@ -52,10 +54,8 @@ export const DeleteFeedbackHistoryModal = ({
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            <Modal.Title>{FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE}</Modal.Title>
-            <Modal.Content>
-                {error && <div className="delete-feedback-history-error-container">{error}</div>}
-            </Modal.Content>
+            <Modal.Title>{FEEDBACK_TEXT.DELETE_MODAL.TITLE}</Modal.Title>
+            <Modal.Content>{error && <div className={styles['error-container']}>{error}</div>}</Modal.Content>
             <Modal.Actions>
                 <Button
                     onClick={handleClose}
@@ -69,7 +69,7 @@ export const DeleteFeedbackHistoryModal = ({
                     onClick={handleConfirmDelete}
                     buttonStyle="primary"
                     className="confirmation-btn"
-                    disabled={isSubmitting || !historyToDelete}
+                    disabled={isSubmitting || !itemToDelete}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>

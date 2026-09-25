@@ -1,10 +1,11 @@
 @use '@/assets/sass/variables/colors' as c;
 
 .editing-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: 126px 170px;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    column-gap: 15px;
+    row-gap: 4px;
 }
 
 .editing-actions .add-income-button,
@@ -77,4 +78,13 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
+}
+
+.category-limit-message {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: c.$error;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
 }

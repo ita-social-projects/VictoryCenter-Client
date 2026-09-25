@@ -425,6 +425,18 @@ export const FundsExpenditureSection = ({
         summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
         hasSelectedRecords ||
         hasExchangeRateError;
+    const hasReachedIncomeCategoryLimit =
+        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const hasReachedExpenseCategoryLimit =
+        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const categoryLimitMessage =
+        hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit
+            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH
+            : hasReachedIncomeCategoryLimit
+              ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME
+              : hasReachedExpenseCategoryLimit
+                ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE
+                : undefined;
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
@@ -869,6 +881,7 @@ export const FundsExpenditureSection = ({
                 controlsDisabled={isRowEditMode}
                 isAddIncomeDisabled={isAddIncomeDisabled}
                 isAddExpenseDisabled={isAddExpenseDisabled}
+                categoryLimitMessage={categoryLimitMessage}
                 onTypeChange={handleTypeChange}
                 onCategoryChange={setSelectedCategoryId}
                 onExchangeRateChange={handleExchangeRateChange}

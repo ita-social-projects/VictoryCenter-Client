@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as EyeClosedIcon } from '@/assets/icons/eye-closed.svg';
 import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
@@ -10,12 +9,17 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { ToastType } from '@/types/admin/toast';
-import { Metric, MetricType, UpdateSingleMetricDto } from '@/types/admin/main-page';
+import { Metric, MetricType, UpdateMetricResult, UpdateSingleMetricDto } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import { useState } from 'react';
 import { RaisedMetricEditPanel } from '../raised-metric-edit-panel/RaisedMetricEditPanel';
 import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/StatisticsMetricEditPanel';
 import styles from './StatisticsMetricsList.module.scss';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { REPORTS_TEXT } from '@/const/admin/reports';
+import { TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
+import { isConcurrencyError } from '@/utils/functions/is-concurrency-error/is-concurrency-error';
 
 interface StatisticsMetricsListProps {
     metrics: Metric[];
@@ -92,25 +96,58 @@ export const StatisticsMetricsList = ({
         try {
             setPendingMetric(updatedMetric);
             const response = await MainPageApi.updateMetric(client, updatedMetric.id, patch as UpdateSingleMetricDto);
-
             if (response.wasModified) {
-                const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? updatedMetric : m));
+                const syncedMetric = applyServerState(updatedMetric, response);
+                const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? syncedMetric : m));
                 onMetricUpdate(newMetrics);
-                setEditingMetricId(null);
-                setPendingMetric(null);
-                addToast('Зміни збережено успішно', ToastType.Success, 3000);
-            } else {
-                setEditingMetricId(null);
-                setPendingMetric(null);
-                addToast('Змін не виявлено', ToastType.Info, 3000);
             }
+            setEditingMetricId(null);
+            setPendingMetric(null);
+
+            addToast(
+                response.wasModified
+                    ? REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY
+                    : REPORTS_TEXT.MESSAGE.NO_CHANGES_FOUND,
+                response.wasModified ? ToastType.Success : ToastType.Info,
+                3000,
+            );
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status === 409) {
-                addToast('Дані змінено іншим користувачем. Перезавантажте сторінку', ToastType.Warning, 3000);
+            setPendingMetric(null);
+            if (isConcurrencyError(error)) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.DATA_MODIFIED_BY_ANOTHER_USER, ToastType.Warning, 3000);
             } else {
-                addToast('Виникла помилка, спробуйте ще раз', ToastType.Error, 3000);
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
             }
         }
+    };
+
+    const applyServerState = (metric: Metric, response: UpdateMetricResult): Metric => {
+        const hasExisting = metric.localizations?.some((loc) => loc.languageId === DEFAULT_ENGLISH_LANGUAGE_ID);
+        let localizations =
+            metric.localizations?.map((loc) =>
+                loc.languageId === DEFAULT_ENGLISH_LANGUAGE_ID && response.localizationValue != null
+                    ? { ...loc, value: response.localizationValue }
+                    : loc,
+            ) ?? [];
+
+        if (!hasExisting && response.localizationValue != null) {
+            localizations = [
+                ...localizations,
+                {
+                    languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                    value: response.localizationValue,
+                    language: { id: DEFAULT_ENGLISH_LANGUAGE_ID, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ];
+        }
+
+        return {
+            ...metric,
+            rowVersion: response.rowVersion ?? metric.rowVersion,
+            value: response.value ?? metric.value,
+            localizations,
+        };
     };
 
     const handleCancelEdit = () => {

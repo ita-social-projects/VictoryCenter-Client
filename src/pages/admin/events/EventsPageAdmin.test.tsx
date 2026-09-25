@@ -51,15 +51,37 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         onSearchClear,
         onSuggestionSelect,
         onStatusFilterChange,
+        statusFilter,
         fetchSearchItems,
     }: any) => (
         <div data-testid="events-toolbar">
             <span>{placeholder}</span>
-            <button onClick={onAddItem}>{AddItemButtonText}</button>
-            <button onClick={onSearchClear}>Clear Search</button>
-            <button onClick={() => onSuggestionSelect({})}>Select Suggestion</button>
-            <button onClick={() => onStatusFilterChange('ACTIVE')}>Filter Status</button>
-            <button onClick={() => fetchSearchItems('query', { offset: 0, limit: 10 })}>Fetch Search</button>
+
+            <button type="button" onClick={onAddItem}>
+                {AddItemButtonText}
+            </button>
+
+            <button type="button" onClick={onSearchClear}>
+                Clear Search
+            </button>
+
+            <button type="button" onClick={() => onSuggestionSelect?.({})}>
+                Select Suggestion
+            </button>
+
+            <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
+                Enable status filter
+            </button>
+
+            <button type="button" data-testid="clear-status-filter" onClick={() => onStatusFilterChange?.(undefined)}>
+                Clear status filter
+            </button>
+
+            <button type="button" onClick={() => fetchSearchItems?.('query', { offset: 0, limit: 10 })}>
+                Fetch Search
+            </button>
+
+            {statusFilter !== undefined && <span data-testid="active-status-filter">{String(statusFilter)}</span>}
         </div>
     ),
 }));
@@ -597,7 +619,7 @@ describe('EventsPageAdmin', () => {
 
         await user.click(await screen.findByText('Clear Search'));
         await user.click(screen.getByText('Select Suggestion'));
-        await user.click(screen.getByText('Filter Status'));
+        await user.click(screen.getByTestId('enable-status-filter'));
         await user.click(screen.getByText('Fetch Search'));
 
         expect(mockedEventsApi.fetchEventSearchItems).toHaveBeenCalledWith(
@@ -777,7 +799,9 @@ describe('EventsPageAdmin', () => {
             mockOnAddCategory(newCategory);
         });
 
-        expect(await screen.findByText('Category 3')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Category 3')).toBeInTheDocument();
+        });
     });
 
     it('updates an existing category in the categories list', async () => {
@@ -797,9 +821,11 @@ describe('EventsPageAdmin', () => {
             mockOnUpdateCategory(updatedCategory);
         });
 
-        expect(await screen.findByText('Updated Category')).toBeInTheDocument();
-        expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
-        expect(screen.getByText('Category 2')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Updated Category')).toBeInTheDocument();
+            expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
+            expect(screen.getByText('Category 2')).toBeInTheDocument();
+        });
     });
 
     it('updates a non-selected category without changing the selected category state', async () => {
@@ -849,7 +875,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith({}, categories[0].id, 0, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith({}, categories[0].id, 0, 5, undefined, undefined);
         });
 
         expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
@@ -860,7 +886,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText('Second event')).toBeInTheDocument();
     });
 
-    it('renders the empty state when there are no event items', async () => {
+    it('renders the empty state with add material button when no status filter is selected', async () => {
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
 
         mockedEventsApi.fetchEvents.mockResolvedValue({
@@ -871,6 +897,57 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+    });
+
+    it('renders filtered empty state without add material button', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, 1);
+        });
+    });
+
+    it('renders add material button after clearing the status filter', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('clear-status-filter'));
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
     });
 
     it('loads more event items when the load-more action is triggered', async () => {
@@ -895,7 +972,15 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('load-more-events'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[0].id, 5, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
+                2,
+                {},
+                categories[0].id,
+                5,
+                5,
+                undefined,
+                undefined,
+            );
         });
 
         expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
@@ -962,10 +1047,19 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[1].id, 0, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
+                2,
+                {},
+                categories[1].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
+
+            expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
         });
 
-        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 

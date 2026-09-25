@@ -107,6 +107,55 @@ export const EventsPageAdmin = () => {
         });
     const { openModalActions } = modalsStateControl;
 
+    const getEventSearchItems = useCallback(
+        async (
+            searchTerm: string,
+            paginationRequest: PaginationRequestParams,
+        ): Promise<PaginationResult<EventSearchItemData>> =>
+            EventsApi.fetchEventSearchItems(
+                client,
+                searchTerm,
+                paginationRequest.offset as number,
+                paginationRequest.limit as number,
+                paginationRequest.requestOptions?.cancellationSignal,
+            ),
+        [client],
+    );
+
+    // Toolbar handlers
+    const onStatusFilterChange = useCallback(
+        (status: VisibilityStatus | undefined) => {
+            setStatusFilter(status);
+
+            resetEventItemsState();
+        },
+        [resetEventItemsState],
+    );
+
+    // Category handlers
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
+
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
+    );
+
+    // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
         clearError('categories');
 
@@ -232,9 +281,10 @@ export const EventsPageAdmin = () => {
                 entities={eventItems}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
+                reorderDisabled={statusFilter !== undefined}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered],
+        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],
     );
 
     const fetchEventItems = useCallback(
@@ -252,7 +302,14 @@ export const EventsPageAdmin = () => {
                 const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
                 const offset = pageToFetch * pageSize;
 
-                const response = await EventsApi.fetchEvents(client, categoryId, offset, pageSize);
+                const response = await EventsApi.fetchEvents(
+                    client,
+                    categoryId,
+                    offset,
+                    pageSize,
+                    undefined,
+                    statusFilter,
+                );
 
                 if (requestId !== requestIdRef.current) {
                     return;
@@ -293,7 +350,7 @@ export const EventsPageAdmin = () => {
                 }
             }
         },
-        [client, pageSize, addToast, setErrorState],
+        [client, pageSize, addToast, setErrorState, statusFilter],
     );
 
     useEffect(() => {
@@ -330,7 +387,7 @@ export const EventsPageAdmin = () => {
         }
     }, [fetchEventItems, selectedCategory]);
 
-    const addMaterialButton = (
+    const addMaterialButton = statusFilter === undefined && (
         <Button
             className="btn-add"
             onClick={() => {
@@ -341,47 +398,6 @@ export const EventsPageAdmin = () => {
             {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
             <PlusIcon className="plus-icon" aria-hidden="true" />
         </Button>
-    );
-
-    const getEventSearchItems = useCallback(
-        async (
-            searchTerm: string,
-            paginationRequest: PaginationRequestParams,
-        ): Promise<PaginationResult<EventSearchItemData>> =>
-            EventsApi.fetchEventSearchItems(
-                client,
-                searchTerm,
-                paginationRequest.offset as number,
-                paginationRequest.limit as number,
-                paginationRequest.requestOptions?.cancellationSignal,
-            ),
-        [client],
-    );
-
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
-    }, []);
-
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            }
-        },
-        [openModalActions],
-    );
-
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-        ],
-        [],
     );
 
     const handleSectionDraftChange = useCallback((sectionId: EditableHeaderSectionId, value: string) => {
@@ -417,6 +433,9 @@ export const EventsPageAdmin = () => {
         setEventsIntroDraft(eventsIntroSection);
         setEditingSectionId(null);
     }, [eventsIntroSection]);
+
+    const emptyStateMessage =
+        statusFilter !== undefined ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
 
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
@@ -499,7 +518,7 @@ export const EventsPageAdmin = () => {
                         onLoadMore={handleOnLoadMore}
                         hasMore={hasMore}
                         isLoading={isEventItemsLoading}
-                        emptyStateMessage={EVENT_ITEMS_TEXT.NO_RECORDS}
+                        emptyStateMessage={emptyStateMessage}
                         emptyStateAction={addMaterialButton}
                     />
                 )}

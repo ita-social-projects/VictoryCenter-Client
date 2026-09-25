@@ -11,6 +11,7 @@ export interface FeedbackComponentProps {
     showPhoto?: boolean;
     onEdit?: (item: FeedbackListItem) => void;
     onDelete?: (item: FeedbackListItem) => void;
+    onTranslate?: (item: FeedbackListItem) => void;
 }
 
 const getFeedbackDescription = (item: FeedbackListItem): string => {
@@ -20,7 +21,13 @@ const getFeedbackDescription = (item: FeedbackListItem): string => {
     return '';
 };
 
-export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }: FeedbackComponentProps) => {
+export const FeedbackComponent = ({
+    item,
+    showPhoto = false,
+    onEdit,
+    onDelete,
+    onTranslate,
+}: FeedbackComponentProps) => {
     const [imgError, setImgError] = useState(false);
     const isVideo = 'link' in item;
     const title = ('title' in item ? item.title : item.authorName) || '';
@@ -41,6 +48,12 @@ export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }:
         e.stopPropagation();
         e.preventDefault();
         onDelete?.(item);
+    };
+
+    const handleTranslate = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onTranslate?.(item);
     };
 
     return (
@@ -69,6 +82,12 @@ export const FeedbackComponent = ({ item, showPhoto = false, onEdit, onDelete }:
 
             <div className="feedback-controls">
                 <div className="feedback-actions">
+                    <IconButton
+                        aria-label={FEEDBACK_TEXT.ACTIONS.TRANSLATE}
+                        type="button"
+                        onClick={handleTranslate}
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                    />
                     <IconButton
                         aria-label={FEEDBACK_TEXT.ACTIONS.EDIT}
                         type="button"

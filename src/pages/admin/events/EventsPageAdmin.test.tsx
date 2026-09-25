@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { act } from 'react';
 import '@testing-library/jest-dom';
-import { act } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
@@ -66,7 +65,19 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 }));
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
-    LocalizationStatuses: () => <span data-testid="localization-statuses-mock" />,
+    LocalizationStatuses: ({
+        languages,
+        localizedEntity,
+    }: {
+        languages: { id: number; code: string }[];
+        localizedEntity: EventCategoryDto;
+    }) => (
+        <span
+            data-testid="localization-statuses-mock"
+            data-languages={languages?.map((lang) => lang.code).join(',')}
+            data-entity-id={localizedEntity?.id}
+        />
+    ),
 }));
 
 const mockOpenAddCategoryModal = jest.fn();
@@ -95,7 +106,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
         renderCategoryExtra,
     }: any) => (
         <div data-testid="category-bar">
-            {categories.map((category: any) => (
+            {categories.map((category: EventCategoryDto) => (
                 <button
                     key={category.id}
                     type="button"
@@ -330,14 +341,26 @@ const renderEventsPage = async () => {
 };
 
 describe('EventsPageAdmin', () => {
-    const categories: any[] = [
+    const categories: EventCategoryDto[] = [
         {
             id: 1,
             name: 'Category 1',
             relatedEventNewsCount: 0,
-            localizations: [{ language: { code: 'en' }, name: 'Localized Cat 1' }],
+            localizations: [
+                {
+                    entityId: 1,
+                    language: { id: 2, code: 'en' },
+                    name: 'Localized Cat 1',
+                    translationStatus: 1,
+                },
+            ],
         },
-        { id: 2, name: 'Category 2', relatedEventNewsCount: 0 },
+        {
+            id: 2,
+            name: 'Category 2',
+            relatedEventNewsCount: 0,
+            localizations: [],
+        },
     ];
 
     const eventItems: EventItemDto[] = [
@@ -388,6 +411,18 @@ describe('EventsPageAdmin', () => {
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
         mockOnDeleteCategory.mockClear();
+    });
+
+    it('passes languages and localizedEntity props to LocalizationStatuses for each category', async () => {
+        await renderEventsPage();
+
+        const statusMocks = await screen.findAllByTestId('localization-statuses-mock');
+
+        expect(statusMocks).toHaveLength(categories.length);
+        expect(statusMocks[0]).toHaveAttribute('data-languages', 'en');
+        expect(statusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
+        expect(statusMocks[1]).toHaveAttribute('data-languages', 'en');
+        expect(statusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -731,10 +766,11 @@ describe('EventsPageAdmin', () => {
         expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
 
-        const newCategory: any = {
+        const newCategory: EventCategoryDto = {
             id: 3,
             name: 'Category 3',
             relatedEventNewsCount: 0,
+            localizations: [],
         };
 
         act(() => {
@@ -750,10 +786,11 @@ describe('EventsPageAdmin', () => {
         expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
 
-        const updatedCategory: any = {
+        const updatedCategory: EventCategoryDto = {
             id: 1,
             name: 'Updated Category',
             relatedEventNewsCount: 0,
+            localizations: [],
         };
 
         act(() => {
@@ -769,10 +806,11 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
         expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
 
-        const updatedCategory2: any = {
+        const updatedCategory2: EventCategoryDto = {
             id: 2,
             name: 'Updated Category 2',
             relatedEventNewsCount: 0,
+            localizations: [],
         };
 
         act(() => {

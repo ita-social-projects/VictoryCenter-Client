@@ -181,17 +181,11 @@ export const EventsPageAdmin = () => {
     );
 
     const getCategoryName = useCallback(
-        (category: any) => {
-            const localization = (category.localizations ?? []).find(
-                (loc: any) =>
-                    loc.language?.code === selectedLanguage?.code ||
-                    loc.language?.id === selectedLanguage?.id ||
-                    loc.localizationInfoDto?.code === selectedLanguage?.code ||
-                    loc.localizationInfoDto?.id === selectedLanguage?.id,
-            );
+        (category: EventCategoryDto) => {
+            const localization = category.localizations?.find((loc) => loc.language.code === selectedLanguage?.code);
             return localization?.name || category.name;
         },
-        [selectedLanguage?.code, selectedLanguage?.id],
+        [selectedLanguage?.code],
     );
 
     const updatePageSize = useCallback(() => {
@@ -493,7 +487,7 @@ export const EventsPageAdmin = () => {
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                     renderCategoryExtra={(category) => (
-                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category as any} />
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
                     )}
                 />
                 {error.type === 'categories' && <div className="error-message">{error.message}</div>}

@@ -7,6 +7,11 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT } from '@/const/admin/events';
+import {
+    EventsPageTextValidationRule,
+    getEventsPageTextValidationError,
+    isEventsPageTextOverMaxLength,
+} from '@/validation/admin/events-page-schema/events-page-schema';
 import styles from './EditableHeaderSection.module.scss';
 
 export type EditableHeaderSectionMode = 'view' | 'edit';
@@ -20,6 +25,7 @@ export interface EditableHeaderSectionProps {
     inputLabel: string;
     initialPublishedHtml: string;
     maxLength: number;
+    validationRule: EventsPageTextValidationRule;
     mode: EditableHeaderSectionMode;
     onEnterEditMode: () => void;
     onDraftChange: (value: string) => void;
@@ -69,6 +75,7 @@ export const EditableHeaderSection = ({
     inputLabel,
     initialPublishedHtml,
     maxLength,
+    validationRule,
     mode,
     onEnterEditMode,
     onDraftChange,
@@ -79,11 +86,13 @@ export const EditableHeaderSection = ({
     placeholder,
 }: EditableHeaderSectionProps) => {
     const [draftValue, setDraftValue] = useState(initialPublishedHtml);
+    const [validationError, setValidationError] = useState<string>();
     const [isCancelConfirmationModalOpen, setIsCancelConfirmationModalOpen] = useState(false);
 
     useEffect(() => {
         if (mode === 'view') {
             setDraftValue(initialPublishedHtml);
+            setValidationError(undefined);
         }
     }, [initialPublishedHtml, mode]);
 
@@ -92,22 +101,31 @@ export const EditableHeaderSection = ({
             const normalizedValue = normalizeEventsDraftHtml(value);
             setDraftValue(normalizedValue);
             onDraftChange(normalizedValue);
+
+            if (validationError || isEventsPageTextOverMaxLength(normalizedValue, validationRule)) {
+                setValidationError(getEventsPageTextValidationError(normalizedValue, validationRule));
+            }
         },
-        [onDraftChange],
+        [onDraftChange, validationError, validationRule],
     );
 
     const handleBlur = useCallback(() => {
         const normalizedValue = normalizeEventsDraftHtml(draftValue, true);
         setDraftValue(normalizedValue);
         onDraftChange(normalizedValue);
-    }, [draftValue, onDraftChange]);
+        setValidationError(getEventsPageTextValidationError(normalizedValue, validationRule));
+    }, [draftValue, onDraftChange, validationRule]);
 
     const isEditMode = mode === 'edit';
     const isDescriptionSection = sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
     const normalizedDraftValue = normalizeEventsDraftHtml(draftValue, true);
     const normalizedInitialValue = normalizeEventsDraftHtml(initialPublishedHtml, true);
     const isDraftChanged = normalizedDraftValue !== normalizedInitialValue;
-    const isPublishButtonDisabled = disabled || isPublishForcedDisabled || !isDraftChanged || !normalizedDraftValue;
+    const isPublishButtonDisabled =
+        disabled ||
+        isPublishForcedDisabled ||
+        !isDraftChanged ||
+        !!getEventsPageTextValidationError(normalizedDraftValue, validationRule);
 
     const handleCancelClick = useCallback(() => {
         if (isDraftChanged) {
@@ -177,7 +195,9 @@ export const EditableHeaderSection = ({
                             maxLength={maxLength}
                             disabled={disabled}
                             placeholder={placeholder}
+                            error={validationError}
                             trimOnBlur
+                            enforceMaxLength={false}
                             showCounterBelow
                         />
                         <div className={styles['editable-header-section-form-actions']}>

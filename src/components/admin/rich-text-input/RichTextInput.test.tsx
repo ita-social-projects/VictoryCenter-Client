@@ -245,7 +245,13 @@ describe('RichTextInput', () => {
             renderRichTextInput({ maxLength: 50 });
             expect(mockMaxLengthPluginProps).not.toBeNull();
             expect(mockMaxLengthPluginProps.maxLength).toBe(50);
+            expect(mockMaxLengthPluginProps.enforceMaxLength).toBe(true);
             expect(typeof mockMaxLengthPluginProps.onLengthChange).toBe('function');
+        });
+
+        it('passes disabled max length enforcement to MaxLengthPlugin', () => {
+            renderRichTextInput({ enforceMaxLength: false });
+            expect(mockMaxLengthPluginProps.enforceMaxLength).toBe(false);
         });
 
         it('passes onChange callback to OnChangePlugin', () => {

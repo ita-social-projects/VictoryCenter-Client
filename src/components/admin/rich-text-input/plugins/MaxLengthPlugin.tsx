@@ -6,9 +6,10 @@ import { trimTextContentFromAnchor } from '@lexical/selection';
 export interface MaxLengthPluginProps {
     maxLength: number;
     onLengthChange?: (length: number) => void;
+    enforceMaxLength?: boolean;
 }
 
-export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginProps) => {
+export const MaxLengthPlugin = ({ maxLength, onLengthChange, enforceMaxLength = true }: MaxLengthPluginProps) => {
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
@@ -33,13 +34,13 @@ export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginPr
             if (prevTextContent !== currentTextContent) {
                 const textLength = currentTextContent.length;
 
-                if (textLength > maxLength) {
+                if (enforceMaxLength && textLength > maxLength) {
                     const overflowLength = textLength - maxLength;
                     trimTextContentFromAnchor(editor, selection.anchor, overflowLength);
                 }
             }
         });
-    }, [editor, maxLength]);
+    }, [editor, enforceMaxLength, maxLength]);
 
     return null;
 };

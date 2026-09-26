@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { fireEvent, getDefaultNormalizer, render, screen } from '@testing-library/react';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_TEXT } from '@/const/admin/events';
+import { EVENTS_PAGE_VALIDATION, EVENTS_TEXT } from '@/const/admin/events';
 import { EditableHeaderSection, EditableHeaderSectionProps, normalizeEventsDraftHtml } from './EditableHeaderSection';
 
 const TEST_EVENTS_INTRO_CONTENT = {
@@ -23,6 +23,8 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         disabled,
         placeholder,
         hideToolbar,
+        enforceMaxLength,
+        error,
     }: RichTextInputGroupProps) => {
         const mockParser = new globalThis.DOMParser();
         const visibleText = mockParser.parseFromString(value, 'text/html').body.textContent ?? '';
@@ -31,7 +33,11 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 
         return (
             <div>
-                <div data-testid="rich-text-value" data-hide-toolbar={hideToolbar}>
+                <div
+                    data-testid="rich-text-value"
+                    data-hide-toolbar={hideToolbar}
+                    data-enforce-max-length={enforceMaxLength}
+                >
                     {value}
                 </div>
                 <input
@@ -48,6 +54,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                     }}
                     onChange={(event) => onChange(`<p>${event.target.value}</p>`)}
                 />
+                {error && <span>{error}</span>}
                 <output>
                     {visibleText.length}/{maxLength}
                 </output>
@@ -67,6 +74,7 @@ const defaultProps: EditableHeaderSectionProps = {
     inputLabel: EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE,
     initialPublishedHtml: '<p>Опублікований <strong>опис</strong></p>',
     maxLength: EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION,
+    validationRule: EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION,
     mode: 'view',
     onEnterEditMode: jest.fn(),
     onDraftChange: jest.fn(),
@@ -163,6 +171,7 @@ describe('EditableHeaderSection', () => {
 
         expect(screen.getByTestId('rich-text-value')).toHaveTextContent(defaultProps.initialPublishedHtml);
         expect(screen.getByTestId('rich-text-value')).not.toHaveAttribute('data-hide-toolbar');
+        expect(screen.getByTestId('rich-text-value')).toHaveAttribute('data-enforce-max-length', 'false');
         expect(screen.getByText(/\/100$/)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).toBeEnabled();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
@@ -256,6 +265,68 @@ describe('EditableHeaderSection', () => {
         expect(defaultProps.onDraftChange).toHaveBeenLastCalledWith('');
     });
 
+    it('shows a maximum-length error while typing', () => {
+        renderSection({ mode: 'edit', initialPublishedHtml: '<p>Достатньо довгий текст</p>' });
+
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value: 'a'.repeat(1001) } });
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000))).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+    });
+
+    it('shows required and minimum-length errors on blur and clears an error after valid input', () => {
+        renderSection({ mode: 'edit', initialPublishedHtml: '<p>Достатньо довгий текст</p>' });
+        const input = screen.getByLabelText(defaultProps.inputLabel);
+
+        fireEvent.change(input, { target: { value: '' } });
+        fireEvent.blur(input);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+
+        fireEvent.change(input, { target: { value: 'коротко' } });
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
+
+        fireEvent.change(input, { target: { value: 'Достатньо довго' } });
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+    });
+
+    it('clears a validation error after cancelling an edit', () => {
+        const { rerender } = renderSection({ mode: 'edit', initialPublishedHtml: '<p>Достатньо довгий текст</p>' });
+        const input = screen.getByLabelText(defaultProps.inputLabel);
+
+        fireEvent.change(input, { target: { value: 'коротко' } });
+        fireEvent.blur(input);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
+
+        rerender(
+            <EditableHeaderSection
+                {...defaultProps}
+                mode="view"
+                initialPublishedHtml="<p>Достатньо довгий текст</p>"
+            />,
+        );
+        rerender(
+            <EditableHeaderSection
+                {...defaultProps}
+                mode="edit"
+                initialPublishedHtml="<p>Достатньо довгий текст</p>"
+            />,
+        );
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
+    });
+
+    it.each([
+        ['empty', ''],
+        ['short', 'коротко'],
+        ['long', 'a'.repeat(1001)],
+    ])('disables publish for a changed %s draft', (_caseName, value) => {
+        renderSection({ mode: 'edit', initialPublishedHtml: '<p>Достатньо довгий текст</p>' });
+
+        fireEvent.change(screen.getByLabelText(defaultProps.inputLabel), { target: { value } });
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+    });
     it('shows the cleanup control only while focused with content and clears this draft', () => {
         renderSection({ mode: 'edit' });
         const input = screen.getByLabelText(defaultProps.inputLabel);

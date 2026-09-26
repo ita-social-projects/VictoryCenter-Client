@@ -174,6 +174,8 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
         deleteFeedback: jest.fn(),
+        createReview: jest.fn(),
+        createVideoReview: jest.fn(),
     },
 }));
 
@@ -239,6 +241,7 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.fetchVideos.mockResolvedValue(mockVideosData);
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
         mockFeedbackApi.deleteFeedback.mockResolvedValue();
+        mockFeedbackApi.createVideoReview.mockResolvedValue(mockVideosData.items[0]);
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -326,11 +329,19 @@ describe('FeedbackPageAdmin', () => {
         expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
-    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+    it('creates a video review and shows the success toast when the modal submits', async () => {
         await openAddVideoReviewModalOnVideosTab();
 
         fireEvent.click(screen.getByTestId('add-video-review-submit'));
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.createVideoReview).toHaveBeenCalledWith(mockAdminClient, {
+                title: 't',
+                link: 'l',
+                status: VisibilityStatus.Published,
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+        });
     });
 
     it('should close AddVideoReviewModal when its onClose is called', async () => {

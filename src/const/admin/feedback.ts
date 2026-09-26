@@ -36,12 +36,13 @@ export const FEEDBACK_TEXT = {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
         FAIL_TO_REORDER: 'Виникла помилка, не вдалося змінити порядок елемента',
         SUCCESS_DELETE: 'Матеріал успішно видалено',
-        SUCCESS_ADD_HISTORY: 'Історію успішно додано',
         FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
-        SUCCESS_EDIT_HISTORY: 'Зміни успішно опубліковано',
+        SUCCESS_PUBLISH: 'Відгук успішно опубліковано',
+        SUCCESS_UPDATE: 'Зміни успішно опубліковано',
         FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
         SUCCESS_TRANSLATE: 'Переклад успішно збережено',
         FAIL_TO_TRANSLATE: 'Виникла помилка під час збереження перекладу',
+        FAIL_TO_PUBLISH: 'Виникла помилка під час збереження',
     },
     DELETE_MODAL: {
         TITLE: 'Видалити матеріал?',
@@ -79,8 +80,9 @@ export const FEEDBACK_TEXT = {
     },
     EDIT_REVIEW_MODAL: {
         TITLE: 'Редагувати відгук',
-        SUCCESS_UPDATE: 'Зміни успішно опубліковано',
-        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
+    },
+    PUBLISH_MODAL: {
+        TITLE_NEW: 'Опублікувати новий відгук?',
     },
 };
 

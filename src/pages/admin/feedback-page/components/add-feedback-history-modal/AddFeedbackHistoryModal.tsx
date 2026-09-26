@@ -142,16 +142,16 @@ export const AddFeedbackHistoryModal = ({
     const handlePreSubmit = () => {
         if (!isValid || isSubmitting) return;
 
-        if (initialData) {
-            setShowPublishConfirmModal(true);
-        } else {
-            handleSubmit(executeSubmit)();
-        }
+        setShowPublishConfirmModal(true);
     };
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleClose} className={styles['add-feedback-history-modal']}>
+            <Modal
+                isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal}
+                onClose={handleClose}
+                className={styles['add-feedback-history-modal']}
+            >
                 <Modal.Title>
                     {initialData ? FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE : FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE}
                 </Modal.Title>
@@ -279,7 +279,7 @@ export const AddFeedbackHistoryModal = ({
 
             <ConfirmationModal
                 isOpen={showPublishConfirmModal}
-                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                title={initialData ? COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES : FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onConfirm={handleSubmit(executeSubmit)}

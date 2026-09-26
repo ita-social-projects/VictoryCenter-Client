@@ -15,14 +15,16 @@ import { getNormalizedInputText } from '@/utils/functions/formatters/text-format
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
+import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackReviewFormFields } from '../feedback-review-form-fields/FeedbackReviewFormFields';
 import styles from './AddFeedbackReviewModal.module.scss';
 
 export interface AddFeedbackReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onAddReview?: (review: FeedbackReviewDto) => void;
     onEditReview?: (review: FeedbackReviewDto) => void;
-    onEditError?: () => void;
+    onSubmitError?: () => void;
     initialData?: FeedbackReviewDto;
 }
 
@@ -34,8 +36,9 @@ const defaultFormState: FeedbackReviewFormValues = {
 export const AddFeedbackReviewModal = ({
     isOpen,
     onClose,
+    onAddReview,
     onEditReview,
-    onEditError,
+    onSubmitError,
     initialData,
 }: AddFeedbackReviewModalProps) => {
     const client = useAdminClient();
@@ -76,27 +79,35 @@ export const AddFeedbackReviewModal = ({
     }, [onClose]);
 
     const handleConfirmPublish = useCallback(async () => {
-        if (!initialData || isSubmitting) return;
+        if (isSubmitting) return;
 
         const { authorName, text } = getValues();
+        const payload = {
+            authorName: getNormalizedInputText(authorName),
+            text: getNormalizedInputText(text),
+            status: initialData?.status ?? VisibilityStatus.Published,
+        };
 
         try {
             setIsSubmitting(true);
-            const updatedReview = await FeedbackApi.updateReview(client, initialData.id, {
-                authorName: getNormalizedInputText(authorName),
-                text: getNormalizedInputText(text),
-                status: initialData.status,
-            });
+
+            if (initialData) {
+                const updatedReview = await FeedbackApi.updateReview(client, initialData.id, payload);
+                onEditReview?.(updatedReview);
+            } else {
+                const newReview = await FeedbackApi.createReview(client, payload);
+                onAddReview?.(newReview);
+            }
+
             setShowPublishConfirmModal(false);
-            onEditReview?.(updatedReview);
             onClose();
         } catch {
             setShowPublishConfirmModal(false);
-            onEditError?.();
+            onSubmitError?.();
         } finally {
             setIsSubmitting(false);
         }
-    }, [initialData, isSubmitting, getValues, client, onEditReview, onClose, onEditError]);
+    }, [initialData, isSubmitting, getValues, client, onAddReview, onEditReview, onClose, onSubmitError]);
 
     const isPublishDisabled = isEditMode ? !isValid || !isDirty || isSubmitting : !isValid;
 
@@ -116,7 +127,7 @@ export const AddFeedbackReviewModal = ({
                         <Button
                             buttonStyle="primary"
                             disabled={isPublishDisabled}
-                            onClick={isEditMode ? () => setShowPublishConfirmModal(true) : undefined}
+                            onClick={() => setShowPublishConfirmModal(true)}
                         >
                             {FEEDBACK_TEXT.ADD_REVIEW_MODAL.PUBLISH}
                         </Button>
@@ -126,7 +137,7 @@ export const AddFeedbackReviewModal = ({
 
             <ConfirmationModal
                 isOpen={showPublishConfirmModal}
-                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                title={isEditMode ? COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES : FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 isButtonsDisabled={isSubmitting}

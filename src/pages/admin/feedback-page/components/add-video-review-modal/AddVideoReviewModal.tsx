@@ -29,6 +29,7 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
     const [linkError, setLinkError] = useState<string | undefined>(undefined);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [showPublishConfirmModal, setShowPublishConfirmModal] = useState(false);
 
     const isDirty = title.trim().length > 0 || link.trim().length > 0;
 
@@ -72,10 +73,12 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
         });
     }, []);
 
-    const handleSubmit = useCallback(async () => {
+    const handleConfirmPublish = useCallback(async () => {
         if (!onSubmit) return;
 
+        setShowPublishConfirmModal(false);
         setIsSubmitting(true);
+
         const success = await onSubmit({
             title: getNormalizedInputText(title),
             link: getNormalizedInputText(link),
@@ -113,7 +116,7 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleRequestClose}>
+            <Modal isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal} onClose={handleRequestClose}>
                 <Modal.Title>{FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE}</Modal.Title>
                 <Modal.Content>
                     <InputWithCharacterLimitGroup
@@ -157,7 +160,11 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
 
                 <Modal.Actions>
                     <div className={styles.actions}>
-                        <Button buttonStyle="primary" onClick={handleSubmit} disabled={isSubmitDisabled}>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={() => setShowPublishConfirmModal(true)}
+                            disabled={isSubmitDisabled}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>
@@ -170,6 +177,16 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
                 onClose={handleCancelClose}
                 onCancel={handleCancelClose}
                 onConfirm={handleConfirmClose}
+            />
+            <ConfirmationModal
+                isOpen={showPublishConfirmModal}
+                title={FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isSubmitting}
+                onConfirm={handleConfirmPublish}
+                onCancel={() => setShowPublishConfirmModal(false)}
+                onClose={() => setShowPublishConfirmModal(false)}
             />
         </>
     );

@@ -17,6 +17,7 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
     FeedbackApi: {
         updateReview: jest.fn(),
+        createReview: jest.fn(),
     },
 }));
 
@@ -29,6 +30,8 @@ describe('AddFeedbackReviewModal', () => {
         const defaultProps = {
             isOpen: true,
             onClose: jest.fn(),
+            onAddReview: jest.fn(),
+            onSubmitError: jest.fn(),
         };
 
         const fillValidValues = () => {
@@ -145,6 +148,84 @@ describe('AddFeedbackReviewModal', () => {
             });
         });
 
+        describe('publish flow', () => {
+            const fillAndClickPublish = async () => {
+                fillValidValues();
+
+                await waitFor(() => {
+                    expect(getPublishButton()).toBeEnabled();
+                });
+
+                fireEvent.click(getPublishButton());
+            };
+
+            it('shows publish confirmation with the new-review title', async () => {
+                render(<AddFeedbackReviewModal {...defaultProps} />);
+
+                await fillAndClickPublish();
+
+                expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+                expect(screen.getByText(FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW)).toBeInTheDocument();
+            });
+
+            it('does not save and keeps the modal open when publish is cancelled', async () => {
+                render(<AddFeedbackReviewModal {...defaultProps} />);
+
+                await fillAndClickPublish();
+
+                fireEvent.click(screen.getByTestId('confirmation-cancel'));
+
+                expect(FeedbackApi.createReview).not.toHaveBeenCalled();
+                expect(defaultProps.onClose).not.toHaveBeenCalled();
+                expect(getAuthorNameInput()).toHaveValue('Анастасія');
+            });
+
+            it('creates the review, notifies parent and closes when publish is confirmed', async () => {
+                const newReview: FeedbackReviewDto = {
+                    id: 7,
+                    authorName: 'Анастасія',
+                    text: 'Дуже вдячна центру за підтримку',
+                    status: VisibilityStatus.Published,
+                    priority: 1,
+                    localizations: [],
+                };
+                (FeedbackApi.createReview as jest.Mock).mockResolvedValue(newReview);
+
+                render(<AddFeedbackReviewModal {...defaultProps} />);
+
+                await fillAndClickPublish();
+
+                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+                await waitFor(() => {
+                    expect(FeedbackApi.createReview).toHaveBeenCalledWith(expect.anything(), {
+                        authorName: 'Анастасія',
+                        text: 'Дуже вдячна центру за підтримку',
+                        status: VisibilityStatus.Published,
+                    });
+                    expect(defaultProps.onAddReview).toHaveBeenCalledWith(newReview);
+                    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+                });
+            });
+
+            it('calls onSubmitError and keeps the modal open when creation fails', async () => {
+                (FeedbackApi.createReview as jest.Mock).mockRejectedValue(new Error('Create failed'));
+
+                render(<AddFeedbackReviewModal {...defaultProps} />);
+
+                await fillAndClickPublish();
+
+                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+                await waitFor(() => {
+                    expect(defaultProps.onSubmitError).toHaveBeenCalledTimes(1);
+                });
+
+                expect(defaultProps.onAddReview).not.toHaveBeenCalled();
+                expect(defaultProps.onClose).not.toHaveBeenCalled();
+            });
+        });
+
         describe('close behavior', () => {
             it('calls onClose immediately when form is not dirty', () => {
                 const onClose = jest.fn();
@@ -203,7 +284,7 @@ describe('AddFeedbackReviewModal', () => {
             onClose: jest.fn(),
             initialData: mockReview,
             onEditReview: jest.fn(),
-            onEditError: jest.fn(),
+            onSubmitError: jest.fn(),
         };
 
         const renderAndWaitForPrefill = async (props = {}) => {
@@ -325,7 +406,7 @@ describe('AddFeedbackReviewModal', () => {
                 });
             });
 
-            it('calls onEditError and keeps the modal open when saving fails', async () => {
+            it('calls onSubmitError and keeps the modal open when saving fails', async () => {
                 (FeedbackApi.updateReview as jest.Mock).mockRejectedValue(new Error('Update failed'));
 
                 await renderAndWaitForPrefill();
@@ -334,7 +415,7 @@ describe('AddFeedbackReviewModal', () => {
                 fireEvent.click(screen.getByTestId('confirmation-confirm'));
 
                 await waitFor(() => {
-                    expect(defaultProps.onEditError).toHaveBeenCalledTimes(1);
+                    expect(defaultProps.onSubmitError).toHaveBeenCalledTimes(1);
                 });
 
                 expect(defaultProps.onEditReview).not.toHaveBeenCalled();

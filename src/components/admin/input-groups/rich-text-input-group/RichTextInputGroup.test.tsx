@@ -38,6 +38,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         hideToolbar,
         placeholder,
         showCounter,
+        enforceMaxLength,
         onLengthChange,
     }: {
         id: string;
@@ -51,6 +52,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         hideToolbar?: boolean;
         placeholder?: string;
         showCounter?: boolean;
+        enforceMaxLength?: boolean;
         onLengthChange?: (length: number) => void;
     }) => (
         <div
@@ -63,6 +65,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
             data-hide-toolbar={hideToolbar}
             data-placeholder={placeholder}
             data-show-counter={showCounter}
+            data-enforce-max-length={enforceMaxLength}
         >
             <button data-testid="mock-on-change" onClick={() => onChange('<p>Changed</p>')}>
                 Change
@@ -165,6 +168,11 @@ describe('RichTextInputGroup', () => {
         it('forwards maxLength prop to RichTextInput', () => {
             renderRichTextInputGroup({ maxLength: 50 });
             expect(getRichTextInput()).toHaveAttribute('data-max-length', '50');
+        });
+
+        it('forwards enforceMaxLength prop to RichTextInput', () => {
+            renderRichTextInputGroup({ enforceMaxLength: false });
+            expect(getRichTextInput()).toHaveAttribute('data-enforce-max-length', 'false');
         });
 
         it('forwards disabled prop to RichTextInput', () => {

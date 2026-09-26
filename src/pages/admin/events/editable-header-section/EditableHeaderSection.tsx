@@ -197,6 +197,7 @@ export const EditableHeaderSection = ({
                             placeholder={placeholder}
                             error={validationError}
                             trimOnBlur
+                            enforceMaxLength={false}
                             showCounterBelow
                         />
                         <div className={styles['editable-header-section-form-actions']}>

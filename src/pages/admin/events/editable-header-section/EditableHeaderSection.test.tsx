@@ -23,6 +23,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         disabled,
         placeholder,
         hideToolbar,
+        enforceMaxLength,
         error,
     }: RichTextInputGroupProps) => {
         const mockParser = new globalThis.DOMParser();
@@ -32,7 +33,11 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 
         return (
             <div>
-                <div data-testid="rich-text-value" data-hide-toolbar={hideToolbar}>
+                <div
+                    data-testid="rich-text-value"
+                    data-hide-toolbar={hideToolbar}
+                    data-enforce-max-length={enforceMaxLength}
+                >
                     {value}
                 </div>
                 <input
@@ -166,6 +171,7 @@ describe('EditableHeaderSection', () => {
 
         expect(screen.getByTestId('rich-text-value')).toHaveTextContent(defaultProps.initialPublishedHtml);
         expect(screen.getByTestId('rich-text-value')).not.toHaveAttribute('data-hide-toolbar');
+        expect(screen.getByTestId('rich-text-value')).toHaveAttribute('data-enforce-max-length', 'false');
         expect(screen.getByText(/\/100$/)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).toBeEnabled();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();

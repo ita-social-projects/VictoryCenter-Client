@@ -130,24 +130,6 @@ export const FeedbackPageAdmin = () => {
         [activeCategory, handleNotImplemented],
     );
 
-    const handleAddVideoReviewSubmit = useCallback(
-        async (data: { title: string; link: string }) => {
-            try {
-                const newVideo = await FeedbackApi.createVideoReview(client, {
-                    ...data,
-                    status: VisibilityStatus.Published,
-                });
-                setItems((prev) => [...prev, newVideo]);
-                addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
-                return true;
-            } catch {
-                addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
-                return false;
-            }
-        },
-        [client, addToast],
-    );
-
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
             setItemToDelete({ item, category: activeCategory });
@@ -170,14 +152,6 @@ export const FeedbackPageAdmin = () => {
             setItems((prev) => prev.map((item) => (item.id === updatedReview.id ? updatedReview : item)));
             setSelectedSearchItem((prev) => (prev && prev.id === updatedReview.id ? updatedReview : prev));
             addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
-        },
-        [addToast],
-    );
-
-    const handleAddReviewSuccess = useCallback(
-        (newReview: FeedbackReviewDto) => {
-            setItems((prev) => [...prev, newReview]);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
         },
         [addToast],
     );
@@ -279,6 +253,31 @@ export const FeedbackPageAdmin = () => {
         },
         [fetchCategoryItems, activeCategory, addToast],
     );
+
+    const handleAddVideoReviewSubmit = useCallback(
+        async (data: { title: string; link: string }) => {
+            try {
+                await FeedbackApi.createVideoReview(client, {
+                    ...data,
+                    status: VisibilityStatus.Published,
+                });
+                setSelectedSearchItem(null);
+                fetchCategoryItems(activeCategory, 0);
+                addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
+                return false;
+            }
+        },
+        [client, fetchCategoryItems, activeCategory, addToast],
+    );
+
+    const handleAddReviewSuccess = useCallback(() => {
+        setSelectedSearchItem(null);
+        fetchCategoryItems(activeCategory, 0);
+        addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+    }, [fetchCategoryItems, activeCategory, addToast]);
 
     const handleEditHistorySuccess = useCallback(
         (updatedHistory: FeedbackHistoryDto) => {

@@ -76,13 +76,13 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
     const handleConfirmPublish = useCallback(async () => {
         if (!onSubmit) return;
 
+        setShowPublishConfirmModal(false);
         setIsSubmitting(true);
+
         const success = await onSubmit({
             title: getNormalizedInputText(title),
             link: getNormalizedInputText(link),
         });
-
-        setShowPublishConfirmModal(false);
 
         if (success) {
             resetForm();
@@ -116,7 +116,7 @@ export const AddVideoReviewModal = ({ isOpen, onClose, onSubmit }: AddVideoRevie
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleRequestClose}>
+            <Modal isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal} onClose={handleRequestClose}>
                 <Modal.Title>{FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE}</Modal.Title>
                 <Modal.Content>
                     <InputWithCharacterLimitGroup

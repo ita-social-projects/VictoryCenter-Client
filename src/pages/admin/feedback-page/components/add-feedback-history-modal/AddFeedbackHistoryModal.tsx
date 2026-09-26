@@ -147,7 +147,11 @@ export const AddFeedbackHistoryModal = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleClose} className={styles['add-feedback-history-modal']}>
+            <Modal
+                isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal}
+                onClose={handleClose}
+                className={styles['add-feedback-history-modal']}
+            >
                 <Modal.Title>
                     {initialData ? FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE : FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE}
                 </Modal.Title>

@@ -505,7 +505,9 @@ describe('EventsPageAdmin', () => {
         await user.click(await screen.findByRole('button', { name: `Редагувати ${descriptionId}` }));
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
 
-        await user.click(screen.getAllByText('Cancel')[0]);
+        await user.type(screen.getByRole('textbox', { name: `Змінити ${descriptionId}` }), 'Draft text');
+        await user.click(screen.getByRole('button', { name: `Скасувати редагування ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Підтвердити скасування ${descriptionId}` }));
 
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
     });

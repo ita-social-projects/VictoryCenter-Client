@@ -77,6 +77,8 @@ export const API_ROUTES = {
         BASE: 'EventsPage',
         DESCRIPTION: 'EventsPage/description',
         EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
+        TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY: 'EventsPage/events-block-title/toggle-visibility',
+        TOGGLE_DESCRIPTION_VISIBILITY: 'EventsPage/description/toggle-visibility',
     },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',

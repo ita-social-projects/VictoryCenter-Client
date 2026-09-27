@@ -38,6 +38,8 @@ export interface EventsLocalizableFields {
 export interface EventsIntroSectionDto {
     eventsBlockTitle: string;
     pageDescription: string;
+    isEventsBlockTitleHidden: boolean;
+    isPageDescriptionHidden: boolean;
 }
 
 export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
+import { ReactComponent as EyeClosedIcon } from '@/assets/icons/eye-closed.svg';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
@@ -35,6 +36,8 @@ export interface EditableHeaderSectionProps {
     isPublishDisabled?: boolean;
     disabled?: boolean;
     placeholder: string;
+    isHidden?: boolean;
+    onToggleVisibility?: () => void;
 }
 
 const sanitizeViewHtml = (html: string) =>
@@ -84,6 +87,8 @@ export const EditableHeaderSection = ({
     isPublishDisabled: isPublishForcedDisabled = false,
     disabled = false,
     placeholder,
+    isHidden,
+    onToggleVisibility,
 }: EditableHeaderSectionProps) => {
     const [draftValue, setDraftValue] = useState(initialPublishedHtml);
     const [validationError, setValidationError] = useState<string>();
@@ -152,7 +157,7 @@ export const EditableHeaderSection = ({
                     isDescriptionSection
                         ? styles['editable-header-section--description']
                         : styles['editable-header-section--events-block-title']
-                } ${isEditMode ? styles['editable-header-section--edit'] : ''}`}
+                } ${isEditMode ? styles['editable-header-section--edit'] : ''} ${isHidden ? styles['editable-header-section--hidden'] : ''}`}
                 data-testid={`${sectionId}-section`}
             >
                 {!isEditMode && (
@@ -176,8 +181,9 @@ export const EditableHeaderSection = ({
                                 className={styles['editable-header-section-icon-button']}
                                 aria-label={`${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: ${heading}`}
                                 disabled={disabled}
+                                onClick={onToggleVisibility}
                             >
-                                <EyeOpenedIcon />
+                                {isHidden ? <EyeClosedIcon /> : <EyeOpenedIcon />}
                             </button>
                         </div>
                     </div>

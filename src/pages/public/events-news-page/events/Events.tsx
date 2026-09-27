@@ -13,7 +13,11 @@ import {
 } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import styles from './Events.module.scss';
 
-export const Events = ({ title, tags }: EventsData) => {
+export interface EventsProps extends EventsData {
+    isTitleHidden?: boolean;
+}
+
+export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
     const { t } = useTranslation('eventsNewsPage');
     const pageSize = 8;
 
@@ -78,7 +82,7 @@ export const Events = ({ title, tags }: EventsData) => {
                     </button>
                 </div>
 
-                {title && <h2 className={styles['header-title']}>{title}</h2>}
+                {!isTitleHidden && title && <h2 className={styles['header-title']}>{title}</h2>}
             </div>
             <div className={styles['cards-block']}>
                 {error && (

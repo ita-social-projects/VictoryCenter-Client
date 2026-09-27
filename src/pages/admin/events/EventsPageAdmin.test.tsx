@@ -377,11 +377,15 @@ describe('EventsPageAdmin', () => {
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         });
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         });
 
         mockAddToast.mockClear();
@@ -441,6 +445,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         let resolveIntroSection!: (section: IntroSection) => void;
@@ -465,6 +471,8 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 
@@ -516,6 +524,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         const user = userEvent.setup();
@@ -563,6 +573,8 @@ describe('EventsPageAdmin', () => {
             resolvePublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 

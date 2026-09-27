@@ -149,7 +149,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
-            isHidden,
+            isHidden: _isHidden,
             onToggleVisibility,
         }: {
             sectionId: string;
@@ -179,7 +179,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                     >
                         Edit section
                     </button>
-                    
+
                     <button
                         type="button"
                         onClick={onToggleVisibility}
@@ -629,12 +629,14 @@ describe('EventsPageAdmin', () => {
             isPageDescriptionHidden: false,
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
-        
+
         mockedEventsApi.toggleEventsDescriptionVisibility.mockResolvedValueOnce(mockResponse);
 
         await renderEventsPage();
 
-        await user.click(screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Опис сторінки` }));
+        await user.click(
+            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Опис сторінки` }),
+        );
 
         await waitFor(() => {
             expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledWith({});
@@ -650,12 +652,16 @@ describe('EventsPageAdmin', () => {
             isPageDescriptionHidden: false,
         };
         const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
-        
+
         mockedEventsApi.toggleEventsTitleVisibility.mockResolvedValueOnce(mockResponse);
 
         await renderEventsPage();
 
-        await user.click(screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Заголовок блоку подій` }));
+        await user.click(
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Заголовок блоку подій`,
+            }),
+        );
 
         await waitFor(() => {
             expect(mockedEventsApi.toggleEventsTitleVisibility).toHaveBeenCalledWith({});
@@ -672,8 +678,12 @@ describe('EventsPageAdmin', () => {
 
         await renderEventsPage();
 
-        expect(screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID + '-section')).toBeInTheDocument();
-        expect(screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID + '-section')).toBeInTheDocument();
+        expect(
+            screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID + '-section'),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID + '-section'),
+        ).toBeInTheDocument();
     });
 
     it.each([

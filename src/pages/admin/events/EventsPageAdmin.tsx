@@ -239,7 +239,10 @@ export const EventsPageAdmin = () => {
 
     const getCategoryName = useCallback(
         (category: EventCategoryDto) => {
-            const localization = category.localizations?.find((loc) => loc.language.code === selectedLanguage?.code);
+            const localization = category.localizations?.find((loc) => {
+                const langCode = loc.language?.code ?? (loc as any).localizationInfoDto?.code;
+                return langCode === selectedLanguage?.code;
+            });
             return localization?.name || category.name;
         },
         [selectedLanguage?.code],

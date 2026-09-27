@@ -5,6 +5,7 @@ import { LinearProgress } from '@mui/material';
 import { Button } from '@/components/public/ui/button/Button';
 import { ReactComponent as ArrowDownIcon } from '@/assets/icons/arrow-down.svg';
 import { EventsData, EventsNews, Tag } from '@/types/public/events-news';
+import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 import { SingleEventNews } from './single-event-news/SingleEventNews';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 import {
@@ -82,7 +83,7 @@ export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
                     </button>
                 </div>
 
-                {!isTitleHidden && title && <h2 className={styles['header-title']}>{title}</h2>}
+                {!isTitleHidden && title && <SafeHtml as="h2" className={styles['header-title']} html={title} />}
             </div>
             <div className={styles['cards-block']}>
                 {error && (

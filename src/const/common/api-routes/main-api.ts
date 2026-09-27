@@ -75,6 +75,7 @@ export const API_ROUTES = {
     },
     EVENTS_PAGE: {
         BASE: 'EventsPage',
+        PUBLIC: 'EventsPage/public',
         DESCRIPTION: 'EventsPage/description',
         EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
         TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY: 'EventsPage/events-block-title/toggle-visibility',

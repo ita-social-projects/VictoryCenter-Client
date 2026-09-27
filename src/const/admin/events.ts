@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 export const EVENTS_TEXT = {
@@ -47,6 +49,26 @@ export const EVENTS_TEXT = {
     },
 };
 
+export const EVENTS_PAGE_VALIDATION = {
+    PAGE_DESCRIPTION: {
+        min: 10,
+        max: EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () =>
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION.min),
+        getMaxError: () =>
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION.max),
+    },
+    EVENTS_BLOCK_TITLE: {
+        min: 10,
+        max: EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () =>
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE.min),
+        getMaxError: () =>
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE.max),
+    },
+};
 export const EVENT_CATEGORY_VALIDATION = {
     name: {
         min: 2,

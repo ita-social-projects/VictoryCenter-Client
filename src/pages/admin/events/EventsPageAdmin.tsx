@@ -29,6 +29,7 @@ import { ToastType } from '@/types/admin/toast';
 import {
     EVENT_ITEMS_TEXT,
     EVENT_NOTIFICATION_TIMERS,
+    EVENTS_PAGE_VALIDATION,
     EVENTS_TEXT,
     DEFAULT_LOAD_ITEMS_COUNT,
     LIST_ITEM_HEIGHT_IN_PIXELS,
@@ -36,6 +37,10 @@ import {
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
+import {
+    EventsPageTextValidationRule,
+    getEventsPageTextValidationError,
+} from '@/validation/admin/events-page-schema/events-page-schema';
 import './EventsPageAdmin.scss';
 
 const EMPTY_ERROR: ErrorState = {
@@ -47,7 +52,10 @@ const introSectionFieldById: Record<EditableHeaderSectionId, EventsIntroSectionU
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: 'pageDescription',
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: 'eventsBlockTitle',
 };
-
+const introSectionValidationById: Record<EditableHeaderSectionId, EventsPageTextValidationRule> = {
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION,
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE,
+};
 export const EventsPageAdmin = () => {
     const [editingSectionId, setEditingSectionId] = useState<EditableHeaderSectionId | null>(null);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -410,6 +418,13 @@ export const EventsPageAdmin = () => {
         async (sectionId: EditableHeaderSectionId, value: string) => {
             if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
 
+            const validationError = getEventsPageTextValidationError(value, introSectionValidationById[sectionId]);
+
+            if (validationError) {
+                addToast(validationError, ToastType.Error, EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+                return;
+            }
+
             const field = introSectionFieldById[sectionId];
             const updatedSection = { ...eventsIntroDraft, [field]: value };
 
@@ -426,7 +441,7 @@ export const EventsPageAdmin = () => {
                 setIsEventsIntroSectionPublishing(false);
             }
         },
-        [client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
+        [addToast, client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
     );
 
     const cancelSectionEdit = useCallback(() => {
@@ -466,6 +481,7 @@ export const EventsPageAdmin = () => {
                     inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
                     initialPublishedHtml={eventsIntroSection?.pageDescription ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION}
+                    validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]}
                     mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? 'edit' : 'view'}
                     onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
                     onDraftChange={(value) =>
@@ -483,6 +499,7 @@ export const EventsPageAdmin = () => {
                     inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}
                     initialPublishedHtml={eventsIntroSection?.eventsBlockTitle ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE}
+                    validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]}
                     mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID ? 'edit' : 'view'}
                     onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
                     onDraftChange={(value) =>

@@ -246,7 +246,9 @@ export const FeedbackPageAdmin = () => {
             setSelectedSearchItem((prev) => (prev && prev.id === updatedItem.id ? updatedItem : prev));
 
             if (isTranslationFilterActive) {
-                fetchCategoryItems(activeCategory, 0);
+                if (!selectedSearchItem) {
+                    fetchCategoryItems(activeCategory, 0);
+                }
                 return;
             }
 
@@ -257,7 +259,7 @@ export const FeedbackPageAdmin = () => {
                     : prev.filter((item) => item.id !== updatedItem.id),
             );
         },
-        [isTranslationFilterActive, fetchCategoryItems, activeCategory, statusFilter],
+        [isTranslationFilterActive, fetchCategoryItems, activeCategory, statusFilter, selectedSearchItem],
     );
 
     const handleEditHistorySuccess = useCallback(

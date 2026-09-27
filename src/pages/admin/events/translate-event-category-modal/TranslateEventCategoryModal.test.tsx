@@ -71,7 +71,16 @@ describe('TranslateEventCategoryModal', () => {
     });
 
     it('filters out DEFAULT_LOCALE and sorts categories alphabetically (A-Z)', () => {
-        render(
+        const { rerender } = render(
+            <TranslateEventCategoryModal
+                isOpen={false}
+                categories={categories}
+                onClose={onClose}
+                translationLanguages={translationLanguages}
+            />,
+        );
+
+        rerender(
             <TranslateEventCategoryModal
                 isOpen={true}
                 categories={categories}

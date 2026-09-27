@@ -74,12 +74,13 @@ describe('TranslateEventCategoryForm', () => {
     });
 
     it('calls onCategoryChange and marks form as dirty when a category is selected', () => {
-        render(
+        const { rerender } = render(
             <TranslateEventCategoryForm
                 categories={categories}
                 onSubmit={onSubmit}
                 onCategoryChange={onCategoryChange}
                 onDirtyChange={onDirtyChange}
+                selectedCategory={null}
             />,
         );
 
@@ -87,6 +88,17 @@ describe('TranslateEventCategoryForm', () => {
         fireEvent.change(select, { target: { value: '1' } });
 
         expect(onCategoryChange).toHaveBeenCalledWith(categories[0]);
+
+        rerender(
+            <TranslateEventCategoryForm
+                categories={categories}
+                onSubmit={onSubmit}
+                onCategoryChange={onCategoryChange}
+                onDirtyChange={onDirtyChange}
+                selectedCategory={categories[0]}
+            />,
+        );
+
         expect(onDirtyChange).toHaveBeenLastCalledWith(true);
     });
 

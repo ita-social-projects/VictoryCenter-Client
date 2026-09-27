@@ -1,12 +1,17 @@
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import { forwardRef, useEffect, useState } from 'react';
+import {
+    validateTranslateCategoryName,
+    validateTranslateCategorySelection,
+    validateTranslateEventCategoryForm,
+} from '@/validation/admin/event-schema/event-schema';
+import { forwardRef, useCallback, useEffect } from 'react';
 import styles from './TranslateEventCategoryForm.module.scss';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface TranslateEventCategoryFormValues {
     name: string;
@@ -14,6 +19,7 @@ export interface TranslateEventCategoryFormValues {
 
 export interface TranslateEventCategoryFormErrorState {
     name: string | undefined;
+    category?: string | undefined;
     [key: string]: string | string[] | undefined;
 }
 
@@ -38,26 +44,6 @@ const DEFAULT_FORM_STATE: TranslateEventCategoryFormValues = {
     name: '',
 };
 
-const validateName = (name: string): string | undefined => {
-    const trimmed = name.trim();
-    if (!trimmed) {
-        return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
-    }
-    if (trimmed.length > EVENT_CATEGORY_VALIDATION.name.max) {
-        return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max);
-    }
-    return undefined;
-};
-
-const validateForm = (
-    formState: TranslateEventCategoryFormValues,
-    _isPublishing: boolean,
-): TranslateEventCategoryFormErrorState => {
-    return {
-        name: validateName(formState.name),
-    };
-};
-
 export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormRef, TranslateEventCategoryFormProps>(
     (
         {
@@ -68,10 +54,20 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
             onCategoryChange,
             onValidationChange,
             onDirtyChange,
-            selectedCategory,
+            selectedCategory = null,
         }: TranslateEventCategoryFormProps,
         ref,
     ) => {
+        const validateForm = useCallback(
+            (
+                formState: TranslateEventCategoryFormValues,
+                _isPublishing: boolean,
+            ): TranslateEventCategoryFormErrorState => {
+                return validateTranslateEventCategoryForm(formState.name, selectedCategory);
+            },
+            [selectedCategory],
+        );
+
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateEventCategoryFormValues,
             TranslateEventCategoryFormErrorState
@@ -84,34 +80,32 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        const [localSelectedCategory, setLocalSelectedCategory] = useState<EventCategoryDto | null>(null);
-        const activeCategory = selectedCategory !== undefined ? selectedCategory : localSelectedCategory;
-
         useEffect(() => {
             const baseData = initialData ?? DEFAULT_FORM_STATE;
             const isNameDirty = JSON.stringify(formState) !== JSON.stringify(baseData);
-            const isCategoryDirty = activeCategory !== null;
+            const isCategoryDirty = selectedCategory !== null;
             onDirtyChange?.(isNameDirty || isCategoryDirty);
-        }, [formState, initialData, activeCategory, onDirtyChange]);
+        }, [formState, initialData, selectedCategory, onDirtyChange]);
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setFormState((prev) => ({ ...prev, name: e.target.value }));
         };
 
         const handleCategoryChange = (category: EventCategoryDto | null) => {
-            if (selectedCategory === undefined) {
-                setLocalSelectedCategory(category);
-            }
             onCategoryChange?.(category);
+            setErrors((prev) => ({ ...prev, category: validateTranslateCategorySelection(category) }));
         };
 
         const handleNameBlur = () => {
-            const normalized = formState.name.trim().replace(/\s+/g, ' ');
+            const normalized = getNormalizedInputText(formState.name);
             if (normalized !== formState.name) {
                 setFormState((prev) => ({ ...prev, name: normalized }));
             }
-            const error = validateName(normalized);
-            setErrors((prev) => ({ ...prev, name: error }));
+            setErrors((prev) => ({
+                ...prev,
+                name: validateTranslateCategoryName(normalized),
+                category: validateTranslateCategorySelection(selectedCategory),
+            }));
         };
 
         return (
@@ -123,13 +117,14 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
             >
                 <SingleSelectInputGroup
                     label={EVENT_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                    error={errors.category}
                     isRequired
                     options={categories}
                     getOptionId={(c) => c.id}
                     getOptionName={(c) => c.name}
                     disabled={isSubmitting || formDisabled}
                     onChange={handleCategoryChange}
-                    value={activeCategory || undefined}
+                    value={selectedCategory || undefined}
                     placeholder="Оберіть категорію"
                     id="category-select"
                 />

@@ -36,7 +36,7 @@ export const TranslateEventCategoryModal = ({
     }, [translationLanguages]);
 
     useEffect(() => {
-        if (isOpen) {
+        if (!isOpen) {
             setSelectedCategory(null);
             setIsDirty(false);
             setIsFormValid(false);

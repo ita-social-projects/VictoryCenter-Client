@@ -197,6 +197,14 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         Publish section
                     </button>
 
+                    <button
+                        type="button"
+                        onClick={() => onPublish('<p>short</p>')}
+                        aria-label={`Опублікувати невалідне ${sectionId}`}
+                    >
+                        Publish invalid section
+                    </button>
+
                     {isCancelConfirmationOpen && (
                         <div data-testid={`${sectionId}-cancel-confirmation-modal`}>
                             <button
@@ -467,6 +475,43 @@ describe('EventsPageAdmin', () => {
         });
     });
 
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID],
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID],
+    ])('does not call the API for an invalid %s draft', async (sectionId) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Опублікувати невалідне ${sectionId}` }));
+
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            ToastType.Error,
+            EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+        );
+    });
+    it.each([
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
+            'pageDescription',
+            { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' },
+        ],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            'eventsBlockTitle',
+            { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' },
+        ],
+    ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${sectionId}` }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, field, payload);
+        });
+    });
     it('prevents another intro section publish while a publish request is pending', async () => {
         type IntroSection = {
             eventsBlockTitle: string;

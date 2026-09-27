@@ -33,6 +33,8 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
         updateEventsIntroSection: jest.fn(),
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
+        toggleEventsTitleVisibility: jest.fn(),
+        toggleEventsDescriptionVisibility: jest.fn(),
     },
 }));
 
@@ -147,6 +149,8 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
+            isHidden,
+            onToggleVisibility,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -157,6 +161,8 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml: string;
             isPublishDisabled?: boolean;
             disabled?: boolean;
+            isHidden?: boolean;
+            onToggleVisibility?: () => void;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
@@ -172,6 +178,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={disabled}
                     >
                         Edit section
+                    </button>
+                    
+                    <button
+                        type="button"
+                        onClick={onToggleVisibility}
+                        aria-label={`Переглянути секцію: ${sectionId === 'events-page-description' ? 'Опис сторінки' : 'Заголовок блоку подій'}`}
+                        disabled={disabled}
+                    >
+                        Toggle visibility
                     </button>
 
                     {mode === 'edit' && (
@@ -503,12 +518,22 @@ describe('EventsPageAdmin', () => {
         [
             EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
             'pageDescription',
-            { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' },
+            {
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Loaded title</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
+            },
         ],
         [
             EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
             'eventsBlockTitle',
-            { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' },
+            {
+                pageDescription: '<p>Loaded description</p>',
+                eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
+            },
         ],
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
         const user = userEvent.setup();
@@ -593,6 +618,62 @@ describe('EventsPageAdmin', () => {
                 }),
             ).toBeEnabled();
         });
+    });
+
+    it('calls toggleEventsDescriptionVisibility when toggling visibility for page description', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
+        
+        mockedEventsApi.toggleEventsDescriptionVisibility.mockResolvedValueOnce(mockResponse);
+
+        await renderEventsPage();
+
+        await user.click(screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Опис сторінки` }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledWith({});
+        });
+    });
+
+    it('calls toggleEventsTitleVisibility when toggling visibility for events block title', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
+        
+        mockedEventsApi.toggleEventsTitleVisibility.mockResolvedValueOnce(mockResponse);
+
+        await renderEventsPage();
+
+        await user.click(screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Заголовок блоку подій` }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.toggleEventsTitleVisibility).toHaveBeenCalledWith({});
+        });
+    });
+
+    it('renders with eye-closed icons when sections are initially hidden', async () => {
+        mockedEventsApi.getEventsIntroSection.mockResolvedValueOnce({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: true,
+            isPageDescriptionHidden: true,
+        });
+
+        await renderEventsPage();
+
+        expect(screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID + '-section')).toBeInTheDocument();
+        expect(screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID + '-section')).toBeInTheDocument();
     });
 
     it.each([

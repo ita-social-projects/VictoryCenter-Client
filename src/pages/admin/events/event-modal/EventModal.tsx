@@ -139,10 +139,11 @@ export const EventModal = (props: EventModalProps) => {
 
     const {
         control,
-        formState: { errors, isDirty, isValid },
+        formState: { errors, isDirty },
         reset,
         setError,
         clearErrors,
+        watch,
     } = useForm<EventFormValues>({
         resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
         defaultValues: initialFormState,
@@ -150,7 +151,12 @@ export const EventModal = (props: EventModalProps) => {
         context: { isPublishing },
     });
 
-    const isSaveDisabled = !isEditMode || !isDirty || !isValid;
+    const formValues = watch();
+    const isDraftValid = EventValidationSchema.isValidSync(formValues, { context: { isPublishing: false } });
+    const isPublishValid = EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } });
+
+    const isSaveAsDraftDisabled = !isEditMode || !isDirty || !isDraftValid;
+    const isPublishDisabled = !isEditMode || !isDirty || !isPublishValid;
 
     const handleTextFieldBlur = useCallback(
         (field: any) => () => {
@@ -636,7 +642,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="secondary"
-                            disabled={isSaveDisabled}
+                            disabled={isSaveAsDraftDisabled}
                             className={styles['action-button']}
                             onClick={handleSaveAsDraft}
                         >
@@ -645,7 +651,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            disabled={isSaveDisabled}
+                            disabled={isPublishDisabled}
                             className={styles['action-button']}
                             onClick={handlePublish}
                         >

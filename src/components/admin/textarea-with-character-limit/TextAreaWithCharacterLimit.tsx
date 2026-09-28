@@ -127,8 +127,6 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             adjustHeight();
         }, [localValue, adjustHeight]);
 
-        // Text wraps differently when the field's width changes (modal opening, image preview loading,
-        // layout switching), so the height has to be recalculated on width changes as well.
         useEffect(() => {
             const textarea = internalRef.current;
             if (!autoGrow || !textarea || typeof ResizeObserver === 'undefined') return;

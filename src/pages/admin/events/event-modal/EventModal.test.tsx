@@ -452,5 +452,23 @@ describe('EventModal', () => {
             });
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
+
+        it('collapses repeated spaces in the title while typing', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Нова  назва  події' } });
+
+            expect(screen.getByDisplayValue('Нова назва події')).toBeInTheDocument();
+        });
+
+        it('collapses repeated spaces in the link while typing', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.resource), {
+                target: { value: 'https://example.com/  news' },
+            });
+
+            expect(screen.getByDisplayValue('https://example.com/ news')).toBeInTheDocument();
+        });
     });
 });

@@ -124,6 +124,11 @@ const eventToEdit: EventItemDto = {
     backgroundImage: null,
 };
 
+const eventWithImage: EventItemDto = {
+    ...eventToEdit,
+    previewImage: { id: 7, url: 'https://example.com/event.png', mimeType: 'image/png' },
+};
+
 describe('EventModal', () => {
     describe('elements rendering', () => {
         it('renders modal title', () => {
@@ -431,7 +436,18 @@ describe('EventModal', () => {
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
 
-        it('enables the save buttons in edit mode after a valid change', async () => {
+        it('enables both buttons after a valid change when all publish fields are filled', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventWithImage} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventWithImage.title), { target: { value: 'Нова назва події' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('enables only the draft button when a field required for publishing is empty', async () => {
             render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
 
             fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Нова назва події' } });
@@ -439,7 +455,7 @@ describe('EventModal', () => {
             await waitFor(() => {
                 expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
             });
-            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
 
         it('keeps the save buttons disabled in edit mode when the change is invalid', async () => {

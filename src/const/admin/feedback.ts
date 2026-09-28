@@ -132,3 +132,4 @@ export const FEEDBACK_REVIEW_VALIDATION = {
     },
 };
 export const FEEDBACK_PAGINATION_LIMIT = 7;
+export const FEEDBACK_SEARCH_PAGE_SIZE = 5;

@@ -133,6 +133,15 @@ describe('EventModal', () => {
             expect(screen.getByTestId('modal-title')).toHaveTextContent(EVENTS_TEXT.FORM.MODAL_TITLE);
         });
 
+        it('prefills the form with the event data in edit mode', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByDisplayValue(eventToEdit.title)).toBeInTheDocument();
+            expect(screen.getByDisplayValue(eventToEdit.description)).toBeInTheDocument();
+            expect(screen.getByDisplayValue(eventToEdit.resource)).toBeInTheDocument();
+            expect(screen.getByText('18/08/2026')).toBeInTheDocument();
+        });
+
         it('shows the edit title in edit mode', () => {
             render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
 

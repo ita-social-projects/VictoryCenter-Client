@@ -423,5 +423,34 @@ describe('EventModal', () => {
 
             expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         });
+
+        it('keeps the save buttons disabled in edit mode until something changes', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('enables the save buttons in edit mode after a valid change', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Нова назва події' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('keeps the save buttons disabled in edit mode when the change is invalid', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Коротко' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
     });
 });

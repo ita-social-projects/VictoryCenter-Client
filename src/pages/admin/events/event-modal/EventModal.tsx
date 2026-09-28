@@ -58,6 +58,16 @@ const formatDateValue = (date: Date) => {
     return `${date.getFullYear()}-${month}-${day}`;
 };
 
+const getEditFormState = (event: EventItemDto): EventFormValues => ({
+    title: event.title ?? '',
+    description: event.description ?? '',
+    additionalDescription: '',
+    publishDate: event.publishedAt ? formatDateValue(new Date(event.publishedAt)) : null,
+    image: event.previewImage,
+    linkUkr: event.resource ?? '',
+    linkEng: '',
+});
+
 const parseDateValue = (value: string) => {
     const [year, month, day] = value.split('-').map(Number);
     return new Date(year, month - 1, day);
@@ -125,6 +135,8 @@ export const EventModal = (props: EventModalProps) => {
 
     const [isPublishing, setIsPublishing] = useState(false);
 
+    const initialFormState = props.mode === ModalMode.Edit ? getEditFormState(props.eventToEdit) : defaultFormState;
+
     const {
         control,
         formState: { errors, isDirty },
@@ -133,7 +145,7 @@ export const EventModal = (props: EventModalProps) => {
         clearErrors,
     } = useForm<EventFormValues>({
         resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
-        defaultValues: defaultFormState,
+        defaultValues: initialFormState,
         mode: 'onTouched',
         context: { isPublishing },
     });

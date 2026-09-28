@@ -38,6 +38,8 @@ export interface RichTextInputProps {
      * text content when the input loses focus.
      */
     trimOnBlur?: boolean;
+    /** If true, prevents the editor value from exceeding maxLength. */
+    enforceMaxLength?: boolean;
     showCounter?: boolean;
     onLengthChange?: (length: number) => void;
 }
@@ -67,6 +69,7 @@ export const RichTextInput = ({
     className,
     hasError = false,
     trimOnBlur = false,
+    enforceMaxLength = true,
     showCounter = true,
     onLengthChange,
 }: RichTextInputProps) => {
@@ -136,7 +139,11 @@ export const RichTextInput = ({
                 </div>
                 <HistoryPlugin />
                 <OnChangePlugin onChange={onChange} />
-                <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
+                <MaxLengthPlugin
+                    maxLength={maxLength}
+                    onLengthChange={handleLengthChange}
+                    enforceMaxLength={enforceMaxLength}
+                />
                 <FocusPlugin
                     onFocus={onFocus}
                     onBlur={onBlur}

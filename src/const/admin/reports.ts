@@ -284,7 +284,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
-        ADD_EXPENSE: 'Витрати',
+        ADD_EXPENSE: 'Витрата',
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
         EDIT_CATEGORY: 'Редагувати',
@@ -325,8 +325,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
-        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
+        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_MAX_DECIMALS: 'Не більше 2 цифр після коми',

@@ -1,5 +1,7 @@
 import * as Yup from 'yup';
-import { EVENT_VALIDATION } from '@/const/admin/events';
+import { EVENT_CATEGORY_VALIDATION, EVENT_VALIDATION } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { Image, ImageValues } from '@/types/common/image';
 
 export const EventValidationSchema = Yup.object({
@@ -63,3 +65,45 @@ export const EventValidationSchema = Yup.object({
 });
 
 export type EventFormValues = Yup.InferType<typeof EventValidationSchema>;
+
+export const TranslateEventCategoryValidationSchema = Yup.object({
+    name: Yup.string()
+        .trim()
+        .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
+        .max(
+            EVENT_CATEGORY_VALIDATION.name.max,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max),
+        ),
+
+    category: Yup.mixed<EventCategoryDto>().nullable().required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED),
+});
+
+export const validateTranslateCategoryName = (name: string): string | undefined => {
+    try {
+        TranslateEventCategoryValidationSchema.validateSyncAt('name', { name });
+        return undefined;
+    } catch (error) {
+        return error instanceof Yup.ValidationError ? error.message : undefined;
+    }
+};
+
+export const validateTranslateCategorySelection = (
+    category: EventCategoryDto | null | undefined,
+): string | undefined => {
+    try {
+        TranslateEventCategoryValidationSchema.validateSyncAt('category', { category });
+        return undefined;
+    } catch (error) {
+        return error instanceof Yup.ValidationError ? error.message : undefined;
+    }
+};
+
+export const validateTranslateEventCategoryForm = (
+    name: string,
+    category: EventCategoryDto | null | undefined,
+): { name: string | undefined; category: string | undefined } => {
+    return {
+        name: validateTranslateCategoryName(name),
+        category: validateTranslateCategorySelection(category),
+    };
+};

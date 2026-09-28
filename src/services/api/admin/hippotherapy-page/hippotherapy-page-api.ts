@@ -2,7 +2,6 @@ import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import {
-    HippotherapyGalleryCardContent,
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageContentModel,
@@ -10,27 +9,22 @@ import {
     HippotherapyScientificReferenceDto,
 } from '@/types/admin/hippotherapy-page';
 
-const resolveImageValue = async <T extends HippotherapyImageValue>(client: AxiosInstance, value: T): Promise<T> => {
+const resolveImageValue = async <T extends HippotherapyImageValue>(
+    client: AxiosInstance,
+    value: T,
+    uploadedImageIds: number[],
+): Promise<T> => {
     if (!value.image && !value.imageId) {
         return value;
     }
 
     const { finalImageId } = await ImageApi.getUpdateImageId(client, value.image, value.imageId);
 
-    return { ...value, imageId: finalImageId };
-};
-
-const resolveGalleryCards = async (
-    client: AxiosInstance,
-    cards: HippotherapyGalleryCardContent[],
-): Promise<HippotherapyGalleryCardContent[]> => {
-    const resolved: HippotherapyGalleryCardContent[] = [];
-
-    for (const card of cards) {
-        resolved.push(await resolveImageValue(client, card));
+    if (finalImageId && !value.imageId) {
+        uploadedImageIds.push(finalImageId);
     }
 
-    return resolved;
+    return { ...value, imageId: finalImageId };
 };
 
 const stripReferenceLocalIds = (
@@ -78,31 +72,58 @@ export const HippotherapyPageApi = {
         client: AxiosInstance,
         content: HippotherapyPageContentModel,
     ): Promise<HippotherapyPageContentModel> => {
-        const introSection = await resolveImageValue(client, content.introSection);
-        const quoteSection = await resolveImageValue(client, content.quoteSection);
-        const hippoventionCenterSection = await resolveImageValue(client, content.hippoventionCenterSection);
-        const advantagesCards = await resolveGalleryCards(client, content.advantagesSection.cards);
-        const anotherQuoteSection = await resolveImageValue(client, content.anotherQuoteSection);
-        const participantsCards = await resolveGalleryCards(client, content.participantsSection.cards);
-        const ethicsSection = await resolveImageValue(client, content.ethicsSection);
+        const uploadedImageIds: number[] = [];
+        const imageRequests: Promise<unknown>[] = [];
 
-        const payload: HippotherapyPageContentDto = {
-            ...content,
-            introSection,
-            quoteSection,
-            hippoventionCenterSection,
-            advantagesSection: { ...content.advantagesSection, cards: advantagesCards },
-            anotherQuoteSection,
-            participantsSection: { ...content.participantsSection, cards: participantsCards },
-            ethicsSection,
-            scientificReferencesSection: {
-                ...content.scientificReferencesSection,
-                scientificReferences: stripReferenceLocalIds(content.scientificReferencesSection.scientificReferences),
-            },
+        const resolveImage = <T extends HippotherapyImageValue>(value: T): Promise<T> => {
+            const request = resolveImageValue(client, value, uploadedImageIds);
+            imageRequests.push(request);
+            return request;
         };
 
-        const response = await client.put<HippotherapyPageContentDto>(API_ROUTES.HIPPOTHERAPY_PAGE.BASE, payload);
+        try {
+            const [
+                introSection,
+                quoteSection,
+                hippoventionCenterSection,
+                advantagesCards,
+                anotherQuoteSection,
+                participantsCards,
+                ethicsSection,
+            ] = await Promise.all([
+                resolveImage(content.introSection),
+                resolveImage(content.quoteSection),
+                resolveImage(content.hippoventionCenterSection),
+                Promise.all(content.advantagesSection.cards.map((card) => resolveImage(card))),
+                resolveImage(content.anotherQuoteSection),
+                Promise.all(content.participantsSection.cards.map((card) => resolveImage(card))),
+                resolveImage(content.ethicsSection),
+            ]);
 
-        return toContentModel(response.data);
+            const payload: HippotherapyPageContentDto = {
+                ...content,
+                introSection,
+                quoteSection,
+                hippoventionCenterSection,
+                advantagesSection: { ...content.advantagesSection, cards: advantagesCards },
+                anotherQuoteSection,
+                participantsSection: { ...content.participantsSection, cards: participantsCards },
+                ethicsSection,
+                scientificReferencesSection: {
+                    ...content.scientificReferencesSection,
+                    scientificReferences: stripReferenceLocalIds(
+                        content.scientificReferencesSection.scientificReferences,
+                    ),
+                },
+            };
+
+            const response = await client.put<HippotherapyPageContentDto>(API_ROUTES.HIPPOTHERAPY_PAGE.BASE, payload);
+
+            return toContentModel(response.data);
+        } catch (error) {
+            await Promise.allSettled(imageRequests);
+            await Promise.allSettled(uploadedImageIds.map((imageId) => ImageApi.delete(client, imageId)));
+            throw error;
+        }
     },
 };

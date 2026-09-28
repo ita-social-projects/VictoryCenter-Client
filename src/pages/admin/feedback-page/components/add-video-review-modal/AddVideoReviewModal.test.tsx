@@ -151,11 +151,32 @@ describe('AddVideoReviewModal', () => {
     });
 
     describe('submit behaviour', () => {
+        it('shows the publish confirmation when the submit button is clicked', () => {
+            renderOpen();
+            fillForm();
+            fireEvent.click(getSubmitButton());
+
+            expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+            expect(screen.getByText(FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW)).toBeInTheDocument();
+        });
+
+        it('does not call onSubmit when the publish confirmation is cancelled', () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderOpen(jest.fn(), onSubmit);
+            fillForm();
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-no'));
+
+            expect(onSubmit).not.toHaveBeenCalled();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
+        });
+
         it('calls onSubmit with normalized values', async () => {
             const onSubmit = jest.fn().mockResolvedValue(true);
             renderOpen(jest.fn(), onSubmit);
             fillForm('  Valid title  ', `  ${validLink}  `);
             fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
             await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ title: 'Valid title', link: validLink }));
         });
 
@@ -165,6 +186,7 @@ describe('AddVideoReviewModal', () => {
             renderOpen(onClose, onSubmit);
             fillForm();
             fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
             await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
         });
 
@@ -174,6 +196,7 @@ describe('AddVideoReviewModal', () => {
             renderOpen(onClose, onSubmit);
             fillForm();
             fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
             await waitFor(() => expect(onSubmit).toHaveBeenCalled());
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
@@ -189,6 +212,7 @@ describe('AddVideoReviewModal', () => {
             renderOpen(jest.fn(), onSubmit);
             fillForm();
             fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
             expect(getSubmitButton()).toBeDisabled();
             await act(async () => {
                 resolveSubmit(true);
@@ -209,13 +233,13 @@ describe('AddVideoReviewModal', () => {
             renderOpen(onClose);
             fireEvent.click(getCloseButton());
             expect(onClose).toHaveBeenCalledTimes(1);
-            expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
         });
 
         it('shows the unsaved-changes confirmation when a field has data', () => {
             const onClose = requestCloseWithDraftTitle();
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
             expect(
                 screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
                     normalizer: getDefaultNormalizer({ collapseWhitespace: false }),

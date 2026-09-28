@@ -33,6 +33,7 @@ describe('FeedbackApi', () => {
         get: jest.fn(),
         delete: jest.fn(),
         put: jest.fn(),
+        post: jest.fn(),
     } as any;
 
     beforeEach(() => {
@@ -41,6 +42,7 @@ describe('FeedbackApi', () => {
         mockClient.get.mockResolvedValue({ data: mockHistoryList });
         mockClient.delete.mockResolvedValue({ data: undefined });
         mockClient.put.mockResolvedValue({ data: undefined });
+        mockClient.post.mockResolvedValue({ data: undefined });
     });
 
     afterEach(() => {
@@ -367,6 +369,58 @@ describe('FeedbackApi', () => {
                 status: VisibilityStatus.Published,
             });
             expect(result).toEqual({ ...updatedReview, localizations: [] });
+        });
+    });
+
+    describe('createReview', () => {
+        it('should send post request with review data', async () => {
+            const newReview = {
+                id: 7,
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+                priority: 1,
+            };
+            mockClient.post.mockResolvedValue({ data: newReview });
+
+            const result = await FeedbackApi.createReview(mockClient, {
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+            });
+
+            expect(mockClient.post).toHaveBeenCalledWith('FeedbackReviews', {
+                authorName: 'Олена',
+                text: 'Дуже вдячна центру за підтримку',
+                status: VisibilityStatus.Published,
+            });
+            expect(result).toEqual(newReview);
+        });
+    });
+
+    describe('createVideoReview', () => {
+        it('should send post request with video data', async () => {
+            const newVideo = {
+                id: 9,
+                title: 'Test video review',
+                link: 'https://www.youtube.com/watch?v=test',
+                status: VisibilityStatus.Published,
+                priority: 1,
+            };
+            mockClient.post.mockResolvedValue({ data: newVideo });
+
+            const result = await FeedbackApi.createVideoReview(mockClient, {
+                title: 'Test video review',
+                link: 'https://www.youtube.com/watch?v=test',
+                status: VisibilityStatus.Published,
+            });
+
+            expect(mockClient.post).toHaveBeenCalledWith('VideoReviews', {
+                title: 'Test video review',
+                link: 'https://www.youtube.com/watch?v=test',
+                status: VisibilityStatus.Published,
+            });
+            expect(result).toEqual(newVideo);
         });
     });
 });

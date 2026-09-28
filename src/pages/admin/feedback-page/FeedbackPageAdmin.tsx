@@ -131,11 +131,6 @@ export const FeedbackPageAdmin = () => {
         [activeCategory, handleNotImplemented],
     );
 
-    const handleAddVideoReviewSubmit = useCallback(async () => {
-        handleNotImplemented();
-        return false;
-    }, [handleNotImplemented]);
-
     const handleDeleteClick = useCallback(
         (item: FeedbackListItem) => {
             setItemToDelete({ item, category: activeCategory });
@@ -153,8 +148,8 @@ export const FeedbackPageAdmin = () => {
         [selectedSearchItem, addToast],
     );
 
-    const handleEditReviewError = useCallback(() => {
-        addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+    const handleReviewSubmitError = useCallback(() => {
+        addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
     }, [addToast]);
 
     const handleTranslateClick = useCallback(
@@ -233,10 +228,35 @@ export const FeedbackPageAdmin = () => {
         (_newHistory: FeedbackHistoryDto) => {
             setSelectedSearchItem(null);
             fetchCategoryItems(activeCategory, 0);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_ADD_HISTORY, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
         },
         [fetchCategoryItems, activeCategory, addToast],
     );
+
+    const handleAddVideoReviewSubmit = useCallback(
+        async (data: { title: string; link: string }) => {
+            try {
+                await FeedbackApi.createVideoReview(client, {
+                    ...data,
+                    status: VisibilityStatus.Published,
+                });
+                setSelectedSearchItem(null);
+                fetchCategoryItems(activeCategory, 0);
+                addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
+                return false;
+            }
+        },
+        [client, fetchCategoryItems, activeCategory, addToast],
+    );
+
+    const handleAddReviewSuccess = useCallback(() => {
+        setSelectedSearchItem(null);
+        fetchCategoryItems(activeCategory, 0);
+        addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+    }, [fetchCategoryItems, activeCategory, addToast]);
 
     const isTranslationFilterActive =
         translationStatusFilter !== undefined && translationStatusFilter !== TranslationStatusFilter.All;
@@ -265,7 +285,7 @@ export const FeedbackPageAdmin = () => {
     const handleEditHistorySuccess = useCallback(
         (updatedHistory: FeedbackHistoryDto) => {
             applyUpdatedItem(updatedHistory);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_EDIT_HISTORY, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         },
         [applyUpdatedItem, addToast],
     );
@@ -273,7 +293,7 @@ export const FeedbackPageAdmin = () => {
     const handleEditReviewSuccess = useCallback(
         (updatedReview: FeedbackReviewDto) => {
             applyUpdatedItem(updatedReview);
-            addToast(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         },
         [applyUpdatedItem, addToast],
     );
@@ -519,8 +539,9 @@ export const FeedbackPageAdmin = () => {
                     setIsAddReviewModalOpen(false);
                     setReviewToEdit(null);
                 }}
+                onAddReview={handleAddReviewSuccess}
                 onEditReview={handleEditReviewSuccess}
-                onEditError={handleEditReviewError}
+                onSubmitError={handleReviewSubmitError}
                 initialData={reviewToEdit || undefined}
             />
             <TranslateFeedbackHistoryModal

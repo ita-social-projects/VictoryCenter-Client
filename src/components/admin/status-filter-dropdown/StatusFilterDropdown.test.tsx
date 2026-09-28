@@ -9,7 +9,7 @@ jest.mock('@/components/common/select/Select', () => {
         <option value={value === undefined ? 'undefined' : value}>{name}</option>
     );
 
-    const MockSelect = ({ children, onValueChange, value, ...props }: SelectProps<any>) => {
+    const MockSelect = ({ children, onValueChange, value, onBlur: _onBlur, ...props }: SelectProps<any>) => {
         const handleChange = (e: any) => {
             const val = e.target.value === 'undefined' ? undefined : e.target.value;
             onValueChange(val);

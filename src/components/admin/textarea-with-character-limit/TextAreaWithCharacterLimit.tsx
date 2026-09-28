@@ -96,7 +96,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             handleChange(e);
         };
 
-        useEffect(() => {
+        const adjustHeight = useCallback(() => {
             const textarea = internalRef.current;
             if (!autoGrow || !textarea) return;
 
@@ -121,7 +121,29 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
             textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
             textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
-        }, [localValue, autoGrow, maxRows]);
+        }, [autoGrow, maxRows]);
+
+        useEffect(() => {
+            adjustHeight();
+        }, [localValue, adjustHeight]);
+
+        // Text wraps differently when the field's width changes (modal opening, image preview loading,
+        // layout switching), so the height has to be recalculated on width changes as well.
+        useEffect(() => {
+            const textarea = internalRef.current;
+            if (!autoGrow || !textarea || typeof ResizeObserver === 'undefined') return;
+
+            let lastWidth = textarea.clientWidth;
+            const observer = new ResizeObserver(() => {
+                const width = textarea.clientWidth;
+                if (width === lastWidth) return;
+                lastWidth = width;
+                adjustHeight();
+            });
+            observer.observe(textarea);
+
+            return () => observer.disconnect();
+        }, [autoGrow, adjustHeight]);
 
         return (
             <div className="char-limit-textarea">

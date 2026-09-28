@@ -261,6 +261,22 @@ describe('TranslateHistoryModal', () => {
         });
     });
 
+    describe('Description field auto-grow', () => {
+        it('grows to fit the full text without a row cap or scrollbar', async () => {
+            const user = userEvent.setup();
+            renderModal();
+
+            const descriptionInput = screen.getByRole('textbox', { name: /опис/i });
+            Object.defineProperty(descriptionInput, 'scrollHeight', { value: 1000, configurable: true });
+
+            await user.click(descriptionInput);
+            await user.paste('Long description '.repeat(30));
+
+            expect(Number.parseFloat(descriptionInput.style.height)).toBeGreaterThanOrEqual(1000);
+            expect(descriptionInput.style.overflowY).toBe('hidden');
+        });
+    });
+
     describe('Edge Cases', () => {
         it('renders forms correctly even if no language is selected initially', () => {
             render(

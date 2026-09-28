@@ -274,6 +274,9 @@ describe('AddFeedbackHistoryModal', () => {
 
         fireEvent.click(publishBtn);
 
+        const confirmBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(confirmBtn);
+
         await waitFor(() => {
             expect(FeedbackApi.createHistory).toHaveBeenCalledWith(
                 expect.anything(),
@@ -302,6 +305,9 @@ describe('AddFeedbackHistoryModal', () => {
         });
 
         fireEvent.click(publishBtn);
+
+        const confirmBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(confirmBtn);
 
         await waitFor(() => {
             expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_CREATE_HISTORY)).toBeInTheDocument();

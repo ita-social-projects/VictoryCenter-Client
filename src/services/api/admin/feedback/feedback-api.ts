@@ -109,12 +109,26 @@ export const FeedbackApi = {
         );
         return filterAndPaginate(items, params, (item) => item.authorName);
     },
+    createReview: async (
+        client: AxiosInstance,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.post<FeedbackReviewDto>(API_ROUTES.FEEDBACK_REVIEWS.BASE, review);
+        return response.data;
+    },
     updateReview: async (
         client: AxiosInstance,
         id: number,
         review: { authorName: string; text: string; status: VisibilityStatus },
     ): Promise<FeedbackReviewDto> => {
         const response = await client.put<FeedbackReviewDto>(`${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`, review);
+        return response.data;
+    },
+    createVideoReview: async (
+        client: AxiosInstance,
+        video: { title: string; link: string; status: VisibilityStatus },
+    ): Promise<FeedbackVideoDto> => {
+        const response = await client.post<FeedbackVideoDto>(API_ROUTES.VIDEO_REVIEWS.BASE, video);
         return response.data;
     },
     fetchVideos: async (

@@ -428,7 +428,9 @@ describe('EventModal', () => {
 
             expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         });
+    });
 
+    describe('edit mode', () => {
         it('keeps the save buttons disabled in edit mode until something changes', () => {
             render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
 

@@ -139,7 +139,7 @@ export const EventModal = (props: EventModalProps) => {
 
     const {
         control,
-        formState: { errors, isDirty },
+        formState: { errors, isDirty, isValid },
         reset,
         setError,
         clearErrors,
@@ -149,6 +149,8 @@ export const EventModal = (props: EventModalProps) => {
         mode: 'onTouched',
         context: { isPublishing },
     });
+
+    const isSaveDisabled = !isEditMode || !isDirty || !isValid;
 
     const handleTextFieldChange = useCallback(
         (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -638,7 +640,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="secondary"
-                            disabled={true}
+                            disabled={isSaveDisabled}
                             className={styles['action-button']}
                             onClick={handleSaveAsDraft}
                         >
@@ -647,7 +649,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            disabled={true}
+                            disabled={isSaveDisabled}
                             className={styles['action-button']}
                             onClick={handlePublish}
                         >

@@ -35,6 +35,7 @@ import {
     LIST_ITEM_HEIGHT_IN_PIXELS,
 } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
 import {
     EventsPageTextValidationRule,
@@ -62,6 +63,7 @@ export const EventsPageAdmin = () => {
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
@@ -107,9 +109,10 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
     const { openModalActions } = modalsStateControl;
 
     const getEventSearchItems = useCallback(
@@ -197,13 +200,13 @@ export const EventsPageAdmin = () => {
         fetchEventsIntroSection();
     }, [client, setErrorState]);
 
-    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
-
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
+
+    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
 
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
@@ -234,7 +237,17 @@ export const EventsPageAdmin = () => {
         [categories, selectedCategory?.id, resetEventItemsState],
     );
 
-    // Event items handlers
+    const getCategoryName = useCallback(
+        (category: EventCategoryDto) => {
+            const localization = category.localizations?.find((loc) => {
+                const langCode = loc.language?.code ?? (loc as any).localizationInfoDto?.code;
+                return langCode === selectedLanguage?.code;
+            });
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code],
+    );
+
     const updatePageSize = useCallback(() => {
         if (!listContainerRef.current) {
             return;
@@ -507,11 +520,14 @@ export const EventsPageAdmin = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
                 {error.type === 'categories' && <div className="error-message">{error.message}</div>}
 

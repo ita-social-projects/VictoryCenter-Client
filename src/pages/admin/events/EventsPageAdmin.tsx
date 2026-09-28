@@ -264,9 +264,28 @@ export const EventsPageAdmin = () => {
 
     const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
 
-    const handleEntitiesReordered = useCallback(() => {
-        /*TODO: add implementation.*/
-    }, []);
+    const handleEntitiesReordered = useCallback(
+        async (eventItems: EventItemDto[]) => {
+            try {
+                setError((currentError) => (currentError.type === 'events-reorder' ? EMPTY_ERROR : currentError));
+
+                setEventItems(eventItems);
+                const orderedIds = eventItems.map((e) => e.id);
+                const categoryId = selectedCategory!.id;
+
+                await EventsApi.reorder(client, categoryId, orderedIds);
+            } catch {
+                addToast(
+                    EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+                    ToastType.Error,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                );
+
+                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
+            }
+        },
+        [client, selectedCategory, setErrorState],
+    );
 
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
@@ -279,7 +298,7 @@ export const EventsPageAdmin = () => {
                 entities={eventItems}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
-                reorderDisabled={statusFilter !== undefined}
+                reorderDisabled={statusFilter !== undefined || eventItems.length < 2}
             ></DraggableListItem>
         ),
         [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],

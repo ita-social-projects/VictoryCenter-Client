@@ -294,10 +294,28 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     DraggableListItem: ({
         entity,
         renderEntityComponent,
+        onEntitiesReordered,
+        entities,
     }: {
         entity: EventItemDto;
         renderEntityComponent: (item: EventItemDto) => React.ReactNode;
-    }) => <div data-testid={`draggable-event-${entity.id}`}>{renderEntityComponent(entity)}</div>,
+        onEntitiesReordered?: (items: EventItemDto[]) => void;
+        entities?: EventItemDto[];
+    }) => (
+        <div data-testid={`draggable-event-${entity.id}`}>
+            {renderEntityComponent(entity)}
+            <button
+                type="button"
+                data-testid={`reorder-btn-${entity.id}`}
+                onClick={() => {
+                    const newOrder = entities ? [...entities].reverse() : [];
+                    onEntitiesReordered?.(newOrder);
+                }}
+            >
+                Reorder
+            </button>
+        </div>
+    ),
 }));
 
 class ResizeObserverMock {
@@ -992,5 +1010,65 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        mockedEventsApi.reorder = jest.fn().mockResolvedValue(undefined);
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('reorder-btn-101'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.reorder).toHaveBeenCalledTimes(1);
+            expect(mockedEventsApi.reorder).toHaveBeenCalledWith(expect.any(Object), categories[0].id, [102, 101]);
+        });
+
+        const renderedNodes = Array.from(document.querySelectorAll('[data-testid^="rendered-event-"]'));
+        expect(renderedNodes[0].textContent).toContain('Second event');
+        expect(renderedNodes[1].textContent).toContain('First event');
+    });
+
+    it('shows toast and sets error when reorder fails', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        mockedEventsApi.reorder = jest.fn().mockRejectedValue(new Error('Reorder failed'));
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('reorder-btn-101'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.reorder).toHaveBeenCalledTimes(1);
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        });
     });
 });

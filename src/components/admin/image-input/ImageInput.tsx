@@ -97,16 +97,22 @@ export const ImageInput = ({
 
             const imgItem = await convertFileToBase64(file);
 
-            if (!enableCrop) {
+            const needsCrop =
+                enableCrop &&
+                !!(await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(imgItem, cropWidth, cropHeight));
+
+            if (!needsCrop) {
+                setRawImage(null);
                 setPreviewImage(imgItem);
                 onChange(imgItem);
+                setError(null);
                 return;
             }
 
             setRawImage(imgItem);
             setShowCropperModal(true);
         },
-        [enableCrop, minHeight, minWidth, maxSizeMB, onChange, setError],
+        [enableCrop, cropHeight, cropWidth, minHeight, minWidth, maxSizeMB, onChange, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {

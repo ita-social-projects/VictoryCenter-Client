@@ -224,7 +224,7 @@ describe('HippotherapyPageApi', () => {
             );
         });
 
-        it('uploads images one at a time so the backend rate limit is not hit', async () => {
+        it('uploads changed images in parallel', async () => {
             const content = buildContent();
             const newImage: ImageValues = { base64: 'mock-base64', mimeType: 'image/png' };
             content.introSection.image = newImage;
@@ -246,7 +246,55 @@ describe('HippotherapyPageApi', () => {
             await HippotherapyPageApi.update(mockClient, content);
 
             expect(ImageApi.getUpdateImageId).toHaveBeenCalledTimes(3);
-            expect(maxInFlight).toBe(1);
+            expect(maxInFlight).toBe(3);
+        });
+
+        it('waits for all uploads and deletes new images when one upload fails', async () => {
+            const content = buildContent();
+            content.introSection.image = { base64: 'intro', mimeType: 'image/png' };
+            content.quoteSection.image = { base64: 'quote', mimeType: 'image/png' };
+
+            const uploadError = new Error('Upload failed');
+            (ImageApi.getUpdateImageId as jest.Mock).mockImplementation(
+                async (_client: AxiosInstance, image: ImageValues) => {
+                    if (image.base64 === 'quote') {
+                        throw uploadError;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+                    return { finalImageId: 42, imageIdToDelete: null };
+                },
+            );
+
+            await expect(HippotherapyPageApi.update(mockClient, content)).rejects.toThrow(uploadError);
+
+            expect(mockClient.put).not.toHaveBeenCalled();
+            expect(ImageApi.delete).toHaveBeenCalledTimes(1);
+            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 42);
+        });
+
+        it('deletes new images when publishing the page fails', async () => {
+            const content = buildContent();
+            content.introSection.image = { base64: 'intro', mimeType: 'image/png' };
+
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({ finalImageId: 42, imageIdToDelete: null });
+            mockClient.put.mockRejectedValue(new Error('Publish failed'));
+
+            await expect(HippotherapyPageApi.update(mockClient, content)).rejects.toThrow('Publish failed');
+
+            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 42);
+        });
+
+        it('does not delete images replaced in place when publishing fails', async () => {
+            const content = buildContent();
+            content.introSection.image = { base64: 'intro', mimeType: 'image/png' };
+            content.introSection.imageId = 7;
+
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({ finalImageId: 7, imageIdToDelete: null });
+            mockClient.put.mockRejectedValue(new Error('Publish failed'));
+
+            await expect(HippotherapyPageApi.update(mockClient, content)).rejects.toThrow('Publish failed');
+
+            expect(ImageApi.delete).not.toHaveBeenCalled();
         });
     });
 });

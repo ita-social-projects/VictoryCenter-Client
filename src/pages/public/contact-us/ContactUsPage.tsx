@@ -72,14 +72,14 @@ export const ContactUsPage: React.FC = () => {
                     description={t('description')}
                     contactsTitle={t('contactsTitle')}
                     socialLinksTitle={t('socialsTitle')}
-                    email={CONTACT_US_PAGE_DATA.contacts.email}
-                    phone={CONTACT_US_PAGE_DATA.contacts.phone}
+                    email={data?.contacts?.email || CONTACT_US_PAGE_DATA.contacts.email}
+                    phone={data?.contacts?.phone || CONTACT_US_PAGE_DATA.contacts.phone}
                     address={address}
                     socialLinks={CONTACT_US_PAGE_DATA.socialLinks}
                     copyEmailLabel={t('copyEmailAria')}
                     copyPhoneLabel={t('copyPhoneAria')}
-                    onCopyEmail={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.email)}
-                    onCopyPhone={() => handleCopy(CONTACT_US_PAGE_DATA.contacts.phone)}
+                    onCopyEmail={() => handleCopy(data?.contacts?.email || CONTACT_US_PAGE_DATA.contacts.email)}
+                    onCopyPhone={() => handleCopy(data?.contacts?.phone || CONTACT_US_PAGE_DATA.contacts.phone)}
                 />
                 <ContactFormCard
                     title={t('formLabel')}

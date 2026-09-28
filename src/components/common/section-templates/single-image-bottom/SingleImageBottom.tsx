@@ -33,7 +33,7 @@ export const SingleImageBottom = ({
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === SectionMode.View ? viewStyles : styles;
-    const { error, handleSetError } = useImageError();
+    const { error, handleSetError } = useImageError({ resetKey: validationResetKey });
 
     return (
         <div

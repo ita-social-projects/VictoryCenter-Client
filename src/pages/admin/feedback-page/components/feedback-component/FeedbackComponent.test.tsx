@@ -16,6 +16,7 @@ const mockHistoryItem: FeedbackHistoryDto = {
     image: { id: 10, url: 'https://example.com/photo.jpg', mimeType: 'image/jpeg' },
     status: VisibilityStatus.Published,
     priority: 0,
+    localizations: [],
 };
 
 const mockReviewItem: FeedbackReviewDto = {
@@ -24,6 +25,7 @@ const mockReviewItem: FeedbackReviewDto = {
     text: 'Чудовий центр реабілітації!',
     status: VisibilityStatus.Published,
     priority: 1,
+    localizations: [],
 };
 
 const mockVideoItem: FeedbackVideoDto = {
@@ -32,19 +34,30 @@ const mockVideoItem: FeedbackVideoDto = {
     link: 'https://www.youtube.com/watch?v=abc123',
     status: VisibilityStatus.Published,
     priority: 2,
+    localizations: [],
 };
 
 describe('FeedbackComponent', () => {
     let onEditMock: jest.Mock;
     let onDeleteMock: jest.Mock;
+    let onTranslateMock: jest.Mock;
 
     beforeEach(() => {
         onEditMock = jest.fn();
         onDeleteMock = jest.fn();
+        onTranslateMock = jest.fn();
     });
 
     const renderComponent = (props: Partial<FeedbackComponentProps> = {}) =>
-        render(<FeedbackComponent item={mockHistoryItem} onEdit={onEditMock} onDelete={onDeleteMock} {...props} />);
+        render(
+            <FeedbackComponent
+                item={mockHistoryItem}
+                onEdit={onEditMock}
+                onDelete={onDeleteMock}
+                onTranslate={onTranslateMock}
+                {...props}
+            />,
+        );
 
     it('renders history item title and description correctly', () => {
         renderComponent({ item: mockHistoryItem });
@@ -173,13 +186,31 @@ describe('FeedbackComponent', () => {
         expect(parentClickMock).not.toHaveBeenCalled();
     });
 
-    it('does not throw when clicking buttons without onEdit or onDelete handlers provided', () => {
+    it('calls onTranslate with item and stops propagation when translate button is clicked', () => {
+        const parentClickMock = jest.fn();
+        render(
+            <div onClick={parentClickMock}>
+                <FeedbackComponent item={mockHistoryItem} onTranslate={onTranslateMock} />
+            </div>,
+        );
+
+        const translateBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtn);
+
+        expect(onTranslateMock).toHaveBeenCalledTimes(1);
+        expect(onTranslateMock).toHaveBeenCalledWith(mockHistoryItem);
+        expect(parentClickMock).not.toHaveBeenCalled();
+    });
+
+    it('does not throw when clicking buttons without onEdit, onDelete or onTranslate handlers provided', () => {
         render(<FeedbackComponent item={mockHistoryItem} />);
 
+        const translateBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
         const editBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         const deleteBtn = screen.getByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
 
         expect(() => {
+            fireEvent.click(translateBtn);
             fireEvent.click(editBtn);
             fireEvent.click(deleteBtn);
         }).not.toThrow();

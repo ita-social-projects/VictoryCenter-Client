@@ -29,12 +29,18 @@ import { ToastType } from '@/types/admin/toast';
 import {
     EVENT_ITEMS_TEXT,
     EVENT_NOTIFICATION_TIMERS,
+    EVENTS_PAGE_VALIDATION,
     EVENTS_TEXT,
     DEFAULT_LOAD_ITEMS_COUNT,
     LIST_ITEM_HEIGHT_IN_PIXELS,
 } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
+import {
+    EventsPageTextValidationRule,
+    getEventsPageTextValidationError,
+} from '@/validation/admin/events-page-schema/events-page-schema';
 import './EventsPageAdmin.scss';
 
 const EMPTY_ERROR: ErrorState = {
@@ -46,7 +52,10 @@ const introSectionFieldById: Record<EditableHeaderSectionId, EventsIntroSectionU
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: 'pageDescription',
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: 'eventsBlockTitle',
 };
-
+const introSectionValidationById: Record<EditableHeaderSectionId, EventsPageTextValidationRule> = {
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION,
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE,
+};
 export const EventsPageAdmin = () => {
     const [editingSectionId, setEditingSectionId] = useState<EditableHeaderSectionId | null>(null);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -54,6 +63,7 @@ export const EventsPageAdmin = () => {
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
@@ -99,7 +109,7 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, translationLanguages, onLanguageChange, onTranslationStatusFilterChange } =
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
         useLocalizationToolkit({
             setErrorState,
         });
@@ -121,9 +131,14 @@ export const EventsPageAdmin = () => {
     );
 
     // Toolbar handlers
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
-    }, []);
+    const onStatusFilterChange = useCallback(
+        (status: VisibilityStatus | undefined) => {
+            setStatusFilter(status);
+
+            resetEventItemsState();
+        },
+        [resetEventItemsState],
+    );
 
     // Category handlers
     const onContextMenuOptionSelected = useCallback(
@@ -188,13 +203,13 @@ export const EventsPageAdmin = () => {
         fetchEventsIntroSection();
     }, [client, setErrorState]);
 
-    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
-
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
+
+    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
 
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
@@ -225,7 +240,17 @@ export const EventsPageAdmin = () => {
         [categories, selectedCategory?.id, resetEventItemsState],
     );
 
-    // Event items handlers
+    const getCategoryName = useCallback(
+        (category: EventCategoryDto) => {
+            const localization = category.localizations?.find((loc) => {
+                const langCode = loc.language?.code ?? (loc as any).localizationInfoDto?.code;
+                return langCode === selectedLanguage?.code;
+            });
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code],
+    );
+
     const updatePageSize = useCallback(() => {
         if (!listContainerRef.current) {
             return;
@@ -270,9 +295,10 @@ export const EventsPageAdmin = () => {
                 entities={eventItems}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
+                reorderDisabled={statusFilter !== undefined}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered],
+        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],
     );
 
     const fetchEventItems = useCallback(
@@ -290,7 +316,14 @@ export const EventsPageAdmin = () => {
                 const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
                 const offset = pageToFetch * pageSize;
 
-                const response = await EventsApi.fetchEvents(client, categoryId, offset, pageSize);
+                const response = await EventsApi.fetchEvents(
+                    client,
+                    categoryId,
+                    offset,
+                    pageSize,
+                    undefined,
+                    statusFilter,
+                );
 
                 if (requestId !== requestIdRef.current) {
                     return;
@@ -331,7 +364,7 @@ export const EventsPageAdmin = () => {
                 }
             }
         },
-        [client, pageSize, addToast, setErrorState],
+        [client, pageSize, addToast, setErrorState, statusFilter],
     );
 
     useEffect(() => {
@@ -368,7 +401,7 @@ export const EventsPageAdmin = () => {
         }
     }, [fetchEventItems, selectedCategory]);
 
-    const addMaterialButton = (
+    const addMaterialButton = statusFilter === undefined && (
         <Button
             className="btn-add"
             onClick={() => {
@@ -391,6 +424,13 @@ export const EventsPageAdmin = () => {
         async (sectionId: EditableHeaderSectionId, value: string) => {
             if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
 
+            const validationError = getEventsPageTextValidationError(value, introSectionValidationById[sectionId]);
+
+            if (validationError) {
+                addToast(validationError, ToastType.Error, EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+                return;
+            }
+
             const field = introSectionFieldById[sectionId];
             const updatedSection = { ...eventsIntroDraft, [field]: value };
 
@@ -407,13 +447,16 @@ export const EventsPageAdmin = () => {
                 setIsEventsIntroSectionPublishing(false);
             }
         },
-        [client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
+        [addToast, client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
     );
 
     const cancelSectionEdit = useCallback(() => {
         setEventsIntroDraft(eventsIntroSection);
         setEditingSectionId(null);
     }, [eventsIntroSection]);
+
+    const emptyStateMessage =
+        statusFilter !== undefined ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
 
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
@@ -444,6 +487,7 @@ export const EventsPageAdmin = () => {
                     inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
                     initialPublishedHtml={eventsIntroSection?.pageDescription ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION}
+                    validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]}
                     mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? 'edit' : 'view'}
                     onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
                     onDraftChange={(value) =>
@@ -461,6 +505,7 @@ export const EventsPageAdmin = () => {
                     inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}
                     initialPublishedHtml={eventsIntroSection?.eventsBlockTitle ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE}
+                    validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]}
                     mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID ? 'edit' : 'view'}
                     onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
                     onDraftChange={(value) =>
@@ -478,11 +523,14 @@ export const EventsPageAdmin = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
                 {error.type === 'categories' && <div className="error-message">{error.message}</div>}
 
@@ -493,7 +541,7 @@ export const EventsPageAdmin = () => {
                         onLoadMore={handleOnLoadMore}
                         hasMore={hasMore}
                         isLoading={isEventItemsLoading}
-                        emptyStateMessage={EVENT_ITEMS_TEXT.NO_RECORDS}
+                        emptyStateMessage={emptyStateMessage}
                         emptyStateAction={addMaterialButton}
                     />
                 )}

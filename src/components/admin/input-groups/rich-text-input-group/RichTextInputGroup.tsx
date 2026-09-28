@@ -32,6 +32,7 @@ export const RichTextInputGroup = ({
     error,
     className,
     trimOnBlur,
+    enforceMaxLength,
     showCounterBelow = false,
     isWhiteLabel,
 }: RichTextInputGroupProps) => {
@@ -55,6 +56,7 @@ export const RichTextInputGroup = ({
                 placeholder={placeholder}
                 hasError={!!error}
                 trimOnBlur={trimOnBlur}
+                enforceMaxLength={enforceMaxLength}
                 showCounter={!showCounterBelow}
                 onLengthChange={setCurrentLength}
             />

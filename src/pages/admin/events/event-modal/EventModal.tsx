@@ -23,14 +23,20 @@ import styles from './EventModal.module.scss';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/calendar.svg';
 import { ReactComponent as ChevronRightIcon } from '@/assets/icons/chevron-right.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { ModalMode } from '@/types/admin/common';
+import { EventItemDto } from '@/types/admin/events';
 
 type PickerLayer = 'date-picker' | 'month-year-selector' | 'calendar';
 
-export type EventModalProps = {
+type EventModalBaseProps = {
     isOpen: boolean;
     onClose: () => void;
     currentCategory: EventCategoryDto | null;
 };
+
+export type EventModalProps =
+    | (EventModalBaseProps & { mode: ModalMode.Add })
+    | (EventModalBaseProps & { mode: ModalMode.Edit; eventToEdit: EventItemDto });
 
 const defaultFormState: EventFormValues = {
     title: '',
@@ -101,7 +107,8 @@ const mapEventImageError = (error: string | null): string | undefined => {
 };
 
 export const EventModal = (props: EventModalProps) => {
-    const { isOpen, onClose, currentCategory } = props;
+    const { isOpen, onClose, currentCategory, mode } = props;
+    const isEditMode = mode === ModalMode.Edit;
 
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -272,7 +279,9 @@ export const EventModal = (props: EventModalProps) => {
         <>
             <Modal isOpen={isOpen} onClose={handleClose} maxWidth="665px" className={styles['modal']}>
                 <Modal.Title>
-                    <h2 className={styles['modal-title']}>{EVENTS_TEXT.FORM.MODAL_TITLE}</h2>
+                    <h2 className={styles['modal-title']}>
+                        {isEditMode ? EVENTS_TEXT.FORM.EDIT_MODAL_TITLE : EVENTS_TEXT.FORM.MODAL_TITLE}
+                    </h2>
                 </Modal.Title>
 
                 <Modal.Content>

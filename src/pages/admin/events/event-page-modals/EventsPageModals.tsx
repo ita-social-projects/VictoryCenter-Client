@@ -28,10 +28,21 @@ export const EventsPageModals = ({
     return (
         <>
             <EventModal
+                mode={ModalMode.Add}
                 isOpen={modalState.isAddModalOpen}
                 onClose={closeModalActions.closeAddItemModal}
                 currentCategory={currentCategory}
             />
+
+            {modalState.itemToEdit && (
+                <EventModal
+                    mode={ModalMode.Edit}
+                    isOpen
+                    onClose={closeModalActions.closeEditItemModal}
+                    currentCategory={currentCategory}
+                    eventToEdit={modalState.itemToEdit}
+                />
+            )}
 
             <EventCategoryModal
                 mode={ModalMode.Add}

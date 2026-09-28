@@ -275,7 +275,10 @@ export const EventsPageAdmin = () => {
         };
     }, [updatePageSize]);
 
-    const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
+    const renderEntityComponent = useCallback(
+        (item: EventItemDto) => <EventItemComponent item={item} onEdit={openModalActions.openEditItemModal} />,
+        [openModalActions],
+    );
 
     const handleEntitiesReordered = useCallback(() => {
         /*TODO: add implementation.*/

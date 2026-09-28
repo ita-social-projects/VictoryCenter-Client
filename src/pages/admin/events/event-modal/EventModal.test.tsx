@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventModal } from './EventModal';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { EventItemDto } from '@/types/admin/events';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -105,9 +107,21 @@ const currentCategory: EventCategoryDto | null = {
 };
 
 const defaultProps = {
+    mode: ModalMode.Add as const,
     isOpen: true,
     onClose: jest.fn(),
     currentCategory,
+};
+
+const eventToEdit: EventItemDto = {
+    id: 1,
+    resource: 'https://example.com',
+    publishedAt: '2026-08-18T00:00:00Z',
+    title: 'Завершилась програма',
+    description: 'Цього тижня ми успішно завершили програму реабілітації',
+    status: VisibilityStatus.Draft,
+    previewImage: null,
+    backgroundImage: null,
 };
 
 describe('EventModal', () => {
@@ -117,6 +131,12 @@ describe('EventModal', () => {
 
             expect(screen.getByTestId('modal-title')).toBeInTheDocument();
             expect(screen.getByTestId('modal-title')).toHaveTextContent(EVENTS_TEXT.FORM.MODAL_TITLE);
+        });
+
+        it('shows the edit title in edit mode', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(EVENTS_TEXT.FORM.EDIT_MODAL_TITLE);
         });
 
         it('renders link section title', () => {

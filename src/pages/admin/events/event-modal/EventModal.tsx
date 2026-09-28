@@ -152,13 +152,6 @@ export const EventModal = (props: EventModalProps) => {
 
     const isSaveDisabled = !isEditMode || !isDirty || !isValid;
 
-    const handleTextFieldChange = useCallback(
-        (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            field.onChange(getNormalizedInputTextWhileTyping(e.target.value));
-        },
-        [],
-    );
-
     const handleTextFieldBlur = useCallback(
         (field: any) => () => {
             if (field.value) {
@@ -309,7 +302,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.TITLE}
                                     id="event-title"
@@ -317,6 +310,7 @@ export const EventModal = (props: EventModalProps) => {
                                     error={errors.title?.message}
                                     isRequired
                                     showCounterBelow
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />
@@ -601,7 +595,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
                                     id="event-link-ukr"
@@ -610,6 +604,7 @@ export const EventModal = (props: EventModalProps) => {
                                     isRequired
                                     showCounter={false}
                                     className={styles['link-ukr']}
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />
@@ -621,7 +616,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value ?? ''}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_ENG}
                                     id="event-link-eng"
@@ -629,6 +624,7 @@ export const EventModal = (props: EventModalProps) => {
                                     error={errors.linkEng?.message}
                                     showCounter={false}
                                     className={styles['link-eng']}
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />

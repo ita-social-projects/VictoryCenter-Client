@@ -179,7 +179,7 @@ export const EditableHeaderSection = ({
                             <button
                                 type="button"
                                 className={styles['editable-header-section-icon-button']}
-                                aria-label={`${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: ${heading}`}
+                                aria-label={`${isHidden ? EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION : EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${heading}`}
                                 disabled={disabled}
                                 onClick={onToggleVisibility}
                             >

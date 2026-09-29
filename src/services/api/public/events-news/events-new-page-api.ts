@@ -11,12 +11,12 @@ export const EventsNewsPageApi = {
             const response = await axiosInstance.get<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.PUBLIC);
             const data = response.data;
             mock.description = data.pageDescription;
-            mock.isPageDescriptionHidden = data.isPageDescriptionHidden;
+            mock.isPageDescriptionHidden = !data.pageDescription;
             mock.eventsData = {
                 ...mock.eventsData,
                 title: data.eventsBlockTitle,
             };
-            mock.isEventsBlockTitleHidden = data.isEventsBlockTitleHidden;
+            mock.isEventsBlockTitleHidden = !data.eventsBlockTitle;
         } catch (error) {
             // throw error
         }

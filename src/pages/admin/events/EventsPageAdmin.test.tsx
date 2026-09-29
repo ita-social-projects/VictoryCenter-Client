@@ -183,7 +183,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                     <button
                         type="button"
                         onClick={onToggleVisibility}
-                        aria-label={`Переглянути секцію: ${sectionId === 'events-page-description' ? 'Опис сторінки' : 'Заголовок блоку подій'}`}
+                        aria-label={`${_isHidden ? 'Показати секцію' : 'Сховати секцію'}: ${sectionId === 'events-page-description' ? 'Опис сторінки' : 'Заголовок блоку подій'}`}
                         disabled={disabled}
                     >
                         Toggle visibility
@@ -635,7 +635,7 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         await user.click(
-            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Опис сторінки` }),
+            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: Опис сторінки` }),
         );
 
         await waitFor(() => {
@@ -659,7 +659,7 @@ describe('EventsPageAdmin', () => {
 
         await user.click(
             screen.getByRole('button', {
-                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.VIEW_SECTION}: Заголовок блоку подій`,
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: Заголовок блоку подій`,
             }),
         );
 

@@ -442,12 +442,26 @@ export const EventsPageAdmin = () => {
     const toggleSectionVisibility = useCallback(
         async (sectionId: EditableHeaderSectionId) => {
             try {
-                const updated =
-                    sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID
-                        ? await EventsApi.toggleEventsDescriptionVisibility(client)
-                        : await EventsApi.toggleEventsTitleVisibility(client);
-                setEventsIntroSection(updated);
-                setEventsIntroDraft(updated);
+                const isTitle = sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+                const updated = isTitle
+                    ? await EventsApi.toggleEventsTitleVisibility(client)
+                    : await EventsApi.toggleEventsDescriptionVisibility(client);
+
+                const reconcileState = (prev: EventsIntroSectionDto | null) => {
+                    if (!prev) return updated;
+                    return {
+                        ...updated,
+                        isEventsBlockTitleHidden: isTitle
+                            ? updated.isEventsBlockTitleHidden
+                            : prev.isEventsBlockTitleHidden,
+                        isPageDescriptionHidden: !isTitle
+                            ? updated.isPageDescriptionHidden
+                            : prev.isPageDescriptionHidden,
+                    };
+                };
+
+                setEventsIntroSection(reconcileState);
+                setEventsIntroDraft(reconcileState);
             } catch {
                 setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events-intro');
             }

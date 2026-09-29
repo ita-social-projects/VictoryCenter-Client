@@ -1,11 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { EventCategoryUpdate, EventCategoryCreate, EventCategoryDto } from '@/types/admin/event-category';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { mapEventCategoryDtoToModel } from '@/utils/functions/mappers/admin/events-mappers/event-category-mapper';
 
 export const EventCategoriesApi = {
     getAll: async (client: AxiosInstance): Promise<EventCategoryDto[]> => {
         const response = await client.get<EventCategoryDto[]>(API_ROUTES.EVENT_CATEGORIES.BASE);
-        return response.data;
+        return response.data.map(mapEventCategoryDtoToModel);
     },
 
     create: async (client: AxiosInstance, category: EventCategoryCreate): Promise<EventCategoryDto> => {

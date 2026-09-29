@@ -284,7 +284,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
-        ADD_EXPENSE: 'Витрати',
+        ADD_EXPENSE: 'Витрата',
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
         EDIT_CATEGORY: 'Редагувати',

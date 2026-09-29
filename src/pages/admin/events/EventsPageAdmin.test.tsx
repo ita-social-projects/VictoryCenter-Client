@@ -137,6 +137,7 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 
 jest.mock('./editable-header-section/EditableHeaderSection', () => {
     const mockReact = require('react');
+    const { EVENTS_TEXT } = require('@/const/admin/events');
 
     return {
         EditableHeaderSection: ({
@@ -183,7 +184,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                     <button
                         type="button"
                         onClick={onToggleVisibility}
-                        aria-label={`${_isHidden ? 'Показати секцію' : 'Сховати секцію'}: ${sectionId === 'events-page-description' ? 'Опис сторінки' : 'Заголовок блоку подій'}`}
+                        aria-label={`${_isHidden ? EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION : EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE : EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`}
                         disabled={disabled}
                     >
                         Toggle visibility
@@ -635,7 +636,7 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         await user.click(
-            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: Опис сторінки` }),
+            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}` }),
         );
 
         await waitFor(() => {
@@ -659,7 +660,7 @@ describe('EventsPageAdmin', () => {
 
         await user.click(
             screen.getByRole('button', {
-                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: Заголовок блоку подій`,
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
             }),
         );
 
@@ -679,10 +680,14 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         expect(
-            screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID + '-section'),
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+            }),
         ).toBeInTheDocument();
         expect(
-            screen.getByTestId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID + '-section'),
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
+            }),
         ).toBeInTheDocument();
     });
 

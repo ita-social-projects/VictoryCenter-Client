@@ -636,7 +636,9 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         await user.click(
-            screen.getByRole('button', { name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}` }),
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+            }),
         );
 
         await waitFor(() => {

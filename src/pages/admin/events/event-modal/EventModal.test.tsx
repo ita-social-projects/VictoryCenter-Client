@@ -116,9 +116,11 @@ const defaultProps = {
 const eventToEdit: EventItemDto = {
     id: 1,
     resource: 'https://example.com',
+    resourceEn: 'https://example.com/en/news',
     publishedAt: '2026-08-18T00:00:00Z',
     title: 'Завершилась програма',
     description: 'Цього тижня ми успішно завершили програму реабілітації',
+    additionalDescription: 'Київ, 18:00',
     status: VisibilityStatus.Draft,
     previewImage: null,
     backgroundImage: null,
@@ -145,6 +147,8 @@ describe('EventModal', () => {
             expect(screen.getByDisplayValue(eventToEdit.description)).toBeInTheDocument();
             expect(screen.getByDisplayValue(eventToEdit.resource)).toBeInTheDocument();
             expect(screen.getByText('18/08/2026')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Київ, 18:00')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('https://example.com/en/news')).toBeInTheDocument();
         });
 
         it('shows the edit title in edit mode', () => {

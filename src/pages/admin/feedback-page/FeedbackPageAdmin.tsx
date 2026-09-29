@@ -355,7 +355,7 @@ export const FeedbackPageAdmin = () => {
         if (!wasSelected) {
             fetchCategoryItems(FeedbackCategory.HISTORY);
         }
-    }, [selectedSearchItem, activeCategory]);
+    }, [selectedSearchItem, fetchCategoryItems]);
 
     const handleEntitiesReordered = useCallback(
         async (reorderedItems: FeedbackListItem[]) => {

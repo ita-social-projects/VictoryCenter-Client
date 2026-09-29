@@ -36,10 +36,7 @@ type SearchField = string | null | undefined;
 const matchesPrefix = (text: SearchField, query: string): boolean => {
     const q = query.trim().toLowerCase();
     if (!q || !text) return false;
-    return text
-        .toLowerCase()
-        .split(/\s+/)
-        .some((word) => word.startsWith(q));
+    return text.toLowerCase().startsWith(q);
 };
 
 const filterAndPaginate = <T extends { status: VisibilityStatus }>(

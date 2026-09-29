@@ -61,11 +61,11 @@ const formatDateValue = (date: Date) => {
 const getEditFormState = (event: EventItemDto): EventFormValues => ({
     title: event.title ?? '',
     description: event.description ?? '',
-    additionalDescription: '',
+    additionalDescription: event.additionalDescription ?? '',
     publishDate: event.publishedAt ? formatDateValue(new Date(event.publishedAt)) : null,
     image: event.previewImage,
     linkUkr: event.resource ?? '',
-    linkEng: '',
+    linkEng: event.resourceEn ?? '',
 });
 
 const parseDateValue = (value: string) => {

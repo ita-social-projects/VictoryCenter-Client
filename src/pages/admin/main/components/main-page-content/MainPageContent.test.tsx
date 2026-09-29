@@ -8,6 +8,8 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MainPageContent } from './MainPageContent';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ToastType } from '@/types/admin/toast';
 
 jest.mock('@hookform/resolvers/yup', () => ({
     yupResolver: () => async (data: any) => ({
@@ -420,6 +422,26 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByTestId('confirm-publish'));
     };
 
+    const fillAndSubmitTranslation = async (title = 'Valid title text', description = 'Valid description text') => {
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+        await screen.findByText('Додати переклад');
+
+        fireEvent.change(getTranslationTitleInput(), { target: { value: title } });
+        fireEvent.change(getTranslationDescriptionInput(), { target: { value: description } });
+
+        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
+        fireEvent.click(getSaveTranslationButton());
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
+        });
+    };
+
+    const saveValidTranslation = async (title = 'Valid title text', description = 'Valid description text') => {
+        await renderAndLoadContent();
+        await fillAndSubmitTranslation(title, description);
+    };
+
     it('renders loader initially while data is "fetching"', () => {
         (MainPageApi.get as jest.Mock).mockReturnValueOnce(new Promise(() => undefined));
 
@@ -435,6 +457,7 @@ describe('MainPageContent', () => {
             expect(MainPageApi.get).toHaveBeenCalled();
         });
         expect(await screen.findByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).toBeInTheDocument();
+        expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
@@ -1033,22 +1056,14 @@ describe('MainPageContent', () => {
             },
         });
 
-        await renderAndLoadContent();
-
-        fireEvent.click(screen.getByLabelText('Додати переклад'));
-        await screen.findByText('Додати переклад');
-        fireEvent.change(getTranslationTitleInput(), { target: { value: 'Valid title text' } });
-        fireEvent.change(getTranslationDescriptionInput(), { target: { value: 'Valid description text' } });
-
-        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
-        fireEvent.click(getSaveTranslationButton());
+        await saveValidTranslation();
 
         await waitFor(() => {
-            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
-        });
-
-        await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith('Переклад опубліковано успішно', 'success', 3000);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+                ToastType.Success,
+                3000,
+            );
         });
 
         expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(
@@ -1096,7 +1111,11 @@ describe('MainPageContent', () => {
             expect(MainPageApi.publish).toHaveBeenCalled();
         });
 
-        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            'success',
+            3000,
+        );
     });
 
     it('handles publish error', async () => {
@@ -1117,7 +1136,11 @@ describe('MainPageContent', () => {
             expect(MainPageApi.publish).toHaveBeenCalled();
         });
 
-        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            'success',
+            3000,
+        );
     });
 
     it.each([
@@ -1160,6 +1183,47 @@ describe('MainPageContent', () => {
         );
     });
 
+    it('resets form dirty state and disables publish button after successful publish', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        const publishBtn = await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                'success',
+                3000,
+            );
+        });
+
+        await waitFor(() => {
+            expect(publishBtn).toBeDisabled();
+            expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    it('clears currentMetrics after publish so subsequent publish does not re-send metrics patch', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => expect(MainPageApi.publish).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByTestId('tab-btn-title'));
+        await triggerFormDirtyAndOpenModal('publish-btn');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => expect(MainPageApi.publish).toHaveBeenCalledTimes(2));
+
+        const secondPatch = (MainPageApi.publish as jest.Mock).mock.calls[1][1];
+        expect(secondPatch.impactStatistics?.metrics).toEqual([]);
+    });
+
     it('does not publish when already publishing', async () => {
         let resolvePublish: (value: any) => void;
         const publishPromise = new Promise((resolve) => {
@@ -1181,7 +1245,11 @@ describe('MainPageContent', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                'success',
+                3000,
+            );
         });
     });
 
@@ -1318,6 +1386,88 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByTestId('publish-btn-clean-text'));
         await waitFor(() => {
             expect(translateIcon).not.toBeDisabled();
+        });
+    });
+
+    it('does not show success toast and does not clear currentMetrics when refresh fails after publish', async () => {
+        await renderAndLoadContent();
+
+        (MainPageApi.publish as jest.Mock).mockImplementationOnce(async () => {
+            (MainPageApi.get as jest.Mock).mockRejectedValueOnce(new Error('Refresh failed'));
+            return mockPublishedData;
+        });
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
+        });
+
+        expect(mockAddToast).not.toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            ToastType.Success,
+            3000,
+        );
+    });
+
+    it('closes translation modal but suppresses success toast when refresh fails after translation save', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        (MainPageApi.get as jest.Mock)
+            .mockResolvedValueOnce(mockPageData)
+            .mockRejectedValueOnce(new Error('Refresh failed'));
+
+        await saveValidTranslation();
+
+        await waitFor(() => {
+            expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument();
+        });
+
+        expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.ERROR_LOAD_DATA, ToastType.Error, 3000);
+        expect(mockAddToast).not.toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+            ToastType.Success,
+            3000,
+        );
+    });
+
+    it('does not display PageLoader during background refresh on publish', async () => {
+        await renderAndLoadContent();
+
+        let resolveRefresh: (value: any) => void;
+        const refreshPromise = new Promise((resolve) => {
+            resolveRefresh = resolve;
+        });
+
+        (MainPageApi.publish as jest.Mock).mockImplementationOnce(async () => {
+            (MainPageApi.get as jest.Mock).mockReturnValueOnce(refreshPromise);
+            return mockPublishedData;
+        });
+
+        await triggerFormDirtyAndOpenModal('publish-btn');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        expect(screen.queryByTestId('page-loader')).not.toBeInTheDocument();
+
+        await act(async () => {
+            resolveRefresh!(mockPageData);
+        });
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                ToastType.Success,
+                3000,
+            );
         });
     });
 

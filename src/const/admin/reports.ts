@@ -28,6 +28,7 @@ export const REPORTS_TEXT = {
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         INVALID_VALUE: 'Поле може містити лише цілі цифри',
+        NO_CHANGES_FOUND: 'Змін не виявлено',
     },
     REPORT_AND_ANALYTICS: {
         TITLE: 'Управління фінансами',
@@ -324,8 +325,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
-        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
+        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_MAX_DECIMALS: 'Не більше 2 цифр після коми',

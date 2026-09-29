@@ -37,10 +37,29 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
 }));
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
-    AdminPanelToolbar: ({ placeholder, AddItemButtonText, onAddItem }: AdminPanelToolbarProps<any>) => (
+    AdminPanelToolbar: ({
+        placeholder,
+        AddItemButtonText,
+        onAddItem,
+        onStatusFilterChange,
+        statusFilter,
+    }: AdminPanelToolbarProps<any>) => (
         <div data-testid="events-toolbar">
             <span>{placeholder}</span>
-            <button onClick={onAddItem}>{AddItemButtonText}</button>
+
+            <button type="button" onClick={onAddItem}>
+                {AddItemButtonText}
+            </button>
+
+            <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
+                Enable status filter
+            </button>
+
+            <button type="button" data-testid="clear-status-filter" onClick={() => onStatusFilterChange?.(undefined)}>
+                Clear status filter
+            </button>
+
+            {statusFilter !== undefined && <span data-testid="active-status-filter">{String(statusFilter)}</span>}
         </div>
     ),
 }));
@@ -176,6 +195,14 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={isPublishDisabled}
                     >
                         Publish section
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => onPublish('<p>short</p>')}
+                        aria-label={`Опублікувати невалідне ${sectionId}`}
+                    >
+                        Publish invalid section
                     </button>
 
                     {isCancelConfirmationOpen && (
@@ -448,6 +475,43 @@ describe('EventsPageAdmin', () => {
         });
     });
 
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID],
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID],
+    ])('does not call the API for an invalid %s draft', async (sectionId) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Опублікувати невалідне ${sectionId}` }));
+
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            ToastType.Error,
+            EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+        );
+    });
+    it.each([
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
+            'pageDescription',
+            { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' },
+        ],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            'eventsBlockTitle',
+            { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' },
+        ],
+    ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${sectionId}` }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, field, payload);
+        });
+    });
     it('prevents another intro section publish while a publish request is pending', async () => {
         type IntroSection = {
             eventsBlockTitle: string;
@@ -681,8 +745,9 @@ describe('EventsPageAdmin', () => {
             relatedEventNewsCount: 0,
         };
 
+        mockOnAddCategory(newCategory);
+
         await waitFor(() => {
-            mockOnAddCategory(newCategory);
             expect(screen.getByText('Category 3')).toBeInTheDocument();
         });
     });
@@ -703,8 +768,9 @@ describe('EventsPageAdmin', () => {
             relatedEventNewsCount: 0,
         };
 
+        mockOnUpdateCategory(updatedCategory);
+
         await waitFor(() => {
-            mockOnUpdateCategory(updatedCategory);
             expect(screen.getByText('Updated Category')).toBeInTheDocument();
             expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
@@ -721,8 +787,9 @@ describe('EventsPageAdmin', () => {
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
 
+        mockOnDeleteCategory(1);
+
         await waitFor(() => {
-            mockOnDeleteCategory(1);
             expect(screen.queryByText('Category 1')).not.toBeInTheDocument();
             expect(screen.getByText('Category 2')).toBeInTheDocument();
         });
@@ -739,7 +806,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith({}, categories[0].id, 0, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledWith({}, categories[0].id, 0, 5, undefined, undefined);
         });
 
         expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
@@ -750,7 +817,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText('Second event')).toBeInTheDocument();
     });
 
-    it('renders the empty state when there are no event items', async () => {
+    it('renders the empty state with add material button when no status filter is selected', async () => {
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
 
         mockedEventsApi.fetchEvents.mockResolvedValue({
@@ -761,6 +828,57 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+    });
+
+    it('renders filtered empty state without add material button', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, 1);
+        });
+    });
+
+    it('renders add material button after clearing the status filter', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('clear-status-filter'));
+
+        expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
     });
 
     it('loads more event items when the load-more action is triggered', async () => {
@@ -785,7 +903,15 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('load-more-events'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[0].id, 5, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
+                2,
+                {},
+                categories[0].id,
+                5,
+                5,
+                undefined,
+                undefined,
+            );
         });
 
         expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
@@ -852,7 +978,15 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(2, {}, categories[1].id, 0, 5);
+            expect(mockedEventsApi.fetchEvents).toHaveBeenNthCalledWith(
+                2,
+                {},
+                categories[1].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
 
             expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
         });

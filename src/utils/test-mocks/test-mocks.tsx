@@ -1,4 +1,32 @@
 import { useState } from 'react';
+import { screen, fireEvent, createEvent } from '@testing-library/react';
+
+export const expectFormPreventsDefaultSubmit = (formTestId: string) => {
+    const form = screen.getByTestId(formTestId);
+    const event = createEvent.submit(form);
+    event.preventDefault = jest.fn();
+
+    fireEvent(form, event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+};
+
+export const expectFormRefExposesDirtyState = (
+    ref: { current: { isDirty: () => boolean } | null },
+    triggerChange: () => void,
+) => {
+    expect(ref.current?.isDirty()).toBe(false);
+
+    triggerChange();
+
+    expect(ref.current?.isDirty()).toBe(true);
+};
+
+export const expectFieldsDisabledWhenFormDisabled = (labels: RegExp[]) => {
+    labels.forEach((label) => {
+        expect(screen.getByLabelText(label)).toBeDisabled();
+    });
+};
 
 export const MockCategoryBar = ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
     <div data-testid="mock-category-bar">

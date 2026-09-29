@@ -60,6 +60,7 @@ describe('AddFeedbackHistoryModal', () => {
         image: { id: 10, url: 'https://example.com/photo.jpg', mimeType: 'image/jpeg' },
         status: VisibilityStatus.Published,
         priority: 0,
+        localizations: [],
     };
 
     beforeEach(() => {
@@ -318,6 +319,7 @@ describe('AddFeedbackHistoryModal', () => {
             image: { id: 20, url: 'https://example.com/existing.jpg', mimeType: 'image/jpeg' },
             status: VisibilityStatus.Published,
             priority: 1,
+            localizations: [],
         };
 
         it('pre-populates fields with initialData and disables publish button initially', async () => {

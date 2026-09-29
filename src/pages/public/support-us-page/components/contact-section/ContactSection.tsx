@@ -25,6 +25,7 @@ interface ContactFormProps {
 
 interface FieldProps {
     error?: string;
+    hint?: React.ReactNode;
     children: React.ReactNode;
 }
 
@@ -38,7 +39,7 @@ interface ContactFieldProps {
     multiline?: boolean;
 }
 
-const Field: React.FC<FieldProps> = ({ error, children }) => (
+const Field: React.FC<FieldProps> = ({ error, hint, children }) => (
     <div className={styles['field-wrapper']}>
         {children}
         {error && (
@@ -46,6 +47,7 @@ const Field: React.FC<FieldProps> = ({ error, children }) => (
                 {error}
             </span>
         )}
+        {!error && hint}
     </div>
 );
 
@@ -89,12 +91,9 @@ const getHint = (
     t: TFunction<'contactUsPage', undefined>,
 ) => {
     if (!limit) return null;
-    if (value.length >= limit.MAX) return { text: t('contactForm.limitReached'), type: 'error' as const };
+    if (value.length >= limit.MAX) return t('contactForm.limitReached');
     if (value.length >= limit.INFO_AT) {
-        return {
-            text: t('contactForm.charactersRemaining', { count: limit.MAX - value.length }),
-            type: 'warn' as const,
-        };
+        return t('contactForm.charactersRemaining', { count: limit.MAX - value.length });
     }
     return null;
 };
@@ -190,7 +189,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
         classNames(styles.field, {
             [styles['field--error']]: hasError,
         });
-    const messageClass = (type: 'error' | 'warn') => (type === 'error' ? styles.error : styles.info);
     const isEmpty = (value?: string) => value !== undefined && !value.trim();
     const isFieldTouched = (field: keyof ContactFormData) => Boolean(touchedFields[field]) || isSubmitted;
     const getErrorMessage = (field: keyof typeof requiredMessages, message?: string, type?: string, value?: string) =>
@@ -227,7 +225,16 @@ const ContactForm: React.FC<ContactFormProps> = ({
                         type="email"
                     />
                 </Field>
-                <Field error={getErrorMessage('subject', errors.subject?.message, errors.subject?.type, subjectValue)}>
+                <Field
+                    error={getErrorMessage('subject', errors.subject?.message, errors.subject?.type, subjectValue)}
+                    hint={
+                        subjectHint && (
+                            <span className={styles.info} role="status" aria-live="polite">
+                                {subjectHint}
+                            </span>
+                        )
+                    }
+                >
                     <ContactField
                         placeholder={subjectPlaceholder}
                         className={fieldClass(Boolean(errors.subject) && isFieldTouched('subject'))}
@@ -239,12 +246,16 @@ const ContactForm: React.FC<ContactFormProps> = ({
                         maxLength={CONTACT_FORM_LIMITS.SUBJECT.MAX}
                     />
                 </Field>
-                {!errors.subject && subjectHint && (
-                    <span className={messageClass(subjectHint.type)} role="status">
-                        {subjectHint.text}
-                    </span>
-                )}
-                <Field error={getErrorMessage('message', errors.message?.message, errors.message?.type, messageValue)}>
+                <Field
+                    error={getErrorMessage('message', errors.message?.message, errors.message?.type, messageValue)}
+                    hint={
+                        messageHint && (
+                            <span className={styles.info} role="status" aria-live="polite">
+                                {messageHint}
+                            </span>
+                        )
+                    }
+                >
                     <ContactField
                         placeholder={messagePlaceholder}
                         className={classNames(
@@ -260,11 +271,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
                         multiline
                     />
                 </Field>
-                {!errors.message && messageHint && (
-                    <span className={messageClass(messageHint.type)} role="status">
-                        {messageHint.text}
-                    </span>
-                )}
                 <div ref={containerRef} />
                 <button type="submit" className={styles.submit} disabled={!token || Object.keys(errors).length > 0}>
                     {submitLabel}

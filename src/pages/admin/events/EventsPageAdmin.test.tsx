@@ -605,7 +605,7 @@ describe('EventsPageAdmin', () => {
         expect(mockAddToast).toHaveBeenCalledWith(
             COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
             ToastType.Success,
-            3000,
+            EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
         );
     });
 

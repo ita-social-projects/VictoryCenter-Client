@@ -480,7 +480,7 @@ export const EventsPageAdmin = () => {
                 addToast(
                     COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
                     ToastType.Success,
-                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
                 );
             } catch {
                 addToast(

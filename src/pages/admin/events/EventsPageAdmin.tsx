@@ -300,7 +300,7 @@ export const EventsPageAdmin = () => {
                 setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
             }
         },
-        [client, selectedCategory, setErrorState],
+        [client, selectedCategory, setErrorState, addToast],
     );
 
     const renderEventItem = useCallback(

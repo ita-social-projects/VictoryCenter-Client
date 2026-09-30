@@ -334,8 +334,23 @@ export const HistorySectionForm = ({
         }
 
         const applySave = () => {
+            const contents = localSection.contents.map((content) => {
+                const title = content.title?.replace(/ {2,}/g, ' ') ?? content.title;
+                const description = content.description?.replace(/ {2,}/g, ' ') ?? content.description;
+                return title === content.title && description === content.description
+                    ? content
+                    : { ...content, title, description };
+            });
+            const hasExtraSpaces = contents.some((content, index) => content !== localSection.contents[index]);
+            const savedSection = hasExtraSpaces ? { ...localSection, contents } : localSection;
+
+            if (hasExtraSpaces) {
+                localSectionRef.current = savedSection;
+                setLocalSection(savedSection);
+                onSectionChangeRef.current?.(savedSection);
+            }
             onSave();
-            setOriginalSection(localSection);
+            setOriginalSection(savedSection);
             setIsDirty(false);
             setSectionMode(SectionMode.View);
             setValidationResetKey((prev) => prev + 1);

@@ -36,6 +36,7 @@ export const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
         mobile: 158,
         showFrom: 'all',
         side: 'left',
+        safeLine: true,
         photo: {
             src: directorPhoto,
             nameKey: 'PHOTO_DIRECTOR_NAME',

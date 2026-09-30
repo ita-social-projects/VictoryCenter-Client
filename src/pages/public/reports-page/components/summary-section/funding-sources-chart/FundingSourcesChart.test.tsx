@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { FundingSourcesChart } from './FundingSourcesChart';
 
 const defaultFormatAmount = (amount: number) => `${amount.toLocaleString('uk-UA')} грн`;
+const total = 100 + 50 + 25;
 
 describe('FundingSourcesChart', () => {
     const mockItems = [
@@ -37,9 +38,9 @@ describe('FundingSourcesChart', () => {
         const barB = screen.getByText('Source B').closest('.row')?.querySelector('.bar');
         const barC = screen.getByText('Source C').closest('.row')?.querySelector('.bar');
 
-        expect(barA).toHaveStyle({ width: '100%' });
-        expect(barB).toHaveStyle({ width: '50%' });
-        expect(barC).toHaveStyle({ width: '25%' });
+        expect(barA).toHaveStyle({ width: `${(100 / total) * 100}%` });
+        expect(barB).toHaveStyle({ width: `${(50 / total) * 100}%` });
+        expect(barC).toHaveStyle({ width: `${(25 / total) * 100}%` });
     });
 
     it('assigns variant classes in correct cycle', () => {

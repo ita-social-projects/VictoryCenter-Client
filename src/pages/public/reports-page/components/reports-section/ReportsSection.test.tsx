@@ -179,7 +179,7 @@ describe('ReportsSection', () => {
     });
 
     describe('SignalR real-time updates', () => {
-        const initialReports = [makeReport(1), makeReport(2)];
+        const initialReports = [1,2,3,4,5].map(makeReport);
 
         beforeEach(() => {
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValue({
@@ -191,13 +191,13 @@ describe('ReportsSection', () => {
             (useSignalR as jest.Mock).mockReturnValue(null);
             render(<ReportsSection />);
             await waitFor(() => {
-                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
             });
         });
 
         it('adds a new report when PdfReportCreated is received', async () => {
             render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const createdCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportCreated')[1];
 
@@ -209,14 +209,14 @@ describe('ReportsSection', () => {
             await user.click(screen.getByText('reports.showMore'));
 
             await waitFor(() => {
-                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(3);
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(6);
                 expect(screen.getByText('Звіт 99')).toBeInTheDocument();
             });
         });
 
         it('updates an existing report when PdfReportUpdated is received', async () => {
             render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const updatedCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportUpdated')[1];
 
@@ -231,7 +231,7 @@ describe('ReportsSection', () => {
 
         it('removes a report when PdfReportDeleted is received', async () => {
             render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const deletedCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfReportDeleted')[1];
 
@@ -240,14 +240,14 @@ describe('ReportsSection', () => {
             });
 
             await waitFor(() => {
-                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(1);
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(4);
                 expect(screen.queryByText('Звіт 1')).not.toBeInTheDocument();
             });
         });
 
         it('refetches all reports when PdfReportsReordered is received', async () => {
             render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({
                 items: [makeReport(3), makeReport(4), makeReport(5)],

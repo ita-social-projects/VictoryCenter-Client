@@ -1181,6 +1181,9 @@ describe('EventsPageAdmin', () => {
                 ToastType.Error,
                 EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
             );
+        });
+    });
+
     it('deletes a non-selected category without changing the list integrity', async () => {
         render(<EventsPageAdmin />);
         expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();

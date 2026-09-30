@@ -41,6 +41,7 @@ export const SECTIONS_TEXT = {
             },
             DESCRIPTION: {
                 TEXT: 'Опис',
+                PLACEHOLDER: 'Введіть опис',
             },
         },
         CARD: {

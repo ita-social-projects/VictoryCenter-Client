@@ -203,8 +203,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         FAIL_TO_TRANSLATE_CATEGORY: 'Не вдалося зберегти переклад категорії. Спробуйте ще раз',
         FAIL_TO_UPDATE_CATEGORY_TRANSLATION: 'Не вдалося оновити переклад категорії. Спробуйте ще раз',
-        LIMIT_INCOME: 'Ліміт 4 категорій надходжень вичерпано',
-        LIMIT_EXPENSE: 'Ліміт 4 категорій витрат вичерпано',
+        LIMIT_INCOME: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій надходжень вичерпано`,
+        LIMIT_EXPENSE: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій витрат вичерпано`,
         LIMIT_BOTH: 'Ліміт по категоріях вичерпано',
     },
     MODAL: {

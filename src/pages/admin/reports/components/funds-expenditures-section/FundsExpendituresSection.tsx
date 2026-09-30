@@ -417,18 +417,18 @@ export const FundsExpenditureSection = ({
         onSelectionChange?.(hasSelectedRecords);
     }, [hasSelectedRecords, onSelectionChange]);
 
-    const isAddIncomeDisabled =
-        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
-        hasSelectedRecords ||
-        hasExchangeRateError;
-    const isAddExpenseDisabled =
-        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
-        hasSelectedRecords ||
-        hasExchangeRateError;
     const hasReachedIncomeCategoryLimit =
         summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
     const hasReachedExpenseCategoryLimit =
         summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const isAddIncomeDisabled =
+        hasReachedIncomeCategoryLimit  ||
+        hasSelectedRecords ||
+        hasExchangeRateError;
+    const isAddExpenseDisabled =
+        hasReachedExpenseCategoryLimit ||
+        hasSelectedRecords ||
+        hasExchangeRateError;
     const categoryLimitMessage =
         hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit
             ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH

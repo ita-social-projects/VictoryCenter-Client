@@ -30,7 +30,7 @@ describe('FundingSourcesChart', () => {
         expect(screen.getByText(/5\s+000\s+грн/)).toBeInTheDocument();
     });
 
-    it('calculates ratios correctly based on max amount', () => {
+    it('calculates ratios correctly based on total amount', () => {
         render(<FundingSourcesChart items={mockItems} formatAmount={defaultFormatAmount} />);
 
         const barA = screen.getByText('Source A').closest('.row')?.querySelector('.bar');

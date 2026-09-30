@@ -15,8 +15,8 @@ interface FundingSourcesChartProps {
 
 export const FundingSourcesChart = ({ items, formatAmount }: FundingSourcesChartProps) => {
     const { t } = useTranslation('reportsPage');
-    const maxAmount = useMemo(() => {
-        return Math.max(...items.map((item) => item.amount));
+    const totalAmount = useMemo(() => {
+        return items.reduce((sum, item) => sum + item.amount, 0);
     }, [items]);
 
     return (
@@ -28,7 +28,7 @@ export const FundingSourcesChart = ({ items, formatAmount }: FundingSourcesChart
                         key={item.label}
                         label={item.label}
                         formattedAmount={formatAmount(item.amount)}
-                        ratio={maxAmount > 0 ? item.amount / maxAmount : 0}
+                        ratio={totalAmount > 0 ? item.amount / totalAmount : 0}
                         variant={styles[`variant${index % 4}`]}
                     />
                 ))}

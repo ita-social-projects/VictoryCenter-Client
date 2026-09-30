@@ -127,22 +127,22 @@ describe('ReportsSection', () => {
         });
     });
 
-    describe('without overflow (<= 2 items)', () => {
+    describe('without overflow (<= 5 items)', () => {
         it('renders all items and no toggle button', async () => {
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({
-                items: [makeReport(1), makeReport(2)],
+                items: [makeReport(1), makeReport(2), makeReport(3), makeReport(4), makeReport(5)],
             });
 
             render(<ReportsSection />);
 
             await waitFor(() => {
-                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
             });
             expect(screen.queryByText('reports.showMore')).not.toBeInTheDocument();
         });
     });
 
-    describe('with overflow (> 2 items)', () => {
+    describe('with overflow (> 5 items)', () => {
         const manyReports = [1, 2, 3, 4, 5, 6].map(makeReport);
 
         beforeEach(() => {
@@ -151,11 +151,11 @@ describe('ReportsSection', () => {
             });
         });
 
-        it('renders only first 2 items initially and shows toggle button', async () => {
+        it('renders only first 5 items initially and shows toggle button', async () => {
             render(<ReportsSection />);
 
             await waitFor(() => {
-                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
+                expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
             });
             expect(screen.getByText('reports.showMore')).toBeInTheDocument();
         });
@@ -173,7 +173,7 @@ describe('ReportsSection', () => {
             expect(screen.getByText('reports.showLess')).toBeInTheDocument();
 
             await user.click(screen.getByText('reports.showLess'));
-            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
             expect(screen.getByText('reports.showMore')).toBeInTheDocument();
         });
     });

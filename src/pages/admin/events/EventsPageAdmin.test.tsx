@@ -459,7 +459,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT)).toBeInTheDocument();
     });
 
-    it('renders both content sections and changes edit mode for the selected section only', async () => {
+    it('keeps both content sections in edit mode independently', async () => {
         const user = userEvent.setup();
 
         await renderEventsPage();
@@ -477,7 +477,7 @@ describe('EventsPageAdmin', () => {
 
         await user.click(screen.getByRole('button', { name: `Редагувати ${titleId}` }));
 
-        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
         expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('edit');
     });
 
@@ -580,14 +580,111 @@ describe('EventsPageAdmin', () => {
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
         const user = userEvent.setup();
 
+        mockedEventsApi.updateEventsIntroSection.mockResolvedValueOnce(payload);
+
         await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${sectionId}` }));
+
+        expect(screen.getByTestId(`${sectionId}-section`)).toHaveTextContent('edit');
+
         await user.click(screen.getByRole('button', { name: `Опублікувати ${sectionId}` }));
+
+        expect(screen.getByText('Опублікувати зміни?')).toBeInTheDocument();
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
         await waitFor(() => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, field, payload);
         });
+
+        expect(screen.getByTestId(`${sectionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${sectionId}-html`)).toHaveTextContent(
+            payload[field as 'pageDescription' | 'eventsBlockTitle'],
+        );
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            ToastType.Success,
+            3000,
+        );
     });
-    it('prevents another intro section publish while a publish request is pending', async () => {
+
+    it('preserves another section draft and edit mode after publishing the current section', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
+        mockedEventsApi.updateEventsIntroSection
+            .mockResolvedValueOnce({
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Loaded title</p>',
+            })
+            .mockResolvedValueOnce({
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Updated content</p>',
+            });
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Редагувати ${titleId}` }));
+        await user.type(screen.getByRole('textbox', { name: `Змінити ${titleId}` }), 'Чернетка заголовка');
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, 'pageDescription', {
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Чернетка заголовка</p>',
+            });
+        });
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('edit');
+
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${titleId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith({}, 'eventsBlockTitle', {
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Updated content</p>',
+            });
+        });
+    });
+
+    it('cancels one section without changing another section edit mode', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Редагувати ${titleId}` }));
+        await user.click(screen.getByRole('button', { name: `Скасувати редагування ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Підтвердити скасування ${descriptionId}` }));
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('edit');
+    });
+
+    it('closes the publish confirmation without calling the API when publishing is declined', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.type(screen.getByRole('textbox', { name: `Змінити ${descriptionId}` }), 'Оновлений текст');
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).not.toBeInTheDocument();
+        expect(mockedEventsApi.updateEventsIntroSection).not.toHaveBeenCalled();
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
+    });
+    it('keeps another intro section available for publishing while a publish request is pending', async () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
@@ -620,6 +717,8 @@ describe('EventsPageAdmin', () => {
             }),
         );
 
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
         expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledTimes(1);
 
         expect(
@@ -632,7 +731,7 @@ describe('EventsPageAdmin', () => {
             screen.getByRole('button', {
                 name: `Опублікувати ${titleId}`,
             }),
-        ).toBeDisabled();
+        ).toBeEnabled();
 
         await waitFor(() => {
             resolvePublish({
@@ -654,6 +753,62 @@ describe('EventsPageAdmin', () => {
                 name: `Опублікувати ${titleId}`,
             }),
         ).toBeEnabled();
+    });
+
+    it('preserves both section updates when they are published concurrently', async () => {
+        type IntroSection = {
+            eventsBlockTitle: string;
+            pageDescription: string;
+        };
+
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+
+        let resolveDescriptionPublish!: (section: IntroSection) => void;
+        let resolveTitlePublish!: (section: IntroSection) => void;
+
+        const descriptionPublishPromise = new Promise<IntroSection>((resolve) => {
+            resolveDescriptionPublish = resolve;
+        });
+        const titlePublishPromise = new Promise<IntroSection>((resolve) => {
+            resolveTitlePublish = resolve;
+        });
+
+        mockedEventsApi.updateEventsIntroSection
+            .mockReturnValueOnce(descriptionPublishPromise)
+            .mockReturnValueOnce(titlePublishPromise);
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Редагувати ${titleId}` }));
+
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${titleId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledTimes(2);
+
+        await act(async () => {
+            resolveTitlePublish({
+                eventsBlockTitle: '<p>Updated title</p>',
+                pageDescription: '<p>Loaded description</p>',
+            });
+            await titlePublishPromise;
+        });
+        await act(async () => {
+            resolveDescriptionPublish({
+                eventsBlockTitle: '<p>Loaded title</p>',
+                pageDescription: '<p>Updated description</p>',
+            });
+            await descriptionPublishPromise;
+        });
+
+        expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${titleId}-section`)).toHaveTextContent('view');
+        expect(screen.getByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Updated description</p>');
+        expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Updated title</p>');
     });
 
     it('executes toolbar inline callbacks without errors', async () => {
@@ -758,6 +913,8 @@ describe('EventsPageAdmin', () => {
             }),
         );
 
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
         await waitFor(() => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledTimes(1);
         });
@@ -768,7 +925,11 @@ describe('EventsPageAdmin', () => {
             }),
         ).toBeEnabled();
 
-        expect(mockAddToast).not.toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
+            ToastType.Error,
+            EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+        );
     });
 
     it('renders add category context menu option', async () => {

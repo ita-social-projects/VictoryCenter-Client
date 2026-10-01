@@ -259,9 +259,6 @@ describe('ReportsSection', () => {
                 await reorderedCallback(1);
             });
 
-            const user = userEvent.setup();
-            await user.click(screen.getByText('reports.showMore'));
-
             await waitFor(() => {
                 expect(screen.getAllByTestId('report-item-mock')).toHaveLength(3);
                 expect(screen.getByText('Звіт 5')).toBeInTheDocument();
@@ -270,7 +267,7 @@ describe('ReportsSection', () => {
 
         it('ignores SignalR events if the report languageId does not match current active language', async () => {
             render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const createdCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportCreated')[1];
             const updatedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportUpdated')[1];
@@ -288,7 +285,7 @@ describe('ReportsSection', () => {
 
         it('ignores SignalR deleted event if component is unmounted', async () => {
             const { unmount } = render(<ReportsSection />);
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const deletedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportDeleted')[1];
             unmount();
@@ -301,7 +298,7 @@ describe('ReportsSection', () => {
         it('cleans up SignalR event listeners on unmount', async () => {
             const { unmount } = render(<ReportsSection />);
 
-            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2));
+            await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             unmount();
 

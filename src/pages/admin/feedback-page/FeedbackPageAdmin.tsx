@@ -16,7 +16,12 @@ import {
 } from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
-import { FEEDBACK_CATEGORIES, FEEDBACK_PAGINATION_LIMIT, FEEDBACK_TEXT } from '@/const/admin/feedback';
+import {
+    FEEDBACK_CATEGORIES,
+    FEEDBACK_PAGINATION_LIMIT,
+    FEEDBACK_SEARCH_PAGE_SIZE,
+    FEEDBACK_TEXT,
+} from '@/const/admin/feedback';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
@@ -346,10 +351,11 @@ export const FeedbackPageAdmin = () => {
         const wasSelected = selectedSearchItem !== null;
         setSelectedSearchItem(null);
         setStatusFilter(undefined);
+        setActiveCategory(FeedbackCategory.HISTORY);
         if (!wasSelected) {
-            fetchCategoryItems(activeCategory);
+            fetchCategoryItems(FeedbackCategory.HISTORY);
         }
-    }, [selectedSearchItem, activeCategory, fetchCategoryItems]);
+    }, [selectedSearchItem, fetchCategoryItems]);
 
     const handleEntitiesReordered = useCallback(
         async (reorderedItems: FeedbackListItem[]) => {
@@ -469,7 +475,8 @@ export const FeedbackPageAdmin = () => {
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FEEDBACK}
-                    searchPageSize={FEEDBACK_PAGINATION_LIMIT}
+                    minCharactersToSearch={2}
+                    searchPageSize={FEEDBACK_SEARCH_PAGE_SIZE}
                 />
             </div>
 

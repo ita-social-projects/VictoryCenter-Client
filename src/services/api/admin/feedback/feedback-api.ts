@@ -31,10 +31,18 @@ export interface FeedbackFetchParams {
     searchTerm?: string;
 }
 
+type SearchField = string | null | undefined;
+
+const matchesPrefix = (text: SearchField, query: string): boolean => {
+    const q = query.trim().toLowerCase();
+    if (!q || !text) return false;
+    return text.toLowerCase().startsWith(q);
+};
+
 const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     items: T[],
     params: FeedbackFetchParams | undefined,
-    getSearchField: (item: T) => string,
+    getSearchFields: (item: T) => SearchField[],
 ): PaginationResult<T> => {
     const take = params?.take ?? params?.limit ?? 7;
     const skip = params?.skip ?? params?.offset ?? 0;
@@ -46,8 +54,10 @@ const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     }
 
     if (params?.searchTerm) {
-        const term = params.searchTerm.toLowerCase();
-        filteredItems = filteredItems.filter((item) => getSearchField(item).toLowerCase().includes(term));
+        const searchTerm = params.searchTerm;
+        filteredItems = filteredItems.filter((item) =>
+            getSearchFields(item).some((field) => matchesPrefix(field, searchTerm)),
+        );
     }
 
     const totalItemsCount = filteredItems.length;
@@ -91,7 +101,7 @@ export const FeedbackApi = {
         const response = await client.get<FeedbackHistoryResponseDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE, {
             params: buildRequestParams(params),
         });
-        return filterAndPaginate(response.data.map(mapHistory), params, (item) => item.title);
+        return filterAndPaginate(response.data.map(mapHistory), params, (item) => [item.title, item.story]);
     },
     deleteFeedback: async (client: AxiosInstance, category: FeedbackCategory, id: number): Promise<void> => {
         await client.delete(`${CATEGORY_ROUTES[category]}/${id}`);
@@ -119,7 +129,7 @@ export const FeedbackApi = {
             API_ROUTES.FEEDBACK_REVIEWS.BASE,
             { params: buildRequestParams(params) },
         );
-        return filterAndPaginate(response.data.items.map(mapReview), params, (item) => item.authorName);
+        return filterAndPaginate(response.data.items.map(mapReview), params, (item) => [item.authorName, item.text]);
     },
     createReview: async (
         client: AxiosInstance,
@@ -153,7 +163,7 @@ export const FeedbackApi = {
         const response = await client.get<FeedbackVideoResponseDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE, {
             params: buildRequestParams(params),
         });
-        return filterAndPaginate(response.data.map(mapVideo), params, (item) => item.title);
+        return filterAndPaginate(response.data.map(mapVideo), params, (item) => [item.title]);
     },
     reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
         await client.put(`${CATEGORY_ROUTES[category]}/reorder`, { orderedIds });

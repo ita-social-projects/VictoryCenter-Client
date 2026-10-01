@@ -179,7 +179,7 @@ describe('ReportsSection', () => {
     });
 
     describe('SignalR real-time updates', () => {
-        const initialReports = [1,2,3,4,5].map(makeReport);
+        const initialReports = [1, 2, 3, 4, 5].map(makeReport);
 
         beforeEach(() => {
             (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValue({

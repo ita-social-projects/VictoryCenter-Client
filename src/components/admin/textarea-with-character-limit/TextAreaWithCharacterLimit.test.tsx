@@ -483,4 +483,83 @@ describe('TextAreaWithCharacterLimit', () => {
             expect(textarea.style.overflowY).toBe('auto');
         });
     });
+
+    describe('auto-grow on width change', () => {
+        let resizeCallback: ResizeObserverCallback | null;
+        const observe = jest.fn();
+        const disconnect = jest.fn();
+        const originalResizeObserver = globalThis.ResizeObserver;
+
+        const setClientWidth = (element: HTMLElement, width: number) =>
+            Object.defineProperty(element, 'clientWidth', { value: width, configurable: true });
+        const triggerResize = () => resizeCallback?.([] as ResizeObserverEntry[], {} as ResizeObserver);
+
+        beforeEach(() => {
+            resizeCallback = null;
+            observe.mockClear();
+            disconnect.mockClear();
+            globalThis.ResizeObserver = jest.fn((callback: ResizeObserverCallback) => {
+                resizeCallback = callback;
+                return { observe, disconnect, unobserve: jest.fn() };
+            }) as unknown as typeof ResizeObserver;
+            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation(
+                () => ({ lineHeight: '20px', paddingTop: '0px', paddingBottom: '0px' }) as CSSStyleDeclaration,
+            );
+        });
+
+        afterEach(() => {
+            globalThis.ResizeObserver = originalResizeObserver;
+            jest.restoreAllMocks();
+        });
+
+        it('recalculates height when the field width changes', () => {
+            renderTextAreaWithCharacterLimit({ autoGrow: true, maxRows: 0, value: 'text' });
+            const textarea = getTextArea();
+            expect(observe).toHaveBeenCalledWith(textarea);
+
+            setClientWidth(textarea, 200);
+            Object.defineProperty(textarea, 'scrollHeight', { value: 140, configurable: true });
+            triggerResize();
+
+            expect(textarea.style.height).toBe('140px');
+        });
+
+        it('does not recalculate height when only the height changes', () => {
+            renderTextAreaWithCharacterLimit({ autoGrow: true, maxRows: 0, value: 'text' });
+            const textarea = getTextArea();
+            const initialHeight = textarea.style.height;
+
+            Object.defineProperty(textarea, 'scrollHeight', { value: 140, configurable: true });
+            triggerResize();
+
+            expect(textarea.style.height).toBe(initialHeight);
+        });
+
+        it('disconnects the observer on unmount', () => {
+            const { unmount } = renderTextAreaWithCharacterLimit({ autoGrow: true, value: 'text' });
+
+            unmount();
+
+            expect(disconnect).toHaveBeenCalled();
+        });
+
+        it('does not observe the field when autoGrow is false', () => {
+            renderTextAreaWithCharacterLimit({ autoGrow: false, value: 'text' });
+
+            expect(globalThis.ResizeObserver).not.toHaveBeenCalled();
+        });
+
+        it('still auto-grows on value change when ResizeObserver is unavailable', () => {
+            globalThis.ResizeObserver = undefined as unknown as typeof ResizeObserver;
+
+            const { rerender } = renderTextAreaWithCharacterLimit({ autoGrow: true, maxRows: 0, value: 'text' });
+            const textarea = getTextArea();
+            Object.defineProperty(textarea, 'scrollHeight', { value: 90, configurable: true });
+            rerender(
+                <TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} maxRows={0} value={'longer text'} />,
+            );
+
+            expect(textarea.style.height).toBe('90px');
+        });
+    });
 });

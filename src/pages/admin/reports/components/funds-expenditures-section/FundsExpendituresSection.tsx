@@ -67,6 +67,22 @@ const enrichRecords = (
     }));
 };
 
+const getCategoryLimitMessage = (
+    hasReachedIncomeCategoryLimit: boolean,
+    hasReachedExpenseCategoryLimit: boolean,
+): string | undefined => {
+    if (hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH;
+    }
+    if (hasReachedIncomeCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME;
+    }
+    if (hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE;
+    }
+    return undefined;
+};
+
 export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
@@ -423,14 +439,7 @@ export const FundsExpenditureSection = ({
         summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
     const isAddIncomeDisabled = hasReachedIncomeCategoryLimit || hasSelectedRecords || hasExchangeRateError;
     const isAddExpenseDisabled = hasReachedExpenseCategoryLimit || hasSelectedRecords || hasExchangeRateError;
-    const categoryLimitMessage =
-        hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit
-            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH
-            : hasReachedIncomeCategoryLimit
-              ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME
-              : hasReachedExpenseCategoryLimit
-                ? FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE
-                : undefined;
+    const categoryLimitMessage = getCategoryLimitMessage(hasReachedIncomeCategoryLimit, hasReachedExpenseCategoryLimit);
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 

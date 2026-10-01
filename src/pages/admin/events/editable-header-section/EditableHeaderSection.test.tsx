@@ -87,7 +87,10 @@ const renderSection = (props: Partial<EditableHeaderSectionProps> = {}) =>
     render(<EditableHeaderSection {...defaultProps} {...props} />);
 
 const TwoSections = () => {
-    const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+    const [editingSections, setEditingSections] = useState({
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: false,
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: false,
+    });
 
     return (
         <>
@@ -97,8 +100,13 @@ const TwoSections = () => {
                 heading={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
                 inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}
                 initialPublishedHtml={TEST_EVENTS_INTRO_CONTENT.pageDescription}
-                mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? 'edit' : 'view'}
-                onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
+                mode={editingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID] ? 'edit' : 'view'}
+                onEnterEditMode={() =>
+                    setEditingSections((currentEditingSections) => ({
+                        ...currentEditingSections,
+                        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: true,
+                    }))
+                }
             />
             <EditableHeaderSection
                 {...defaultProps}
@@ -107,8 +115,13 @@ const TwoSections = () => {
                 inputLabel={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}
                 initialPublishedHtml={TEST_EVENTS_INTRO_CONTENT.eventsBlockTitle}
                 maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE}
-                mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID ? 'edit' : 'view'}
-                onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
+                mode={editingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID] ? 'edit' : 'view'}
+                onEnterEditMode={() =>
+                    setEditingSections((currentEditingSections) => ({
+                        ...currentEditingSections,
+                        [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: true,
+                    }))
+                }
             />
         </>
     );
@@ -135,7 +148,7 @@ describe('EditableHeaderSection', () => {
         expect(screen.getByText(longDescription)).toBeInTheDocument();
     });
 
-    it('shows both supplied sections and makes only the selected section editable', () => {
+    it('shows both supplied sections and keeps each section editable independently', () => {
         render(<TwoSections />);
 
         expect(screen.getByText('Тестовий заголовок')).toBeInTheDocument();
@@ -159,9 +172,7 @@ describe('EditableHeaderSection', () => {
             }),
         );
 
-        expect(
-            screen.queryByLabelText(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE),
-        ).not.toBeInTheDocument();
+        expect(screen.getByLabelText(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE)).toBeInTheDocument();
         expect(screen.getByLabelText(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(/\/100$/)).toBeInTheDocument();
     });

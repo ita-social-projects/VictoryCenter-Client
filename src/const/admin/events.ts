@@ -153,6 +153,7 @@ export const EVENT_VALIDATION = {
 
 export const EVENT_NOTIFICATION_TIMERS = {
     SYNC_ERROR_MS: 3000,
+    SYNC_SUCCESS_MS: 3000,
 };
 
 export const DEFAULT_LOAD_ITEMS_COUNT = 5;

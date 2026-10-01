@@ -21,9 +21,9 @@
     "CORRESPONDENT_BANKS_LABEL": "Кореспондентські банки (один із варіантів на вибір)",
 
     "CURRENCY_TABS": {
-        "UAH": "Гривня / UAH",
-        "USD": "Долар / USD",
-        "EUR": "Євро / EUR"
+        "UAH": "UAH",
+        "USD": "USD",
+        "EUR": "EUR"
     },
 
     "ALTERNATIVE_SUPPORT_WAYS_LABEL": "Інші варіанти підтримки",

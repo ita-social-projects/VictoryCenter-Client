@@ -42,6 +42,8 @@ const defaultFormState: EventFormValues = {
     linkEng: '',
 };
 
+const EventDraftValidationSchema = EventValidationSchema.pick(['title']);
+
 const WEEKDAY_LABELS = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'НД'];
 const MONTH_LABELS = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
 
@@ -124,12 +126,18 @@ export const EventModal = (props: EventModalProps) => {
         reset,
         setError,
         clearErrors,
+        watch,
     } = useForm<EventFormValues>({
         resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
         defaultValues: defaultFormState,
         mode: 'onTouched',
         context: { isPublishing },
     });
+
+    const formValues = watch();
+    const isDraftValid = EventDraftValidationSchema.isValidSync(formValues);
+    const isPublishValid =
+        EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } }) && !errors.image;
 
     const handleTextFieldChange = useCallback(
         (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -577,7 +585,7 @@ export const EventModal = (props: EventModalProps) => {
                             render={({ field }) => (
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
-                                    value={field.value}
+                                    value={field.value ?? ''}
                                     onChange={handleTextFieldChange(field)}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
@@ -617,7 +625,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="secondary"
-                            disabled={true}
+                            disabled={!isDraftValid}
                             className={styles['action-button']}
                             onClick={handleSaveAsDraft}
                         >
@@ -626,7 +634,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            disabled={true}
+                            disabled={!isPublishValid}
                             className={styles['action-button']}
                             onClick={handlePublish}
                         >

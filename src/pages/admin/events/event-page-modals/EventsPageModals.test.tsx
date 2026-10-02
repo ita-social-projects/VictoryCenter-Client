@@ -4,10 +4,12 @@ import { EventsPageModals } from './EventsPageModals';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
+import { TranslateEventCategoryModal } from '../translate-event-category-modal/TranslateEventCategoryModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events';
+import { LocalizationLanguage } from '@/types/common/language';
 
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),
@@ -21,9 +23,14 @@ jest.mock('../event-modal/EventModal', () => ({
     EventModal: jest.fn(() => <div data-testid="event-modal" />),
 }));
 
+jest.mock('../translate-event-category-modal/TranslateEventCategoryModal', () => ({
+    TranslateEventCategoryModal: jest.fn(() => <div data-testid="translate-event-category-modal" />),
+}));
+
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
 const mockedDeleteEventCategoryModal = DeleteEventCategoryModal as jest.Mock;
 const mockedEventModal = EventModal as jest.Mock;
+const mockedTranslateEventCategoryModal = TranslateEventCategoryModal as jest.Mock;
 
 describe('EventsPageModals', () => {
     const categories: EventCategoryDto[] = [
@@ -45,11 +52,14 @@ describe('EventsPageModals', () => {
         relatedEventNewsCount: 0,
     };
 
+    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'Англійська' }];
+
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
     const closeAddItemModal = jest.fn();
     const closeDeleteCategoryModal = jest.fn();
     const closeEditItemModal = jest.fn();
+    const closeTranslateCategoryModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
@@ -59,6 +69,7 @@ describe('EventsPageModals', () => {
         isEditCategoryModalOpen = false,
         isAddModalOpen = false,
         isDeleteCategoryModalOpen = false,
+        isCategoryToTranslate = false,
         itemToEdit: EventItemDto | null = null,
     ): UseModalsStateResult<EventItemDto> =>
         ({
@@ -68,6 +79,7 @@ describe('EventsPageModals', () => {
                 isAddModalOpen,
                 isDeleteCategoryModalOpen,
                 itemToEdit,
+                isCategoryToTranslate,
             },
             closeModalActions: {
                 closeAddCategoryModal,
@@ -75,6 +87,7 @@ describe('EventsPageModals', () => {
                 closeAddItemModal,
                 closeDeleteCategoryModal,
                 closeEditItemModal,
+                closeTranslateCategoryModal,
             },
         }) as unknown as UseModalsStateResult<EventItemDto>;
 
@@ -94,6 +107,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -119,6 +133,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -144,6 +159,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -161,12 +177,13 @@ describe('EventsPageModals', () => {
     it('passes false as isOpen when all modals are closed', () => {
         render(
             <EventsPageModals
-                modalsStateControl={createModalsStateControl(false, false, false)}
+                modalsStateControl={createModalsStateControl(false, false, false, false, false)}
                 categories={categories}
                 currentCategory={currentCategory}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -174,6 +191,7 @@ describe('EventsPageModals', () => {
         const editModalProps = getModalPropsByMode(ModalMode.Edit);
         const deleteModalProps = mockedDeleteEventCategoryModal.mock.calls[0][0];
         const eventModalProps = mockedEventModal.mock.calls[0][0];
+        const translateModalProps = mockedTranslateEventCategoryModal.mock.calls[0][0];
 
         expect(addModalProps).toEqual(
             expect.objectContaining({
@@ -200,6 +218,12 @@ describe('EventsPageModals', () => {
                 isOpen: false,
             }),
         );
+
+        expect(translateModalProps).toEqual(
+            expect.objectContaining({
+                isOpen: false,
+            }),
+        );
     });
 
     it('renders add event modal', () => {
@@ -211,6 +235,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -230,12 +255,13 @@ describe('EventsPageModals', () => {
 
         render(
             <EventsPageModals
-                modalsStateControl={createModalsStateControl(false, false, false, false, eventToEdit)}
+                modalsStateControl={createModalsStateControl(false, false, false, false, false, eventToEdit)}
                 categories={categories}
                 currentCategory={currentCategory}
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
             />,
         );
 
@@ -249,6 +275,31 @@ describe('EventsPageModals', () => {
                 onClose: closeEditItemModal,
                 currentCategory,
                 eventToEdit,
+            }),
+        );
+    });
+
+    it('renders translate category modal', () => {
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, false, false, false, true)}
+                categories={categories}
+                currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
+            />,
+        );
+
+        const translateModalProps = mockedTranslateEventCategoryModal.mock.calls[0][0];
+
+        expect(translateModalProps).toEqual(
+            expect.objectContaining({
+                isOpen: true,
+                categories,
+                onClose: closeTranslateCategoryModal,
+                translationLanguages,
             }),
         );
     });

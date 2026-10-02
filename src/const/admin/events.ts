@@ -91,6 +91,12 @@ export const EVENT_CATEGORY_TEXT = {
             CATEGORY: 'Категорія',
         },
         NAME_PLACEHOLDER: 'Введіть назву категорії',
+        CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+    },
+    TRANSLATION_MODAL: {
+        TITLE: 'Переклад категорії',
+        LANGUAGE_EN: 'Англійська',
+        SAVE_BUTTON: 'Зберегти переклад',
     },
 };
 
@@ -148,6 +154,7 @@ export const EVENT_VALIDATION = {
 
 export const EVENT_NOTIFICATION_TIMERS = {
     SYNC_ERROR_MS: 3000,
+    SYNC_SUCCESS_MS: 3000,
 };
 
 export const DEFAULT_LOAD_ITEMS_COUNT = 5;

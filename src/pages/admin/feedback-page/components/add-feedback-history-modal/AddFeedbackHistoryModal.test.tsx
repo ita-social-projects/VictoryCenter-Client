@@ -5,6 +5,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
+import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto } from '@/types/admin/feedback';
 import { ImageValues } from '@/types/common/image';
@@ -30,6 +31,12 @@ jest.mock('@/services/api/admin/image/image-api', () => ({
 jest.mock('@/validation/admin/image-schema/image-schema', () => ({
     IMAGE_VALIDATION_FUNCTIONS: {
         validateImage: jest.fn().mockResolvedValue(null),
+    },
+}));
+
+jest.mock('@/validation/admin/image-dimension-schema/image-dimension-schema', () => ({
+    IMAGE_DIMENSION_VALIDATION_FUNCTIONS: {
+        validateImage: jest.fn(),
     },
 }));
 
@@ -66,6 +73,9 @@ describe('AddFeedbackHistoryModal', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         (useAdminClient as jest.Mock).mockReturnValue({});
+        (IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage as jest.Mock).mockResolvedValue(
+            'Image dimensions do not match',
+        );
     });
 
     const setupDirtyFormAndClose = async (titleValue: string) => {
@@ -274,6 +284,9 @@ describe('AddFeedbackHistoryModal', () => {
 
         fireEvent.click(publishBtn);
 
+        const confirmBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(confirmBtn);
+
         await waitFor(() => {
             expect(FeedbackApi.createHistory).toHaveBeenCalledWith(
                 expect.anything(),
@@ -302,6 +315,9 @@ describe('AddFeedbackHistoryModal', () => {
         });
 
         fireEvent.click(publishBtn);
+
+        const confirmBtn = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(confirmBtn);
 
         await waitFor(() => {
             expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_CREATE_HISTORY)).toBeInTheDocument();

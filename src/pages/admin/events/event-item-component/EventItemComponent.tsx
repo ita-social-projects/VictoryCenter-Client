@@ -7,9 +7,10 @@ import './EventItemComponent.scss';
 
 export interface EventItemComponentProps {
     item: EventItemDto;
+    onEdit: (item: EventItemDto) => void;
 }
 
-export const EventItemComponent = ({ item }: EventItemComponentProps) => {
+export const EventItemComponent = ({ item, onEdit }: EventItemComponentProps) => {
     return (
         <div className="event-item">
             <div className="event-info">
@@ -34,9 +35,7 @@ export const EventItemComponent = ({ item }: EventItemComponentProps) => {
                 <IconButton
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
                     type="button"
-                    onClick={() => {
-                        /*TODO: add implementation.*/
-                    }}
+                    onClick={() => onEdit(item)}
                     DefaultIcon={ACTION_ICONS.edit.default}
                     FilledIcon={ACTION_ICONS.edit.hover}
                 />

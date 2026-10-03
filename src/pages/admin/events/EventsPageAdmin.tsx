@@ -532,6 +532,36 @@ export const EventsPageAdmin = () => {
 
     const isAnySectionEditing = Object.values(editingSections).some(Boolean);
 
+    const toggleSectionVisibility = useCallback(
+        async (sectionId: EditableHeaderSectionId) => {
+            try {
+                const isTitle = sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+                const updated = isTitle
+                    ? await EventsApi.toggleEventsTitleVisibility(client)
+                    : await EventsApi.toggleEventsDescriptionVisibility(client);
+
+                const reconcileState = (prev: EventsIntroSectionDto | null) => {
+                    if (!prev) return updated;
+                    return {
+                        ...updated,
+                        isEventsBlockTitleHidden: isTitle
+                            ? updated.isEventsBlockTitleHidden
+                            : prev.isEventsBlockTitleHidden,
+                        isPageDescriptionHidden: !isTitle
+                            ? updated.isPageDescriptionHidden
+                            : prev.isPageDescriptionHidden,
+                    };
+                };
+
+                setEventsIntroSection(reconcileState);
+                setEventsIntroDraft(reconcileState);
+            } catch {
+                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events-intro');
+            }
+        },
+        [client, setErrorState],
+    );
+
     const emptyStateMessage =
         statusFilter !== undefined ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
 
@@ -586,6 +616,10 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
+                    isHidden={eventsIntroSection?.isPageDescriptionHidden}
+                    onToggleVisibility={() =>
+                        toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)
+                    }
                 />
                 <EditableHeaderSection
                     sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}
@@ -615,6 +649,10 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
+                    isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
+                    onToggleVisibility={() =>
+                        toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)
+                    }
                 />
             </div>
             <div className="events-page-list-container" ref={listContainerRef}>

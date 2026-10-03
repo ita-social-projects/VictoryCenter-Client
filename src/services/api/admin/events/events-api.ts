@@ -29,6 +29,16 @@ export const EventsApi = {
 
         return response.data;
     },
+    toggleEventsTitleVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
+        const response = await client.post<EventsIntroSectionDto>(
+            API_ROUTES.EVENTS_PAGE.TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY,
+        );
+        return response.data;
+    },
+    toggleEventsDescriptionVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
+        const response = await client.post<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.TOGGLE_DESCRIPTION_VISIBILITY);
+        return response.data;
+    },
     fetchEvents: async (
         client: AxiosInstance,
         categoryId: number,

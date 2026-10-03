@@ -135,7 +135,7 @@ describe('EditableHeaderSection', () => {
 
         expect(screen.getByText('Опублікований')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /редагувати секцію/i })).toHaveAttribute('type', 'button');
-        expect(screen.getByRole('button', { name: /переглянути секцію/i })).toHaveAttribute('type', 'button');
+        expect(screen.getByRole('button', { name: /сховати секцію/i })).toHaveAttribute('type', 'button');
         expect(screen.queryByLabelText(defaultProps.inputLabel)).not.toBeInTheDocument();
     });
 

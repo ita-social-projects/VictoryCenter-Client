@@ -28,6 +28,8 @@ export const EVENTS_TEXT = {
         ARIA_LABEL: {
             EDIT_SECTION: 'Редагувати секцію',
             VIEW_SECTION: 'Переглянути секцію',
+            HIDE_SECTION: 'Сховати секцію',
+            SHOW_SECTION: 'Показати секцію',
         },
         CHARACTER_LIMIT: {
             PAGE_DESCRIPTION: 1000,

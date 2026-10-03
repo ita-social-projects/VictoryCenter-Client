@@ -32,6 +32,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         maxLength,
         onBlur,
         id,
+        error,
         disabled,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
@@ -45,6 +46,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                 id={id}
                 disabled={disabled}
             />
+            {error && <span data-testid={`error-${id}`}>{error}</span>}
         </div>
     ),
 }));
@@ -302,6 +304,17 @@ describe('ImageSection', () => {
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
         expect(validateTextMock()).toHaveBeenCalledWith('Initial Description');
+    });
+
+    it('should show field-specific required errors for empty title and description', () => {
+        validateTextMock().mockReturnValue(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        renderComponent();
+
+        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: '' } });
+        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: '' } });
+
+        expect(screen.getByTestId('error-2')).toHaveTextContent(WHO_WE_ARE_TEXT.FORM.VALIDATION.TITLE_REQUIRED);
+        expect(screen.getByTestId('error-3')).toHaveTextContent(WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED);
     });
 
     it('should validate empty title on blur when title is null', () => {

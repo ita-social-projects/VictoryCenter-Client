@@ -68,7 +68,7 @@ jest.mock('./components/contact-form-card/ContactFormCard', () => ({
 describe('ContactUsPage', () => {
     beforeEach(() => {
         (useDataFetch as jest.Mock).mockReturnValue({
-            data: CONTACT_US_PAGE_DATA,
+            data: { contacts: {}, socialLinks: [] },
             isLoading: false,
             error: null,
             refetch: jest.fn(),
@@ -92,6 +92,36 @@ describe('ContactUsPage', () => {
         expect(detailsSection.getAttribute('data-props')).toContain(CONTACT_US_PAGE_DATA.contacts.email);
         expect(detailsSection.getAttribute('data-props')).toContain('вул. Шулявська, буд. 20/22, кв. 41.');
         expect(formCard.getAttribute('data-props')).toContain('formLabel');
+    });
+
+    it('uses social links returned by the company profile API', () => {
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: {
+                contacts: {},
+                socialLinks: [
+                    { socialPlatform: 1, url: 'https://facebook.com/from-api' },
+                    { socialPlatform: 2, url: 'https://t.me/from-api' },
+                ],
+            },
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(
+            <MemoryRouter>
+                <ContactUsPage />
+            </MemoryRouter>,
+        );
+
+        const detailsSection = screen.getByTestId('contact-details-section');
+        const props = JSON.parse(detailsSection.getAttribute('data-props') ?? '{}');
+
+        expect(props.socialLinks).toEqual([
+            { label: 'Facebook', url: 'https://facebook.com/from-api' },
+            { label: 'Telegram', url: 'https://t.me/from-api' },
+        ]);
     });
 
     it('copies email and phone via contact details callbacks', async () => {

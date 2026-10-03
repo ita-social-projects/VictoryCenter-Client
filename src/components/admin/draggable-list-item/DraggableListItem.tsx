@@ -13,6 +13,7 @@ export interface DraggableListItemProps<TEntity> {
     idSelector: (entity: TEntity) => number | string;
     onEntitiesReordered: (entities: TEntity[]) => void;
     reorderDisabled?: boolean;
+    hideDragHandle?: boolean;
 }
 
 export const DraggableListItem = <TEntity,>({
@@ -24,6 +25,7 @@ export const DraggableListItem = <TEntity,>({
     idSelector,
     onEntitiesReordered,
     reorderDisabled = false,
+    hideDragHandle = false,
 }: DraggableListItemProps<TEntity>) => {
     const emptyDragImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
     const [dragPreview, setDragPreview] = useState<DragPreviewModel<TEntity>>({
@@ -32,8 +34,18 @@ export const DraggableListItem = <TEntity,>({
         y: 0,
         item: null,
     });
+
+    const hideDragPreview = useCallback(() => {
+        setDragPreview({
+            visible: false,
+            x: 0,
+            y: 0,
+            item: null,
+        });
+    }, []);
+
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        if (reorderDisabled) {
+        if (reorderDisabled || hideDragHandle) {
             return;
         }
 
@@ -42,11 +54,12 @@ export const DraggableListItem = <TEntity,>({
 
     const handleDrop = useCallback(
         (e: React.DragEvent<HTMLDivElement>, id: number | string) => {
-            if (reorderDisabled) {
+            if (reorderDisabled || hideDragHandle) {
                 return;
             }
 
             e.preventDefault();
+            hideDragPreview();
 
             const draggedIdStr = e.dataTransfer.getData('text/plain');
             const draggedId = isNaN(Number(draggedIdStr)) ? draggedIdStr : Number(draggedIdStr);
@@ -61,21 +74,16 @@ export const DraggableListItem = <TEntity,>({
 
             onEntitiesReordered(updatedEntities);
         },
-        [entities, idSelector, onEntitiesReordered, reorderDisabled],
+        [entities, idSelector, onEntitiesReordered, reorderDisabled, hideDragHandle, hideDragPreview],
     );
 
     const handleDragEnd = () => {
-        setDragPreview({
-            visible: false,
-            x: 0,
-            y: 0,
-            item: null,
-        });
+        hideDragPreview();
     };
 
     const handleDragStart = useCallback(
         (e: React.DragEvent<HTMLDivElement>, id: number | string) => {
-            if (reorderDisabled) {
+            if (reorderDisabled || hideDragHandle) {
                 e.preventDefault();
                 return;
             }
@@ -96,7 +104,7 @@ export const DraggableListItem = <TEntity,>({
             dragImage.src = emptyDragImage;
             e.dataTransfer.setDragImage(dragImage, 0, 0);
         },
-        [entities, idSelector, reorderDisabled],
+        [entities, idSelector, reorderDisabled, hideDragHandle],
     );
 
     const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -118,16 +126,16 @@ export const DraggableListItem = <TEntity,>({
         >
             <DragPreview entity={entity} dragPreview={dragPreview} renderEntityComponent={renderEntityComponent} />
             <div className={'draggable-item'} key={id}>
-                {!reorderDisabled && (
+                {!hideDragHandle && (
                     <div
                         className="dragger"
-                        draggable
+                        draggable={!reorderDisabled}
                         onDragStart={(e) => handleDragStart(e, id)}
                         onDrag={handleDrag}
                         onDragEnd={handleDragEnd}
                         role="button"
                         aria-label={ariaLabel}
-                        tabIndex={0}
+                        tabIndex={reorderDisabled ? -1 : 0}
                     >
                         <DragIcon />
                     </div>

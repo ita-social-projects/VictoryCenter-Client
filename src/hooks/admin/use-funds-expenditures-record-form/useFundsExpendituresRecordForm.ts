@@ -12,7 +12,7 @@ import {
     validateFundsExpendituresCategory,
     validateFundsExpendituresReportingYear,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { getUsdMismatchMessage, useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
+import { useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
 
 interface FundsExpendituresRecordFormState {
     reportingYear: string | undefined;
@@ -157,12 +157,6 @@ export const useFundsExpendituresRecordForm = ({
             return;
         }
 
-        const mismatchMessage = getUsdMismatchMessage(normalizedAmountUah, normalizedAmountUsd, exchangeRate);
-        if (mismatchMessage) {
-            setUsdMismatchMessage(mismatchMessage);
-            return;
-        }
-
         if (!formState.categoryId) {
             return;
         }
@@ -185,7 +179,7 @@ export const useFundsExpendituresRecordForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [formState, getCategoryError, onSubmit, transactionType, exchangeRate, setUsdMismatchMessage]);
+    }, [formState, getCategoryError, onSubmit, transactionType, setUsdMismatchMessage]);
 
     const isDirty =
         Boolean(formState.reportingYear) ||
@@ -197,7 +191,6 @@ export const useFundsExpendituresRecordForm = ({
     const amountUsdValidationError = validateFundsExpendituresAmount(formState.amountUsd, 'save');
     const categoryValidationError = getCategoryError(formState.categoryId, 'blur');
     const reportingYearValidationError = validateFundsExpendituresReportingYear(formState.reportingYear, 'save');
-    const currentUsdMismatchMessage = getUsdMismatchMessage(formState.amountUah, formState.amountUsd, exchangeRate);
 
     const isSubmitDisabled =
         isSubmitting ||
@@ -207,8 +200,7 @@ export const useFundsExpendituresRecordForm = ({
         Boolean(amountUsdValidationError) ||
         Boolean(categoryValidationError) ||
         Boolean(formState.errors.amountUah) ||
-        Boolean(formState.errors.amountUsd) ||
-        Boolean(currentUsdMismatchMessage);
+        Boolean(formState.errors.amountUsd);
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);

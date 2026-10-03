@@ -82,6 +82,7 @@ export const EventsPageAdmin = () => {
     const hasMoreRef = useRef(true);
     const isEventItemsLoadingRef = useRef(false);
     const reorderRequestIdRef = useRef(0);
+    const eventItemsContextIdRef = useRef(0);
     const isReorderingRef = useRef(false);
 
     const client = useAdminClient();
@@ -98,6 +99,7 @@ export const EventsPageAdmin = () => {
     }, []);
 
     const resetEventItemsState = useCallback(() => {
+        eventItemsContextIdRef.current += 1;
         requestIdRef.current += 1;
 
         setEventItems([]);
@@ -291,6 +293,7 @@ export const EventsPageAdmin = () => {
 
             const previousItems = eventItems;
             const currentCategoryId = selectedCategory.id;
+            const currentListContextId = eventItemsContextIdRef.current;
             const reorderRequestId = ++reorderRequestIdRef.current;
 
             try {
@@ -304,7 +307,11 @@ export const EventsPageAdmin = () => {
 
                 await EventsApi.reorder(client, currentCategoryId, orderedIds);
             } catch {
-                if (reorderRequestId === reorderRequestIdRef.current && selectedCategory?.id === currentCategoryId) {
+                if (
+                    reorderRequestId === reorderRequestIdRef.current &&
+                    selectedCategory?.id === currentCategoryId &&
+                    currentListContextId === eventItemsContextIdRef.current
+                ) {
                     setEventItems(previousItems);
                 }
 

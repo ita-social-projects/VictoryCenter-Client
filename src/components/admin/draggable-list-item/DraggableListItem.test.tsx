@@ -42,20 +42,14 @@ describe('DraggableListItem', () => {
 
     const getDragger = () => screen.getByRole('button', { name: /drag item/i });
 
-    const getItem = (): HTMLElement =>
-        screen.getByText('Entity 1').closest('.draggable-item') as HTMLElement;
+    const getItem = (): HTMLElement => screen.getByText('Entity 1').closest('.draggable-item') as HTMLElement;
 
     const createDragDataTransfer = () => ({
         setData: jest.fn(),
         setDragImage: jest.fn(),
     });
 
-    const startDrag = (
-        dragger: HTMLElement,
-        dataTransfer = createDragDataTransfer(),
-        clientX = 50,
-        clientY = 60,
-    ) => {
+    const startDrag = (dragger: HTMLElement, dataTransfer = createDragDataTransfer(), clientX = 50, clientY = 60) => {
         fireEvent.dragStart(dragger, {
             clientX,
             clientY,

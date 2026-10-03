@@ -80,6 +80,7 @@ export const EventsPageAdmin = () => {
     const currentItemsCountRef = useRef(0);
     const hasMoreRef = useRef(true);
     const isEventItemsLoadingRef = useRef(false);
+    const reorderRequestIdRef = useRef(0);
 
     const client = useAdminClient();
 
@@ -281,16 +282,24 @@ export const EventsPageAdmin = () => {
     const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
 
     const handleEntitiesReordered = useCallback(
-        async (eventItems: EventItemDto[]) => {
+        async (reorderedItems: EventItemDto[]) => {
+            const previousItems = eventItems;
+            const currentCategoryId = selectedCategory?.id;
+            const reorderRequestId = ++reorderRequestIdRef.current;
+
             try {
                 setError((currentError) => (currentError.type === 'events-reorder' ? EMPTY_ERROR : currentError));
+                setEventItems(reorderedItems);
 
-                setEventItems(eventItems);
-                const orderedIds = eventItems.map((e) => e.id);
+                const orderedIds = reorderedItems.map((e) => e.id);
                 const categoryId = selectedCategory!.id;
 
                 await EventsApi.reorder(client, categoryId, orderedIds);
             } catch {
+                if (reorderRequestId === reorderRequestIdRef.current && selectedCategory?.id === currentCategoryId) {
+                    setEventItems(previousItems);
+                }
+
                 addToast(
                     EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
                     ToastType.Error,
@@ -300,7 +309,7 @@ export const EventsPageAdmin = () => {
                 setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
             }
         },
-        [client, selectedCategory, setErrorState, addToast],
+        [client, selectedCategory, eventItems, setErrorState, addToast],
     );
 
     const renderEventItem = useCallback(

@@ -227,39 +227,6 @@ describe('DraggableListItem', () => {
         expect(screen.getByText('Entity 1')).toBeInTheDocument();
     });
 
-    it('does not reorder entities when reordering is disabled', () => {
-        const onReorder = jest.fn();
-
-        render(<DraggableListItem {...defaultProps} reorderDisabled onEntitiesReordered={onReorder} />);
-
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dataTransferMock = {
-            getData: jest.fn(() => '3'),
-        };
-
-        fireEvent.drop(item, {
-            dataTransfer: dataTransferMock,
-            preventDefault: jest.fn(),
-        });
-
-        expect(dataTransferMock.getData).not.toHaveBeenCalled();
-        expect(onReorder).not.toHaveBeenCalled();
-    });
-
-    it('does not prevent default on dragOver when reordering is disabled', () => {
-        render(<DraggableListItem {...defaultProps} reorderDisabled />);
-
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dragOverEvent = createEvent.dragOver(item);
-        dragOverEvent.preventDefault = jest.fn();
-
-        fireEvent(item, dragOverEvent);
-
-        expect(dragOverEvent.preventDefault).not.toHaveBeenCalled();
-    });
-
     it('does not render dragger when drag handle is hidden', () => {
         render(<DraggableListItem {...defaultProps} hideDragHandle />);
 
@@ -268,10 +235,19 @@ describe('DraggableListItem', () => {
         expect(screen.getByText('Entity 1')).toBeInTheDocument();
     });
 
-    it('does not reorder entities when drag handle is hidden', () => {
+    it.each([
+        ['reordering is disabled', { reorderDisabled: true }],
+        ['drag handle is hidden', { hideDragHandle: true }],
+    ])('does not reorder entities when %s', (_, props) => {
         const onReorder = jest.fn();
 
-        render(<DraggableListItem {...defaultProps} hideDragHandle onEntitiesReordered={onReorder} />);
+        render(
+            <DraggableListItem
+                {...defaultProps}
+                {...props}
+                onEntitiesReordered={onReorder}
+            />,
+        );
 
         const item = screen.getByText('Entity 1').closest('.draggable-item')!;
 
@@ -288,8 +264,11 @@ describe('DraggableListItem', () => {
         expect(onReorder).not.toHaveBeenCalled();
     });
 
-    it('does not prevent default on dragOver when drag handle is hidden', () => {
-        render(<DraggableListItem {...defaultProps} hideDragHandle />);
+    it.each([
+        ['reordering is disabled', { reorderDisabled: true }],
+        ['drag handle is hidden', { hideDragHandle: true }],
+    ])('does not prevent default on dragOver when %s', (_, props) => {
+        render(<DraggableListItem {...defaultProps} {...props} />);
 
         const item = screen.getByText('Entity 1').closest('.draggable-item')!;
 

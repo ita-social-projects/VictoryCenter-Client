@@ -32,8 +32,51 @@ describe('DraggableListItem', () => {
         ariaLabel: 'Drag Item',
         renderEntityComponent: (entity) => <span>{entity.name}</span>,
         entities,
-        idSelector: (e) => e.id,
+        idSelector: (entity) => entity.id,
         onEntitiesReordered: jest.fn(),
+    };
+
+    const renderComponent = (props: Partial<DraggableListItemProps<TestEntity>> = {}) => {
+        render(<DraggableListItem {...defaultProps} {...props} />);
+    };
+
+    const getDragger = () => screen.getByRole('button', { name: /drag item/i });
+
+    const getItem = (): HTMLElement => screen.getByText('Entity 1').closest('.draggable-item') as HTMLElement;
+
+    const createDragDataTransfer = () => ({
+        setData: jest.fn(),
+        setDragImage: jest.fn(),
+    });
+
+    const startDrag = (dragger: HTMLElement, dataTransfer = createDragDataTransfer(), clientX = 50, clientY = 60) => {
+        fireEvent.dragStart(dragger, {
+            clientX,
+            clientY,
+            dataTransfer,
+        });
+
+        return dataTransfer;
+    };
+
+    const dropEntity = (item: HTMLElement, draggedId: string) => {
+        const dataTransfer = {
+            getData: jest.fn(() => draggedId),
+        };
+
+        fireEvent.drop(item, {
+            dataTransfer,
+            preventDefault: jest.fn(),
+        });
+
+        return dataTransfer;
+    };
+
+    const createDragOverEvent = (item: HTMLElement) => {
+        const event = createEvent.dragOver(item);
+        event.preventDefault = jest.fn();
+
+        return event;
     };
 
     beforeEach(() => {
@@ -41,59 +84,45 @@ describe('DraggableListItem', () => {
     });
 
     it('renders correctly with provided entity', () => {
-        render(<DraggableListItem {...defaultProps} />);
+        renderComponent();
+
         expect(screen.getByText('Entity 1')).toBeInTheDocument();
         expect(screen.getByTestId('drag-icon')).toBeInTheDocument();
     });
 
     it('sets drag preview visible on drag start', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent();
 
-        const dataTransferMock = {
-            setData: jest.fn(),
-            setDragImage: jest.fn(),
-        };
+        const dataTransfer = startDrag(getDragger());
 
-        fireEvent.dragStart(dragger, {
-            clientX: 50,
-            clientY: 60,
-            dataTransfer: dataTransferMock,
-        });
-
-        expect(dataTransferMock.setData).toHaveBeenCalledWith('text/plain', '1');
+        expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', '1');
         expect(screen.getByTestId('drag-preview')).toHaveAttribute('data-visible', 'true');
     });
 
     it('updates drag preview position on drag', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent();
 
-        fireEvent.drag(dragger, { clientX: 120, clientY: 140 });
+        fireEvent.drag(getDragger(), {
+            clientX: 120,
+            clientY: 140,
+        });
 
-        // DragPreview is mocked, so we can’t read actual x/y — but this confirms render
         expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
     });
 
     it('hides drag preview on drag end', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent();
 
-        fireEvent.dragEnd(dragger);
+        fireEvent.dragEnd(getDragger());
+
         expect(screen.getByTestId('drag-preview')).toHaveAttribute('data-visible', 'false');
     });
 
     it('calls onEntitiesReordered with correct order on drop', () => {
         const onReorder = jest.fn();
-        render(<DraggableListItem {...defaultProps} onEntitiesReordered={onReorder} />);
+        renderComponent({ onEntitiesReordered: onReorder });
 
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dataTransferMock = {
-            getData: jest.fn(() => '3'),
-        };
-
-        fireEvent.drop(item, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
+        dropEntity(getItem(), '3');
 
         expect(onReorder).toHaveBeenCalledWith([
             { id: 3, name: 'Entity 3' },
@@ -102,126 +131,124 @@ describe('DraggableListItem', () => {
         ]);
     });
 
+    it('hides drag preview on drop', () => {
+        const onReorder = jest.fn();
+        renderComponent({ onEntitiesReordered: onReorder });
+
+        startDrag(getDragger());
+
+        expect(screen.getByTestId('drag-preview')).toHaveAttribute('data-visible', 'true');
+
+        dropEntity(getItem(), '3');
+
+        expect(screen.getByTestId('drag-preview')).toHaveAttribute('data-visible', 'false');
+    });
+
     it('does not reorder if same id is dropped', () => {
         const onReorder = jest.fn();
-        render(<DraggableListItem {...defaultProps} onEntitiesReordered={onReorder} />);
+        renderComponent({ onEntitiesReordered: onReorder });
 
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dataTransferMock = {
-            getData: jest.fn(() => '1'),
-        };
-
-        fireEvent.drop(item, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
+        dropEntity(getItem(), '1');
 
         expect(onReorder).not.toHaveBeenCalled();
     });
 
     it('prevents default on dragOver', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
+        renderComponent();
 
-        const dragOverEvent = createEvent.dragOver(item);
-        dragOverEvent.preventDefault = jest.fn();
+        const item = getItem();
+        const dragOverEvent = createDragOverEvent(item);
 
         fireEvent(item, dragOverEvent);
+
         expect(dragOverEvent.preventDefault).toHaveBeenCalled();
     });
 
     it('calls setDragImage when dragging a valid entity', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent();
 
-        const dataTransferMock = {
-            setData: jest.fn(),
-            setDragImage: jest.fn(),
-        };
+        const dataTransfer = startDrag(getDragger());
 
-        fireEvent.dragStart(dragger, {
-            clientX: 50,
-            clientY: 60,
-            dataTransfer: dataTransferMock,
-        });
-
-        expect(dataTransferMock.setData).toHaveBeenCalledWith('text/plain', '1');
-        expect(dataTransferMock.setDragImage).toHaveBeenCalled();
+        expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', '1');
+        expect(dataTransfer.setDragImage).toHaveBeenCalled();
     });
 
     it('does nothing if dragging entity not found', () => {
-        render(<DraggableListItem {...defaultProps} id={999} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent({ id: 999 });
 
-        const dataTransferMock = {
-            setData: jest.fn(),
-            setDragImage: jest.fn(),
-        };
+        const dataTransfer = startDrag(getDragger(), createDragDataTransfer(), 10, 20);
 
-        fireEvent.dragStart(dragger, {
-            clientX: 10,
-            clientY: 20,
-            dataTransfer: dataTransferMock,
-        });
-
-        expect(dataTransferMock.setData).not.toHaveBeenCalled();
-        expect(dataTransferMock.setDragImage).not.toHaveBeenCalled();
+        expect(dataTransfer.setData).not.toHaveBeenCalled();
+        expect(dataTransfer.setDragImage).not.toHaveBeenCalled();
     });
 
     it('updates position only when clientX and clientY are non-zero', () => {
-        render(<DraggableListItem {...defaultProps} />);
-        const dragger = screen.getByRole('button', { name: /drag item/i });
+        renderComponent();
 
-        fireEvent.dragStart(dragger, {
-            clientX: 50,
-            clientY: 60,
-            dataTransfer: { setData: jest.fn(), setDragImage: jest.fn() },
-        });
+        const dragger = getDragger();
+        startDrag(dragger);
 
         const dragEventTrue = createEvent.drag(dragger);
-        Object.assign(dragEventTrue, { clientX: 120, clientY: 140 });
+        Object.assign(dragEventTrue, {
+            clientX: 120,
+            clientY: 140,
+        });
         fireEvent(dragger, dragEventTrue);
 
         const dragEventFalse = createEvent.drag(dragger);
-        Object.assign(dragEventFalse, { clientX: 0, clientY: 140 });
+        Object.assign(dragEventFalse, {
+            clientX: 0,
+            clientY: 140,
+        });
         fireEvent(dragger, dragEventFalse);
 
         expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
     });
 
-    it('does not render dragger when reordering is disabled', () => {
-        render(<DraggableListItem {...defaultProps} reorderDisabled />);
+    it('keeps dragger visible but disables dragging when reordering is disabled', () => {
+        renderComponent({ reorderDisabled: true });
+
+        expect(screen.getByTestId('drag-icon')).toBeInTheDocument();
+
+        const dragger = getDragger();
+
+        expect(dragger).toHaveAttribute('draggable', 'false');
+        expect(dragger).toHaveAttribute('tabindex', '-1');
+        expect(screen.getByText('Entity 1')).toBeInTheDocument();
+    });
+
+    it('does not render dragger when drag handle is hidden', () => {
+        renderComponent({ hideDragHandle: true });
 
         expect(screen.queryByTestId('drag-icon')).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /drag item/i })).not.toBeInTheDocument();
         expect(screen.getByText('Entity 1')).toBeInTheDocument();
     });
 
-    it('does not reorder entities when reordering is disabled', () => {
+    it.each([
+        ['reordering is disabled', { reorderDisabled: true }],
+        ['drag handle is hidden', { hideDragHandle: true }],
+    ])('does not reorder entities when %s', (_, props) => {
         const onReorder = jest.fn();
-
-        render(<DraggableListItem {...defaultProps} reorderDisabled onEntitiesReordered={onReorder} />);
-
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dataTransferMock = {
-            getData: jest.fn(() => '3'),
-        };
-
-        fireEvent.drop(item, {
-            dataTransfer: dataTransferMock,
-            preventDefault: jest.fn(),
+        renderComponent({
+            ...props,
+            onEntitiesReordered: onReorder,
         });
 
-        expect(dataTransferMock.getData).not.toHaveBeenCalled();
+        const dataTransfer = dropEntity(getItem(), '3');
+
+        expect(dataTransfer.getData).not.toHaveBeenCalled();
         expect(onReorder).not.toHaveBeenCalled();
     });
 
-    it('does not prevent default on dragOver when reordering is disabled', () => {
-        render(<DraggableListItem {...defaultProps} reorderDisabled />);
+    it.each([
+        ['reordering is disabled', { reorderDisabled: true }],
+        ['drag handle is hidden', { hideDragHandle: true }],
+    ])('does not prevent default on dragOver when %s', (_, props) => {
+        renderComponent(props);
 
-        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
-
-        const dragOverEvent = createEvent.dragOver(item);
-        dragOverEvent.preventDefault = jest.fn();
+        const item = getItem();
+        const dragOverEvent = createDragOverEvent(item);
 
         fireEvent(item, dragOverEvent);
 

@@ -24,6 +24,10 @@ export const WHO_WE_ARE_TEXT = {
             TITLE: 'Заголовок',
             DESCRIPTION: 'Опис',
         },
+        VALIDATION: {
+            TITLE_REQUIRED: "Заголовок обов'язковий",
+            DESCRIPTION_REQUIRED: "Опис обов'язковий",
+        },
     },
 
     MIN_LENGTH: 10,

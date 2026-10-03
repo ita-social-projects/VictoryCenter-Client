@@ -54,6 +54,8 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn(() => undefined),
+        validateTitle: jest.fn(() => undefined),
+        validateDescription: jest.fn(() => undefined),
     },
 }));
 
@@ -67,7 +69,8 @@ describe('ImageSection', () => {
 
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
 
-    const validateTextMock = () => WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
+    const validateTitleMock = () => WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle as jest.Mock;
+    const validateDescriptionMock = () => WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
 
     const renderComponent = (props: Partial<ImageSectionProps> = {}) => {
         const defaultProps: ImageSectionProps = {
@@ -117,8 +120,10 @@ describe('ImageSection', () => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
         mockOnTranslate = jest.fn();
-        validateTextMock().mockReset();
-        validateTextMock().mockReturnValue(undefined);
+        validateTitleMock().mockReset();
+        validateTitleMock().mockReturnValue(undefined);
+        validateDescriptionMock().mockReset();
+        validateDescriptionMock().mockReturnValue(undefined);
     });
 
     it('should render the component with initial values and no errors', () => {
@@ -295,7 +300,7 @@ describe('ImageSection', () => {
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-2'));
 
-        expect(validateTextMock()).toHaveBeenCalledWith('Initial Title');
+        expect(validateTitleMock()).toHaveBeenCalledWith('Initial Title');
     });
 
     it('should validate description on blur', () => {
@@ -303,11 +308,12 @@ describe('ImageSection', () => {
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
-        expect(validateTextMock()).toHaveBeenCalledWith('Initial Description');
+        expect(validateDescriptionMock()).toHaveBeenCalledWith('Initial Description');
     });
 
     it('should show field-specific required errors for empty title and description', () => {
-        validateTextMock().mockReturnValue(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        validateTitleMock().mockReturnValue(WHO_WE_ARE_TEXT.FORM.VALIDATION.TITLE_REQUIRED);
+        validateDescriptionMock().mockReturnValue(WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED);
         renderComponent();
 
         fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: '' } });
@@ -352,7 +358,7 @@ describe('ImageSection', () => {
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-2'));
 
-        expect(validateTextMock()).toHaveBeenCalledWith('');
+        expect(validateTitleMock()).toHaveBeenCalledWith('');
     });
 
     it('should validate empty description on blur when description is null', () => {
@@ -390,12 +396,12 @@ describe('ImageSection', () => {
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
-        expect(validateTextMock()).toHaveBeenCalledWith('');
+        expect(validateDescriptionMock()).toHaveBeenCalledWith('');
     });
 
     it('should disable publish button when title validation returns error on change', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR');
+        validateTitleMock().mockReturnValueOnce('ERR');
 
         fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'any' } });
 
@@ -404,7 +410,7 @@ describe('ImageSection', () => {
 
     it('should disable publish button when description validation returns error on change', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR');
+        validateDescriptionMock().mockReturnValueOnce('ERR');
 
         fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'any' } });
 
@@ -413,7 +419,7 @@ describe('ImageSection', () => {
 
     it('should disable publish button when title validation returns error on blur', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR');
+        validateTitleMock().mockReturnValueOnce('ERR');
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-2'));
 
@@ -422,7 +428,7 @@ describe('ImageSection', () => {
 
     it('should disable publish button when description validation returns error on blur', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR');
+        validateDescriptionMock().mockReturnValueOnce('ERR');
 
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
@@ -431,7 +437,7 @@ describe('ImageSection', () => {
 
     it('should enable publish button after title error is cleared on next change', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
+        validateTitleMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
 
         fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'a' } });
         expect(getPublishButton()).toBeDisabled();
@@ -442,7 +448,7 @@ describe('ImageSection', () => {
 
     it('should enable publish button after description error is cleared on next change', () => {
         renderComponent({ isPublishButtonActive: true });
-        validateTextMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
+        validateDescriptionMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
 
         fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'a' } });
         expect(getPublishButton()).toBeDisabled();
@@ -479,7 +485,7 @@ describe('ImageSection', () => {
 
         fireEvent.blur(titleInput);
 
-        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle).toHaveBeenCalled();
     });
 
     it('should validate description on blur for base language', () => {
@@ -491,7 +497,7 @@ describe('ImageSection', () => {
 
         fireEvent.blur(descInput);
 
-        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription).toHaveBeenCalled();
     });
 
     it('should not validate title or description on blur for non-base language', () => {
@@ -500,11 +506,13 @@ describe('ImageSection', () => {
         const titleInput = screen.getByTestId('mock-rich-input-2');
         const descInput = screen.getByTestId('mock-rich-input-3');
 
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockClear();
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle as jest.Mock).mockClear();
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockClear();
 
         fireEvent.blur(titleInput);
         fireEvent.blur(descInput);
 
-        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).not.toHaveBeenCalled();
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle).not.toHaveBeenCalled();
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription).not.toHaveBeenCalled();
     });
 });

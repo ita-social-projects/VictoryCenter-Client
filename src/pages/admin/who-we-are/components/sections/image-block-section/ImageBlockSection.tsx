@@ -49,12 +49,6 @@ export const ImageSection = ({
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
-    const getFieldValidationError = (value: string, requiredError: string) => {
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(value);
-
-        return error === COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED ? requiredError : error;
-    };
-
     const displayedTitle = useMemo(() => {
         if (!titleContent) return null;
         const titleLocalization = returnDisplayedLocalization(titleContent, language.code);
@@ -91,7 +85,7 @@ export const ImageSection = ({
         });
 
         const plainText = getPlainTextFromHtml(value);
-        const error = getFieldValidationError(plainText, WHO_WE_ARE_TEXT.FORM.VALIDATION.TITLE_REQUIRED);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
         setTitleError(error || null);
     };
 
@@ -103,21 +97,21 @@ export const ImageSection = ({
         });
 
         const plainText = getPlainTextFromHtml(value);
-        const error = getFieldValidationError(plainText, WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 
     const handleTitleBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedTitle ?? '');
-        const error = getFieldValidationError(plainText, WHO_WE_ARE_TEXT.FORM.VALIDATION.TITLE_REQUIRED);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
         setTitleError(error || null);
     };
 
     const handleDescriptionBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
-        const error = getFieldValidationError(plainText, WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 

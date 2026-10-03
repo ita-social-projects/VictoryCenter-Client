@@ -283,8 +283,12 @@ export const EventsPageAdmin = () => {
 
     const handleEntitiesReordered = useCallback(
         async (reorderedItems: EventItemDto[]) => {
+            if (!selectedCategory) {
+                return;
+            }
+
             const previousItems = eventItems;
-            const currentCategoryId = selectedCategory?.id;
+            const currentCategoryId = selectedCategory.id;
             const reorderRequestId = ++reorderRequestIdRef.current;
 
             try {
@@ -292,9 +296,8 @@ export const EventsPageAdmin = () => {
                 setEventItems(reorderedItems);
 
                 const orderedIds = reorderedItems.map((e) => e.id);
-                const categoryId = selectedCategory!.id;
 
-                await EventsApi.reorder(client, categoryId, orderedIds);
+                await EventsApi.reorder(client, currentCategoryId, orderedIds);
             } catch {
                 if (reorderRequestId === reorderRequestIdRef.current && selectedCategory?.id === currentCategoryId) {
                     setEventItems(previousItems);

@@ -2,162 +2,161 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { VideoReviewsSection } from './VideoReviewsSection';
 import { StoriesOfVictoryReviewVideo } from '@/types/public/stories-of-victory';
+import { TranslationStatus } from '@/types/common/language';
 
-// Mock react-i18next
+let mockCurrentLanguage = 'uk';
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
+}));
+
 jest.mock('react-i18next', () => ({
-    useTranslation: jest.fn(() => ({
-        t: jest.fn((key, fallback) => fallback || key),
-        i18n: { changeLanguage: jest.fn() },
-    })),
+    useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-// Mock SVG icon
 jest.mock('@/assets/icons/play-video.svg', () => ({
-    ReactComponent: () => <svg data-testid="play-icon" />,
+    ReactComponent: (props: any) => <svg data-testid="play-icon" {...props} />,
 }));
 
-// Mock video file
-jest.mock('@/assets/videos/child-riding-horse.webm', () => 'child-riding-horse.webm');
+jest.mock('@/assets/images/woman-leaning-on-horse.webp', () => 'fallback-thumbnail.webp');
 
-// Mock video element methods
-HTMLMediaElement.prototype.play = jest.fn(() => Promise.resolve());
-HTMLMediaElement.prototype.pause = jest.fn();
-
-const video1: StoriesOfVictoryReviewVideo = { id: 1, title: 'Video 1', link: 'https://youtube.com/watch?v=123' };
-const video2: StoriesOfVictoryReviewVideo = { id: 2, title: 'Video 2', link: 'https://youtube.com/watch?v=456' };
-const video3: StoriesOfVictoryReviewVideo = { id: 3, title: 'Video 3', link: 'https://youtube.com/watch?v=789' };
-
-const renderSingleVideo = () => render(<VideoReviewsSection content={[video1]} />);
-const getVideoWrapper = () => {
-    const { container } = renderSingleVideo();
-    return container.querySelector('.videoWrapper');
+const youTubeVideo: StoriesOfVictoryReviewVideo = {
+    id: 1,
+    title: 'Коні лікують 2025',
+    link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+};
+const facebookVideo: StoriesOfVictoryReviewVideo = {
+    id: 2,
+    title: 'Відео з Facebook',
+    link: 'https://www.facebook.com/watch/?v=123456789',
 };
 
+const getThumbnail = (container: HTMLElement) => container.querySelector('img')!;
+
 describe('VideoReviewsSection', () => {
-    beforeEach(() => {
-        const { useTranslation } = require('react-i18next');
-        (useTranslation as jest.Mock).mockReturnValue({
-            t: jest.fn((key: string, fallback?: string) => fallback || key),
-            i18n: { changeLanguage: jest.fn() },
-        });
-        (HTMLMediaElement.prototype.play as jest.Mock).mockResolvedValue(undefined);
-        (HTMLMediaElement.prototype.pause as jest.Mock).mockImplementation(() => {});
+    afterEach(() => {
+        mockCurrentLanguage = 'uk';
     });
 
-    it('should render section element', () => {
-        const { container } = render(<VideoReviewsSection content={null} />);
-        expect(container.querySelector('section')).toBeInTheDocument();
+    it('renders the localized section title', () => {
+        render(<VideoReviewsSection content={[youTubeVideo]} />);
+
+        expect(screen.getByRole('heading', { name: 'VIDEO_SECTION.TITLE' })).toBeInTheDocument();
     });
 
-    it('should render title with translation', () => {
-        render(<VideoReviewsSection content={null} />);
-        expect(screen.getByText('Video Reviews')).toBeInTheDocument();
+    it.each([[null], [[]]])('hides the whole section, including its title, when content is %p', (content) => {
+        const { container } = render(<VideoReviewsSection content={content} />);
+
+        expect(container).toBeEmptyDOMElement();
     });
 
-    it('should call useTranslation with successPage namespace', () => {
-        const { useTranslation } = require('react-i18next');
-        render(<VideoReviewsSection content={null} />);
-        expect(useTranslation).toHaveBeenCalledWith('successPage');
-    });
+    it('renders a card with a thumbnail, a play button and a caption for each video', () => {
+        render(<VideoReviewsSection content={[youTubeVideo, facebookVideo]} />);
 
-    it('should render h4 title element', () => {
-        render(<VideoReviewsSection content={null} />);
-        const title = screen.getByText('Video Reviews');
-        expect(title.tagName).toBe('H4');
-    });
-
-    it('should not render videos container when content is null', () => {
-        const { container } = render(<VideoReviewsSection content={null} />);
-        expect(container.querySelector('.videos')).not.toBeInTheDocument();
-    });
-
-    it('should not render videos container when content is empty array', () => {
-        const { container } = render(<VideoReviewsSection content={[]} />);
-        expect(container.querySelector('.videos')).not.toBeInTheDocument();
-    });
-
-    it('should render videos container when content has videos', () => {
-        const { container } = render(<VideoReviewsSection content={[video1]} />);
-        expect(container.querySelector('.videos')).toBeInTheDocument();
-    });
-
-    it('should render all video titles', () => {
-        render(<VideoReviewsSection content={[video1, video2, video3]} />);
-        expect(screen.getByText('Video 1')).toBeInTheDocument();
-        expect(screen.getByText('Video 2')).toBeInTheDocument();
-        expect(screen.getByText('Video 3')).toBeInTheDocument();
-    });
-
-    it('should render play icon for each video when not playing', () => {
-        render(<VideoReviewsSection content={[video1, video2]} />);
         expect(screen.getAllByTestId('play-icon')).toHaveLength(2);
+        expect(screen.getByText('Коні лікують 2025')).toBeInTheDocument();
+        expect(screen.getByText('Відео з Facebook')).toBeInTheDocument();
     });
 
-    it('should show all videos when video link exists', () => {
-        const { container } = render(<VideoReviewsSection content={[video1, video2]} />);
-        expect(container.querySelectorAll('.video')).toHaveLength(2);
+    it('opens the video on its original platform in a new tab', () => {
+        render(<VideoReviewsSection content={[youTubeVideo]} />);
+
+        const link = screen.getByRole('link', { name: 'Коні лікують 2025' });
+        expect(link).toHaveAttribute('href', youTubeVideo.link);
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+        expect(link).toContainElement(screen.getByTestId('play-icon'));
     });
 
-    it('should skip rendering videoWrapper when video link is missing', () => {
-        const { container } = render(<VideoReviewsSection content={[{ ...video1, link: null }]} />);
-        expect(container.querySelector('.videoWrapper')).not.toBeInTheDocument();
+    it('uses the YouTube thumbnail for YouTube links', () => {
+        const { container } = render(<VideoReviewsSection content={[youTubeVideo]} />);
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
+        expect(getThumbnail(container)).toHaveClass('youTubeThumbnail');
     });
 
-    it('should render video title for video without link', () => {
-        render(<VideoReviewsSection content={[{ id: 1, title: 'Video Without Link', link: null }]} />);
-        expect(screen.getByText('Video Without Link')).toBeInTheDocument();
+    it('uses the fallback thumbnail without the YouTube crop for non-YouTube links', () => {
+        const { container } = render(<VideoReviewsSection content={[facebookVideo]} />);
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
+        expect(getThumbnail(container)).not.toHaveClass('youTubeThumbnail');
     });
 
-    describe('with a single video', () => {
-        it('should hide play icon when video is being played', () => {
-            fireEvent.click(getVideoWrapper()!);
-            // state is maintained within the component after click
+    it('switches to the uncropped fallback thumbnail when the YouTube thumbnail fails to load', () => {
+        const { container } = render(<VideoReviewsSection content={[youTubeVideo]} />);
+
+        fireEvent.error(getThumbnail(container));
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
+        expect(getThumbnail(container)).not.toHaveClass('youTubeThumbnail');
+    });
+
+    it("switches to the fallback thumbnail when YouTube returns its small 'no thumbnail' placeholder", () => {
+        const { container } = render(<VideoReviewsSection content={[youTubeVideo]} />);
+        const img = getThumbnail(container);
+        Object.defineProperty(img, 'naturalWidth', { value: 120 });
+
+        fireEvent.load(img);
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
+        expect(getThumbnail(container)).not.toHaveClass('youTubeThumbnail');
+    });
+
+    it('keeps a real YouTube thumbnail after it loads', () => {
+        const { container } = render(<VideoReviewsSection content={[youTubeVideo]} />);
+        const img = getThumbnail(container);
+        Object.defineProperty(img, 'naturalWidth', { value: 480 });
+
+        fireEvent.load(img);
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
+    });
+
+    it('does not replace the fallback photo when it loads', () => {
+        const { container } = render(<VideoReviewsSection content={[facebookVideo]} />);
+        const img = getThumbnail(container);
+        Object.defineProperty(img, 'naturalWidth', { value: 100 });
+
+        fireEvent.load(img);
+
+        expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
+    });
+
+    it('renders the card without a link when the video has no link', () => {
+        render(<VideoReviewsSection content={[{ ...youTubeVideo, link: null }]} />);
+
+        expect(screen.queryByRole('link')).not.toBeInTheDocument();
+        expect(screen.getByText('Коні лікують 2025')).toBeInTheDocument();
+    });
+
+    describe('localization', () => {
+        it('shows the English caption on the English site and keeps the link', () => {
+            mockCurrentLanguage = 'en';
+            render(
+                <VideoReviewsSection
+                    content={[
+                        {
+                            ...youTubeVideo,
+                            localizations: [
+                                {
+                                    language: { id: 2, code: 'en' },
+                                    translationStatus: TranslationStatus.Relevant,
+                                    title: 'Horses heal 2025',
+                                },
+                            ],
+                        },
+                    ]}
+                />,
+            );
+
+            expect(screen.getByText('Horses heal 2025')).toBeInTheDocument();
+            expect(screen.getByRole('link', { name: 'Horses heal 2025' })).toHaveAttribute('href', youTubeVideo.link);
         });
 
-        it('should render video element with correct attributes', () => {
-            const { container } = renderSingleVideo();
-            const video = container.querySelector('video');
-            expect(video).toBeInTheDocument();
-            expect(video).toHaveAttribute('playsinline');
-            expect(video).toHaveAttribute('aria-hidden', 'true');
-        });
+        it('falls back to the Ukrainian caption on the English site when there is no translation', () => {
+            mockCurrentLanguage = 'en';
+            render(<VideoReviewsSection content={[youTubeVideo]} />);
 
-        it('should render video source with correct type', () => {
-            const { container } = renderSingleVideo();
-            const source = container.querySelector('source');
-            expect(source).toBeInTheDocument();
-            expect(source).toHaveAttribute('type', 'video/webm');
-        });
-
-        describe('video wrapper', () => {
-            it('should render video wrapper with role button', () => {
-                const wrapper = getVideoWrapper();
-                expect(wrapper).toHaveAttribute('role', 'button');
-                expect(wrapper).toHaveAttribute('tabindex', '0');
-            });
-
-            it('should handle click on video wrapper', () => {
-                fireEvent.click(getVideoWrapper()!);
-                expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
-            });
-
-            it('should handle Enter key on video wrapper', () => {
-                fireEvent.keyDown(getVideoWrapper()!, { key: 'Enter' });
-                expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
-            });
-
-            it('should handle Space key on video wrapper', () => {
-                fireEvent.keyDown(getVideoWrapper()!, { key: ' ' });
-                expect(HTMLMediaElement.prototype.play).toHaveBeenCalled();
-            });
-
-            it('should not trigger play on other keys', () => {
-                const playMock = jest.fn();
-                HTMLMediaElement.prototype.play = playMock;
-
-                fireEvent.keyDown(getVideoWrapper()!, { key: 'a' });
-                expect(playMock).not.toHaveBeenCalled();
-            });
+            expect(screen.getByText('Коні лікують 2025')).toBeInTheDocument();
         });
     });
 });

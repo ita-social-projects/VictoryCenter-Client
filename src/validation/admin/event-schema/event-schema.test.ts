@@ -44,7 +44,9 @@ describe('EventValidationSchema', () => {
     it('should require a Ukrainian link when publishing', async () => {
         const data = { ...validData, linkUkr: '' };
 
-        await expect(EventValidationSchema.validate(data, { context: { isPublishing: true } })).rejects.toThrow();
+        await expect(
+            EventValidationSchema.validateAt('linkUkr', data, { context: { isPublishing: true } }),
+        ).rejects.toThrow();
     });
 
     it('should reject a non-empty Ukrainian link shorter than the minimum length when saving as draft', async () => {

@@ -1,3 +1,4 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
 .form {
     display: flex;
     flex-direction: column;
@@ -31,4 +32,11 @@
     flex-direction: column;
     flex: 1;
     width: 100%;
+}
+
+.title-input {
+    input,
+    textarea {
+        @include type.h3-semibold-uppercase;
+    }
 }

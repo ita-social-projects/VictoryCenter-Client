@@ -99,6 +99,7 @@ export const SingleImageRight = ({
                                 onChange={handleDescriptionChange}
                                 onBlur={handleDescriptionBlur}
                                 maxLength={descriptionMaxLength}
+                                placeholder={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER}
                                 rows={8}
                                 autoGrow={true}
                                 maxRows={20}

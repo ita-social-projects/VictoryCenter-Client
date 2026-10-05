@@ -59,7 +59,7 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
                 formState: TranslateEventCategoryFormValues,
                 _isPublishing: boolean,
             ): TranslateEventCategoryFormErrorState => {
-                return EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateFrom(
+                return EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateForm(
                     formState.name,
                     selectedCategory ?? undefined,
                 ) as TranslateEventCategoryFormErrorState;
@@ -79,18 +79,6 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        const validateNameAndCategory = (currentNameValue: string) => {
-            const normalized = getNormalizedInputText(currentNameValue);
-
-            setErrors((prev) => ({
-                ...prev,
-                name: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateName(normalized),
-                category: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateCategory(selectedCategory as any),
-            }));
-
-            return normalized;
-        };
-
         useEffect(() => {
             const baseData = initialData ?? DEFAULT_FORM_STATE;
             const isNameDirty = JSON.stringify(formState) !== JSON.stringify(baseData);
@@ -101,7 +89,14 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = e.target.value;
             setFormState((prev) => ({ ...prev, name: newValue }));
-            validateNameAndCategory(newValue);
+
+            if (errors.name) {
+                const normalized = getNormalizedInputText(newValue);
+                setErrors((prev) => ({
+                    ...prev,
+                    name: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateName(normalized),
+                }));
+            }
         };
 
         const handleCategoryChange = (category: EventCategoryDto | null) => {
@@ -113,10 +108,16 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
         };
 
         const handleNameBlur = () => {
-            const normalized = validateNameAndCategory(formState.name);
+            const normalized = getNormalizedInputText(formState.name);
+
             if (normalized !== formState.name) {
                 setFormState((prev) => ({ ...prev, name: normalized }));
             }
+
+            setErrors((prev) => ({
+                ...prev,
+                name: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateName(normalized),
+            }));
         };
 
         return (

@@ -21,7 +21,10 @@ export const EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS = {
             EventCategoryTranslationValidationSchema.validateSyncAt('name', { name: value });
             return undefined;
         } catch (error: any) {
-            return error.message;
+            if (error instanceof Yup.ValidationError) {
+                return error.message;
+            }
+            return undefined;
         }
     },
 
@@ -30,11 +33,14 @@ export const EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS = {
             EventCategoryTranslationValidationSchema.validateSyncAt('category', { category: value });
             return undefined;
         } catch (error: any) {
-            return error.message;
+            if (error instanceof Yup.ValidationError) {
+                return error.message;
+            }
+            return undefined;
         }
     },
 
-    validateFrom: (
+    validateForm: (
         name: string | undefined,
         category: EventCategoryDto | undefined,
     ): { name: string | undefined; category: string | undefined } => {

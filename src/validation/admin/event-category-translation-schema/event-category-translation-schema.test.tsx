@@ -74,7 +74,7 @@ describe('EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS', () => {
 
     describe('validateFrom', () => {
         it('should return an object with undefined values when both inputs are valid', () => {
-            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateFrom('Valid Name', validCategory);
+            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateForm('Valid Name', validCategory);
             expect(result).toEqual({
                 name: undefined,
                 category: undefined,
@@ -82,7 +82,7 @@ describe('EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS', () => {
         });
 
         it('should return an object with error messages when both inputs are invalid', () => {
-            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateFrom('', undefined);
+            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateForm('', undefined);
             expect(result).toEqual({
                 name: 'Name is required error',
                 category: 'Category is required error',
@@ -90,7 +90,7 @@ describe('EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS', () => {
         });
 
         it('should return an error for name but undefined for category if only name is invalid', () => {
-            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateFrom('A', validCategory);
+            const result = EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateForm('A', validCategory);
             expect(result).toEqual({
                 name: 'Name must be at least 2 characters',
                 category: undefined,

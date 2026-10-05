@@ -38,6 +38,7 @@ export interface EditableHeaderSectionProps {
     placeholder: string;
     isHidden?: boolean;
     onToggleVisibility?: () => void;
+    isToggleVisibilityDisabled?: boolean;
 }
 
 const sanitizeViewHtml = (html: string) =>
@@ -89,6 +90,7 @@ export const EditableHeaderSection = ({
     placeholder,
     isHidden,
     onToggleVisibility,
+    isToggleVisibilityDisabled = false,
 }: EditableHeaderSectionProps) => {
     const [draftValue, setDraftValue] = useState(initialPublishedHtml);
     const [validationError, setValidationError] = useState<string>();
@@ -180,7 +182,7 @@ export const EditableHeaderSection = ({
                                 type="button"
                                 className={styles['editable-header-section-icon-button']}
                                 aria-label={`${isHidden ? EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION : EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${heading}`}
-                                disabled={disabled}
+                                disabled={disabled || isToggleVisibilityDisabled}
                                 onClick={onToggleVisibility}
                             >
                                 {isHidden ? <EyeClosedIcon /> : <EyeOpenedIcon />}

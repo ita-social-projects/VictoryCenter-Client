@@ -192,6 +192,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             disabled,
             isHidden: _isHidden,
             onToggleVisibility,
+            isToggleVisibilityDisabled,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -204,6 +205,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             disabled?: boolean;
             isHidden?: boolean;
             onToggleVisibility?: () => void;
+            isToggleVisibilityDisabled?: boolean;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
@@ -225,7 +227,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         type="button"
                         onClick={onToggleVisibility}
                         aria-label={`${_isHidden ? EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION : EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE : EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`}
-                        disabled={disabled}
+                        disabled={disabled || isToggleVisibilityDisabled}
                     >
                         Toggle visibility
                     </button>
@@ -687,6 +689,8 @@ describe('EventsPageAdmin', () => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, 'pageDescription', {
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Чернетка заголовка</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 
@@ -700,6 +704,8 @@ describe('EventsPageAdmin', () => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith({}, 'eventsBlockTitle', {
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
     });
@@ -932,6 +938,56 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.toggleEventsTitleVisibility).toHaveBeenCalledWith({});
+        });
+    });
+
+    it('disables visibility toggle buttons and prevents concurrent toggle requests while a toggle is in progress', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
+
+        let resolveToggle: (val: any) => void = () => {};
+        const togglePromise = new Promise((resolve) => {
+            resolveToggle = resolve;
+        });
+        mockedEventsApi.toggleEventsDescriptionVisibility.mockImplementationOnce(() => togglePromise as any);
+
+        await renderEventsPage();
+
+        const descToggleButton = screen.getByRole('button', {
+            name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+        });
+        const titleToggleButton = screen.getByRole('button', {
+            name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
+        });
+
+        expect(descToggleButton).toBeEnabled();
+        expect(titleToggleButton).toBeEnabled();
+
+        await user.click(descToggleButton);
+
+        expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledTimes(1);
+        expect(descToggleButton).toBeDisabled();
+        expect(titleToggleButton).toBeDisabled();
+
+        await user.click(descToggleButton);
+        expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledTimes(1);
+
+        await user.click(titleToggleButton);
+        expect(mockedEventsApi.toggleEventsTitleVisibility).not.toHaveBeenCalled();
+
+        act(() => {
+            resolveToggle(mockResponse);
+        });
+
+        await waitFor(() => {
+            expect(descToggleButton).toBeEnabled();
+            expect(titleToggleButton).toBeEnabled();
         });
     });
 

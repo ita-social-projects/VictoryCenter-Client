@@ -349,6 +349,12 @@ describe('EditableHeaderSection', () => {
         fireEvent.click(clearButton);
         expect(defaultProps.onDraftChange).toHaveBeenLastCalledWith('');
     });
+
+    it('disables the visibility toggle button when isToggleVisibilityDisabled is true', () => {
+        renderSection({ isToggleVisibilityDisabled: true });
+
+        expect(screen.getByRole('button', { name: /сховати секцію/i })).toBeDisabled();
+    });
 });
 
 describe('normalizeEventsDraftHtml', () => {

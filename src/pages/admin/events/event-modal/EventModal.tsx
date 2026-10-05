@@ -23,14 +23,20 @@ import styles from './EventModal.module.scss';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/calendar.svg';
 import { ReactComponent as ChevronRightIcon } from '@/assets/icons/chevron-right.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { ModalMode } from '@/types/admin/common';
+import { EventItemDto } from '@/types/admin/events';
 
 type PickerLayer = 'date-picker' | 'month-year-selector' | 'calendar';
 
-export type EventModalProps = {
+type EventModalBaseProps = {
     isOpen: boolean;
     onClose: () => void;
     currentCategory: EventCategoryDto | null;
 };
+
+export type EventModalProps =
+    | (EventModalBaseProps & { mode: ModalMode.Add })
+    | (EventModalBaseProps & { mode: ModalMode.Edit; eventToEdit: EventItemDto });
 
 const defaultFormState: EventFormValues = {
     title: '',
@@ -53,6 +59,16 @@ const formatDateValue = (date: Date) => {
 
     return `${date.getFullYear()}-${month}-${day}`;
 };
+
+const getEditFormState = (event: EventItemDto): EventFormValues => ({
+    title: event.title ?? '',
+    description: event.description ?? '',
+    additionalDescription: event.additionalDescription ?? '',
+    publishDate: event.publishedAt ? formatDateValue(new Date(event.publishedAt)) : null,
+    image: event.previewImage,
+    linkUkr: event.resource ?? '',
+    linkEng: event.resourceEn ?? '',
+});
 
 const parseDateValue = (value: string) => {
     const [year, month, day] = value.split('-').map(Number);
@@ -103,7 +119,8 @@ const mapEventImageError = (error: string | null): string | undefined => {
 };
 
 export const EventModal = (props: EventModalProps) => {
-    const { isOpen, onClose, currentCategory } = props;
+    const { isOpen, onClose, currentCategory, mode } = props;
+    const isEditMode = mode === ModalMode.Edit;
 
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -120,6 +137,8 @@ export const EventModal = (props: EventModalProps) => {
 
     const [isPublishing, setIsPublishing] = useState(false);
 
+    const initialFormState = props.mode === ModalMode.Edit ? getEditFormState(props.eventToEdit) : defaultFormState;
+
     const {
         control,
         formState: { errors, isDirty },
@@ -129,7 +148,7 @@ export const EventModal = (props: EventModalProps) => {
         watch,
     } = useForm<EventFormValues>({
         resolver: yupResolver(EventValidationSchema as Yup.ObjectSchema<EventFormValues>),
-        defaultValues: defaultFormState,
+        defaultValues: initialFormState,
         mode: 'onTouched',
         context: { isPublishing },
     });
@@ -139,12 +158,8 @@ export const EventModal = (props: EventModalProps) => {
     const isPublishValid =
         EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } }) && !errors.image;
 
-    const handleTextFieldChange = useCallback(
-        (field: any) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            field.onChange(getNormalizedInputTextWhileTyping(e.target.value));
-        },
-        [],
-    );
+    const isSaveAsDraftDisabled = !isDirty || !isDraftValid;
+    const isPublishDisabled = !isDirty || !isPublishValid;
 
     const handleTextFieldBlur = useCallback(
         (field: any) => () => {
@@ -280,7 +295,9 @@ export const EventModal = (props: EventModalProps) => {
         <>
             <Modal isOpen={isOpen} onClose={handleClose} maxWidth="665px" className={styles['modal']}>
                 <Modal.Title>
-                    <h2 className={styles['modal-title']}>{EVENTS_TEXT.FORM.MODAL_TITLE}</h2>
+                    <h2 className={styles['modal-title']}>
+                        {isEditMode ? EVENTS_TEXT.FORM.EDIT_MODAL_TITLE : EVENTS_TEXT.FORM.MODAL_TITLE}
+                    </h2>
                 </Modal.Title>
 
                 <Modal.Content>
@@ -294,7 +311,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.TITLE}
                                     id="event-title"
@@ -302,6 +319,7 @@ export const EventModal = (props: EventModalProps) => {
                                     error={errors.title?.message}
                                     isRequired
                                     showCounterBelow
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />
@@ -586,7 +604,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value ?? ''}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}
                                     id="event-link-ukr"
@@ -595,6 +613,7 @@ export const EventModal = (props: EventModalProps) => {
                                     isRequired
                                     showCounter={false}
                                     className={styles['link-ukr']}
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />
@@ -606,7 +625,7 @@ export const EventModal = (props: EventModalProps) => {
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
                                     value={field.value ?? ''}
-                                    onChange={handleTextFieldChange(field)}
+                                    onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_ENG}
                                     id="event-link-eng"
@@ -614,6 +633,7 @@ export const EventModal = (props: EventModalProps) => {
                                     error={errors.linkEng?.message}
                                     showCounter={false}
                                     className={styles['link-eng']}
+                                    normalizeValue={getNormalizedInputTextWhileTyping}
                                 />
                             )}
                         />
@@ -625,7 +645,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="secondary"
-                            disabled={!isDraftValid}
+                            disabled={isSaveAsDraftDisabled}
                             className={styles['action-button']}
                             onClick={handleSaveAsDraft}
                         >
@@ -634,7 +654,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            disabled={!isPublishValid}
+                            disabled={isPublishDisabled}
                             className={styles['action-button']}
                             onClick={handlePublish}
                         >

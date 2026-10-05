@@ -58,6 +58,7 @@ describe('EventsPageModals', () => {
     const closeEditCategoryModal = jest.fn();
     const closeAddItemModal = jest.fn();
     const closeDeleteCategoryModal = jest.fn();
+    const closeEditItemModal = jest.fn();
     const closeTranslateCategoryModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
@@ -69,6 +70,7 @@ describe('EventsPageModals', () => {
         isAddModalOpen = false,
         isDeleteCategoryModalOpen = false,
         isCategoryToTranslate = false,
+        itemToEdit: EventItemDto | null = null,
     ): UseModalsStateResult<EventItemDto> =>
         ({
             modalState: {
@@ -76,6 +78,7 @@ describe('EventsPageModals', () => {
                 isEditCategoryModalOpen,
                 isAddModalOpen,
                 isDeleteCategoryModalOpen,
+                itemToEdit,
                 isCategoryToTranslate,
             },
             closeModalActions: {
@@ -83,6 +86,7 @@ describe('EventsPageModals', () => {
                 closeEditCategoryModal,
                 closeAddItemModal,
                 closeDeleteCategoryModal,
+                closeEditItemModal,
                 closeTranslateCategoryModal,
             },
         }) as unknown as UseModalsStateResult<EventItemDto>;
@@ -242,6 +246,35 @@ describe('EventsPageModals', () => {
                 isOpen: true,
                 onClose: closeAddItemModal,
                 currentCategory,
+            }),
+        );
+    });
+
+    it('renders edit event modal when an event is selected', () => {
+        const eventToEdit = { id: 5, title: 'Event' } as EventItemDto;
+
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, false, false, false, false, eventToEdit)}
+                categories={categories}
+                currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
+                translationLanguages={translationLanguages}
+            />,
+        );
+
+        const editEventModalProps = mockedEventModal.mock.calls
+            .map(([props]) => props)
+            .find((props) => props.mode === ModalMode.Edit);
+
+        expect(editEventModalProps).toEqual(
+            expect.objectContaining({
+                isOpen: true,
+                onClose: closeEditItemModal,
+                currentCategory,
+                eventToEdit,
             }),
         );
     });

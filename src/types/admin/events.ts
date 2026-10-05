@@ -4,9 +4,11 @@ import { VisibilityStatus } from './common';
 export interface EventItemDto {
     id: number;
     resource: string;
+    resourceEn?: string | null;
     publishedAt: string;
     title: string;
     description: string;
+    additionalDescription?: string | null;
     status: VisibilityStatus;
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;

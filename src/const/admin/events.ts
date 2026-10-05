@@ -36,6 +36,7 @@ export const EVENTS_TEXT = {
     },
     FORM: {
         MODAL_TITLE: 'Додати матеріал',
+        EDIT_MODAL_TITLE: 'Редагувати матеріал',
         LINKS_SECTION_TITLE: 'Додати посилання на матеріал',
         LABEL: {
             TITLE: 'Заголовок',

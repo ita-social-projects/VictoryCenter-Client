@@ -22,6 +22,7 @@ interface ContactFormCardProps {
     subjectPlaceholder: string;
     messagePlaceholder: string;
     submitLabel: string;
+    onSubmitSuccess?: () => void;
 }
 
 const getCharacterLimitHint = (
@@ -49,6 +50,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     subjectPlaceholder,
     messagePlaceholder,
     submitLabel,
+    onSubmitSuccess,
 }) => {
     const { t, i18n } = useTranslation('contactUsPage');
 
@@ -126,6 +128,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
             reset();
             resetTurnstile();
             showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
+            onSubmitSuccess?.();
         } catch {
             showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }

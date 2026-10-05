@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
+import { getCounterLength } from '@/utils/functions/get-counter-length/get-counter-length';
 
 interface UseInputWithCharacterLimitProps<T extends HTMLInputElement | HTMLTextAreaElement> {
     value: string;
@@ -28,7 +29,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
 }: UseInputWithCharacterLimitProps<T>) => {
     const [isFocused, setIsFocused] = useState(false);
     const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({ onWarningChange });
-    const currentLength = (value ?? '').replace(/ +$/, '').length;
+    const currentLength = getCounterLength(value);
 
     const handleChange = (e: React.ChangeEvent<T>) => {
         let newValue = e.target.value;

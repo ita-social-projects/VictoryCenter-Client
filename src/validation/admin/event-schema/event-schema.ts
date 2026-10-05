@@ -1,5 +1,7 @@
 import * as Yup from 'yup';
-import { EVENT_VALIDATION } from '@/const/admin/events';
+import { EVENT_CATEGORY_VALIDATION, EVENT_VALIDATION } from '@/const/admin/events';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EventCategoryDto } from '@/types/admin/event-category';
 import { Image, ImageValues } from '@/types/common/image';
 
 export const EventValidationSchema = Yup.object({
@@ -28,9 +30,13 @@ export const EventValidationSchema = Yup.object({
 
     linkUkr: Yup.string()
         .trim()
-        .required(EVENT_VALIDATION.linkUkr.getRequiredError())
-        .min(EVENT_VALIDATION.linkUkr.min, EVENT_VALIDATION.linkUkr.getMinError())
-        .max(EVENT_VALIDATION.linkUkr.max, EVENT_VALIDATION.linkUkr.getMaxError()),
+        .max(EVENT_VALIDATION.linkUkr.max, EVENT_VALIDATION.linkUkr.getMaxError())
+        .test('min-length-if-not-empty', EVENT_VALIDATION.linkUkr.getMinError(), (value) => {
+            return !value || value.length >= EVENT_VALIDATION.linkUkr.min;
+        })
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing ? schema.required(EVENT_VALIDATION.linkUkr.getRequiredError()) : schema.notRequired(),
+        ),
 
     linkEng: Yup.string()
         .trim()
@@ -63,3 +69,45 @@ export const EventValidationSchema = Yup.object({
 });
 
 export type EventFormValues = Yup.InferType<typeof EventValidationSchema>;
+
+export const TranslateEventCategoryValidationSchema = Yup.object({
+    name: Yup.string()
+        .trim()
+        .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
+        .max(
+            EVENT_CATEGORY_VALIDATION.name.max,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max),
+        ),
+
+    category: Yup.mixed<EventCategoryDto>().nullable().required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED),
+});
+
+export const validateTranslateCategoryName = (name: string): string | undefined => {
+    try {
+        TranslateEventCategoryValidationSchema.validateSyncAt('name', { name });
+        return undefined;
+    } catch (error) {
+        return error instanceof Yup.ValidationError ? error.message : undefined;
+    }
+};
+
+export const validateTranslateCategorySelection = (
+    category: EventCategoryDto | null | undefined,
+): string | undefined => {
+    try {
+        TranslateEventCategoryValidationSchema.validateSyncAt('category', { category });
+        return undefined;
+    } catch (error) {
+        return error instanceof Yup.ValidationError ? error.message : undefined;
+    }
+};
+
+export const validateTranslateEventCategoryForm = (
+    name: string,
+    category: EventCategoryDto | null | undefined,
+): { name: string | undefined; category: string | undefined } => {
+    return {
+        name: validateTranslateCategoryName(name),
+        category: validateTranslateCategorySelection(category),
+    };
+};

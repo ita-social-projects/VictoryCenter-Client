@@ -9,6 +9,7 @@ import {
     HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/history-translation-schema/history-translation-schema';
 import styles from './TranslateHistorySectionForm.module.scss';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 
 export interface TranslateHistorySectionFormValues {
     title: string;
@@ -124,10 +125,11 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                         onBlur={handleTitleBlur}
                         id="history-translation-title"
                         name="title"
-                        placeholder="ВВЕДІТЬ НАЗВУ"
+                        placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         maxLength={HISTORY_TRANSLATION_VALIDATION.title.max}
                         disabled={isSubmitting || formDisabled}
                         error={errors.title}
+                        className={styles['title-input']}
                     />
                 </div>
                 <div className={styles['form-group']}>
@@ -135,11 +137,13 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                         label="*Опис"
                         id="history-translation-description"
                         name="description"
+                        placeholder={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER}
                         value={formState.description}
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
                         rows={5}
                         autoGrow
+                        maxRows={0}
                         disabled={isSubmitting || formDisabled}
                         maxLength={HISTORY_TRANSLATION_VALIDATION.description.max}
                         error={errors.description}

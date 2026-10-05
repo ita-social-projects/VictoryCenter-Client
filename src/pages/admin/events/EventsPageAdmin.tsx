@@ -7,6 +7,7 @@ import { DraggableListItem } from '@/components/admin/draggable-list-item/Dragga
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { Button } from '@/components/admin/button/Button';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
@@ -35,6 +36,7 @@ import {
     LIST_ITEM_HEIGHT_IN_PIXELS,
 } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
 import {
     EventsPageTextValidationRule,
@@ -55,29 +57,49 @@ const introSectionValidationById: Record<EditableHeaderSectionId, EventsPageText
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: EVENTS_PAGE_VALIDATION.PAGE_DESCRIPTION,
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: EVENTS_PAGE_VALIDATION.EVENTS_BLOCK_TITLE,
 };
+
+interface PublishConfirmationState {
+    sectionId: EditableHeaderSectionId;
+    value: string;
+}
+
+type EditableSectionState = Record<EditableHeaderSectionId, boolean>;
+
+const createEditableSectionState = (): EditableSectionState => ({
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: false,
+    [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: false,
+});
+
 export const EventsPageAdmin = () => {
-    const [editingSectionId, setEditingSectionId] = useState<EditableHeaderSectionId | null>(null);
+    const [editingSections, setEditingSections] = useState<EditableSectionState>(createEditableSectionState);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>(EMPTY_ERROR);
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
+    const [isReordering, setIsReordering] = useState(false);
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
-    const [isEventsIntroSectionPublishing, setIsEventsIntroSectionPublishing] = useState(false);
+    const [publishingSections, setPublishingSections] = useState<EditableSectionState>(createEditableSectionState);
+    const [publishConfirmation, setPublishConfirmation] = useState<PublishConfirmationState | null>(null);
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const requestIdRef = useRef(0);
+    const publishingSectionsRef = useRef<EditableSectionState>(createEditableSectionState());
     const currentPageRef = useRef<number>(1);
     const currentItemsCountRef = useRef(0);
     const hasMoreRef = useRef(true);
     const isEventItemsLoadingRef = useRef(false);
+    const reorderRequestIdRef = useRef(0);
+    const eventItemsContextIdRef = useRef(0);
+    const isReorderingRef = useRef(false);
 
     const client = useAdminClient();
 
@@ -93,6 +115,7 @@ export const EventsPageAdmin = () => {
     }, []);
 
     const resetEventItemsState = useCallback(() => {
+        eventItemsContextIdRef.current += 1;
         requestIdRef.current += 1;
 
         setEventItems([]);
@@ -107,9 +130,10 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
     const { openModalActions } = modalsStateControl;
 
     const getEventSearchItems = useCallback(
@@ -146,6 +170,8 @@ export const EventsPageAdmin = () => {
                 openModalActions.openEditCategoryModal();
             } else if (id === 'delete') {
                 openModalActions.openDeleteCategoryModal();
+            } else if (id === 'translate') {
+                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],
@@ -156,6 +182,7 @@ export const EventsPageAdmin = () => {
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
             { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );
@@ -197,13 +224,13 @@ export const EventsPageAdmin = () => {
         fetchEventsIntroSection();
     }, [client, setErrorState]);
 
-    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
-
     const handleAddEvent = useCallback(() => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
+
+    const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
+        setCategories((prev) => [...prev, newCategory]);
+    }, []);
 
     const handleUpdateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
@@ -234,7 +261,17 @@ export const EventsPageAdmin = () => {
         [categories, selectedCategory?.id, resetEventItemsState],
     );
 
-    // Event items handlers
+    const getCategoryName = useCallback(
+        (category: EventCategoryDto) => {
+            const localization = category.localizations?.find((loc) => {
+                const langCode = loc.language?.code ?? (loc as any).localizationInfoDto?.code;
+                return langCode === selectedLanguage?.code;
+            });
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code],
+    );
+
     const updatePageSize = useCallback(() => {
         if (!listContainerRef.current) {
             return;
@@ -264,9 +301,50 @@ export const EventsPageAdmin = () => {
 
     const renderEntityComponent = useCallback((item: EventItemDto) => <EventItemComponent item={item} />, []);
 
-    const handleEntitiesReordered = useCallback(() => {
-        /*TODO: add implementation.*/
-    }, []);
+    const handleEntitiesReordered = useCallback(
+        async (reorderedItems: EventItemDto[]) => {
+            if (!selectedCategory) {
+                return;
+            }
+
+            const previousItems = eventItems;
+            const currentCategoryId = selectedCategory.id;
+            const currentListContextId = eventItemsContextIdRef.current;
+            const reorderRequestId = ++reorderRequestIdRef.current;
+
+            try {
+                isReorderingRef.current = true;
+                setIsReordering(true);
+
+                setError((currentError) => (currentError.type === 'events-reorder' ? EMPTY_ERROR : currentError));
+                setEventItems(reorderedItems);
+
+                const orderedIds = reorderedItems.map((e) => e.id);
+
+                await EventsApi.reorder(client, currentCategoryId, orderedIds);
+            } catch {
+                if (
+                    reorderRequestId === reorderRequestIdRef.current &&
+                    selectedCategory?.id === currentCategoryId &&
+                    currentListContextId === eventItemsContextIdRef.current
+                ) {
+                    setEventItems(previousItems);
+                }
+
+                addToast(
+                    EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+                    ToastType.Error,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                );
+
+                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
+            } finally {
+                isReorderingRef.current = false;
+                setIsReordering(false);
+            }
+        },
+        [client, selectedCategory, eventItems, setErrorState, addToast],
+    );
 
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
@@ -279,10 +357,11 @@ export const EventsPageAdmin = () => {
                 entities={eventItems}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
-                reorderDisabled={statusFilter !== undefined}
+                reorderDisabled={isReordering}
+                hideDragHandle={statusFilter !== undefined || eventItems.length < 2}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],
+        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter, isReordering],
     );
 
     const fetchEventItems = useCallback(
@@ -404,9 +483,9 @@ export const EventsPageAdmin = () => {
         setEventsIntroDraft((currentDraft) => (currentDraft ? { ...currentDraft, [field]: value } : currentDraft));
     }, []);
 
-    const publishSection = useCallback(
-        async (sectionId: EditableHeaderSectionId, value: string) => {
-            if (!eventsIntroDraft || isEventsIntroSectionPublishing) return;
+    const openPublishConfirmation = useCallback(
+        (sectionId: EditableHeaderSectionId, value: string) => {
+            if (!eventsIntroDraft || publishingSectionsRef.current[sectionId]) return;
 
             const validationError = getEventsPageTextValidationError(value, introSectionValidationById[sectionId]);
 
@@ -415,29 +494,90 @@ export const EventsPageAdmin = () => {
                 return;
             }
 
+            setPublishConfirmation({ sectionId, value });
+        },
+        [addToast, eventsIntroDraft],
+    );
+
+    const publishSection = useCallback(
+        async (sectionId: EditableHeaderSectionId, value: string) => {
+            if (!eventsIntroDraft || publishingSectionsRef.current[sectionId]) return;
+
             const field = introSectionFieldById[sectionId];
             const updatedSection = { ...eventsIntroDraft, [field]: value };
 
-            setIsEventsIntroSectionPublishing(true);
+            publishingSectionsRef.current[sectionId] = true;
+            setPublishingSections((currentPublishingSections) => ({
+                ...currentPublishingSections,
+                [sectionId]: true,
+            }));
 
             try {
                 const publishedSection = await EventsApi.updateEventsIntroSection(client, field, updatedSection);
-                setEventsIntroSection(publishedSection);
-                setEventsIntroDraft(publishedSection);
-                setEditingSectionId(null);
+                setEventsIntroSection((currentSection) =>
+                    currentSection ? { ...currentSection, [field]: publishedSection[field] } : publishedSection,
+                );
+                setEventsIntroDraft((currentDraft) =>
+                    currentDraft ? { ...currentDraft, [field]: publishedSection[field] } : publishedSection,
+                );
+                setEditingSections((currentEditingSections) => ({
+                    ...currentEditingSections,
+                    [sectionId]: false,
+                }));
+                addToast(
+                    COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                    ToastType.Success,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
+                );
             } catch {
-                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events-intro');
+                addToast(
+                    COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
+                    ToastType.Error,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                );
             } finally {
-                setIsEventsIntroSectionPublishing(false);
+                publishingSectionsRef.current[sectionId] = false;
+                setPublishingSections((currentPublishingSections) => ({
+                    ...currentPublishingSections,
+                    [sectionId]: false,
+                }));
             }
         },
-        [addToast, client, eventsIntroDraft, isEventsIntroSectionPublishing, setErrorState],
+        [addToast, client, eventsIntroDraft],
     );
 
-    const cancelSectionEdit = useCallback(() => {
-        setEventsIntroDraft(eventsIntroSection);
-        setEditingSectionId(null);
-    }, [eventsIntroSection]);
+    const handlePublishConfirmation = useCallback(() => {
+        if (!publishConfirmation || publishingSectionsRef.current[publishConfirmation.sectionId]) return;
+
+        const { sectionId, value } = publishConfirmation;
+        setPublishConfirmation(null);
+        publishSection(sectionId, value);
+    }, [publishConfirmation, publishSection]);
+
+    const closePublishConfirmation = useCallback(() => {
+        if (!publishConfirmation || !publishingSectionsRef.current[publishConfirmation.sectionId]) {
+            setPublishConfirmation(null);
+        }
+    }, [publishConfirmation]);
+
+    const cancelSectionEdit = useCallback(
+        (sectionId: EditableHeaderSectionId) => {
+            const field = introSectionFieldById[sectionId];
+
+            setEventsIntroDraft((currentDraft) =>
+                currentDraft && eventsIntroSection
+                    ? { ...currentDraft, [field]: eventsIntroSection[field] }
+                    : currentDraft,
+            );
+            setEditingSections((currentEditingSections) => ({
+                ...currentEditingSections,
+                [sectionId]: false,
+            }));
+        },
+        [eventsIntroSection],
+    );
+
+    const isAnySectionEditing = Object.values(editingSections).some(Boolean);
 
     const toggleSectionVisibility = useCallback(
         async (sectionId: EditableHeaderSectionId) => {
@@ -493,7 +633,7 @@ export const EventsPageAdmin = () => {
                 />
             </div>
             <div
-                className={`events-page-content-sections ${editingSectionId ? 'events-page-content-sections--editing' : ''}`}
+                className={`events-page-content-sections ${isAnySectionEditing ? 'events-page-content-sections--editing' : ''}`}
             >
                 <EditableHeaderSection
                     sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID}
@@ -502,15 +642,26 @@ export const EventsPageAdmin = () => {
                     initialPublishedHtml={eventsIntroSection?.pageDescription ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.PAGE_DESCRIPTION}
                     validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]}
-                    mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? 'edit' : 'view'}
-                    onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
+                    mode={editingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID] ? 'edit' : 'view'}
+                    onEnterEditMode={() =>
+                        setEditingSections((currentEditingSections) => ({
+                            ...currentEditingSections,
+                            [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]: true,
+                        }))
+                    }
                     onDraftChange={(value) =>
                         handleSectionDraftChange(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)
                     }
-                    onCancelEdit={cancelSectionEdit}
-                    onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)}
-                    isPublishDisabled={isEventsIntroSectionPublishing}
-                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
+                    onCancelEdit={() => cancelSectionEdit(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)}
+                    onPublish={(value) =>
+                        openPublishConfirmation(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, value)
+                    }
+                    isPublishDisabled={publishingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID]}
+                    disabled={
+                        isEventsIntroSectionLoading ||
+                        publishingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID] ||
+                        !eventsIntroDraft
+                    }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
                     isHidden={eventsIntroSection?.isPageDescriptionHidden}
                     onToggleVisibility={() =>
@@ -524,15 +675,26 @@ export const EventsPageAdmin = () => {
                     initialPublishedHtml={eventsIntroSection?.eventsBlockTitle ?? ''}
                     maxLength={EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE}
                     validationRule={introSectionValidationById[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]}
-                    mode={editingSectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID ? 'edit' : 'view'}
-                    onEnterEditMode={() => setEditingSectionId(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
+                    mode={editingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID] ? 'edit' : 'view'}
+                    onEnterEditMode={() =>
+                        setEditingSections((currentEditingSections) => ({
+                            ...currentEditingSections,
+                            [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: true,
+                        }))
+                    }
                     onDraftChange={(value) =>
                         handleSectionDraftChange(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)
                     }
-                    onCancelEdit={cancelSectionEdit}
-                    onPublish={(value) => publishSection(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)}
-                    isPublishDisabled={isEventsIntroSectionPublishing}
-                    disabled={isEventsIntroSectionLoading || isEventsIntroSectionPublishing || !eventsIntroDraft}
+                    onCancelEdit={() => cancelSectionEdit(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)}
+                    onPublish={(value) =>
+                        openPublishConfirmation(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID, value)
+                    }
+                    isPublishDisabled={publishingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]}
+                    disabled={
+                        isEventsIntroSectionLoading ||
+                        publishingSections[EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID] ||
+                        !eventsIntroDraft
+                    }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
                     isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
                     onToggleVisibility={() =>
@@ -545,11 +707,14 @@ export const EventsPageAdmin = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
                 {error.type === 'categories' && <div className="error-message">{error.message}</div>}
 
@@ -573,6 +738,17 @@ export const EventsPageAdmin = () => {
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}
+                translationLanguages={translationLanguages}
+            />
+            <ConfirmationModal
+                isOpen={!!publishConfirmation}
+                onClose={closePublishConfirmation}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={handlePublishConfirmation}
+                onCancel={closePublishConfirmation}
+                isButtonsDisabled={!!publishConfirmation && publishingSections[publishConfirmation.sectionId]}
             />
             <ToastContainer />
         </div>

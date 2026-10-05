@@ -7,7 +7,7 @@ import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackCategory } from '@/types/admin/feedback';
 import { ToastType } from '@/types/admin/toast';
 import { VisibilityStatus } from '@/types/admin/common';
-import { TranslationStatusFilter } from '@/types/common/language';
+import { TranslationStatus, TranslationStatusFilter } from '@/types/common/language';
 
 beforeAll(() => {
     class MockResizeObserver {
@@ -174,6 +174,8 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
         deleteFeedback: jest.fn(),
+        createReview: jest.fn(),
+        createVideoReview: jest.fn(),
     },
 }));
 
@@ -239,6 +241,7 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.fetchVideos.mockResolvedValue(mockVideosData);
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
         mockFeedbackApi.deleteFeedback.mockResolvedValue();
+        mockFeedbackApi.createVideoReview.mockResolvedValue(mockVideosData.items[0]);
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -326,11 +329,19 @@ describe('FeedbackPageAdmin', () => {
         expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
-    it('should close AddVideoReviewModal and show not-implemented toast when the stub submit is called', async () => {
+    it('creates a video review and shows the success toast when the modal submits', async () => {
         await openAddVideoReviewModalOnVideosTab();
 
         fireEvent.click(screen.getByTestId('add-video-review-submit'));
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.createVideoReview).toHaveBeenCalledWith(mockAdminClient, {
+                title: 't',
+                link: 'l',
+                status: VisibilityStatus.Published,
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+        });
     });
 
     it('should close AddVideoReviewModal when its onClose is called', async () => {
@@ -641,6 +652,102 @@ describe('FeedbackPageAdmin', () => {
                 mockAdminClient,
                 expect.objectContaining({ status: VisibilityStatus.Published }),
             );
+        });
+    });
+
+    describe('translation indicators and language/translation filtering', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+        let originalLocalizationValues: typeof mockLocalizationValues;
+
+        beforeEach(() => {
+            originalLocalizationValues = mockLocalizationValues;
+        });
+
+        afterEach(() => {
+            mockLocalizationValues = originalLocalizationValues;
+        });
+
+        it('sends translationStatusFilter to the API and no language param', async () => {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: TranslationStatusFilter.Missing,
+            };
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledWith(
+                    mockAdminClient,
+                    expect.objectContaining({ translationStatusFilter: TranslationStatusFilter.Missing }),
+                );
+            });
+            const params = mockFeedbackApi.fetchHistory.mock.calls[0][1];
+            expect(params).not.toHaveProperty('language');
+        });
+
+        it('shows the English text and an EN indicator per record when English is selected', async () => {
+            mockLocalizationValues = { ...mockLocalizationValues, selectedLanguage: english };
+            mockFeedbackApi.fetchHistory.mockResolvedValue({
+                ...mockHistoryData,
+                items: [
+                    {
+                        ...mockHistoryData.items[0],
+                        localizations: [
+                            {
+                                language: english,
+                                translationStatus: TranslationStatus.Relevant,
+                                title: 'Story 1',
+                                story: 'Story 1 text',
+                            },
+                        ],
+                    },
+                    mockHistoryData.items[1],
+                ],
+            });
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Story 1')).toBeInTheDocument();
+            });
+            expect(screen.getByText('Історія 2')).toBeInTheDocument();
+            expect(screen.getAllByText('EN')).toHaveLength(2);
+        });
+
+        it('refetches the list after a translation is saved while a translation filter is active', async () => {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: TranslationStatusFilter.Missing,
+            };
+            mockAdminClient.post.mockResolvedValueOnce({
+                data: {
+                    entityId: 1,
+                    title: 'Success Story',
+                    story: 'English story text',
+                    localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            });
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+            expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(1);
+
+            fireEvent.click(screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE })[0]);
+            fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Success Story' } });
+            fireEvent.change(screen.getByLabelText(/Історія/), { target: { value: 'English story text' } });
+
+            const saveBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
+            await waitFor(() => expect(saveBtn).toBeEnabled());
+            fireEvent.click(saveBtn);
+
+            await waitFor(() => {
+                expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(2);
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_TRANSLATE, ToastType.Success);
         });
     });
 

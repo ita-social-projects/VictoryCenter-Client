@@ -6,6 +6,7 @@ jest.mock('./CtaSection.module.scss', () => ({
     root: 'root-class',
     content: 'content-class',
     title: 'title-class',
+    'title--emphasis': 'title-emphasis-class',
     description: 'description-class',
     actions: 'actions-class',
     button: 'button-class',
@@ -38,6 +39,14 @@ describe('CtaSection', () => {
         { label: 'Donate', href: '/donate' },
         { label: 'Support', href: '/support' },
     ];
+
+    const renderCtaSection = (props?: Partial<React.ComponentProps<typeof CtaSection>>) => {
+        const utils = render(
+            <CtaSection title="Title" description="Desc" mediaUrl="video.mp4" buttons={defaultButtons} {...props} />,
+        );
+        const title = screen.getByTestId('mock-safe-html');
+        return { ...utils, title };
+    };
 
     it('renders the section structure with title and description', () => {
         render(
@@ -93,5 +102,26 @@ describe('CtaSection', () => {
 
         expect(buttons[1]).toHaveTextContent('Support');
         expect(buttons[1]).toHaveAttribute('data-variant', 'secondary-light');
+    });
+
+    it('uses only the base title class by default', () => {
+        const { title } = renderCtaSection();
+
+        expect(title).toHaveClass('title-class');
+        expect(title).not.toHaveClass('title-emphasis-class');
+    });
+
+    it('uses only the base title class when titleVariant is "default"', () => {
+        const { title } = renderCtaSection({ titleVariant: 'default' });
+
+        expect(title).toHaveClass('title-class');
+        expect(title).not.toHaveClass('title-emphasis-class');
+    });
+
+    it('adds the emphasis modifier class when titleVariant is "emphasis"', () => {
+        const { title } = renderCtaSection({ titleVariant: 'emphasis' });
+
+        expect(title).toHaveClass('title-class');
+        expect(title).toHaveClass('title-emphasis-class');
     });
 });

@@ -67,6 +67,22 @@ const enrichRecords = (
     }));
 };
 
+const getCategoryLimitMessage = (
+    hasReachedIncomeCategoryLimit: boolean,
+    hasReachedExpenseCategoryLimit: boolean,
+): string | undefined => {
+    if (hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH;
+    }
+    if (hasReachedIncomeCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME;
+    }
+    if (hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE;
+    }
+    return undefined;
+};
+
 export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
@@ -417,14 +433,13 @@ export const FundsExpenditureSection = ({
         onSelectionChange?.(hasSelectedRecords);
     }, [hasSelectedRecords, onSelectionChange]);
 
-    const isAddIncomeDisabled =
-        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
-        hasSelectedRecords ||
-        hasExchangeRateError;
-    const isAddExpenseDisabled =
-        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType ||
-        hasSelectedRecords ||
-        hasExchangeRateError;
+    const hasReachedIncomeCategoryLimit =
+        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const hasReachedExpenseCategoryLimit =
+        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const isAddIncomeDisabled = hasReachedIncomeCategoryLimit || hasSelectedRecords || hasExchangeRateError;
+    const isAddExpenseDisabled = hasReachedExpenseCategoryLimit || hasSelectedRecords || hasExchangeRateError;
+    const categoryLimitMessage = getCategoryLimitMessage(hasReachedIncomeCategoryLimit, hasReachedExpenseCategoryLimit);
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
@@ -869,6 +884,7 @@ export const FundsExpenditureSection = ({
                 controlsDisabled={isRowEditMode}
                 isAddIncomeDisabled={isAddIncomeDisabled}
                 isAddExpenseDisabled={isAddExpenseDisabled}
+                categoryLimitMessage={categoryLimitMessage}
                 onTypeChange={handleTypeChange}
                 onCategoryChange={setSelectedCategoryId}
                 onExchangeRateChange={handleExchangeRateChange}

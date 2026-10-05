@@ -203,6 +203,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         FAIL_TO_TRANSLATE_CATEGORY: 'Не вдалося зберегти переклад категорії. Спробуйте ще раз',
         FAIL_TO_UPDATE_CATEGORY_TRANSLATION: 'Не вдалося оновити переклад категорії. Спробуйте ще раз',
+        LIMIT_INCOME: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій надходжень вичерпано`,
+        LIMIT_EXPENSE: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій витрат вичерпано`,
+        LIMIT_BOTH: 'Ліміт по категоріях вичерпано',
     },
     MODAL: {
         SHARED: {
@@ -284,7 +287,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
-        ADD_EXPENSE: 'Витрати',
+        ADD_EXPENSE: 'Витрата',
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
         EDIT_CATEGORY: 'Редагувати',

@@ -10,9 +10,10 @@ export interface EventItemDto {
     status: VisibilityStatus;
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
+    priority: number;
 }
 
-export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search';
+export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
 
 export interface ErrorState {
     message: string | null;

@@ -4,7 +4,6 @@ import {
     FeedbackHistoryPublicDto,
     FeedbackReviewPublicDto,
     FeedbackVideoPublicDto,
-    StoriesOfVictoryPageData,
     StoriesOfVictoryReview,
     StoriesOfVictoryReviewArticle,
     StoriesOfVictoryReviewVideo,
@@ -65,23 +64,4 @@ export const PublicFeedbackApi = {
         });
         return response.data.map(mapVideo);
     },
-};
-
-const valueOrEmpty = <T>(result: PromiseSettledResult<T[]>): T[] => (result.status === 'fulfilled' ? result.value : []);
-
-export const storiesOfVictoryPageDataFetch = async (
-    options: RequestOptions = {},
-): Promise<StoriesOfVictoryPageData> => {
-    const results = await Promise.allSettled([
-        PublicFeedbackApi.fetchHistories(options),
-        PublicFeedbackApi.fetchReviews(options),
-        PublicFeedbackApi.fetchVideos(options),
-    ] as const);
-    const [histories, reviews, videos] = results;
-
-    if (histories.status === 'rejected' && reviews.status === 'rejected' && videos.status === 'rejected') {
-        throw histories.reason;
-    }
-
-    return { histories: valueOrEmpty(histories), reviews: valueOrEmpty(reviews), videos: valueOrEmpty(videos) };
 };

@@ -36,12 +36,6 @@ export type StoriesOfVictoryReviewArticle = {
     localizations?: FeedbackHistoryLocalization[];
 };
 
-export type StoriesOfVictoryPageData = {
-    histories: StoriesOfVictoryReviewArticle[];
-    reviews: StoriesOfVictoryReview[];
-    videos: StoriesOfVictoryReviewVideo[];
-};
-
 export interface FeedbackHistoryPublicDto {
     id: number;
     title: string;

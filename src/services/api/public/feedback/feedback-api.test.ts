@@ -1,4 +1,4 @@
-import { PublicFeedbackApi, storiesOfVictoryPageDataFetch } from './feedback-api';
+import { PublicFeedbackApi } from './feedback-api';
 import { axiosInstance } from '@/services/api/axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { TranslationStatus } from '@/types/common/language';
@@ -109,49 +109,25 @@ describe('PublicFeedbackApi', () => {
         });
     });
 
-    it('fetches all three lists for the page in one call', async () => {
-        (axiosInstance.get as jest.Mock).mockImplementation((url: string) => {
-            if (url === API_ROUTES.FEEDBACK_HISTORIES.PUBLISHED) return Promise.resolve({ data: [historyDto] });
-            if (url === API_ROUTES.FEEDBACK_REVIEWS.PUBLISHED) return Promise.resolve({ data: [reviewDto] });
-            return Promise.resolve({ data: [videoDto] });
-        });
-
-        const result = await storiesOfVictoryPageDataFetch();
-
-        expect(result.histories).toHaveLength(1);
-        expect(result.reviews).toHaveLength(1);
-        expect(result.videos).toHaveLength(1);
-    });
-
-    it('keeps the sections that loaded when one request fails', async () => {
-        (axiosInstance.get as jest.Mock).mockImplementation((url: string) => {
-            if (url === API_ROUTES.FEEDBACK_HISTORIES.PUBLISHED) return Promise.resolve({ data: [historyDto] });
-            if (url === API_ROUTES.FEEDBACK_REVIEWS.PUBLISHED) return Promise.resolve({ data: [reviewDto] });
-            return Promise.reject(new Error('videos down'));
-        });
-
-        const result = await storiesOfVictoryPageDataFetch();
-
-        expect(result.histories).toHaveLength(1);
-        expect(result.reviews).toHaveLength(1);
-        expect(result.videos).toEqual([]);
-    });
-
-    it('rejects when every request fails', async () => {
-        (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('network'));
-
-        await expect(storiesOfVictoryPageDataFetch()).rejects.toThrow('network');
-    });
-
-    it('forwards the cancellation signal to every request', async () => {
+    it.each([
+        ['fetchHistories', API_ROUTES.FEEDBACK_HISTORIES.PUBLISHED],
+        ['fetchReviews', API_ROUTES.FEEDBACK_REVIEWS.PUBLISHED],
+        ['fetchVideos', API_ROUTES.VIDEO_REVIEWS.PUBLISHED],
+    ] as const)('%s forwards the cancellation signal', async (method, url) => {
         (axiosInstance.get as jest.Mock).mockResolvedValue({ data: [] });
         const controller = new AbortController();
 
-        await storiesOfVictoryPageDataFetch({ cancellationSignal: controller.signal });
+        await PublicFeedbackApi[method]({ cancellationSignal: controller.signal });
 
-        expect(axiosInstance.get).toHaveBeenCalledTimes(3);
-        (axiosInstance.get as jest.Mock).mock.calls.forEach(([, config]) => {
-            expect(config).toEqual({ signal: controller.signal });
-        });
+        expect(axiosInstance.get).toHaveBeenCalledWith(url, { signal: controller.signal });
     });
+
+    it.each(['fetchHistories', 'fetchReviews', 'fetchVideos'] as const)(
+        '%s propagates request errors so the section can show its error state',
+        async (method) => {
+            (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('network'));
+
+            await expect(PublicFeedbackApi[method]()).rejects.toThrow('network');
+        },
+    );
 });

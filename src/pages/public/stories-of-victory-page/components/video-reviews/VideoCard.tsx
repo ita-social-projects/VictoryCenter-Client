@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { getVideoThumbnailUrl } from '@/utils/functions/video-thumbnail/video-thumbnail';
+import { isHttpOrHttpsUrl } from '@/utils/functions/url';
 import { StoriesOfVictoryReviewVideo } from '@/types/public/stories-of-victory';
 import styles from './VideoReviewsSection.module.scss';
 import { ReactComponent as PlayIcon } from '@/assets/icons/play-video.svg';
@@ -16,7 +17,8 @@ interface VideoCardProps {
 export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     const { title } = useGetLocalization(video.localizations, { title: video.title });
     const [thumbnailFailed, setThumbnailFailed] = useState(false);
-    const youTubeThumbnail = thumbnailFailed ? null : getVideoThumbnailUrl(video.link);
+    const link = isHttpOrHttpsUrl(video.link) ? video.link : null;
+    const youTubeThumbnail = thumbnailFailed ? null : getVideoThumbnailUrl(link);
 
     const handleThumbnailLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
         if (youTubeThumbnail && event.currentTarget.naturalWidth <= YOUTUBE_PLACEHOLDER_MAX_WIDTH) {
@@ -39,9 +41,9 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
     return (
         <div className={styles.video}>
-            {video.link ? (
+            {link ? (
                 <a
-                    href={video.link}
+                    href={link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={styles.link}

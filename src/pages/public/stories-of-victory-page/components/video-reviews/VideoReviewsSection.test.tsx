@@ -121,6 +121,18 @@ describe('VideoReviewsSection', () => {
         expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
     });
 
+    // eslint-disable-next-line no-script-url -- verifies script URLs are not rendered as links
+    it.each(['javascript:alert(1)', 'data:text/html,<script>alert(1)</script>', 'not a url'])(
+        'renders the card without a link when the stored link is not http(s): %s',
+        (unsafeLink) => {
+            const { container } = render(<VideoReviewsSection content={[{ ...youTubeVideo, link: unsafeLink }]} />);
+
+            expect(screen.queryByRole('link')).not.toBeInTheDocument();
+            expect(screen.getByText('Коні лікують 2025')).toBeInTheDocument();
+            expect(getThumbnail(container)).toHaveAttribute('src', 'fallback-thumbnail.webp');
+        },
+    );
+
     it('renders the card without a link when the video has no link', () => {
         render(<VideoReviewsSection content={[{ ...youTubeVideo, link: null }]} />);
 

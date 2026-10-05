@@ -163,6 +163,7 @@ export const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 export const EVENT_ITEMS_TEXT = {
     MESSAGE: {
         FAILED_TO_FETCH_ITEMS: 'Виникла помилка, не вдалось завантажити новини та події',
+        FAILED_TO_REORDER_ITEMS: 'Виникла помилка, не вдалось змінити порядок елементів',
     },
     ACTIONS: {
         REORDER: 'Змінити порядок елемента',

@@ -30,9 +30,13 @@ export const EventValidationSchema = Yup.object({
 
     linkUkr: Yup.string()
         .trim()
-        .required(EVENT_VALIDATION.linkUkr.getRequiredError())
-        .min(EVENT_VALIDATION.linkUkr.min, EVENT_VALIDATION.linkUkr.getMinError())
-        .max(EVENT_VALIDATION.linkUkr.max, EVENT_VALIDATION.linkUkr.getMaxError()),
+        .max(EVENT_VALIDATION.linkUkr.max, EVENT_VALIDATION.linkUkr.getMaxError())
+        .test('min-length-if-not-empty', EVENT_VALIDATION.linkUkr.getMinError(), (value) => {
+            return !value || value.length >= EVENT_VALIDATION.linkUkr.min;
+        })
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing ? schema.required(EVENT_VALIDATION.linkUkr.getRequiredError()) : schema.notRequired(),
+        ),
 
     linkEng: Yup.string()
         .trim()

@@ -34,4 +34,24 @@ describe('EventValidationSchema', () => {
 
         await expect(EventValidationSchema.validate(data, { context: { isPublishing: true } })).rejects.toThrow();
     });
+
+    it('should allow an empty Ukrainian link when saving as draft', async () => {
+        const data = { ...validData, linkUkr: '' };
+
+        await expect(EventValidationSchema.validate(data, { context: { isPublishing: false } })).resolves.toEqual(data);
+    });
+
+    it('should require a Ukrainian link when publishing', async () => {
+        const data = { ...validData, linkUkr: '' };
+
+        await expect(
+            EventValidationSchema.validateAt('linkUkr', data, { context: { isPublishing: true } }),
+        ).rejects.toThrow();
+    });
+
+    it('should reject a non-empty Ukrainian link shorter than the minimum length when saving as draft', async () => {
+        const data = { ...validData, linkUkr: 'link' };
+
+        await expect(EventValidationSchema.validate(data, { context: { isPublishing: false } })).rejects.toThrow();
+    });
 });

@@ -27,6 +27,10 @@ const expectDatePickerClosed = () => {
     expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
 };
 
+const fillTextField = (label: string, value: string) => {
+    fireEvent.change(screen.getByRole('textbox', { name: label }), { target: { value } });
+};
+
 jest.mock('@/components/common/modal/Modal', () => ({
     Modal: require('@/utils/test-mocks/events-modals-mocks').MockModal,
 }));
@@ -224,6 +228,74 @@ describe('EventModal', () => {
                     mockEventValidation.title.getRequiredError(),
                 );
             });
+        });
+
+        it('enables saving as draft immediately after entering a valid title', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('disables both actions immediately when a valid title becomes invalid', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'short');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('keeps publishing disabled when required publishing fields are missing', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('enables publishing when every required field is valid', () => {
+            render(<EventModal {...defaultProps} />);
+            const todayLabel = getTodayLabel();
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+            openDatePickerAndSelectToday(todayLabel);
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('keeps saving as draft enabled when optional fields are invalid', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'bad');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_ENG, 'bad');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('keeps saving as draft enabled when image validation fails', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByTestId('trigger-image-error'));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
     });
 

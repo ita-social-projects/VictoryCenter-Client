@@ -72,6 +72,7 @@ export const API_ROUTES = {
     EVENTS: {
         BASE: 'EventNews',
         PUBLISHED: 'EventNews/published',
+        REORDER: 'EventNews/reorder',
     },
     EVENTS_PAGE: {
         BASE: 'EventsPage',

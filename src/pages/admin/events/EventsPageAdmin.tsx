@@ -77,7 +77,7 @@ export const EventsPageAdmin = () => {
     const [categories, setCategories] = useState<EventCategoryDto[]>([]);
     const [eventItems, setEventItems] = useState<EventItemDto[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<EventCategoryDto | null>(null);
-
+    const [isReordering, setIsReordering] = useState(false);
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
@@ -86,6 +86,7 @@ export const EventsPageAdmin = () => {
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
 
@@ -96,6 +97,9 @@ export const EventsPageAdmin = () => {
     const currentItemsCountRef = useRef(0);
     const hasMoreRef = useRef(true);
     const isEventItemsLoadingRef = useRef(false);
+    const reorderRequestIdRef = useRef(0);
+    const eventItemsContextIdRef = useRef(0);
+    const isReorderingRef = useRef(false);
 
     const client = useAdminClient();
 
@@ -111,6 +115,7 @@ export const EventsPageAdmin = () => {
     }, []);
 
     const resetEventItemsState = useCallback(() => {
+        eventItemsContextIdRef.current += 1;
         requestIdRef.current += 1;
 
         setEventItems([]);
@@ -299,9 +304,50 @@ export const EventsPageAdmin = () => {
         [openModalActions],
     );
 
-    const handleEntitiesReordered = useCallback(() => {
-        /*TODO: add implementation.*/
-    }, []);
+    const handleEntitiesReordered = useCallback(
+        async (reorderedItems: EventItemDto[]) => {
+            if (!selectedCategory) {
+                return;
+            }
+
+            const previousItems = eventItems;
+            const currentCategoryId = selectedCategory.id;
+            const currentListContextId = eventItemsContextIdRef.current;
+            const reorderRequestId = ++reorderRequestIdRef.current;
+
+            try {
+                isReorderingRef.current = true;
+                setIsReordering(true);
+
+                setError((currentError) => (currentError.type === 'events-reorder' ? EMPTY_ERROR : currentError));
+                setEventItems(reorderedItems);
+
+                const orderedIds = reorderedItems.map((e) => e.id);
+
+                await EventsApi.reorder(client, currentCategoryId, orderedIds);
+            } catch {
+                if (
+                    reorderRequestId === reorderRequestIdRef.current &&
+                    selectedCategory?.id === currentCategoryId &&
+                    currentListContextId === eventItemsContextIdRef.current
+                ) {
+                    setEventItems(previousItems);
+                }
+
+                addToast(
+                    EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+                    ToastType.Error,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                );
+
+                setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
+            } finally {
+                isReorderingRef.current = false;
+                setIsReordering(false);
+            }
+        },
+        [client, selectedCategory, eventItems, setErrorState, addToast],
+    );
 
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
@@ -314,10 +360,11 @@ export const EventsPageAdmin = () => {
                 entities={eventItems}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
-                reorderDisabled={statusFilter !== undefined}
+                reorderDisabled={isReordering}
+                hideDragHandle={statusFilter !== undefined || eventItems.length < 2}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter],
+        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter, isReordering],
     );
 
     const fetchEventItems = useCallback(

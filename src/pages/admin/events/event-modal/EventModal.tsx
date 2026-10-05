@@ -48,6 +48,8 @@ const defaultFormState: EventFormValues = {
     linkEng: '',
 };
 
+const EventDraftValidationSchema = EventValidationSchema.pick(['title']);
+
 const WEEKDAY_LABELS = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'НД'];
 const MONTH_LABELS = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
 
@@ -152,11 +154,12 @@ export const EventModal = (props: EventModalProps) => {
     });
 
     const formValues = watch();
-    const isDraftValid = EventValidationSchema.isValidSync(formValues, { context: { isPublishing: false } });
-    const isPublishValid = EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } });
+    const isDraftValid = EventDraftValidationSchema.isValidSync(formValues);
+    const isPublishValid =
+        EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } }) && !errors.image;
 
-    const isSaveAsDraftDisabled = !isEditMode || !isDirty || !isDraftValid;
-    const isPublishDisabled = !isEditMode || !isDirty || !isPublishValid;
+    const isSaveAsDraftDisabled = !isDirty || !isDraftValid;
+    const isPublishDisabled = !isDirty || !isPublishValid;
 
     const handleTextFieldBlur = useCallback(
         (field: any) => () => {
@@ -600,7 +603,7 @@ export const EventModal = (props: EventModalProps) => {
                             render={({ field }) => (
                                 <InputWithCharacterLimitGroup
                                     name={field.name}
-                                    value={field.value}
+                                    value={field.value ?? ''}
                                     onChange={field.onChange}
                                     onBlur={handleTextFieldBlur(field)}
                                     label={EVENTS_TEXT.FORM.LABEL.LINK_UKR}

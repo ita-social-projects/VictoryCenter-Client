@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ContactFormCard } from './ContactFormCard';
 import { useTurnstile } from '@/hooks/public/use-turnstile';
@@ -211,6 +211,51 @@ describe('ContactFormCard', () => {
                 'Це тестове повідомлення достатньої довжини.',
             );
         };
+
+        it('does not call onSubmitSuccess if the card unmounts before the request completes', async () => {
+            let resolveRequest: () => void = () => undefined;
+            (submitContactUsForm as jest.Mock).mockReturnValueOnce(
+                new Promise<void>((resolve) => {
+                    resolveRequest = resolve;
+                }),
+            );
+            const onSubmitSuccess = jest.fn();
+
+            const { unmount } = render(<ContactFormCard {...DEFAULT_PROPS} onSubmitSuccess={onSubmitSuccess} />);
+            await fillValidForm();
+            fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+            await waitFor(() => expect(submitContactUsForm).toHaveBeenCalledTimes(1));
+
+            unmount();
+            await act(async () => {
+                resolveRequest();
+            });
+
+            expect(onSubmitSuccess).not.toHaveBeenCalled();
+        });
+
+        it('calls onSubmitSuccess after successful submission', async () => {
+            (submitContactUsForm as jest.Mock).mockResolvedValueOnce(undefined);
+            const onSubmitSuccess = jest.fn();
+
+            render(<ContactFormCard {...DEFAULT_PROPS} onSubmitSuccess={onSubmitSuccess} />);
+            await fillValidForm();
+            fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+            await waitFor(() => expect(onSubmitSuccess).toHaveBeenCalledTimes(1));
+        });
+
+        it('does not call onSubmitSuccess if submission fails', async () => {
+            (submitContactUsForm as jest.Mock).mockRejectedValueOnce(new Error('API Error'));
+            const onSubmitSuccess = jest.fn();
+
+            render(<ContactFormCard {...DEFAULT_PROPS} onSubmitSuccess={onSubmitSuccess} />);
+            await fillValidForm();
+            fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+            await screen.findByText('contactForm.submitError');
+            expect(onSubmitSuccess).not.toHaveBeenCalled();
+        });
 
         it('submits form successfully and shows success toast', async () => {
             (submitContactUsForm as jest.Mock).mockResolvedValueOnce(undefined);

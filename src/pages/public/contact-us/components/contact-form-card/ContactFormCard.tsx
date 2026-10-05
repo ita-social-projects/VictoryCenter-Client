@@ -87,6 +87,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         reset: resetTurnstile,
     } = useTurnstile(CF_TURNSTILE_SITE_KEY);
 
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
     const [toast, setToast] = useState<Toast | null>(null);
 
     const showToast = (message: string, type: ToastType, duration: number) => {
@@ -125,11 +134,14 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 message: data.message,
             });
 
+            if (!isMountedRef.current) return;
+
             reset();
             resetTurnstile();
             showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
             onSubmitSuccess?.();
         } catch {
+            if (!isMountedRef.current) return;
             showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }
     };

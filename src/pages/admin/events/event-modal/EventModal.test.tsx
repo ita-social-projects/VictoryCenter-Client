@@ -119,6 +119,7 @@ const defaultProps = {
 
 const eventToEdit: EventItemDto = {
     id: 1,
+    priority: 1,
     resource: 'https://example.com',
     resourceEn: 'https://example.com/en/news',
     publishedAt: '2026-08-18T00:00:00Z',

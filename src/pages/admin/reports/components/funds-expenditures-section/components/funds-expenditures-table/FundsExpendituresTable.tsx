@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
 import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
@@ -39,6 +40,8 @@ export interface ProgramAggregateRow {
     amountUsd: string;
 }
 
+export type TableRowItem = { isProgram: false; data: EnrichedRecord } | { isProgram: true; data: ProgramAggregateRow };
+
 type SortableColumn = 'type' | 'categoryName' | 'amountUah' | 'amountUsd';
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -57,7 +60,12 @@ interface FundsExpendituresTableProps {
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
-        data: { categoryId: number; amountUah: string; amountUsd: string },
+        data: {
+            categoryId: number;
+            amountUah: string;
+            amountUsd: string;
+            lastEditedField: FundsExpendituresAmountField;
+        },
     ) => boolean | Promise<boolean>;
     programAggregateRow?: ProgramAggregateRow | null;
     onProgramYearSave?: (reportingYear: string) => boolean | Promise<boolean>;
@@ -77,6 +85,7 @@ interface RowEditState {
     categoryId: number | undefined;
     amountUah: string;
     amountUsd: string;
+    lastEditedField: FundsExpendituresAmountField;
     errors: {
         category?: string;
         amountUah?: string;
@@ -90,12 +99,33 @@ const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
     expense: FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE,
 };
 
-const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecord[] => {
-    if (!sort.column || !sort.direction) {
-        return records;
-    }
+const sortTableItems = (items: TableRowItem[], sort: ColumnSort): TableRowItem[] => {
+    return [...items].sort((itemA, itemB) => {
+        const a = itemA.isProgram
+            ? {
+                  type: 'expense' as FundsExpendituresTransactionType,
+                  categoryName: itemA.data.categoryName,
+                  amountUah: itemA.data.amountUah,
+                  amountUsd: itemA.data.amountUsd,
+              }
+            : itemA.data;
 
-    return [...records].sort((a, b) => {
+        const b = itemB.isProgram
+            ? {
+                  type: 'expense' as FundsExpendituresTransactionType,
+                  categoryName: itemB.data.categoryName,
+                  amountUah: itemB.data.amountUah,
+                  amountUsd: itemB.data.amountUsd,
+              }
+            : itemB.data;
+
+        if (!sort.column || !sort.direction) {
+            if (a.type !== b.type) {
+                return a.type === 'income' ? -1 : 1;
+            }
+            return parseAmount(b.amountUah) - parseAmount(a.amountUah);
+        }
+
         const { column, direction } = sort;
         let comparison = 0;
 
@@ -139,20 +169,23 @@ const isAcceptButtonDisabled = (rowEditState: RowEditState | null, exchangeRate?
     const normalizedOriginalUah = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true);
     const normalizedOriginalUsd = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true);
 
+    const isAmountsUnchanged =
+        normalizedAmountUah === normalizedOriginalUah && normalizedAmountUsd === normalizedOriginalUsd;
+
+    const hasAmountChanged =
+        (!isAmountsUnchanged && Boolean(rowEditState.usdMismatchMessage)) ||
+        (!isAmountsUnchanged && isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate));
+
     const hasErrors =
         rowEditState.categoryId === undefined ||
         Boolean(rowEditState.errors.category) ||
         Boolean(rowEditState.errors.amountUah) ||
         Boolean(rowEditState.errors.amountUsd) ||
-        Boolean(rowEditState.usdMismatchMessage) ||
-        isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate);
+        hasAmountChanged;
 
     const amountsEmpty = normalizedAmountUah === '' || normalizedAmountUsd === '';
 
-    const noChanges =
-        rowEditState.categoryId === rowEditState.originalCategoryId &&
-        normalizedAmountUah === normalizedOriginalUah &&
-        normalizedAmountUsd === normalizedOriginalUsd;
+    const noChanges = rowEditState.categoryId === rowEditState.originalCategoryId && isAmountsUnchanged;
 
     return hasErrors || amountsEmpty || noChanges;
 };
@@ -198,6 +231,24 @@ export const FundsExpendituresTable = ({
         expense: getCategoriesForType(categories, typeInferenceSource, 'expense'),
     };
 
+    const tableItems = useMemo<TableRowItem[]>(() => {
+        const items: TableRowItem[] = records.map((record) => ({
+            isProgram: false,
+            data: record,
+        }));
+
+        if (programAggregateRow) {
+            items.push({
+                isProgram: true,
+                data: programAggregateRow,
+            });
+        }
+
+        return items;
+    }, [records, programAggregateRow]);
+
+    const sortedTableItems = useMemo(() => sortTableItems(tableItems, sort), [tableItems, sort]);
+
     const getRowEditValidationError = useCallback(
         (
             record: EnrichedRecord,
@@ -229,6 +280,7 @@ export const FundsExpendituresTable = ({
                 categoryId: record.categoryId,
                 amountUah: record.amountUah,
                 amountUsd: record.amountUsd,
+                lastEditedField: 'amountUah',
                 errors: {},
                 usdMismatchMessage: undefined,
             });
@@ -379,6 +431,7 @@ export const FundsExpendituresTable = ({
                 categoryId: nextCategoryId,
                 amountUah: preparedAmountUah,
                 amountUsd: preparedAmountUsd,
+                lastEditedField: rowEditState.lastEditedField,
             });
 
             setRowEditMode(null);
@@ -410,7 +463,6 @@ export const FundsExpendituresTable = ({
     );
 
     const isTableEditing = isAnyRowEditing || isProgramYearEditing;
-    const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
     const isProgramYearAcceptDisabled =
         !programYearEdit || programYearEdit.year === programYearEdit.originalYear || isSavingProgramYear;
@@ -468,6 +520,7 @@ export const FundsExpendituresTable = ({
                                         ref={headerCheckboxRef}
                                         className={styles['header-checkbox']}
                                         aria-label="Select all records"
+                                        disabled={isTableEditing || isRowActionsDisabled}
                                         checked={allEligibleSelected}
                                         onChange={(e) => onSelectAllToggle?.(e.target.checked)}
                                     />
@@ -518,101 +571,15 @@ export const FundsExpendituresTable = ({
                                     <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
                                 </span>
                             </th>
-                            {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
+                            {isEditing && (
+                                <th className={cn(styles.th, styles['actions-th'])}>
+                                    {FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS}
+                                </th>
+                            )}
                         </tr>
                     </thead>
                     <tbody>
-                        {programAggregateRow && (
-                            <tr
-                                className={cn(styles.tr, styles['program-aggregate-row'], {
-                                    [styles['program-aggregate-row-editing']]: isProgramYearEditing,
-                                })}
-                                data-testid="program-aggregate-row"
-                            >
-                                {isEditing && (
-                                    <td className={cn(styles.td, styles['checkbox-td'])} aria-hidden="true" />
-                                )}
-                                <td className={cn(styles.td, { [styles['category-edit-td']]: isProgramYearEditing })}>
-                                    {isProgramYearEditing ? (
-                                        <div className={styles['category-edit-wrapper']}>
-                                            <Select<string>
-                                                value={programYearEdit?.year}
-                                                onValueChange={handleProgramYearChange}
-                                                disabled={isSavingProgramYear}
-                                                placeholder={
-                                                    FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER
-                                                }
-                                                className={styles['category-edit-select']}
-                                                optionClassName={styles['category-edit-option']}
-                                            >
-                                                {programYearOptions.map((year) => (
-                                                    <Select.Option key={year} value={year} name={year} />
-                                                ))}
-                                            </Select>
-                                        </div>
-                                    ) : (
-                                        programAggregateRow.reportingYear
-                                    )}
-                                </td>
-                                <td className={styles.td}>
-                                    <span className={cn(styles['type-chip'], styles['type-chip-expense'])}>
-                                        {FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
-                                    </span>
-                                </td>
-                                <td className={styles.td}>{programAggregateRow.categoryName}</td>
-                                <td className={styles.td}>{programAggregateRow.amountUah}</td>
-                                <td className={styles.td}>{programAggregateRow.amountUsd}</td>
-                                {isEditing && (
-                                    <td className={cn(styles.td, styles['actions-td'])}>
-                                        <div className={styles['row-actions']}>
-                                            {isProgramYearEditing ? (
-                                                <>
-                                                    <button
-                                                        type="button"
-                                                        className={cn(
-                                                            styles['icon-button'],
-                                                            styles['accept-icon-button'],
-                                                        )}
-                                                        aria-label="Accept program reporting year"
-                                                        onClick={handleAcceptProgramYearEdit}
-                                                        disabled={isProgramYearAcceptDisabled}
-                                                    >
-                                                        {isSavingProgramYear ? (
-                                                            <InlineLoader size={1.2} />
-                                                        ) : (
-                                                            <CheckmarkIcon className={styles['action-icon']} />
-                                                        )}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={cn(
-                                                            styles['icon-button'],
-                                                            styles['close-icon-button'],
-                                                        )}
-                                                        aria-label="Close program reporting year edit"
-                                                        onClick={handleCloseProgramYearEdit}
-                                                        disabled={isSavingProgramYear}
-                                                    >
-                                                        <CrossIcon className={styles['action-icon']} />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <IconButton
-                                                    type="button"
-                                                    className={cn(styles['icon-button'], styles['edit-icon-button'])}
-                                                    aria-label="Edit program reporting year"
-                                                    onClick={handleStartProgramYearEdit}
-                                                    disabled={isAnyRowEditing || isRowActionsDisabled}
-                                                    DefaultIcon={ACTION_ICONS.edit.default}
-                                                    FilledIcon={ACTION_ICONS.edit.hover}
-                                                />
-                                            )}
-                                        </div>
-                                    </td>
-                                )}
-                            </tr>
-                        )}
-                        {sortedRecords.length === 0 && !programAggregateRow ? (
+                        {sortedTableItems.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={colSpan}
@@ -628,7 +595,120 @@ export const FundsExpendituresTable = ({
                                 </td>
                             </tr>
                         ) : (
-                            sortedRecords.map((record) => {
+                            sortedTableItems.map((item) => {
+                                if (item.isProgram) {
+                                    const prog = item.data;
+                                    return (
+                                        <tr
+                                            key="program-aggregate-row"
+                                            className={cn(styles.tr, styles['program-aggregate-row'], {
+                                                [styles['program-aggregate-row-editing']]: isProgramYearEditing,
+                                            })}
+                                            data-testid="program-aggregate-row"
+                                        >
+                                            {isEditing && (
+                                                <td
+                                                    className={cn(styles.td, styles['checkbox-td'])}
+                                                    aria-hidden="true"
+                                                />
+                                            )}
+                                            <td
+                                                className={cn(styles.td, {
+                                                    [styles['category-edit-td']]: isProgramYearEditing,
+                                                })}
+                                            >
+                                                {isProgramYearEditing ? (
+                                                    <div className={styles['category-edit-wrapper']}>
+                                                        <Select<string>
+                                                            value={programYearEdit?.year}
+                                                            onValueChange={handleProgramYearChange}
+                                                            disabled={isSavingProgramYear}
+                                                            placeholder={
+                                                                FUNDS_EXPENDITURES_TEXT.MODAL.SHARED
+                                                                    .REPORTING_YEAR_PLACEHOLDER
+                                                            }
+                                                            className={styles['category-edit-select']}
+                                                            optionClassName={styles['category-edit-option']}
+                                                        >
+                                                            {programYearOptions.map((year) => (
+                                                                <Select.Option key={year} value={year} name={year} />
+                                                            ))}
+                                                        </Select>
+                                                    </div>
+                                                ) : (
+                                                    prog.reportingYear
+                                                )}
+                                            </td>
+                                            <td className={styles.td}>
+                                                <span className={cn(styles['type-chip'], styles['type-chip-expense'])}>
+                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
+                                                </span>
+                                            </td>
+                                            <td className={styles.td}>{prog.categoryName}</td>
+                                            <td className={styles.td}>{prog.amountUah}</td>
+                                            <td className={styles.td}>{prog.amountUsd}</td>
+                                            {isEditing && (
+                                                <td className={cn(styles.td, styles['actions-td'])}>
+                                                    <div className={styles['row-actions']}>
+                                                        {isProgramYearEditing ? (
+                                                            <>
+                                                                <button
+                                                                    type="button"
+                                                                    className={cn(
+                                                                        styles['icon-button'],
+                                                                        styles['accept-icon-button'],
+                                                                    )}
+                                                                    aria-label="Accept program reporting year"
+                                                                    onClick={handleAcceptProgramYearEdit}
+                                                                    disabled={isProgramYearAcceptDisabled}
+                                                                >
+                                                                    {isSavingProgramYear ? (
+                                                                        <InlineLoader size={1.2} />
+                                                                    ) : (
+                                                                        <CheckmarkIcon
+                                                                            className={styles['action-icon']}
+                                                                        />
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className={cn(
+                                                                        styles['icon-button'],
+                                                                        styles['close-icon-button'],
+                                                                    )}
+                                                                    aria-label="Close program reporting year edit"
+                                                                    onClick={handleCloseProgramYearEdit}
+                                                                    disabled={isSavingProgramYear}
+                                                                >
+                                                                    <CrossIcon className={styles['action-icon']} />
+                                                                </button>
+                                                            </>
+                                                        ) : (
+                                                            <IconButton
+                                                                type="button"
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['edit-icon-button'],
+                                                                )}
+                                                                aria-label="Edit program reporting year"
+                                                                onClick={handleStartProgramYearEdit}
+                                                                disabled={
+                                                                    isAnyRowEditing ||
+                                                                    isSavingInProgress ||
+                                                                    isRowActionsDisabled
+                                                                }
+                                                                DefaultIcon={ACTION_ICONS.edit.default}
+                                                                FilledIcon={ACTION_ICONS.edit.hover}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            )}
+                                        </tr>
+                                    );
+                                }
+
+                                const record = item.data;
                                 const isEditedRow = rowEditState?.recordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
 
@@ -657,7 +737,13 @@ export const FundsExpendituresTable = ({
                                                 {TYPE_LABEL_MAP[record.type]}
                                             </span>
                                         </td>
-                                        <td className={cn(styles.td, { [styles['category-edit-td']]: isEditedRow })}>
+                                        <td
+                                            className={cn(styles.td, {
+                                                [styles['category-edit-td']]: isEditedRow,
+                                                [styles['category-td']]: !isEditedRow,
+                                            })}
+                                            title={!isEditedRow ? record.categoryName : undefined}
+                                        >
                                             {isEditedRow ? (
                                                 <div
                                                     className={styles['category-edit-wrapper']}

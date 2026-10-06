@@ -8,6 +8,7 @@ interface FundsRecordActionsProps {
     isAddIncomeDisabled?: boolean;
     isAddExpenseDisabled?: boolean;
     controlsDisabled?: boolean;
+    categoryLimitMessage?: string;
     onAddIncome?: () => void;
     onAddExpense?: () => void;
     className?: string;
@@ -18,6 +19,7 @@ export const FundsRecordActions = ({
     isAddIncomeDisabled = false,
     isAddExpenseDisabled = false,
     controlsDisabled = false,
+    categoryLimitMessage,
     onAddIncome,
     onAddExpense,
     className,
@@ -47,6 +49,7 @@ export const FundsRecordActions = ({
                 <PlusIcon className={styles['plus-icon']} />
                 {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME}
             </Button>
+            {categoryLimitMessage && <p className={styles['category-limit-message']}>{categoryLimitMessage}</p>}
         </div>
     );
 };

@@ -6,6 +6,7 @@ import {
     ReportFundsExpendituresSettings,
     ReportFundsExpendituresCategoryDto,
     ReportFundsExpendituresRecordDto,
+    ReportFundsExpendituresRecordFormValues,
     ReportFundsExpendituresSettingsDto,
     ReportFundsExpendituresSummaryDto,
 } from '@/types/admin/reports';
@@ -132,10 +133,7 @@ export const FundsExpendituresApi = {
 
     createRecord: async (
         client: AxiosInstance,
-        record: Pick<
-            ReportFundsExpendituresRecord,
-            'categoryId' | 'type' | 'reportingYear' | 'amountUah' | 'amountUsd'
-        >,
+        record: ReportFundsExpendituresRecordFormValues,
     ): Promise<ReportFundsExpendituresRecord> => {
         const response = await client.post<ReportFundsExpendituresRecordDto>(
             API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS,
@@ -148,10 +146,7 @@ export const FundsExpendituresApi = {
     updateRecord: async (
         client: AxiosInstance,
         id: number,
-        record: Pick<
-            ReportFundsExpendituresRecord,
-            'categoryId' | 'type' | 'reportingYear' | 'amountUah' | 'amountUsd'
-        >,
+        record: ReportFundsExpendituresRecordFormValues,
     ): Promise<ReportFundsExpendituresRecord> => {
         const response = await client.put<ReportFundsExpendituresRecordDto>(
             `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/${id}`,

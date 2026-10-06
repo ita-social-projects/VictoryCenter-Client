@@ -1,8 +1,4 @@
-import {
-    CreateUpdateHistorySectionDto,
-    CreateHistorySectionContentDto,
-    HistorySectionDto,
-} from '@/types/common/history-sections';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
@@ -21,36 +17,32 @@ const uploadSectionContentsImages = async (
     const imagesToDeleteAfterSync: number[] = [];
 
     try {
-        await Promise.all(
-            sections.map(async (section) => {
-                await Promise.all(
-                    section.contents.map(async (content: CreateHistorySectionContentDto) => {
-                        if (content.image || content.imageId) {
-                            const existingImageId =
-                                content.imageId ??
-                                (content.image && 'id' in content.image ? (content.image as Image).id : null);
+        for (const section of sections) {
+            for (const content of section.contents) {
+                if (content.image || content.imageId) {
+                    const existingImageId =
+                        content.imageId ??
+                        (content.image && 'id' in content.image ? (content.image as Image).id : null);
 
-                            const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
-                                client,
-                                (content.image as Image | ImageValues | null) ?? null,
-                                existingImageId ?? null,
-                            );
+                    const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+                        client,
+                        (content.image as Image | ImageValues | null) ?? null,
+                        existingImageId ?? null,
+                    );
 
-                            if (finalImageId && finalImageId !== existingImageId) {
-                                newlyCreatedImageIds.push(finalImageId);
-                            }
+                    if (finalImageId && finalImageId !== existingImageId) {
+                        newlyCreatedImageIds.push(finalImageId);
+                    }
 
-                            content.imageId = finalImageId;
-                            content.image = null;
+                    content.imageId = finalImageId;
+                    content.image = null;
 
-                            if (imageIdToDelete) {
-                                imagesToDeleteAfterSync.push(imageIdToDelete);
-                            }
-                        }
-                    }),
-                );
-            }),
-        );
+                    if (imageIdToDelete) {
+                        imagesToDeleteAfterSync.push(imageIdToDelete);
+                    }
+                }
+            }
+        }
     } catch (error) {
         await Promise.allSettled(newlyCreatedImageIds.map((id) => ImageApi.delete(client, id)));
         throw error;

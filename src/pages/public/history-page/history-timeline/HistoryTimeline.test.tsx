@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { HistoryTimeline } from './HistoryTimeline';
+import { HIGHLIGHTED_DATES } from '@/const/public/history-page';
 
 describe('HistoryTimeline', () => {
     it('should render all timeline dates', () => {
@@ -46,5 +47,62 @@ describe('HistoryTimeline', () => {
         // alt text format: "<name>, <role>"
         const directorPhoto = screen.getByAltText('Настя, виконавчий директор');
         expect(directorPhoto).toBeInTheDocument();
+    });
+});
+
+describe('HistoryTimeline safe line variables', () => {
+    const getDateCssVar = (date: string, varName: string) => screen.getByText(date).style.getPropertyValue(varName);
+
+    it('applies --safe-director-line only to the entry flagged with safeLine', () => {
+        render(<HistoryTimeline safeDirectorLine={50} />);
+
+        expect(getDateCssVar('09/2023', '--safe-director-line')).toBe('50px');
+    });
+
+    it('does not apply --safe-director-line to left-side entries without safeLine', () => {
+        render(<HistoryTimeline safeDirectorLine={50} />);
+
+        expect(getDateCssVar('03/2024', '--safe-director-line')).toBe('');
+    });
+
+    it('keeps the config line length for entries without safeLine', () => {
+        render(<HistoryTimeline safeDirectorLine={50} />);
+
+        expect(getDateCssVar('03/2024', '--line-mobile')).toBe(`${HIGHLIGHTED_DATES['03/2024'].mobile}px`);
+        expect(getDateCssVar('03/2024', '--line-xl')).toBe(`${HIGHLIGHTED_DATES['03/2024'].xl}px`);
+    });
+
+    it('does not apply --safe-director-line when safeDirectorLine is undefined', () => {
+        render(<HistoryTimeline />);
+
+        expect(getDateCssVar('09/2023', '--safe-director-line')).toBe('');
+    });
+
+    it('applies --safe-director-line when the value is 0', () => {
+        render(<HistoryTimeline safeDirectorLine={0} />);
+
+        expect(getDateCssVar('09/2023', '--safe-director-line')).toBe('0px');
+    });
+
+    it('applies --safe-topanchor-line only to the top-anchor entry', () => {
+        render(<HistoryTimeline safeTopAnchorLine={120} />);
+
+        expect(getDateCssVar('12/2023', '--safe-topanchor-line')).toBe('120px');
+        expect(getDateCssVar('09/2023', '--safe-topanchor-line')).toBe('');
+        expect(getDateCssVar('03/2024', '--safe-topanchor-line')).toBe('');
+    });
+
+    it('does not apply --safe-topanchor-line when safeTopAnchorLine is undefined', () => {
+        render(<HistoryTimeline />);
+
+        expect(getDateCssVar('12/2023', '--safe-topanchor-line')).toBe('');
+    });
+
+    it('does not set any custom properties on non-highlighted dates', () => {
+        render(<HistoryTimeline safeDirectorLine={50} safeTopAnchorLine={120} />);
+
+        expect(getDateCssVar('10/2023', '--line-mobile')).toBe('');
+        expect(getDateCssVar('10/2023', '--safe-director-line')).toBe('');
+        expect(getDateCssVar('10/2023', '--safe-topanchor-line')).toBe('');
     });
 });

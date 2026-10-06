@@ -1,12 +1,13 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FeedbackPageAdmin, isFeedbackHistory } from './FeedbackPageAdmin';
+import { FeedbackPageAdmin, isFeedbackHistory, isFeedbackReview, isFeedbackVideo } from './FeedbackPageAdmin';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackCategory } from '@/types/admin/feedback';
 import { ToastType } from '@/types/admin/toast';
 import { VisibilityStatus } from '@/types/admin/common';
+import { TranslationStatus, TranslationStatusFilter } from '@/types/common/language';
 
 beforeAll(() => {
     class MockResizeObserver {
@@ -26,8 +27,19 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 let mockLocalizationToolkitProps: any = null;
 const mockRetryFetchLanguages = jest.fn();
 
-let mockLocalizationValues = {
-    allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
+let mockLocalizationValues: {
+    allLanguages: { id: number; code: string; name: string }[];
+    translationLanguages: { id: number; code: string; name: string }[];
+    selectedLanguage: { id: number; code: string; name: string };
+    translationStatusFilter: TranslationStatusFilter | undefined;
+    onLanguageChange: jest.Mock;
+    onTranslationStatusFilterChange: jest.Mock;
+} = {
+    allLanguages: [
+        { id: 1, code: 'uk', name: 'Українська' },
+        { id: 2, code: 'en', name: 'English' },
+    ],
+    translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
     selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
     translationStatusFilter: 0,
     onLanguageChange: jest.fn(),
@@ -120,10 +132,15 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
 }));
 
 jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
-    InfiniteScrollList: ({ items, renderItem, onLoadMore, isLoading, emptyStateMessage }: any) => (
+    InfiniteScrollList: ({ items, renderItem, onLoadMore, isLoading, emptyStateMessage, emptyStateAction }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="infinite-scroll-loader">Loading...</div>}
-            {items.length === 0 && !isLoading && <div data-testid="empty-state">{emptyStateMessage}</div>}
+            {items.length === 0 && !isLoading && (
+                <div data-testid="empty-state">
+                    {emptyStateMessage}
+                    {emptyStateAction}
+                </div>
+            )}
             {items.map((item: any) => (
                 <div key={item.id} data-testid={`list-item-${item.id}`}>
                     {renderItem(item)}
@@ -136,13 +153,29 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     ),
 }));
 
+jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => ({
+    AddVideoReviewModal: ({ isOpen, onClose, onSubmit }: any) =>
+        isOpen ? (
+            <div data-testid="add-video-review-modal">
+                <button data-testid="add-video-review-close" onClick={onClose}>
+                    Close
+                </button>
+                <button data-testid="add-video-review-submit" onClick={() => onSubmit?.({ title: 't', link: 'l' })}>
+                    Submit
+                </button>
+            </div>
+        ) : null,
+}));
+
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
     FeedbackApi: {
         fetchHistory: jest.fn(),
         fetchReviews: jest.fn(),
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
-        deleteHistory: jest.fn(),
+        deleteFeedback: jest.fn(),
+        createReview: jest.fn(),
+        createVideoReview: jest.fn(),
     },
 }));
 
@@ -157,6 +190,7 @@ const mockHistoryData = {
             image: null,
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
         {
             id: 2,
@@ -165,6 +199,7 @@ const mockHistoryData = {
             image: null,
             status: VisibilityStatus.Published,
             priority: 1,
+            localizations: [],
         },
     ],
     totalItemsCount: 2,
@@ -178,6 +213,7 @@ const mockReviewsData = {
             text: 'Відгук учасника 10',
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
     ],
     totalItemsCount: 1,
@@ -188,9 +224,10 @@ const mockVideosData = {
         {
             id: 20,
             title: 'Відео 20',
-            videoUrl: 'https://youtube.com/watch?v=20',
+            link: 'https://youtube.com/watch?v=20',
             status: VisibilityStatus.Published,
             priority: 0,
+            localizations: [],
         },
     ],
     totalItemsCount: 1,
@@ -203,7 +240,8 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.fetchReviews.mockResolvedValue(mockReviewsData);
         mockFeedbackApi.fetchVideos.mockResolvedValue(mockVideosData);
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
-        mockFeedbackApi.deleteHistory.mockResolvedValue();
+        mockFeedbackApi.deleteFeedback.mockResolvedValue();
+        mockFeedbackApi.createVideoReview.mockResolvedValue(mockVideosData.items[0]);
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -249,9 +287,14 @@ describe('FeedbackPageAdmin', () => {
         });
         expect(mockFeedbackApi.fetchVideos).toHaveBeenCalledTimes(1);
         expect(screen.getByTestId('toolbar-placeholder')).toHaveTextContent(FEEDBACK_TEXT.PLACEHOLDER.SEARCH_VIDEOS);
+
+        const videoLink = screen.getByRole('link', { name: mockVideosData.items[0].link });
+        expect(videoLink).toHaveAttribute('href', mockVideosData.items[0].link);
+        expect(videoLink).toHaveAttribute('target', '_blank');
+        expect(videoLink).toHaveAttribute('rel', 'noreferrer');
     });
 
-    it('should call addToast when Add button in toolbar is clicked', async () => {
+    it('should open AddFeedbackHistoryModal when Add button in toolbar is clicked in History tab', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -261,10 +304,54 @@ describe('FeedbackPageAdmin', () => {
         const addBtn = screen.getByTestId('toolbar-add-button');
         fireEvent.click(addBtn);
 
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
     });
 
-    it('should call addToast when Edit button on a card is clicked', async () => {
+    const openAddVideoReviewModalOnVideosTab = async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+        await waitFor(() => {
+            expect(screen.getByText('Відео 20')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('toolbar-add-button'));
+        expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+    };
+
+    it('should open AddVideoReviewModal when Add button is clicked on the videos tab', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('creates a video review and shows the success toast when the modal submits', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        fireEvent.click(screen.getByTestId('add-video-review-submit'));
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.createVideoReview).toHaveBeenCalledWith(mockAdminClient, {
+                title: 't',
+                link: 'l',
+                status: VisibilityStatus.Published,
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+        });
+    });
+
+    it('should close AddVideoReviewModal when its onClose is called', async () => {
+        await openAddVideoReviewModalOnVideosTab();
+
+        fireEvent.click(screen.getByTestId('add-video-review-close'));
+        expect(screen.queryByTestId('add-video-review-modal')).not.toBeInTheDocument();
+    });
+
+    it('should open edit modal when Edit button is clicked on a history card', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -273,11 +360,74 @@ describe('FeedbackPageAdmin', () => {
 
         const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
         fireEvent.click(editBtns[0]);
+        expect(screen.getByText(FEEDBACK_TEXT.EDIT_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+    });
+
+    it('should call addToast when Edit button is clicked on a non-history card', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const videosTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.VIDEOS });
+        fireEvent.click(videosTab);
+
+        await waitFor(() => {
+            expect(screen.getByText(mockVideosData.items[0].title)).toBeInTheDocument();
+        });
+
+        const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
+        fireEvent.click(editBtns[0]);
+
         expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
     });
 
+    it('should open EditFeedbackReviewModal when Edit button is clicked on a review card', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
+        fireEvent.click(reviewsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
+        });
+
+        const editBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT });
+        fireEvent.click(editBtns[0]);
+
+        await waitFor(() => {
+            expect(screen.getByText(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+        });
+        expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+    });
+
+    it('should open AddFeedbackReviewModal when Add button in toolbar is clicked in REVIEWS tab', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
+        fireEvent.click(reviewsTab);
+
+        await waitFor(() => {
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
+        });
+
+        const addBtn = screen.getByTestId('toolbar-add-button');
+        fireEvent.click(addBtn);
+
+        expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+    });
+
     it('should open delete modal when Delete button is clicked on history card and delete item upon confirmation', async () => {
-        mockFeedbackApi.deleteHistory.mockResolvedValueOnce(undefined);
+        mockFeedbackApi.deleteFeedback.mockResolvedValueOnce(undefined);
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
@@ -287,46 +437,78 @@ describe('FeedbackPageAdmin', () => {
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
 
-        expect(screen.getByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(FEEDBACK_TEXT.DELETE_MODAL.TITLE)).toBeInTheDocument();
 
         const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
         fireEvent.click(yesBtn);
 
         await waitFor(() => {
-            expect(mockFeedbackApi.deleteHistory).toHaveBeenCalledWith(mockAdminClient, 1);
+            expect(mockFeedbackApi.deleteFeedback).toHaveBeenCalledWith(mockAdminClient, FeedbackCategory.HISTORY, 1);
             expect(screen.queryByText('Історія 1')).not.toBeInTheDocument();
-            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE_HISTORY, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
         });
     });
 
-    it('should call addToast when Delete button is clicked on non-history card', async () => {
+    it('should open delete modal when Delete button is clicked on a non-history card and delete item upon confirmation', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
-        const reviewsTab = screen.getByText(FEEDBACK_TEXT.TABS.REVIEWS);
+        const reviewsTab = screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS });
         fireEvent.click(reviewsTab);
 
         await waitFor(() => {
-            expect(screen.getByText('Учасник 10')).toBeInTheDocument();
+            expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
         });
 
         const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtns[0]);
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+
+        expect(screen.getByText(FEEDBACK_TEXT.DELETE_MODAL.TITLE)).toBeInTheDocument();
+
+        const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(yesBtn);
+
+        await waitFor(() => {
+            expect(mockFeedbackApi.deleteFeedback).toHaveBeenCalledWith(
+                mockAdminClient,
+                FeedbackCategory.REVIEWS,
+                mockReviewsData.items[0].id,
+            );
+            expect(screen.queryByText('Відгук учасника 10')).not.toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_DELETE, ToastType.Success);
+        });
     });
 
-    it('should call addToast and not open modal when item in history tab is not a valid FeedbackHistoryDto', async () => {
+    it('should open the Add-translation modal when translate icon is clicked on a card without an existing EN localization', async () => {
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+    });
+
+    it('should open the Update-translation modal when translate icon is clicked on a card with an existing EN localization', async () => {
         mockFeedbackApi.fetchHistory.mockResolvedValueOnce({
             items: [
                 {
-                    id: 99,
-                    title: 'Invalid History',
+                    id: 1,
+                    title: 'Історія 1',
+                    story: 'Опис історії 1',
+                    image: null,
                     status: VisibilityStatus.Published,
                     priority: 0,
-                } as any,
+                    localizations: [
+                        { language: { id: 2, code: 'en' }, title: 'Story', story: 'Story text', translationStatus: 1 },
+                    ],
+                },
             ],
             totalItemsCount: 1,
         });
@@ -334,14 +516,49 @@ describe('FeedbackPageAdmin', () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
-            expect(screen.getByText('Invalid History')).toBeInTheDocument();
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
-        const deleteBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.DELETE });
-        fireEvent.click(deleteBtns[0]);
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
 
-        expect(mockAddToast).toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
-        expect(screen.queryByText(FEEDBACK_TEXT.DELETE_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
+    });
+
+    it('should save a new translation, update the list, show a success toast and close the modal', async () => {
+        mockAdminClient.post.mockResolvedValueOnce({
+            data: {
+                entityId: 1,
+                title: 'Success Story',
+                story: 'English story text',
+                localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+                translationStatus: 1,
+            },
+        });
+
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const translateBtns = screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE });
+        fireEvent.click(translateBtns[0]);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+
+        fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Success Story' } });
+        fireEvent.change(screen.getByLabelText(/Історія/), { target: { value: 'English story text' } });
+
+        const saveBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
+        await waitFor(() => expect(saveBtn).toBeEnabled());
+        fireEvent.click(saveBtn);
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_TRANSLATE, ToastType.Success);
+        });
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
     });
 
     it('isFeedbackHistory correctly identifies valid and invalid items', () => {
@@ -353,6 +570,7 @@ describe('FeedbackPageAdmin', () => {
                 image: null,
                 priority: 0,
                 status: VisibilityStatus.Published,
+                localizations: [],
             }),
         ).toBe(true);
         expect(
@@ -362,10 +580,61 @@ describe('FeedbackPageAdmin', () => {
                 text: 'Txt',
                 priority: 0,
                 status: VisibilityStatus.Published,
+                localizations: [],
             }),
         ).toBe(false);
         expect(isFeedbackHistory(null as any)).toBe(false);
         expect(isFeedbackHistory(undefined as any)).toBe(false);
+    });
+
+    it('isFeedbackReview correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackReview({
+                id: 2,
+                authorName: 'A',
+                text: 'Txt',
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackReview({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(false);
+        expect(isFeedbackReview(null as any)).toBe(false);
+    });
+
+    it('isFeedbackVideo correctly identifies valid and invalid items', () => {
+        expect(
+            isFeedbackVideo({
+                id: 3,
+                title: 'Відео',
+                link: 'https://youtube.com/watch?v=1',
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(true);
+        expect(
+            isFeedbackVideo({
+                id: 1,
+                title: 'T',
+                story: 'S',
+                image: null,
+                priority: 0,
+                status: VisibilityStatus.Published,
+                localizations: [],
+            }),
+        ).toBe(false);
+        expect(isFeedbackVideo(null as any)).toBe(false);
     });
 
     it('should refetch items when status filter changes', async () => {
@@ -383,6 +652,102 @@ describe('FeedbackPageAdmin', () => {
                 mockAdminClient,
                 expect.objectContaining({ status: VisibilityStatus.Published }),
             );
+        });
+    });
+
+    describe('translation indicators and language/translation filtering', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+        let originalLocalizationValues: typeof mockLocalizationValues;
+
+        beforeEach(() => {
+            originalLocalizationValues = mockLocalizationValues;
+        });
+
+        afterEach(() => {
+            mockLocalizationValues = originalLocalizationValues;
+        });
+
+        it('sends translationStatusFilter to the API and no language param', async () => {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: TranslationStatusFilter.Missing,
+            };
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledWith(
+                    mockAdminClient,
+                    expect.objectContaining({ translationStatusFilter: TranslationStatusFilter.Missing }),
+                );
+            });
+            const params = mockFeedbackApi.fetchHistory.mock.calls[0][1];
+            expect(params).not.toHaveProperty('language');
+        });
+
+        it('shows the English text and an EN indicator per record when English is selected', async () => {
+            mockLocalizationValues = { ...mockLocalizationValues, selectedLanguage: english };
+            mockFeedbackApi.fetchHistory.mockResolvedValue({
+                ...mockHistoryData,
+                items: [
+                    {
+                        ...mockHistoryData.items[0],
+                        localizations: [
+                            {
+                                language: english,
+                                translationStatus: TranslationStatus.Relevant,
+                                title: 'Story 1',
+                                story: 'Story 1 text',
+                            },
+                        ],
+                    },
+                    mockHistoryData.items[1],
+                ],
+            });
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Story 1')).toBeInTheDocument();
+            });
+            expect(screen.getByText('Історія 2')).toBeInTheDocument();
+            expect(screen.getAllByText('EN')).toHaveLength(2);
+        });
+
+        it('refetches the list after a translation is saved while a translation filter is active', async () => {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: TranslationStatusFilter.Missing,
+            };
+            mockAdminClient.post.mockResolvedValueOnce({
+                data: {
+                    entityId: 1,
+                    title: 'Success Story',
+                    story: 'English story text',
+                    localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            });
+
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+            expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(1);
+
+            fireEvent.click(screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.TRANSLATE })[0]);
+            fireEvent.change(screen.getByLabelText(/Заголовок/), { target: { value: 'Success Story' } });
+            fireEvent.change(screen.getByLabelText(/Історія/), { target: { value: 'English story text' } });
+
+            const saveBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
+            await waitFor(() => expect(saveBtn).toBeEnabled());
+            fireEvent.click(saveBtn);
+
+            await waitFor(() => {
+                expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(2);
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_TRANSLATE, ToastType.Success);
         });
     });
 
@@ -557,6 +922,7 @@ describe('FeedbackPageAdmin', () => {
                     image: null,
                     status: VisibilityStatus.Published,
                     priority: 2,
+                    localizations: [],
                 },
             ],
             totalItemsCount: 3,
@@ -635,5 +1001,50 @@ describe('FeedbackPageAdmin', () => {
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
+    });
+
+    it('should show standard empty state when videos list is empty', async () => {
+        mockFeedbackApi.fetchVideos.mockResolvedValueOnce({ items: [], totalItemsCount: 0 });
+        render(<FeedbackPageAdmin />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Історія 1')).toBeInTheDocument();
+        });
+
+        const videosTab = screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS);
+        fireEvent.click(videosTab);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('empty-state')).toHaveTextContent(COMMON_TEXT_ADMIN.LIST.NOT_FOUND);
+        });
+    });
+
+    it('should open AddVideoReviewModal from the empty-state "Додати матеріал" button on the videos tab', async () => {
+        const originalTranslationStatusFilter = mockLocalizationValues.translationStatusFilter;
+        mockLocalizationValues = { ...mockLocalizationValues, translationStatusFilter: undefined };
+        mockFeedbackApi.fetchVideos.mockResolvedValueOnce({ items: [], totalItemsCount: 0 });
+
+        try {
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText(FEEDBACK_TEXT.TABS.VIDEOS));
+
+            const emptyState = await screen.findByTestId('empty-state');
+            expect(emptyState).toHaveTextContent(FEEDBACK_TEXT.LIST.NO_MATERIALS);
+
+            fireEvent.click(within(emptyState).getByText(FEEDBACK_TEXT.BUTTON.ADD_MATERIAL));
+
+            expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+            expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
+        } finally {
+            mockLocalizationValues = {
+                ...mockLocalizationValues,
+                translationStatusFilter: originalTranslationStatusFilter,
+            };
+        }
     });
 });

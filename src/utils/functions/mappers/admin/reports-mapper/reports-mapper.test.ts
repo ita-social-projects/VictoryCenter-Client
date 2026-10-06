@@ -319,39 +319,79 @@ describe('reports-mapper', () => {
             });
         });
 
-        it('should preserve decimal amounts when mapping record to create dto', () => {
+        it('should preserve decimal amounts when mapping record to create dto with UAH as source', () => {
             const result = mapReportFundsExpendituresRecordToCreateDto({
                 categoryId: 2,
                 type: 'expense',
                 reportingYear: '2026',
                 amountUah: '1 249 854,99',
                 amountUsd: '1234.56',
+                lastEditedField: 'amountUah',
             });
 
             expect(result).toEqual({
                 categoryId: 2,
                 type: 2,
                 reportingYear: 2026,
-                amountUah: 1249854.99,
-                amountUsd: 1234.56,
+                amount: 1249854.99,
+                currency: 1,
             });
         });
 
-        it('should preserve decimal amounts when mapping record to update dto', () => {
+        it('should use the USD amount as the source when it was the last edited field', () => {
+            const result = mapReportFundsExpendituresRecordToCreateDto({
+                categoryId: 2,
+                type: 'expense',
+                reportingYear: '2026',
+                amountUah: '1 249 854,99',
+                amountUsd: '1234.56',
+                lastEditedField: 'amountUsd',
+            });
+
+            expect(result).toEqual({
+                categoryId: 2,
+                type: 2,
+                reportingYear: 2026,
+                amount: 1234.56,
+                currency: 2,
+            });
+        });
+
+        it('should preserve decimal amounts when mapping record to update dto with UAH as source', () => {
             const result = mapReportFundsExpendituresRecordToUpdateDto({
                 categoryId: 1,
                 type: 'income',
                 reportingYear: '2025',
                 amountUah: '350.99',
                 amountUsd: '9.5',
+                lastEditedField: 'amountUah',
             });
 
             expect(result).toEqual({
                 categoryId: 1,
                 type: 1,
                 reportingYear: 2025,
-                amountUah: 350.99,
-                amountUsd: 9.5,
+                amount: 350.99,
+                currency: 1,
+            });
+        });
+
+        it('should map record to update dto with USD as source', () => {
+            const result = mapReportFundsExpendituresRecordToUpdateDto({
+                categoryId: 1,
+                type: 'income',
+                reportingYear: '2025',
+                amountUah: '350.99',
+                amountUsd: '9.5',
+                lastEditedField: 'amountUsd',
+            });
+
+            expect(result).toEqual({
+                categoryId: 1,
+                type: 1,
+                reportingYear: 2025,
+                amount: 9.5,
+                currency: 2,
             });
         });
     });

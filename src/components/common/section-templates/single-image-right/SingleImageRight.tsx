@@ -54,7 +54,7 @@ export const SingleImageRight = ({
         resetKey: validationResetKey,
     });
 
-    const { error, handleSetError } = useImageError();
+    const { error, handleSetError } = useImageError({ resetKey: validationResetKey });
 
     const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
     const descriptionMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
@@ -68,7 +68,7 @@ export const SingleImageRight = ({
         >
             {mode === SectionMode.Edit ? (
                 <>
-                    <div className={baseStyles['left-section']}>
+                    <div data-section-text className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
@@ -99,6 +99,7 @@ export const SingleImageRight = ({
                                 onChange={handleDescriptionChange}
                                 onBlur={handleDescriptionBlur}
                                 maxLength={descriptionMaxLength}
+                                placeholder={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER}
                                 rows={8}
                                 autoGrow={true}
                                 maxRows={20}
@@ -134,7 +135,7 @@ export const SingleImageRight = ({
                 </>
             ) : (
                 <>
-                    <div className={baseStyles['left-section']}>
+                    <div data-section-text className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
                             <h2 className={baseStyles.title}>{title}</h2>
                         </div>

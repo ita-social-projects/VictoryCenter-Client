@@ -25,16 +25,19 @@ const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jes
 const mockPublishRecords = jest.fn();
 const mockGetSettings = jest.fn();
 const mockCancelRecords = jest.fn();
-const mockUpdateRecord = jest.fn();
-const mockBulkDelete = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         publishRecords: (...args: unknown[]) => mockPublishRecords(...args),
         getSettings: (...args: unknown[]) => mockGetSettings(...args),
         cancelRecords: (...args: unknown[]) => mockCancelRecords(...args),
-        updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
-        bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
     },
+}));
+
+const mockSetBlocked = jest.fn();
+jest.mock('@/contexts/admin/admin-navigation-guard-provider/AdminNavigationGuardProvider', () => ({
+    useAdminNavigationGuard: () => ({
+        setBlocked: mockSetBlocked,
+    }),
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
@@ -76,6 +79,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onValidationChange,
         onCountsChange,
         onDataChange,
+        onSelectionChange,
         registerSaveCallback,
         onRowEditModeChange,
     }: {
@@ -93,6 +97,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onValidationChange?: (valid: boolean) => void;
         onCountsChange?: (counts: any) => void;
         onDataChange?: () => void;
+        onSelectionChange?: (hasSelected: boolean) => void;
         registerSaveCallback?: (cb: () => Promise<boolean>) => void;
         onRowEditModeChange?: (isRowEditMode: boolean) => void;
     }) => (
@@ -105,6 +110,12 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             data-delete-category-modal-open={String(isDeleteCategoryModalOpen ?? false)}
         >
             FundsExpenditureSection
+            <button type="button" data-testid="trigger-select-records" onClick={() => onSelectionChange?.(true)}>
+                Select Records
+            </button>
+            <button type="button" data-testid="trigger-unselect-records" onClick={() => onSelectionChange?.(false)}>
+                Unselect Records
+            </button>
             <button
                 type="button"
                 data-testid="activate-funds-edit"
@@ -152,11 +163,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
                     onValidationChange?.(true);
                     onCountsChange?.({ income: 2, expense: 2 });
                     onDataChange?.();
-                    registerSaveCallback?.(async () => {
-                        await mockUpdateRecord();
-                        await mockBulkDelete();
-                        return true;
-                    });
+                    registerSaveCallback?.(async () => true);
                 }}
             >
                 Set Valid Funds Data
@@ -180,17 +187,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
 jest.mock(
     '../funds-expenditures-section/components/common/translate-reports-category-modal/TranslateReportsCategoryModal',
     () => ({
-        TranslateReportsCategoryModal: ({
-            isOpen,
-            onClose,
-            onTranslateCategory,
-            categories,
-        }: {
-            isOpen?: boolean;
-            onClose?: () => void;
-            onTranslateCategory?: (cat: any) => void;
-            categories?: any[];
-        }) => (
+        TranslateReportsCategoryModal: ({ isOpen, onClose, onTranslateCategory, categories }: any) => (
             <div data-testid="translate-category-modal" data-open={String(isOpen ?? false)}>
                 <button type="button" data-testid="translate-modal-close" onClick={() => onClose?.()}>
                     Close
@@ -209,8 +206,8 @@ jest.mock(
 );
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({ onCountsChange, onDataChange }: any) => (
-        <div data-testid="program-expenses-section">
+    ProgramExpensesSection: ({ onCountsChange, onDataChange, exchangeRate }: any) => (
+        <div data-testid="program-expenses-section" data-exchange-rate={exchangeRate ?? ''}>
             ProgramExpensesSection
             <button
                 type="button"
@@ -301,6 +298,65 @@ describe('ReportAnalytics', () => {
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
 
         expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-draft-exchange-rate', '44.20');
+    });
+
+    it('should prevent exiting edit mode and show error toast if report data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+        fireEvent.click(screen.getByTestId('deactivate-funds-edit'));
+
+        expect(mockAddToast).toHaveBeenCalledWith(
+            'Неможливо завершити редагування: додайте щонайменше 2 доходи, 2 витрати та 1 програмну витрату',
+            'error',
+        );
+        expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-is-editing', 'true');
+    });
+
+    it('should block navigation via useAdminNavigationGuard when editing and data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        expect(mockSetBlocked).toHaveBeenCalledWith(false, COMMON_TEXT_ADMIN.MESSAGE.NAVIGATION_BLOCKED);
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+        expect(mockSetBlocked).toHaveBeenCalledWith(true, COMMON_TEXT_ADMIN.MESSAGE.NAVIGATION_BLOCKED);
+    });
+
+    it('should prevent default on beforeunload event when editing and data is invalid', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+        const event = new Event('beforeunload');
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+
+        window.dispatchEvent(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should NOT prevent default on beforeunload event when not editing', () => {
+        render(<ReportAnalytics />);
+
+        const event = new Event('beforeunload');
+        const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+
+        window.dispatchEvent(event);
+
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should pass exchangeRateDraft to ProgramExpensesSection', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+        fireEvent.click(screen.getByTestId('change-funds-exchange-rate'));
+        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
+
+        const programSection = screen.getByTestId('program-expenses-section');
+        expect(programSection).toHaveAttribute('data-exchange-rate', '44.20');
     });
 
     describe('add category modal', () => {
@@ -443,57 +499,84 @@ describe('ReportAnalytics', () => {
     });
 
     describe('Publish functionality', () => {
+        const getPublishButton = () => screen.getByText('Опублікувати');
+        const selectRecords = () => fireEvent.click(screen.getByTestId('trigger-select-records'));
+        const unselectRecords = () => fireEvent.click(screen.getByTestId('trigger-unselect-records'));
+
+        const setupValidPublishState = () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+        };
+
+        it('should disable publish button when some records are selected', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).toBeEnabled();
+
+            selectRecords();
+
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should re-enable publish button when selected records are unselected', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).toBeEnabled();
+
+            selectRecords();
+            expect(getPublishButton()).toBeDisabled();
+
+            unselectRecords();
+            expect(getPublishButton()).toBeEnabled();
+        });
+
         it('should enable publish button when data is valid and changes exist', () => {
+            setupValidPublishState();
+            expect(getPublishButton()).not.toBeDisabled();
+        });
+
+        it('should disable publish button when isRowEditMode is true', () => {
             render(<ReportAnalytics />);
             fireEvent.click(screen.getByTestId('activate-funds-edit'));
 
             fireEvent.click(screen.getByTestId('trigger-funds-data'));
             fireEvent.click(screen.getByTestId('trigger-program-data'));
+            fireEvent.click(screen.getByTestId('start-row-edit'));
 
             const publishButton = screen.getByText('Опублікувати');
-            expect(publishButton).not.toBeDisabled();
+            expect(publishButton).toBeDisabled();
         });
 
         it('should open publish modal on publish click', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'true');
         });
 
         it('should handle publish confirm successfully', async () => {
             mockPublishRecords.mockResolvedValueOnce({});
-            mockUpdateRecord.mockResolvedValueOnce({});
-            mockBulkDelete.mockResolvedValueOnce({});
+            setupValidPublishState();
 
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
-
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
                 expect(mockPublishRecords).toHaveBeenCalled();
-                expect(mockUpdateRecord).toHaveBeenCalled();
-                expect(mockBulkDelete).toHaveBeenCalled();
-                expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+                    'success',
+                    3000,
+                );
             });
             expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument(); // should exit edit mode
         });
 
         it('should handle publish save settings failure', async () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            setupValidPublishState();
             fireEvent.click(screen.getByTestId('trigger-funds-save-fail'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
@@ -503,12 +586,9 @@ describe('ReportAnalytics', () => {
 
         it('should handle publish records API error', async () => {
             mockPublishRecords.mockRejectedValueOnce(new Error('fail'));
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('confirm-modal-publish'));
 
             await waitFor(() => {
@@ -517,24 +597,18 @@ describe('ReportAnalytics', () => {
         });
 
         it('should close publish modal when cancelled', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('cancel-modal-publish'));
 
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
         });
 
         it('should close publish modal when close is clicked', () => {
-            render(<ReportAnalytics />);
-            fireEvent.click(screen.getByTestId('activate-funds-edit'));
-            fireEvent.click(screen.getByTestId('trigger-funds-data'));
-            fireEvent.click(screen.getByTestId('trigger-program-data'));
+            setupValidPublishState();
 
-            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(getPublishButton());
             fireEvent.click(screen.getByTestId('close-modal-publish'));
 
             expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');

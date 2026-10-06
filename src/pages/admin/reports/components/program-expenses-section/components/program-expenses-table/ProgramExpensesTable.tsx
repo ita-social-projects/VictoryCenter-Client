@@ -163,7 +163,8 @@ export const ProgramExpensesTable = ({
                     recordId,
                     programId: value,
                     records: allRecords ?? records,
-                    trigger: 'change',
+                    trigger: value === undefined ? 'blur' : 'change',
+                    isEditing: true,
                 });
 
                 return {
@@ -189,6 +190,7 @@ export const ProgramExpensesTable = ({
                     programId: prev.programId,
                     records: allRecords ?? records,
                     trigger: 'blur',
+                    isEditing: true,
                 });
 
                 return {
@@ -222,6 +224,7 @@ export const ProgramExpensesTable = ({
                 programId: rowEditState.programId,
                 records: allRecords ?? records,
                 trigger: 'blur',
+                isEditing: true,
             });
 
             const isUnchanged =

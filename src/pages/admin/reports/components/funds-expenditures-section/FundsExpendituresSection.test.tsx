@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FundsExpenditureSection } from './FundsExpendituresSection';
+import { FundsExpenditureSection, FundsExpenditureSectionProps } from './FundsExpendituresSection';
 import {
     FUNDS_EXPENDITURES_TEXT,
     FUNDS_EXPENDITURES_VALIDATION,
@@ -1587,5 +1587,105 @@ describe('FundsExpenditureSection aggregate row visibility', () => {
 
         fireEvent.click(screen.getByTestId('filter-income'));
         expect(table).toHaveAttribute('data-has-aggregate-row', 'false');
+    });
+});
+describe('FundsExpenditureSection add buttons disabled state based on selection', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            { ...MOCK_FUNDS_EXPENDITURES_SUMMARY, incomeCategories: 1, expenseCategories: 1 },
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    const renderSection = (props?: Partial<FundsExpenditureSectionProps>) => {
+        render(<FundsExpenditureSection {...props} />);
+    };
+
+    const getToolbar = () => screen.getByTestId('funds-toolbar');
+
+    const selectRow = (testId: string) => {
+        fireEvent.click(screen.getByTestId(testId));
+    };
+
+    const expectAddButtonsDisabled = (disabled: boolean) => {
+        const value = String(disabled);
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', value);
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', value);
+    };
+
+    it('should have both add buttons enabled when selectedRecordIds is empty and all else valid', () => {
+        renderSection();
+
+        expectAddButtonsDisabled(false);
+    });
+
+    it('should disable both add buttons when selectedRecordIds is non-empty', () => {
+        renderSection();
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+    });
+
+    it('should re-enable both add buttons when selection is cleared (e.g., via bulk delete cancel)', async () => {
+        renderSection({ isEditing: true });
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+            expectAddButtonsDisabled(false);
+        });
+    });
+});
+
+describe('FundsExpenditureSection onSelectionChange callback', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            MOCK_FUNDS_EXPENDITURES_SUMMARY,
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('should call onSelectionChange with false initially', () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection onSelectionChange={mockOnSelectionChange} />);
+
+        expect(mockOnSelectionChange).toHaveBeenCalledWith(false);
+    });
+
+    it('should call onSelectionChange with true when a record is selected and false when unselected', () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection onSelectionChange={mockOnSelectionChange} />);
+        fireEvent.click(screen.getByTestId('select-row-1'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(true);
+        fireEvent.click(screen.getByTestId('select-row-1'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+    });
+
+    it('should call onSelectionChange with false when bulk delete modal is cancelled', async () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection isEditing={true} onSelectionChange={mockOnSelectionChange} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(true);
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+        });
     });
 });

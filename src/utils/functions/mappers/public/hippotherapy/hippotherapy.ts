@@ -6,11 +6,11 @@ import {
 } from '@/types/admin/hippotherapy-page';
 import { HippotherapyAbout, HippotherapySwipedCard, Quote } from '@/types/public/hippotherapy-page';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 const toPlain = (value: string): string => getPlainTextFromHtml(value).trim();
 
-const getImageUrl = (value: HippotherapyImageValue): string =>
-    value.image && 'url' in value.image ? value.image.url : '';
+const getImageUrl = (value: HippotherapyImageValue): string => getImageSrc(value.image);
 
 const toQuote = (section: HippotherapyQuoteContent): Quote => ({
     text: toPlain(section.authorName) ? `${section.quoteText}<br /><br />${section.authorName}` : section.quoteText,

@@ -157,12 +157,12 @@ describe('ReportsMediaBlock', () => {
             expect(mockOnTitleChange).toHaveBeenCalledWith('New');
         });
 
-        it('should NOT call onTitleBlur if the normalized value is identical to current value', () => {
+        it('should call onTitleBlur when the value is already normalized', () => {
             renderComponent();
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.blur(titleInput);
 
-            expect(mockOnTitleBlur).not.toHaveBeenCalled();
+            expect(mockOnTitleBlur).toHaveBeenCalledWith('Test Title');
         });
 
         it('should call onTitleBlur if the normalized value is different', () => {
@@ -173,6 +173,18 @@ describe('ReportsMediaBlock', () => {
             expect(mockOnTitleBlur).toHaveBeenCalledWith('Different');
         });
 
+        it('should validate empty Ukrainian and English titles on blur', () => {
+            renderComponent({ values: { ...defaultValues, title: '', titleEn: '' } });
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
+            const titleEnInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
+
+            fireEvent.blur(titleInput);
+            fireEvent.blur(titleEnInput);
+
+            expect(mockOnTitleBlur).toHaveBeenCalledWith('');
+            expect(mockOnTitleEnBlur).toHaveBeenCalledWith('');
+        });
+
         it('should call onTitleEnChange on change', () => {
             renderComponent();
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
@@ -180,12 +192,12 @@ describe('ReportsMediaBlock', () => {
             expect(mockOnTitleEnChange).toHaveBeenCalledWith('New EN');
         });
 
-        it('should NOT call onTitleEnBlur if the normalized value is identical to current value', () => {
+        it('should call onTitleEnBlur when the value is already normalized', () => {
             renderComponent();
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
             fireEvent.blur(titleInput);
 
-            expect(mockOnTitleEnBlur).not.toHaveBeenCalled();
+            expect(mockOnTitleEnBlur).toHaveBeenCalledWith('Test Title UK');
         });
 
         it('should call onTitleEnBlur if the normalized value is different', () => {

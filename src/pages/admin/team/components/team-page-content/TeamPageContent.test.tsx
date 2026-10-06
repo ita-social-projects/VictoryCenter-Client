@@ -1,6 +1,6 @@
-import React, { act } from 'react';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -477,6 +477,12 @@ const expectTeamPageModalsToBeVisible = async () => {
     });
 };
 
+const actFireEvent = async (callback: () => void) => {
+    await act(async () => {
+        callback();
+    });
+};
+
 describe('TeamPageContent', () => {
     const renderTeamPageContent = () => render(<TeamPageContent />);
 
@@ -488,15 +494,37 @@ describe('TeamPageContent', () => {
     const getTeamErrorContainer = () => screen.queryByTestId('team-error-container');
     const getTryAgainButton = () => screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
 
-    const clickAddMemberButton = () => fireEvent.click(getAddMemberButton());
-    const clickCategoryButton = (id: number) => fireEvent.click(getCategoryButton(id));
-    const changeStatusFilter = (value: string) =>
-        fireEvent.change(screen.getByTestId('status-filter'), { target: { value } });
-    const clickTryAgainButton = () => {
-        const button = getTryAgainButton();
-        if (button) fireEvent.click(button);
+    const clickAddMemberButton = async () => {
+        await actFireEvent(() => fireEvent.click(getAddMemberButton()));
     };
-    const typeInSearchInput = (value: string) => fireEvent.change(getSearchInput(), { target: { value } });
+
+    const clickCategoryButton = async (id: number) => {
+        await actFireEvent(() => fireEvent.click(getCategoryButton(id)));
+    };
+
+    const changeStatusFilter = async (value: string) => {
+        await actFireEvent(() => {
+            fireEvent.change(screen.getByTestId('status-filter'), {
+                target: { value },
+            });
+        });
+    };
+
+    const clickTryAgainButton = async () => {
+        const button = getTryAgainButton();
+
+        if (button) {
+            await actFireEvent(() => fireEvent.click(button));
+        }
+    };
+
+    const typeInSearchInput = async (value: string) => {
+        await actFireEvent(() => {
+            fireEvent.change(getSearchInput(), {
+                target: { value },
+            });
+        });
+    };
 
     const expectErrorToBeDisplayed = (errorMessage: string) => {
         expect(getTeamErrorContainer()).toBeInTheDocument();
@@ -542,7 +570,8 @@ describe('TeamPageContent', () => {
                 items: [mockMembers[1]],
                 totalItemsCount: 1,
             } as any);
-            clickCategoryButton(2);
+
+            await clickCategoryButton(2);
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledWith(
@@ -564,7 +593,10 @@ describe('TeamPageContent', () => {
             expect(toolbar).toBeInTheDocument();
 
             const searchInput = getSearchInput();
-            fireEvent.change(searchInput, { target: { value: 'test query' } });
+
+            await actFireEvent(() => {
+                fireEvent.change(searchInput, { target: { value: 'test query' } });
+            });
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
@@ -584,7 +616,7 @@ describe('TeamPageContent', () => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
             });
 
-            changeStatusFilter(VisibilityStatus.Published.toString());
+            await changeStatusFilter(VisibilityStatus.Published.toString());
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenLastCalledWith(
@@ -605,7 +637,7 @@ describe('TeamPageContent', () => {
 
             const initialCallCount = mockTeamMembersApi.getAll.mock.calls.length;
 
-            clickCategoryButton(1);
+            await clickCategoryButton(1);
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
@@ -625,7 +657,7 @@ describe('TeamPageContent', () => {
             });
 
             mockTeamCategoriesApi.getAll.mockResolvedValueOnce(mockCategories);
-            clickTryAgainButton();
+            await clickTryAgainButton();
 
             await waitFor(() => {
                 expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(2);
@@ -639,7 +671,9 @@ describe('TeamPageContent', () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            fireEvent.click(screen.getByTestId('reorder-btn-1'));
+            await actFireEvent(() => {
+                fireEvent.click(screen.getByTestId('reorder-btn-1'));
+            });
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(expect.any(Object), mockCategories[0].id, [
@@ -667,7 +701,9 @@ describe('TeamPageContent', () => {
                 expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
             });
 
-            resolveFirstCall(mockCategories);
+            await act(async () => {
+                resolveFirstCall(mockCategories);
+            });
 
             await waitFor(() => {
                 expect(screen.getByTestId('category-bar')).toBeInTheDocument();
@@ -699,7 +735,7 @@ describe('TeamPageContent', () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            typeInSearchInput('abc');
+            await typeInSearchInput('abc');
 
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
 
@@ -726,11 +762,13 @@ describe('TeamPageContent', () => {
                 totalItemsCount: mockMembers.length,
             } as any);
 
-            clickTryAgainButton();
+            await clickTryAgainButton();
 
-            // Change filter to trigger a new fetch
             const statusFilter = screen.getByTestId('status-filter');
-            fireEvent.change(statusFilter, { target: { value: '1' } });
+
+            await actFireEvent(() => {
+                fireEvent.change(statusFilter, { target: { value: '1' } });
+            });
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
@@ -753,17 +791,27 @@ describe('TeamPageContent', () => {
             await waitFor(() => {
                 expect(getMemberItems().length).toBeGreaterThan(0);
             });
+
             const memberItems = getMemberItems();
-            fireEvent.drop(memberItems[0]);
+
+            await actFireEvent(() => {
+                fireEvent.drop(memberItems[0]);
+            });
+
             expect(mockTeamMembersApi.reorder).not.toHaveBeenCalled();
 
-            fireEvent.dragStart(memberItems[0], {
-                clientX: 0,
-                clientY: 0,
-                dataTransfer: { setDragImage: jest.fn() },
-            } as unknown as React.DragEvent<HTMLDivElement>);
+            await actFireEvent(() => {
+                fireEvent.dragStart(memberItems[0], {
+                    clientX: 0,
+                    clientY: 0,
+                    dataTransfer: { setDragImage: jest.fn() },
+                } as unknown as React.DragEvent<HTMLDivElement>);
+            });
 
-            fireEvent.drop(memberItems[0]);
+            await actFireEvent(() => {
+                fireEvent.drop(memberItems[0]);
+            });
+
             expect(mockTeamMembersApi.reorder).not.toHaveBeenCalled();
         });
 
@@ -773,7 +821,7 @@ describe('TeamPageContent', () => {
             const listContainer = screen.getByTestId('team-page-content').querySelector('.team-page-list-container')!;
             Object.defineProperty(listContainer, 'clientHeight', { value: 600 });
 
-            act(() => {
+            await act(async () => {
                 window.dispatchEvent(new Event('resize'));
             });
 
@@ -863,63 +911,11 @@ describe('TeamPageContent', () => {
             expect(screen.getByTestId('member-name-2')).toHaveTextContent('Jane Smith');
         });
 
-        // it('should handle isAnyModalOpened calculation correctly', async () => {
-        //     renderTeamPageContent();
-        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-        //     fireEvent.click(screen.getByTestId('edit-1'));
-
-        //     await waitFor(() => {
-        //         expect(getEditMemberModal()).toBeInTheDocument();
-        //     });
-
-        //     fireEvent.click(screen.getByTestId('close-edit'));
-
-        //     await waitFor(() => {
-        //         expect(getEditMemberModal()).not.toBeInTheDocument();
-        //     });
-        // });
-
-        // it('should test closeModalActions functionality', async () => {
-        //     renderTeamPageContent();
-        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-        //     fireEvent.click(screen.getByTestId('edit-1'));
-        //     await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
-
-        //     fireEvent.click(screen.getByTestId('close-edit'));
-        //     await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
-
-        //     fireEvent.click(screen.getByTestId('delete-1'));
-        //     await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
-
-        //     fireEvent.click(screen.getByTestId('close-delete'));
-        //     await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
-        // });
-
-        // it('should handle modal state when modals are already opened', async () => {
-        //     renderTeamPageContent();
-        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-        //     clickAddMemberButton();
-        //     await waitFor(() => expect(getAddMemberModal()).toBeInTheDocument());
-
-        //     fireEvent.click(screen.getByTestId(`edit-${mockMembers[0].id}`));
-
-        //     expect(getAddMemberModal()).toBeInTheDocument();
-        //     expect(getEditMemberModal()).not.toBeInTheDocument();
-
-        //     fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
-
-        //     expect(getAddMemberModal()).toBeInTheDocument();
-        //     expect(getDeleteMemberModal()).not.toBeInTheDocument();
-        // });
-
         it('should handle search query change through toolbar', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            typeInSearchInput('test');
+            await typeInSearchInput('test');
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
@@ -940,10 +936,15 @@ describe('TeamPageContent', () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            typeInSearchInput('test');
-            fireEvent.click(screen.getByTestId('select-first-result'));
+            await typeInSearchInput('test');
 
-            fireEvent.click(screen.getByTestId('clear-search-selection'));
+            await actFireEvent(() => {
+                fireEvent.click(screen.getByTestId('select-first-result'));
+            });
+
+            await actFireEvent(() => {
+                fireEvent.click(screen.getByTestId('clear-search-selection'));
+            });
 
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
@@ -956,17 +957,17 @@ describe('TeamPageContent', () => {
                 renderTeamPageContent();
                 await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-                clickAddMemberButton();
+                await clickAddMemberButton();
 
                 await waitFor(() => {
                     expect(screen.getByTestId('simulate-add-member')).toBeInTheDocument();
                 });
 
-                // Confirm adding member when list is at page size (lines 401-403)
-                fireEvent.click(screen.getByTestId('simulate-add-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-add-member'));
+                });
 
                 await waitFor(() => {
-                    // Member should be added to the list
                     expect(getMemberItems()).toHaveLength(3);
                 });
 
@@ -981,7 +982,9 @@ describe('TeamPageContent', () => {
 
                 await expectMemberNameToBe('John Doe');
 
-                fireEvent.click(screen.getByTestId('simulate-translate-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-translate-member'));
+                });
 
                 await expectMemberNameToBe('Translated Member');
                 expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
@@ -991,7 +994,9 @@ describe('TeamPageContent', () => {
             it('shows success toast when translated member is published', async () => {
                 renderTeamPageContent();
 
-                fireEvent.click(screen.getByTestId('simulate-translate-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-translate-member'));
+                });
 
                 await waitFor(() => {
                     expect(mockAddToast).toHaveBeenCalledWith(
@@ -1004,7 +1009,9 @@ describe('TeamPageContent', () => {
             it('shows success toast when translated member is draft', async () => {
                 renderTeamPageContent();
 
-                fireEvent.click(screen.getByTestId('simulate-translate-member-draft'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-translate-member-draft'));
+                });
 
                 await waitFor(() => {
                     expect(mockAddToast).toHaveBeenCalledWith(
@@ -1014,91 +1021,7 @@ describe('TeamPageContent', () => {
                 });
             });
 
-            // it('should edit member without image cache busting when no url present', async () => {
-            //     const membersWithoutImageUrl: TeamMember[] = [
-            //         { ...mockMembers[0], image: { id: 1 } as any },
-            //         mockMembers[1],
-            //     ];
-            //     mockTeamMembersApi.getAll.mockResolvedValueOnce({
-            //         items: membersWithoutImageUrl,
-            //         totalItemsCount: membersWithoutImageUrl.length,
-            //     } as any);
-
-            //     renderTeamPageContent();
-            //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-            //     fireEvent.click(screen.getByTestId(`edit-${membersWithoutImageUrl[0].id}`));
-            //     await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
-
-            //     clickConfirmEditButton();
-
-            //     await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
-
-            //     expect(screen.getByTestId('member-name-1')).toHaveTextContent('Updated Member');
-            // });
-
-            //     it('should set hasMore to true when adding member that exceeds current page capacity', async () => {
-            //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
-            //             items: mockMembers,
-            //             totalItemsCount: mockMembers.length,
-            //         } as any);
-
-            //         renderTeamPageContent();
-            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-            //         clickAddMemberButton();
-
-            //         const addModal = getAddMemberModal();
-            //         expect(addModal).toBeInTheDocument();
-
-            //         clickConfirmAddButton();
-
-            //         await waitFor(() => {
-            //             expect(getAddMemberModal()).not.toBeInTheDocument();
-            //         });
-
-            //         expect(getMemberItems()).toHaveLength(2);
-            //     });
-
-            //     it('should open edit modal and confirm edit updating member name and busting image cache when url present', async () => {
-            //         const membersWithImage: TeamMember[] = [
-            //             { ...mockMembers[0], image: { url: 'https://img/test.png' } as any },
-            //             mockMembers[1],
-            //         ];
-            //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
-            //             items: membersWithImage,
-            //             totalItemsCount: membersWithImage.length,
-            //         } as any);
-
-            //         renderTeamPageContent();
-
-            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-            //         fireEvent.click(screen.getByTestId(`edit-${membersWithImage[0].id}`));
-
-            //         await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
-
-            //         clickConfirmEditButton();
-
-            //         await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
-            //     });
-
-            //     it('should open delete modal and confirm deletion removing member', async () => {
-            //         renderTeamPageContent();
-
-            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-            //         fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
-
-            //         await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
-
-            //         clickConfirmDeleteButton();
-
-            //         await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
-            //     });
-            // });
-
-            describe('AbortController and lgetTeamToolbaroading states', () => {
+            describe('AbortController and loading states', () => {
                 it('should abort previous request when fetchMembers is called again', async () => {
                     const mockAbortController = {
                         abort: jest.fn(() => {}),
@@ -1119,7 +1042,7 @@ describe('TeamPageContent', () => {
                         totalItemsCount: 0,
                     } as any);
 
-                    clickCategoryButton(2);
+                    await clickCategoryButton(2);
 
                     await waitFor(() => {
                         expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
@@ -1143,7 +1066,7 @@ describe('TeamPageContent', () => {
 
                     const loadMoreButton = screen.queryByTestId('load-more');
                     if (loadMoreButton) {
-                        fireEvent.click(loadMoreButton);
+                        await actFireEvent(() => fireEvent.click(loadMoreButton));
                     }
 
                     expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
@@ -1191,7 +1114,9 @@ describe('TeamPageContent', () => {
 
                     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-                    fireEvent.click(screen.getByTestId('reorder-btn-1'));
+                    await actFireEvent(() => {
+                        fireEvent.click(screen.getByTestId('reorder-btn-1'));
+                    });
 
                     await waitFor(() => {
                         expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(
@@ -1215,7 +1140,6 @@ describe('TeamPageContent', () => {
                 } as any);
                 mockTeamMembersApi.reorder.mockResolvedValue(undefined);
 
-                // Reset modal state
                 Object.assign(mockModalState, {
                     isAddModalOpen: false,
                     itemToEdit: null,
@@ -1233,16 +1157,19 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('context-menu')).toBeInTheDocument();
                 });
 
-                // Test add category
-                fireEvent.click(screen.getByTestId('context-menu-add'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('context-menu-add'));
+                });
                 expect(mockOpenModalActions.openAddCategoryModal).toHaveBeenCalled();
 
-                // Test edit category
-                fireEvent.click(screen.getByTestId('context-menu-edit'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('context-menu-edit'));
+                });
                 expect(mockOpenModalActions.openEditCategoryModal).toHaveBeenCalled();
 
-                // Test delete category
-                fireEvent.click(screen.getByTestId('context-menu-delete'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('context-menu-delete'));
+                });
                 expect(mockOpenModalActions.openDeleteCategoryModal).toHaveBeenCalled();
             });
 
@@ -1253,26 +1180,28 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('simulate-add-member')).toBeInTheDocument();
                 });
 
-                // Test add member
-                fireEvent.click(screen.getByTestId('simulate-add-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-add-member'));
+                });
                 expect(mockCloseModalActions.closeAddItemModal).toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
                     ToastType.Info,
                 );
 
-                // Test edit member
-                fireEvent.click(screen.getByTestId('simulate-edit-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-edit-member'));
+                });
                 expect(mockCloseModalActions.closeEditItemModal).toHaveBeenCalled();
 
-                // Test delete member
-                fireEvent.click(screen.getByTestId('simulate-delete-member'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-delete-member'));
+                });
                 expect(mockCloseModalActions.closeDeleteItemModal).toHaveBeenCalled();
             });
 
             it('shows DONT_FORGET_TO_ORDER toast when editing a Draft member and publishing it', async () => {
-                // Simulate the member being edited was previously a Draft
-                mockModalState.itemToEdit = mockMembers[1]; // status: Draft
+                mockModalState.itemToEdit = mockMembers[1];
 
                 render(<TeamPageContent />);
 
@@ -1280,7 +1209,9 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('simulate-edit-draft-to-published')).toBeInTheDocument();
                 });
 
-                fireEvent.click(screen.getByTestId('simulate-edit-draft-to-published'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-edit-draft-to-published'));
+                });
 
                 expect(mockAddToast).toHaveBeenCalledWith(
                     TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
@@ -1290,8 +1221,7 @@ describe('TeamPageContent', () => {
             });
 
             it('does NOT show DONT_FORGET_TO_ORDER toast when re-saving an already Published member', async () => {
-                // Simulate the member being edited was already Published
-                mockModalState.itemToEdit = mockMembers[0]; // status: Published
+                mockModalState.itemToEdit = mockMembers[0];
 
                 render(<TeamPageContent />);
 
@@ -1299,7 +1229,9 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('simulate-edit-published-to-published')).toBeInTheDocument();
                 });
 
-                fireEvent.click(screen.getByTestId('simulate-edit-published-to-published'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-edit-published-to-published'));
+                });
 
                 expect(mockAddToast).not.toHaveBeenCalledWith(
                     TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
@@ -1315,14 +1247,17 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('simulate-add-category')).toBeInTheDocument();
                 });
 
-                // Test add category
-                fireEvent.click(screen.getByTestId('simulate-add-category'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-add-category'));
+                });
 
-                // Test edit category
-                fireEvent.click(screen.getByTestId('simulate-edit-category'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-edit-category'));
+                });
 
-                // Test delete category
-                fireEvent.click(screen.getByTestId('simulate-delete-category'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('simulate-delete-category'));
+                });
             });
 
             it('handles member edit and delete modal opening', async () => {
@@ -1332,12 +1267,14 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
                 });
 
-                // Test edit member modal
-                fireEvent.click(screen.getByTestId('edit-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('edit-member-1'));
+                });
                 expect(mockOpenModalActions.openEditItemModal).toHaveBeenCalledWith(mockMembers[0]);
 
-                // Test delete member modal
-                fireEvent.click(screen.getByTestId('delete-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('delete-member-1'));
+                });
                 expect(mockOpenModalActions.openDeleteItemModal).toHaveBeenCalledWith(mockMembers[0]);
             });
 
@@ -1346,7 +1283,9 @@ describe('TeamPageContent', () => {
 
                 await expectTranslateButtonToBeVisible();
 
-                fireEvent.click(screen.getByTestId('translate-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('translate-member-1'));
+                });
 
                 expect(mockOpenModalActions.openTranslateItemModal).toHaveBeenCalledWith(mockMembers[0]);
                 expect(mockOpenModalActions.openEditTranslationModal).not.toHaveBeenCalled();
@@ -1374,7 +1313,9 @@ describe('TeamPageContent', () => {
 
                 await expectTranslateButtonToBeVisible();
 
-                fireEvent.click(screen.getByTestId('translate-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('translate-member-1'));
+                });
 
                 expect(mockOpenModalActions.openEditTranslationModal).toHaveBeenCalledWith(memberWithTranslation);
                 expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
@@ -1387,7 +1328,9 @@ describe('TeamPageContent', () => {
 
                 await expectTranslateButtonToBeVisible();
 
-                fireEvent.click(screen.getByTestId('translate-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('translate-member-1'));
+                });
 
                 expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
                 expect(mockOpenModalActions.openEditTranslationModal).not.toHaveBeenCalled();
@@ -1402,8 +1345,12 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
                 });
 
-                fireEvent.click(screen.getByTestId('edit-member-1'));
-                fireEvent.click(screen.getByTestId('delete-member-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('edit-member-1'));
+                });
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('delete-member-1'));
+                });
 
                 expect(mockOpenModalActions.openEditItemModal).not.toHaveBeenCalled();
                 expect(mockOpenModalActions.openDeleteItemModal).not.toHaveBeenCalled();
@@ -1424,7 +1371,10 @@ describe('TeamPageContent', () => {
                 mockTeamCategoriesApi.getAll.mockResolvedValueOnce(mockCategories);
 
                 const retryButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
-                fireEvent.click(retryButton);
+
+                await actFireEvent(() => {
+                    fireEvent.click(retryButton);
+                });
 
                 await waitFor(() => {
                     expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(2);
@@ -1432,7 +1382,6 @@ describe('TeamPageContent', () => {
             });
 
             it('handles members API error and retry', async () => {
-                // Clear any existing calls
                 mockTeamMembersApi.getAll.mockClear();
 
                 mockTeamMembersApi.getAll.mockRejectedValueOnce(new Error('Members API Error'));
@@ -1444,7 +1393,6 @@ describe('TeamPageContent', () => {
                     expect(screen.getByText(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_FETCH_MEMBERS)).toBeInTheDocument();
                 });
 
-                // Ensure the first call happened
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(1);
 
                 mockTeamMembersApi.getAll.mockResolvedValueOnce({
@@ -1452,9 +1400,12 @@ describe('TeamPageContent', () => {
                     totalItemsCount: mockMembers.length,
                 } as any);
 
-                // Trigger retry by changing status filter (since that's what triggers fetchMembers)
-                fireEvent.change(screen.getByTestId('status-filter'), {
-                    target: { value: '1' },
+                const statusFilter = screen.getByTestId('status-filter');
+
+                await actFireEvent(() => {
+                    fireEvent.change(statusFilter, {
+                        target: { value: '1' },
+                    });
                 });
 
                 await waitFor(() => {
@@ -1471,7 +1422,9 @@ describe('TeamPageContent', () => {
                     expect(screen.getByTestId('reorder-btn-1')).toBeInTheDocument();
                 });
 
-                fireEvent.click(screen.getByTestId('reorder-btn-1'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('reorder-btn-1'));
+                });
 
                 await waitFor(() => {
                     expect(screen.getByTestId('team-error-container')).toBeInTheDocument();
@@ -1534,7 +1487,9 @@ describe('TeamPageContent', () => {
                     totalItemsCount: 10,
                 } as any);
 
-                fireEvent.click(screen.getByTestId('load-more-btn'));
+                await actFireEvent(() => {
+                    fireEvent.click(screen.getByTestId('load-more-btn'));
+                });
 
                 await waitFor(() => {
                     expect(mockTeamMembersApi.getAll).toHaveBeenCalledWith(

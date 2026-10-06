@@ -24,9 +24,14 @@ jest.mock('@/components/admin/input-error-with-character-counter/InputErrorWithC
 }));
 
 jest.mock('@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior', () => ({
-    TextAreaWithBulletBehavior: ({ hasError, ...props }: any) => (
-        <textarea data-testid="textarea" data-has-error={hasError ? 'true' : 'false'} {...props} />
-    ),
+    TextAreaWithBulletBehavior: ({
+        hasError,
+        autoGrow,
+        maxRows,
+        maxLimitWarning,
+        onWarningChange,
+        ...textareaProps
+    }: any) => <textarea data-testid="textarea" data-has-error={hasError ? 'true' : 'false'} {...textareaProps} />,
 }));
 
 describe('CardDescriptionField', () => {

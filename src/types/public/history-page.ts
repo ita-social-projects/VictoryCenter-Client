@@ -38,6 +38,7 @@ export interface LineConfig {
     showFrom: 'all' | 'tablet' | 'desktop';
     photo?: PhotoConfig;
     side: 'left' | 'right';
+    safeLine?: boolean;
 }
 
 export interface HistorySectionContentLocalization extends EntityLocalization, HistorySectionContentLocalizableFields {}

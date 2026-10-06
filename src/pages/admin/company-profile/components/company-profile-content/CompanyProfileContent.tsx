@@ -22,6 +22,7 @@ import { CompanyProfileValidationSchema } from '@/validation/admin/company-profi
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { CompanyProfilePublishModal } from '../company-profile-publish-modal/CompanyProfilePublishModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 type TabType = 'profile' | 'socials';
 
@@ -81,7 +82,7 @@ export const CompanyProfileContent = () => {
             setIsPublishModalOpen(false);
             setPendingPublishData(null);
 
-            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
         } finally {
             setIsPublishing(false);
         }

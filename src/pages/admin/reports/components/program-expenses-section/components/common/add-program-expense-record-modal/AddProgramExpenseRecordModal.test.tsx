@@ -242,7 +242,7 @@ describe('AddProgramExpenseRecordModal', () => {
         selectCategoryOption('Program A');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
 
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
     });
 

@@ -44,14 +44,25 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
         ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
-    it('validates duplicate program category', () => {
+    it('validates duplicate program category when adding a new record', () => {
         expect(
             validateProgramExpenseProgram({
                 recordId: 0,
                 programId: 1,
                 records,
             }),
-        ).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
+        ).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED);
+    });
+
+    it('validates duplicate program category when editing an existing record', () => {
+        expect(
+            validateProgramExpenseProgram({
+                recordId: 2,
+                programId: 1,
+                records,
+                isEditing: true,
+            }),
+        ).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_MUST_BE_UNIQUE);
     });
 
     it('passes unique program category and ignores current record', () => {

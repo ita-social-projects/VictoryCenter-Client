@@ -6,6 +6,7 @@ import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { COMPANY_PROFILE_VALIDATION } from '@/const/admin/company-profile';
 import { ToastType } from '@/types/admin/toast';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockAddToast = jest.fn();
 
@@ -290,6 +291,10 @@ describe('CompanyProfileContent', () => {
 
         await waitFor(() => expect(mockedPublish).toHaveBeenCalledTimes(1));
         expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
-        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', ToastType.Success, 3000);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED,
+            ToastType.Success,
+            3000,
+        );
     });
 });

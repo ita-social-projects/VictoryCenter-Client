@@ -32,6 +32,7 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'accept-icon-button': 'accept-icon-button',
     'close-icon-button': 'close-icon-button',
     'action-icon': 'action-icon',
+    'category-td': 'category-td',
     'category-edit-td': 'category-edit-td',
     'category-edit-wrapper': 'category-edit-wrapper',
     'category-edit-select': 'category-edit-select',
@@ -285,20 +286,22 @@ describe('FundsExpendituresTable', () => {
 
         const amountUahHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH);
 
-        fireEvent.click(amountUahHeader);
         let rows = screen.getAllByRole('row').slice(1);
-        let firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('1 000');
+        let amounts = rows.map((row) => within(row).getAllByRole('cell')[3].textContent);
+        expect(amounts).toEqual(['7 265', '4 200', '1 000']);
 
         fireEvent.click(amountUahHeader);
         rows = screen.getAllByRole('row').slice(1);
-        firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('7 265');
+        expect(within(rows[0]).getAllByRole('cell')[3]).toHaveTextContent('1 000');
 
         fireEvent.click(amountUahHeader);
         rows = screen.getAllByRole('row').slice(1);
-        firstRowCells = within(rows[0]).getAllByRole('cell');
-        expect(firstRowCells[3]).toHaveTextContent('7 265');
+        expect(within(rows[0]).getAllByRole('cell')[3]).toHaveTextContent('7 265');
+
+        fireEvent.click(amountUahHeader);
+        rows = screen.getAllByRole('row').slice(1);
+        amounts = rows.map((row) => within(row).getAllByRole('cell')[3].textContent);
+        expect(amounts).toEqual(['7 265', '4 200', '1 000']);
     });
 
     describe('scroll to top button', () => {
@@ -378,6 +381,16 @@ describe('FundsExpendituresTable', () => {
             render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
             expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
         });
+
+        it('should not render the actions column header when isEditing is false (default)', () => {
+            renderTable({ records: [] });
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS)).not.toBeInTheDocument();
+        });
+
+        it('should render the actions column header when isEditing is true', () => {
+            renderTable({ records: [], isEditing: true });
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
+        });
     });
 
     describe('row category editing', () => {
@@ -408,6 +421,7 @@ describe('FundsExpendituresTable', () => {
 
             expect(screen.getByLabelText('Edit record 2')).toBeDisabled();
             expect(screen.getByLabelText('Delete record 2')).toBeDisabled();
+            expect(screen.getByLabelText('Select all records')).toBeDisabled();
             expect(screen.getByLabelText('Select record 2')).toBeDisabled();
         });
 
@@ -436,6 +450,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 3,
                 amountUah: '7 265',
                 amountUsd: '4 200',
+                lastEditedField: 'amountUah',
             });
         });
 
@@ -445,7 +460,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Благодійні внески-2'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -476,7 +491,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -590,6 +605,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 3,
                 amountUah: '7 300',
                 amountUsd: '4 250',
+                lastEditedField: 'amountUsd',
             });
         });
 
@@ -617,6 +633,7 @@ describe('FundsExpendituresTable', () => {
                 categoryId: 2,
                 amountUah: '7 265,12',
                 amountUsd: '173,22',
+                lastEditedField: 'amountUah',
             });
         });
 
@@ -689,6 +706,20 @@ describe('FundsExpendituresTable', () => {
 
             expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('8040');
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
+        it('should apply category-td class and title in view mode, and switch to category-edit-td without title when editing', () => {
+            renderTable({ isEditing: true });
+
+            const categoryCell = screen.getByText('Грантові кошти').closest('td');
+            expect(categoryCell).toHaveClass('category-td');
+            expect(categoryCell).not.toHaveClass('category-edit-td');
+            expect(categoryCell).toHaveAttribute('title', 'Грантові кошти');
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            expect(categoryCell).toHaveClass('category-edit-td');
+            expect(categoryCell).not.toHaveClass('category-td');
+            expect(categoryCell).not.toHaveAttribute('title');
         });
     });
 
@@ -763,6 +794,15 @@ describe('FundsExpendituresTable program aggregate row', () => {
         expect(screen.getByTestId('program-aggregate-row')).toBeInTheDocument();
         expect(screen.getByText('Програмні')).toBeInTheDocument();
         expect(screen.getByLabelText('Edit program reporting year')).toBeInTheDocument();
+    });
+
+    it('participates in sorting along with other expense records', () => {
+        renderTable({ programAggregateRow, isEditing: false });
+
+        const rows = screen.getAllByRole('row').slice(1);
+        const categories = rows.map((row) => within(row).getAllByRole('cell')[2].textContent);
+
+        expect(categories).toEqual(['Грантові кошти', 'Благодійні внески', 'Програмні', 'Адміністративні витрати']);
     });
 
     it('keeps accept disabled until the year changes, then saves the new year', async () => {

@@ -85,7 +85,7 @@ export const ImageSection = ({
         });
 
         const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
         setTitleError(error || null);
     };
 
@@ -97,21 +97,21 @@ export const ImageSection = ({
         });
 
         const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 
     const handleTitleBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedTitle ?? '');
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
         setTitleError(error || null);
     };
 
     const handleDescriptionBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 

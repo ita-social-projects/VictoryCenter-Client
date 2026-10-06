@@ -14,6 +14,9 @@ jest.mock('./HistoryQuadImages', () => ({
 jest.mock('./HistoryDualImages', () => ({
     HistoryDualImages: () => <div data-testid="dual-images" />,
 }));
+jest.mock('./HistoryTripleImages', () => ({
+    HistoryTripleImages: () => <div data-testid="triple-images" />,
+}));
 
 const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 const mockedUseScrollAnimation = jest.mocked(useScrollAnimation);
@@ -49,6 +52,19 @@ const makeSection = (template: SectionTemplate, overrides: Partial<HistorySectio
 
 const TEST_IMAGE = { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image/jpeg' };
 
+const makeSectionWithImage = (
+    template: SectionTemplate,
+    title: string | null,
+    description: string | null = null,
+): HistorySectionModel =>
+    makeSection(template, {
+        contents: [
+            makeContent(10, ContentType.Title, 0, { title }),
+            makeContent(11, ContentType.Description, 1, { description }),
+            makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+        ],
+    });
+
 describe('HistorySection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -69,18 +85,13 @@ describe('HistorySection', () => {
 
             expect(screen.queryByTestId('quad-images')).not.toBeInTheDocument();
             expect(screen.queryByTestId('dual-images')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('triple-images')).not.toBeInTheDocument();
         });
     });
 
     describe('SingleImageRight template', () => {
         it('should render an image when image is provided', () => {
-            const section = makeSection(SectionTemplate.SingleImageRight, {
-                contents: [
-                    makeContent(10, ContentType.Title, 0, { title: '2024 — Березень' }),
-                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
-                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
-                ],
-            });
+            const section = makeSectionWithImage(SectionTemplate.SingleImageRight, '2024 — Березень');
 
             render(<HistorySection section={section} />);
 
@@ -96,13 +107,7 @@ describe('HistorySection', () => {
 
     describe('SingleImageTop template', () => {
         it('should render image above header when image is provided', () => {
-            const section = makeSection(SectionTemplate.SingleImageTop, {
-                contents: [
-                    makeContent(10, ContentType.Title, 0, { title: '2024 — Квітень' }),
-                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
-                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
-                ],
-            });
+            const section = makeSectionWithImage(SectionTemplate.SingleImageTop, '2024 — Квітень');
 
             render(<HistorySection section={section} />);
 
@@ -120,13 +125,7 @@ describe('HistorySection', () => {
 
     describe('QuadImagesBottom template', () => {
         it('should render HistoryQuadImages component', () => {
-            const section = makeSection(SectionTemplate.QuadImagesBottom, {
-                contents: [
-                    makeContent(10, ContentType.Title, 0, { title: '2024' }),
-                    makeContent(11, ContentType.Description, 1, { description: 'Текст' }),
-                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
-                ],
-            });
+            const section = makeSectionWithImage(SectionTemplate.QuadImagesBottom, '2024', 'Текст');
 
             render(<HistorySection section={section} />);
 
@@ -136,13 +135,7 @@ describe('HistorySection', () => {
 
     describe('DualImagesBottom template', () => {
         it('should render HistoryDualImages component', () => {
-            const section = makeSection(SectionTemplate.DualImagesBottom, {
-                contents: [
-                    makeContent(10, ContentType.Title, 0),
-                    makeContent(11, ContentType.Description, 1),
-                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
-                ],
-            });
+            const section = makeSectionWithImage(SectionTemplate.DualImagesBottom, null, null);
 
             render(<HistorySection section={section} />);
 
@@ -161,6 +154,39 @@ describe('HistorySection', () => {
             render(<HistorySection section={section} />);
 
             expect(screen.getByTestId('dual-images')).toBeInTheDocument();
+        });
+    });
+
+    describe('TripleImagesBottom template', () => {
+        it('should render HistoryTripleImages component', () => {
+            const section = makeSectionWithImage(SectionTemplate.TripleImagesBottom, null, null);
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByTestId('triple-images')).toBeInTheDocument();
+        });
+
+        it('should not render HistoryTripleImages when no images are provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.TripleImagesBottom)} />);
+
+            expect(screen.queryByTestId('triple-images')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('SingleImageBottom template', () => {
+        it('should render an image below the header when image is provided', () => {
+            const section = makeSectionWithImage(SectionTemplate.SingleImageBottom, '2024 — Літо');
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByRole('presentation')).toBeInTheDocument();
+            expect(screen.getByText('ЛІТО')).toBeInTheDocument();
+        });
+
+        it('should not render an image when no image is provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.SingleImageBottom)} />);
+
+            expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
         });
     });
 

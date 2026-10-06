@@ -139,7 +139,7 @@ describe('RightSection', () => {
         // Чекаємо спрацювання useEffect у компоненті
         await waitFor(
             () => {
-                expect(screen.getByTestId('tab-долар')).toHaveClass('active');
+                expect(screen.getByTestId('tab-usd')).toHaveClass('active');
             },
             { timeout: 2000 },
         );
@@ -157,16 +157,16 @@ describe('RightSection', () => {
         render(<RightSection donateData={createMockDonateData()} />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('tab-долар')).toHaveClass('active');
+            expect(screen.getByTestId('tab-usd')).toHaveClass('active');
         });
 
-        fireEvent.click(screen.getByTestId('tab-євро'));
+        fireEvent.click(screen.getByTestId('tab-eur'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('tab-євро')).toHaveClass('active');
+            expect(screen.getByTestId('tab-eur')).toHaveClass('active');
         });
 
-        expect(screen.getByTestId('tab-євро')).toHaveClass('active');
+        expect(screen.getByTestId('tab-eur')).toHaveClass('active');
     });
 
     describe('error state', () => {
@@ -185,34 +185,34 @@ describe('RightSection', () => {
             render(<RightSection donateData={createMockDonateData()} />);
 
             expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-гривня')).toHaveClass('active');
+            expect(screen.getByTestId('tab-uah')).toHaveClass('active');
             expect(screen.getByTestId('alt-support')).toBeInTheDocument();
         });
 
         it('renders all available currency tabs', () => {
             render(<RightSection donateData={createMockDonateData()} />);
 
-            expect(screen.getByTestId('tab-гривня')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-долар')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-євро')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-eur')).toBeInTheDocument();
         });
 
         it('switches to USD tab and shows AbroadPaymentDetails', async () => {
             render(<RightSection donateData={createMockDonateData()} />);
-            await testTabSwitch('долар', 'abroad-payment', 'USD');
+            await testTabSwitch('usd', 'abroad-payment', 'USD');
         });
 
         it('switches between all tabs correctly', async () => {
             render(<RightSection donateData={createMockDonateData()} />);
-            await testTabSwitch('долар', 'abroad-payment', 'USD', 'гривня');
-            await testTabSwitch('євро', 'abroad-payment', 'EUR', 'долар');
-            await testTabSwitch('гривня', 'ukraine-payment', undefined, 'євро');
+            await testTabSwitch('usd', 'abroad-payment', 'USD', 'uah');
+            await testTabSwitch('eur', 'abroad-payment', 'EUR', 'usd');
+            await testTabSwitch('uah', 'ukraine-payment', undefined, 'eur');
         });
 
         it('always renders AlternativeSupportWays with current currency', async () => {
             render(<RightSection donateData={createMockDonateData()} />);
 
-            fireEvent.click(screen.getByTestId('tab-долар'));
+            fireEvent.click(screen.getByTestId('tab-usd'));
             await waitFor(() => {
                 expect(screen.getByTestId('alt-support')).toHaveTextContent(`Alternative Support - ${Currency.USD}`);
             });

@@ -169,6 +169,9 @@ describe('PartnerForm', () => {
         expect(screen.getByTestId(`partner-form-${cardHtmlId}`)).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL)).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.PARTNER.IMAGE_LABEL)).toBeInTheDocument();
+        const header = document.querySelector('.header');
+        expect(header?.querySelector('label.input-label .required-field')).toBeInTheDocument();
+        expect(header).toContainElement(getDeleteButton());
         expect(screen.getByPlaceholderText(PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER)).toBeInTheDocument();
         expect(getDescriptionTextarea()).toHaveValue(defaultValues.description);
     });

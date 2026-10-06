@@ -13,6 +13,7 @@ export interface InfiniteScrollListProps<T> {
     hasMore: boolean;
     isLoading: boolean;
     emptyStateMessage: string;
+    emptyStateAction?: React.ReactNode;
 }
 
 export const InfiniteScrollList = <T,>({
@@ -22,6 +23,7 @@ export const InfiniteScrollList = <T,>({
     hasMore,
     isLoading,
     emptyStateMessage,
+    emptyStateAction,
 }: InfiniteScrollListProps<T>) => {
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState<boolean>(false);
     const listContainerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +73,7 @@ export const InfiniteScrollList = <T,>({
             <div className="infinite-scroll-list-not-found" data-testid="infinite-scroll-list-not-found">
                 <NotFoundIcon className="infinite-scroll-list-not-found-icon" />
                 <p>{emptyStateMessage}</p>
+                {emptyStateAction}
             </div>
         );
     } else {

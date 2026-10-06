@@ -70,10 +70,14 @@ export const API_ROUTES = {
         PUBLIC: 'WhoWeArePage',
     },
     EVENTS: {
-        BASE: 'Events',
-        SEARCH: 'Events/search',
-        PUBLISHED: 'Events/published',
-        BY_SLUG: 'Events/slug',
+        BASE: 'EventNews',
+        PUBLISHED: 'EventNews/published',
+        REORDER: 'EventNews/reorder',
+    },
+    EVENTS_PAGE: {
+        BASE: 'EventsPage',
+        DESCRIPTION: 'EventsPage/description',
+        EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
     },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
@@ -88,6 +92,21 @@ export const API_ROUTES = {
     },
     FEEDBACK_HISTORIES: {
         BASE: 'FeedbackHistories',
+    },
+    FEEDBACK_REVIEWS: {
+        BASE: 'FeedbackReviews',
+    },
+    VIDEO_REVIEWS: {
+        BASE: 'VideoReviews',
+    },
+    FEEDBACK_HISTORY_LOCALIZATIONS: {
+        BASE: 'FeedbackHistoryLocalizations',
+    },
+    FEEDBACK_REVIEW_LOCALIZATIONS: {
+        BASE: 'FeedbackReviewLocalizations',
+    },
+    VIDEO_REVIEW_LOCALIZATIONS: {
+        BASE: 'VideoReviewLocalizations',
     },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',

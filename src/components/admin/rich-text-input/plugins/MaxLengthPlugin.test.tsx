@@ -120,6 +120,30 @@ describe('MaxLengthPlugin', () => {
         expect(trimTextContentFromAnchor).toHaveBeenCalledWith(mockEditor, mockSelection.anchor, 37);
     });
 
+    it('does not trim text when max length enforcement is disabled', () => {
+        const { trimTextContentFromAnchor } = require('@lexical/selection');
+        const { $getSelection, $isRangeSelection } = require('lexical');
+        const mockSelection = {
+            isCollapsed: jest.fn(() => true),
+            anchor: {},
+        };
+        $getSelection.mockReturnValue(mockSelection);
+        $isRangeSelection.mockReturnValue(true);
+
+        mockGetRoot.mockReturnValue({
+            getTextContent: jest.fn(() => 'previous text'),
+        });
+
+        render(<MaxLengthPlugin maxLength={10} enforceMaxLength={false} />);
+
+        const transformCallback = mockRegisterNodeTransform.mock.calls[0][1];
+        transformCallback({
+            getTextContent: jest.fn(() => 'this is a very long text that exceeds maxLength'),
+        });
+
+        expect(trimTextContentFromAnchor).not.toHaveBeenCalled();
+    });
+
     it('handles selection that is not collapsed', () => {
         const { $getSelection, $isRangeSelection } = require('lexical');
         const { trimTextContentFromAnchor } = require('@lexical/selection');

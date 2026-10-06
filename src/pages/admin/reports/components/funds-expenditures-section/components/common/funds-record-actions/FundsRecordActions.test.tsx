@@ -9,6 +9,7 @@ jest.mock('./FundsRecordActions.module.scss', () => ({
     'add-income-button': 'add-income-button',
     'action-button-disabled-by-row-edit': 'action-button-disabled-by-row-edit',
     'plus-icon': 'plus-icon',
+    'category-limit-message': 'category-limit-message',
 }));
 
 jest.mock('@/assets/icons/plus.svg', () => ({
@@ -78,6 +79,18 @@ describe('FundsRecordActions', () => {
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeDisabled();
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeDisabled();
+    });
+
+    it('should render category limit message when provided', () => {
+        render(
+            <FundsRecordActions
+                onAddIncome={onAddIncome}
+                onAddExpense={onAddExpense}
+                categoryLimitMessage={FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH}
+            />,
+        );
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH)).toBeInTheDocument();
     });
 
     it('should render with custom testId and className', () => {

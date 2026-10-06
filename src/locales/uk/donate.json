@@ -5,7 +5,7 @@
     "ONE_TIME_DONATE_BUTTON_LABEL": "Донатити",
     "SUBSCRIPTION_DONATE_BUTTON_LABEL": "Донатити щомісячно",
 
-    "UKRAINE_PAYMENT_DETAILS_LABEL": "Реквізити для донатів в Україні",
+    "UKRAINE_PAYMENT_DETAILS_LABEL": "Реквізити для донатів у гривнях",
     "UKRAINE_UIDSREOU_LABEL": "ЄДРПОУ",
     "UKRAINE_PAYMENT_DESTINATION_LABEL": "Призначення платежу",
     "PAYMENT_DETAILS_COMMON_RECIPIENT_LABEL": "Одержувач",
@@ -21,9 +21,9 @@
     "CORRESPONDENT_BANKS_LABEL": "Кореспондентські банки (один із варіантів на вибір)",
 
     "CURRENCY_TABS": {
-        "UAH": "Гривня / UAH",
-        "USD": "Долар / USD",
-        "EUR": "Євро / EUR"
+        "UAH": "UAH",
+        "USD": "USD",
+        "EUR": "EUR"
     },
 
     "ALTERNATIVE_SUPPORT_WAYS_LABEL": "Інші варіанти підтримки",

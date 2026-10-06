@@ -1,5 +1,22 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
+import { NUMBER_FORMAT_LOCALES } from '@/const/common/locales';
+
+export interface ResolvedMetricValue {
+    value: number;
+    usedLocalizedValue: boolean;
+}
+
+export const resolveMetricValue = (
+    localizedValue: string | null | undefined,
+    baseValue: number,
+): ResolvedMetricValue => {
+    const parsed = localizedValue ? parseFormattedNumber(localizedValue) : null;
+
+    return parsed !== null
+        ? { value: parsed, usedLocalizedValue: true }
+        : { value: baseValue, usedLocalizedValue: false };
+};
 
 export const getMetricName = (metric: Metric, language: 'UA' | 'EN' = 'UA') => {
     const code = language === 'UA' ? 'uk' : 'en';
@@ -16,7 +33,7 @@ export const getMetricName = (metric: Metric, language: 'UA' | 'EN' = 'UA') => {
 };
 
 export const formatMetricValue = (metric: Metric, language: 'UA' | 'EN' = 'UA') => {
-    const locale = language === 'UA' ? 'uk-UA' : 'en-US';
+    const locale = NUMBER_FORMAT_LOCALES[language === 'UA' ? 'uk' : 'en'];
 
     let numValue = metric.value;
 
@@ -25,22 +42,21 @@ export const formatMetricValue = (metric: Metric, language: 'UA' | 'EN' = 'UA') 
             (l: any) => l?.language?.code === 'en' || l?.localizationInfoDto?.code === 'en' || l?.languageId === 2,
         );
 
-        if (enLoc && enLoc.value) {
-            const parsedValue = parseFormattedNumber(enLoc.value);
-            if (parsedValue !== null) {
-                numValue = parsedValue;
-            }
-        }
+        numValue = resolveMetricValue(enLoc?.value, metric.value).value;
     }
 
     const valueStr = numValue.toLocaleString(locale);
 
-    switch (metric.prefix) {
+    return applyMetricPrefix(valueStr, metric.prefix);
+};
+
+export const applyMetricPrefix = (value: string, prefix?: number | null): string => {
+    switch (prefix) {
         case MetricPrefix.Plus:
-            return `${valueStr}+`;
+            return `${value}+`;
         case MetricPrefix.Percent:
-            return `${valueStr}%`;
+            return `${value}%`;
         default:
-            return valueStr;
+            return value;
     }
 };

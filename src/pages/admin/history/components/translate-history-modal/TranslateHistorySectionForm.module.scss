@@ -1,3 +1,4 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
 .form {
     display: flex;
     flex-direction: column;
@@ -12,9 +13,30 @@
     }
 }
 
+// Overrides the row layout above at every width; centers the fields since the flex parent
+// stretches this form to the (taller) image's height.
+.form--stacked {
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+
+    // Without this, .form-group's flex: 1 (meant for the row layout's width) would grow
+    // each field to fill the stretched height instead of leaving room to center.
+    > .form-group {
+        flex: 0 0 auto;
+    }
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
     flex: 1;
     width: 100%;
+}
+
+.title-input {
+    input,
+    textarea {
+        @include type.h3-semibold-uppercase;
+    }
 }

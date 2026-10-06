@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useFundsAmountEdit } from '@/hooks/admin/use-funds-amount-edit/useFundsAmountEdit';
 import { AmountEditRow } from '@/pages/admin/reports/components/amount-edit-row/AmountEditRow';
+import { FundsExpendituresAmountField } from '@/types/admin/reports';
 
 export interface AmountRowEditState {
     recordId: number;
@@ -8,6 +9,7 @@ export interface AmountRowEditState {
     originalAmountUsd: string;
     amountUah: string;
     amountUsd: string;
+    lastEditedField?: FundsExpendituresAmountField;
     errors: { amountUah?: string; amountUsd?: string };
     usdMismatchMessage?: string;
 }

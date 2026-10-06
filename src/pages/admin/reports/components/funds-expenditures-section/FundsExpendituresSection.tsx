@@ -18,6 +18,7 @@ import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expendi
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ReportFundsExpendituresSettingsLocalizationsApi } from '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api';
 import {
+    FundsExpendituresAmountField,
     FundsExpendituresTransactionType,
     FundsExpendituresSummary,
     ReportFundsExpendituresCategory,
@@ -66,7 +67,23 @@ const enrichRecords = (
     }));
 };
 
-interface FundsExpenditureSectionProps {
+const getCategoryLimitMessage = (
+    hasReachedIncomeCategoryLimit: boolean,
+    hasReachedExpenseCategoryLimit: boolean,
+): string | undefined => {
+    if (hasReachedIncomeCategoryLimit && hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH;
+    }
+    if (hasReachedIncomeCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME;
+    }
+    if (hasReachedExpenseCategoryLimit) {
+        return FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE;
+    }
+    return undefined;
+};
+
+export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
@@ -87,6 +104,7 @@ interface FundsExpenditureSectionProps {
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
+    onSelectionChange?: (hasSelected: boolean) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -107,6 +125,7 @@ export const FundsExpenditureSection = ({
     onValidationChange,
     onCountsChange,
     onDataChange,
+    onSelectionChange,
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
@@ -409,10 +428,19 @@ export const FundsExpenditureSection = ({
             .map((r) => r.id);
     }, [filteredRecords, programCategoryLabel]);
 
-    const isAddIncomeDisabled =
-        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
-    const isAddExpenseDisabled =
-        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
+    const hasSelectedRecords = selectedRecordIds.length > 0;
+
+    useEffect(() => {
+        onSelectionChange?.(hasSelectedRecords);
+    }, [hasSelectedRecords, onSelectionChange]);
+
+    const hasReachedIncomeCategoryLimit =
+        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const hasReachedExpenseCategoryLimit =
+        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const isAddIncomeDisabled = hasReachedIncomeCategoryLimit || hasSelectedRecords || hasExchangeRateError;
+    const isAddExpenseDisabled = hasReachedExpenseCategoryLimit || hasSelectedRecords || hasExchangeRateError;
+    const categoryLimitMessage = getCategoryLimitMessage(hasReachedIncomeCategoryLimit, hasReachedExpenseCategoryLimit);
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
@@ -455,7 +483,15 @@ export const FundsExpenditureSection = ({
     );
 
     const handleRecordSave = useCallback(
-        (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => {
+        (
+            recordId: number,
+            data: {
+                categoryId: number;
+                amountUah: string;
+                amountUsd: string;
+                lastEditedField: FundsExpendituresAmountField;
+            },
+        ) => {
             setRecordsState((prev) =>
                 prev.map((record) =>
                     record.id === recordId
@@ -464,6 +500,7 @@ export const FundsExpenditureSection = ({
                               categoryId: data.categoryId,
                               amountUah: data.amountUah,
                               amountUsd: data.amountUsd,
+                              lastEditedField: data.lastEditedField,
                           }
                         : record,
                 ),
@@ -472,6 +509,7 @@ export const FundsExpenditureSection = ({
             setModifiedRecordIds((prev) => {
                 if (prev.includes(recordId)) {
                     return prev;
+
                 }
 
                 return [...prev, recordId];
@@ -491,6 +529,7 @@ export const FundsExpenditureSection = ({
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
+            lastEditedField: FundsExpendituresAmountField;
             type: FundsExpendituresTransactionType;
         }): Promise<boolean> => {
             try {
@@ -499,6 +538,7 @@ export const FundsExpenditureSection = ({
                     reportingYear: data.reportingYear,
                     amountUah: data.amountUah,
                     amountUsd: data.amountUsd,
+                    lastEditedField: data.lastEditedField,
                     type: data.type,
                 });
 
@@ -863,6 +903,7 @@ export const FundsExpenditureSection = ({
                 controlsDisabled={isRowEditMode}
                 isAddIncomeDisabled={isAddIncomeDisabled}
                 isAddExpenseDisabled={isAddExpenseDisabled}
+                categoryLimitMessage={categoryLimitMessage}
                 onTypeChange={handleTypeChange}
                 onCategoryChange={setSelectedCategoryId}
                 onExchangeRateChange={handleExchangeRateChange}

@@ -11,9 +11,10 @@ export const HistoryQuadImages = ({ images }: HistoryQuadImagesProps) => {
         <div className={styles.grid}>
             {images.map((image, index) => {
                 const src = getImageSrc(image);
+                const key = `${index}-${src}`;
                 if (!src) return null;
                 return (
-                    <div key={src} className={`${styles.cell} ${index % 2 === 1 ? styles.elevated : ''}`}>
+                    <div key={key} className={`${styles.cell} ${index % 2 === 1 ? styles.elevated : ''}`}>
                         <img src={src} alt="" className={styles.image} loading="lazy" />
                     </div>
                 );

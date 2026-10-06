@@ -33,6 +33,7 @@ export interface HistoryFormProps {
     isFormDisabled?: boolean;
     onReplaceSection?: (sectionIndex: number) => void;
     onSectionsChange?: (sections: HistorySectionDto[]) => void;
+    onValidationChange?: (isValid: boolean) => void;
     onHasEditingSectionChange?: (hasEditingSection: boolean) => void;
     onSectionSaved?: () => void;
     onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
@@ -67,6 +68,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         isFormDisabled = false,
         onReplaceSection,
         onSectionsChange,
+        onValidationChange,
         onHasEditingSectionChange,
         onSectionSaved,
         onSectionDeleted,
@@ -192,6 +194,19 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             }),
         [localSections],
     );
+
+    const isFormValid = useMemo(
+        () =>
+            localSections.length > 0 &&
+            sectionValidity.every(Boolean) &&
+            sectionStates.length === localSections.length &&
+            sectionStates.every((state) => state.isSaved && !state.isEditing),
+        [localSections.length, sectionValidity, sectionStates],
+    );
+
+    useEffect(() => {
+        onValidationChange?.(isFormValid);
+    }, [isFormValid, onValidationChange]);
 
     const updateSectionState = useCallback(
         (sectionKey: string, updates: Partial<Omit<SectionEditingState, 'sectionKey'>>) => {

@@ -9,6 +9,16 @@ describe('text validation', () => {
         );
     });
 
+    it('returns the title-specific error for an empty title', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle('')).toBe(WHO_WE_ARE_TEXT.FORM.VALIDATION.TITLE_REQUIRED);
+    });
+
+    it('returns the description-specific error for an empty description', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('')).toBe(
+            WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED,
+        );
+    });
+
     it('rejects too short text', () => {
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText('abc')).toBe(
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH),

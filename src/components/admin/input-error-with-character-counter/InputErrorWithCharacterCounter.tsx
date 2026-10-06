@@ -1,3 +1,4 @@
+import { getCounterLength } from '@/utils/functions/get-counter-length/get-counter-length';
 import styles from './InputErrorWithCharacterCounter.module.scss';
 import cn from 'classnames';
 
@@ -22,13 +23,13 @@ export const InputErrorWithCharacterCounter = ({
     isWhiteLabel,
     containerClassName,
 }: InputErrorWithCharacterCounterProps) => {
-    const normalizedLength = currentLength !== undefined ? currentLength : value.length;
+    const displayedLength = currentLength ?? getCounterLength(value);
     return (
         <div className={cn(styles.container, containerClassName)}>
             <div className={styles['error-section']}>{error || ''}</div>
             <div className={cn(styles['counter-section'], { [styles['white-label']]: isWhiteLabel })}>
                 <output id={counterId} htmlFor={htmlFor}>
-                    {normalizedLength}/{maxLength}
+                    {displayedLength}/{maxLength}
                 </output>
             </div>
         </div>

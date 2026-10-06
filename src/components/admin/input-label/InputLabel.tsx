@@ -7,7 +7,7 @@ export interface InputLabelProps {
 }
 
 export const InputLabel = ({ htmlFor, text, isRequired }: InputLabelProps) => (
-    <label htmlFor={htmlFor} className="input-label">
+    <label htmlFor={htmlFor} className="input-label" onClick={(e) => e.preventDefault()}>
         {isRequired && <span className="required-field">*</span>}
         {text}
     </label>

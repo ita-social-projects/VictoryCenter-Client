@@ -137,6 +137,7 @@ export const TranslateProgramCategoryForm = forwardRef<
                     maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
                     name="name"
                     id="translate-program-category-name"
+                    showCounterBelow
                 />
             </form>
         );

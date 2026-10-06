@@ -1,15 +1,29 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
-import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
+import {
+    CreateFeedbackHistoryDto,
+    UpdateFeedbackHistoryDto,
+    FeedbackCategory,
+    FeedbackHistoryDto,
+    FeedbackHistoryLocalization,
+    FeedbackHistoryLocalizationDto,
+    FeedbackHistoryResponseDto,
+    FeedbackReviewDto,
+    FeedbackReviewLocalization,
+    FeedbackReviewLocalizationDto,
+    FeedbackReviewResponseDto,
+    FeedbackVideoDto,
+    FeedbackVideoLocalization,
+    FeedbackVideoLocalizationDto,
+    FeedbackVideoResponseDto,
+} from '@/types/admin/feedback';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-
-const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export interface FeedbackFetchParams {
     status?: VisibilityStatus;
-    language?: string;
-    translationStatus?: TranslationStatusFilter;
+    translationStatusFilter?: TranslationStatusFilter;
     skip?: number;
     take?: number;
     offset?: number;
@@ -17,10 +31,18 @@ export interface FeedbackFetchParams {
     searchTerm?: string;
 }
 
+type SearchField = string | null | undefined;
+
+const matchesPrefix = (text: SearchField, query: string): boolean => {
+    const q = query.trim().toLowerCase();
+    if (!q || !text) return false;
+    return text.toLowerCase().startsWith(q);
+};
+
 const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     items: T[],
     params: FeedbackFetchParams | undefined,
-    getSearchField: (item: T) => string,
+    getSearchFields: (item: T) => SearchField[],
 ): PaginationResult<T> => {
     const take = params?.take ?? params?.limit ?? 7;
     const skip = params?.skip ?? params?.offset ?? 0;
@@ -32,8 +54,10 @@ const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     }
 
     if (params?.searchTerm) {
-        const term = params.searchTerm.toLowerCase();
-        filteredItems = filteredItems.filter((item) => getSearchField(item).toLowerCase().includes(term));
+        const searchTerm = params.searchTerm;
+        filteredItems = filteredItems.filter((item) =>
+            getSearchFields(item).some((field) => matchesPrefix(field, searchTerm)),
+        );
     }
 
     const totalItemsCount = filteredItems.length;
@@ -42,51 +66,106 @@ const filterAndPaginate = <T extends { status: VisibilityStatus }>(
     return { items: data, totalItemsCount };
 };
 
+const CATEGORY_ROUTES: Record<FeedbackCategory, string> = {
+    [FeedbackCategory.HISTORY]: API_ROUTES.FEEDBACK_HISTORIES.BASE,
+    [FeedbackCategory.REVIEWS]: API_ROUTES.FEEDBACK_REVIEWS.BASE,
+    [FeedbackCategory.VIDEOS]: API_ROUTES.VIDEO_REVIEWS.BASE,
+};
+
+const buildRequestParams = (params: FeedbackFetchParams | undefined): Record<string, unknown> => {
+    const requestParams: Record<string, unknown> = {};
+    if (params?.translationStatusFilter !== undefined && params.translationStatusFilter !== null) {
+        requestParams.translationStatusFilter = params.translationStatusFilter;
+    }
+    return requestParams;
+};
+
+const mapHistory = (item: FeedbackHistoryResponseDto): FeedbackHistoryDto =>
+    mapEntityWithLocalizations<FeedbackHistoryResponseDto, FeedbackHistoryLocalizationDto, FeedbackHistoryLocalization>(
+        item,
+    );
+
+const mapReview = (item: FeedbackReviewResponseDto): FeedbackReviewDto =>
+    mapEntityWithLocalizations<FeedbackReviewResponseDto, FeedbackReviewLocalizationDto, FeedbackReviewLocalization>(
+        item,
+    );
+
+const mapVideo = (item: FeedbackVideoResponseDto): FeedbackVideoDto =>
+    mapEntityWithLocalizations<FeedbackVideoResponseDto, FeedbackVideoLocalizationDto, FeedbackVideoLocalization>(item);
+
 export const FeedbackApi = {
     fetchHistory: async (
         client: AxiosInstance,
         params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackHistoryDto>> => {
-        const response = await client.get<FeedbackHistoryDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE);
-        return filterAndPaginate(response.data, params, (item) => item.title);
+        const response = await client.get<FeedbackHistoryResponseDto[]>(API_ROUTES.FEEDBACK_HISTORIES.BASE, {
+            params: buildRequestParams(params),
+        });
+        return filterAndPaginate(response.data.map(mapHistory), params, (item) => [item.title, item.story]);
     },
-    deleteHistory: async (client: AxiosInstance, id: number): Promise<void> => {
-        await client.delete(`${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`);
+    deleteFeedback: async (client: AxiosInstance, category: FeedbackCategory, id: number): Promise<void> => {
+        await client.delete(`${CATEGORY_ROUTES[category]}/${id}`);
+    },
+    createHistory: async (client: AxiosInstance, data: CreateFeedbackHistoryDto): Promise<FeedbackHistoryDto> => {
+        const response = await client.post<FeedbackHistoryResponseDto>(API_ROUTES.FEEDBACK_HISTORIES.BASE, data);
+        return mapHistory(response.data);
+    },
+    updateHistory: async (
+        client: AxiosInstance,
+        id: number,
+        data: UpdateFeedbackHistoryDto,
+    ): Promise<FeedbackHistoryDto> => {
+        const response = await client.put<FeedbackHistoryResponseDto>(
+            `${API_ROUTES.FEEDBACK_HISTORIES.BASE}/${id}`,
+            data,
+        );
+        return mapHistory(response.data);
     },
     fetchReviews: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackReviewDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackReviewDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            authorName: `Учасник ${i + 1}`,
-            text: `Текст відгуку ${i + 1}`,
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.authorName);
+        const response = await client.get<PaginationResult<FeedbackReviewResponseDto>>(
+            API_ROUTES.FEEDBACK_REVIEWS.BASE,
+            { params: buildRequestParams(params) },
+        );
+        return filterAndPaginate(response.data.items.map(mapReview), params, (item) => [item.authorName, item.text]);
+    },
+    createReview: async (
+        client: AxiosInstance,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.post<FeedbackReviewDto>(API_ROUTES.FEEDBACK_REVIEWS.BASE, review);
+        return response.data;
+    },
+    updateReview: async (
+        client: AxiosInstance,
+        id: number,
+        review: { authorName: string; text: string; status: VisibilityStatus },
+    ): Promise<FeedbackReviewDto> => {
+        const response = await client.put<FeedbackReviewResponseDto>(
+            `${API_ROUTES.FEEDBACK_REVIEWS.BASE}/${id}`,
+            review,
+        );
+        return mapReview(response.data);
+    },
+    createVideoReview: async (
+        client: AxiosInstance,
+        video: { title: string; link: string; status: VisibilityStatus },
+    ): Promise<FeedbackVideoDto> => {
+        const response = await client.post<FeedbackVideoDto>(API_ROUTES.VIDEO_REVIEWS.BASE, video);
+        return response.data;
     },
     fetchVideos: async (
-        _client: AxiosInstance,
-        _params?: FeedbackFetchParams,
+        client: AxiosInstance,
+        params?: FeedbackFetchParams,
     ): Promise<PaginationResult<FeedbackVideoDto>> => {
-        await mockDelay(500);
-
-        const allItems: FeedbackVideoDto[] = Array.from({ length: 21 }).map((_, i) => ({
-            id: i + 1,
-            title: `Відео ${i + 1}`,
-            videoUrl: 'https://example.com/video',
-            status: VisibilityStatus.Published,
-            priority: i,
-        }));
-
-        return filterAndPaginate(allItems, _params, (item) => item.title);
+        const response = await client.get<FeedbackVideoResponseDto[]>(API_ROUTES.VIDEO_REVIEWS.BASE, {
+            params: buildRequestParams(params),
+        });
+        return filterAndPaginate(response.data.map(mapVideo), params, (item) => [item.title]);
     },
-    reorderFeedback: async (_client: AxiosInstance, _category: string, _orderedIds: number[]): Promise<void> => {
-        await mockDelay(500);
-        // Mock successful reorder
+    reorderFeedback: async (client: AxiosInstance, category: FeedbackCategory, orderedIds: number[]): Promise<void> => {
+        await client.put(`${CATEGORY_ROUTES[category]}/reorder`, { orderedIds });
     },
 };

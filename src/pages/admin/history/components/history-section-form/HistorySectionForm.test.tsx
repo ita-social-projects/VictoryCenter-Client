@@ -283,6 +283,45 @@ describe('HistorySectionForm', () => {
         });
     });
 
+    it('collapses repeated spaces in title and description when saving a section', () => {
+        mockRenderHistorySection.mockImplementation(
+            ({
+                handlers,
+            }: {
+                handlers: { onTitleChange: (value: string) => void; onDescriptionChange: (value: string) => void };
+            }) => (
+                <div>
+                    <button type="button" onClick={() => handlers.onTitleChange('Original    title')}>
+                        Change title with spaces
+                    </button>
+                    <button type="button" onClick={() => handlers.onDescriptionChange('First    line\nSecond   line')}>
+                        Change description with spaces
+                    </button>
+                </div>
+            ),
+        );
+        const props = createProps();
+
+        render(<HistorySectionForm {...props} />);
+        fireEvent.click(screen.getByRole('button', { name: 'Edit section' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Change title with spaces' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Change description with spaces' }));
+        fireEvent.click(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.SAVE }));
+
+        expect(props.onSectionChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                contents: expect.arrayContaining([
+                    expect.objectContaining({ contentType: ContentType.Title, title: 'Original title' }),
+                    expect.objectContaining({
+                        contentType: ContentType.Description,
+                        description: 'First line\nSecond line',
+                    }),
+                ]),
+            }),
+        );
+        expect(props.onSave).toHaveBeenCalledTimes(1);
+    });
+
     it('keeps cancel active and save disabled when section enters edit mode without changes', () => {
         const props = createProps();
 
@@ -351,6 +390,7 @@ describe('HistorySectionForm', () => {
         fireEvent.click(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.SAVE }));
 
         expect(props.onSave).toHaveBeenCalledTimes(1);
+        expect(props.onSectionChange).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
             expect(props.onEditStateChange).toHaveBeenLastCalledWith(false);

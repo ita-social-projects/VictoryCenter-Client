@@ -70,6 +70,7 @@ jest.mock(
             rows,
             error,
             disabled,
+            placeholder,
             currentLength,
         }: {
             label: string;
@@ -80,6 +81,7 @@ jest.mock(
             maxLength: number;
             rows: number;
             error?: string;
+            placeholder?: string;
             disabled?: boolean;
             currentLength?: number;
         }) => (
@@ -97,6 +99,7 @@ jest.mock(
                     maxLength={maxLength}
                     rows={rows}
                     disabled={disabled}
+                    placeholder={placeholder}
                 />
             </div>
         ),
@@ -167,6 +170,15 @@ describe('TitleDescriptionSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
+
+    it.each([SectionMode.View, SectionMode.Edit, SectionMode.Template])(
+        'marks its root element with data-section-text in %s mode',
+        (mode) => {
+            const { container } = renderComponent({ mode });
+
+            expect(container.firstElementChild).toHaveAttribute('data-section-text');
+        },
+    );
 
     it('calls useSectionValidation with callbacks, template, and flags', () => {
         const onTitleChange = jest.fn();
@@ -287,6 +299,10 @@ describe('TitleDescriptionSection', () => {
 
             const descriptionTextarea = getDescriptionTextarea()!;
             expect(descriptionTextarea).toHaveAttribute('maxLength', String(descriptionMax));
+            expect(descriptionTextarea).toHaveAttribute(
+                'placeholder',
+                SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER,
+            );
             expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });
 

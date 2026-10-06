@@ -11,6 +11,7 @@ export const HistoryQuote = () => {
             title={t('CLOSING_TITLE')}
             description={t('CLOSING_DESCRIPTION')}
             mediaUrl={quoteBg}
+            titleVariant="emphasis"
             overlay={{ opacity: 0.35, color: '#0f0600' }}
             buttons={[
                 { label: t('CLOSING_BTN_DONATE'), href: PUBLIC_ROUTES.DONATE.FULL },

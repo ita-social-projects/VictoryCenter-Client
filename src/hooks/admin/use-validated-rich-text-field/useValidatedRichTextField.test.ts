@@ -80,7 +80,7 @@ describe('useValidatedRichTextField', () => {
     });
 
     it('clears the error on change once it has been shown', () => {
-        const { result, rerender } = renderHook(({ value }) => useValidatedRichTextField({ value, onChange }), {
+        const { result } = renderHook(({ value }) => useValidatedRichTextField({ value, onChange }), {
             initialProps: { value: 'short' },
         });
 

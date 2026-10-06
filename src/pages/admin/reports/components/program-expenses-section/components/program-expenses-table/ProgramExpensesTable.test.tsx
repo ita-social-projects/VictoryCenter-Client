@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
 
 jest.mock(
@@ -283,6 +284,19 @@ describe('ProgramExpensesTable', () => {
         await waitFor(() => {
             expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
         });
+    });
+
+    it('should show the required error under the program field and disable accept when the program is cleared', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        fireEvent.click(
+            screen.getByTestId(`select-option-${PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}-undefined`),
+        );
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+        expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
     });
 
     it('should show selection bar with count and delete button when records are selected', () => {

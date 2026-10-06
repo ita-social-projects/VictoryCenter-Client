@@ -9,7 +9,10 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { ReportsApi } from '@/services/api/admin/reports/reports-api';
+import { ReportsPublicApi } from '@/services/api/public/reports/reports-api';
 import { ReportsMediaSettings } from '@/types/admin/reports';
+import { RequestOptions } from '@/types/common/api';
+import { formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
 import { ToastType } from '@/types/admin/toast';
 import { Button } from '@/components/admin/button/Button';
 import axios from 'axios';
@@ -22,7 +25,6 @@ import {
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS,
     REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/reports-schema/reports-media-settings/reports-media-settings-schema';
-import { fetchDefaultImageAsImageValues } from '@/utils/functions/fetch-default-image/fetch-default-image';
 import { Image, ImageValues } from '@/types/common/image';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -87,9 +89,9 @@ const syncValuesFromData = (data: ReportsMediaSettings | null): MediaSettingsFor
     if (!data) return DEFAULT_FORM_STATE;
     return {
         collectedFunds: {
+            totalAmount: 0,
             title: data.collectedFunds.title ?? '',
             titleEn: data.collectedFunds.titleEn ?? '',
-            totalAmount: 0,
             image: data.collectedFunds.image ?? null,
             imageId: data.collectedFunds.imageId ?? null,
         },
@@ -129,8 +131,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         const {
             data: mediaSettingsData,
-            isLoading,
-            error: fetchError,
+            isLoading: isMediaSettingsLoading,
+            error: mediaSettingsError,
             refetch,
         } = useDataFetch<ReportsMediaSettings>({
             initialData: {
@@ -141,13 +143,54 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             autoFetchDisabled: false,
         });
 
+        const fetchPublicCollectedTotalHandler = useCallback(async (options: RequestOptions = {}) => {
+            try {
+                const publishedReport = await ReportsPublicApi.getPublishedReports(undefined, options);
+                return publishedReport.funding.totalUah;
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    return 0;
+                }
+                throw error;
+            }
+        }, []);
+
+        const {
+            data: publicCollectedTotalUah,
+            isLoading: isPublicCollectedTotalLoading,
+            error: publicCollectedTotalError,
+            refetch: refetchPublicCollectedTotal,
+        } = useDataFetch<number>({
+            initialData: 0,
+            fetchHandler: fetchPublicCollectedTotalHandler,
+            autoFetchDependencies: [isActive],
+        });
+
+        const publicCollectedTotalLoadedRef = useRef(false);
         useEffect(() => {
-            if (!fetchError) return;
-            if (axios.isCancel?.(fetchError) || fetchError.name === 'CanceledError' || fetchError.name === 'AbortError')
-                return;
+            if (!isPublicCollectedTotalLoading && !publicCollectedTotalError) {
+                publicCollectedTotalLoadedRef.current = true;
+            }
+        }, [isPublicCollectedTotalLoading, publicCollectedTotalError]);
+
+        const isLoading =
+            isMediaSettingsLoading || (isPublicCollectedTotalLoading && !publicCollectedTotalLoadedRef.current);
+
+        const fetchError =
+            mediaSettingsError ?? (publicCollectedTotalLoadedRef.current ? null : publicCollectedTotalError);
+
+        useEffect(() => {
+            const error = mediaSettingsError ?? publicCollectedTotalError;
+            if (!error) return;
+            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') return;
 
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS, ToastType.Error);
-        }, [fetchError, addToast]);
+        }, [mediaSettingsError, publicCollectedTotalError, addToast]);
+
+        const handleRetry = useCallback(() => {
+            if (mediaSettingsError) refetch();
+            if (publicCollectedTotalError) refetchPublicCollectedTotal();
+        }, [mediaSettingsError, publicCollectedTotalError, refetch, refetchPublicCollectedTotal]);
 
         const initialData = useMemo(() => syncValuesFromData(mediaSettingsData), [mediaSettingsData]);
 
@@ -158,34 +201,12 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
         const onSubmit = useCallback(
             async (data: MediaSettingsFormValues) => {
                 try {
-                    let collectedFundsImage = data.collectedFunds.image;
-                    let collectedFundsImageId = data.collectedFunds.imageId;
-
-                    if (!collectedFundsImage && !collectedFundsImageId) {
-                        collectedFundsImage = await fetchDefaultImageAsImageValues(
-                            CollectedFundsImage,
-                            REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.width,
-                            REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.height,
-                        );
-                    }
-
-                    let changedLivesImage = data.changedLives.image;
-                    let changedLivesImageId = data.changedLives.imageId;
-
-                    if (!changedLivesImage && !changedLivesImageId) {
-                        changedLivesImage = await fetchDefaultImageAsImageValues(
-                            ChangedLivesImage,
-                            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.width,
-                            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.height,
-                        );
-                    }
-
                     await ReportsApi.updateMediaSettings(client, {
                         collectedFunds: {
                             title: data.collectedFunds.title,
                             titleEn: data.collectedFunds.titleEn,
-                            image: collectedFundsImage,
-                            imageId: collectedFundsImageId,
+                            image: data.collectedFunds.image,
+                            imageId: data.collectedFunds.imageId,
                         },
                         changedLives: {
                             title: data.changedLives.title,
@@ -195,8 +216,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 if (isNaN(parsed)) throw new Error('changedLives is not a valid integer');
                                 return parsed;
                             })(),
-                            image: changedLivesImage,
-                            imageId: changedLivesImageId,
+                            image: data.changedLives.image,
+                            imageId: data.changedLives.imageId,
                         },
                     });
 
@@ -249,13 +270,17 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 value: any,
                 blurValidationField?: keyof MediaSettingsFormErrors,
             ) => {
-                setFormState((prev) => ({
-                    ...prev,
-                    [block]: {
-                        ...prev[block],
-                        [field]: value,
-                    },
-                }));
+                setFormState((prev) => {
+                    if (prev[block][field] === value) return prev;
+
+                    return {
+                        ...prev,
+                        [block]: {
+                            ...prev[block],
+                            [field]: value,
+                        },
+                    };
+                });
                 if (blurValidationField) {
                     const newFormState = {
                         ...formState,
@@ -286,6 +311,14 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         useImperativeHandle(ref, () => ({ submit: handlePublishProxy }));
 
+        const collectedFundsBlockValues = useMemo(
+            () => ({
+                ...formState.collectedFunds,
+                totalAmount: formatCollectedAmount(publicCollectedTotalUah),
+            }),
+            [formState.collectedFunds, publicCollectedTotalUah],
+        );
+
         return (
             <div style={{ display: isActive ? 'block' : 'none' }}>
                 {isLoading && (
@@ -296,7 +329,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 {fetchError && !isLoading && (
                     <div className={styles.error}>
                         <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                        <Button onClick={() => refetch()} buttonStyle="primary" className={styles['error-button']}>
+                        <Button onClick={handleRetry} buttonStyle="primary" className={styles['error-button']}>
                             {REPORTS_TEXT.BUTTON.TRY_AGAIN}
                         </Button>
                     </div>
@@ -305,7 +338,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     <div>
                         <div className={styles.blocks}>
                             <ReportsMediaBlock
-                                values={formState.collectedFunds}
+                                values={collectedFundsBlockValues}
                                 titleError={errors.collectedFundsTitle}
                                 titleEnError={errors.collectedFundsTitleEn}
                                 totalAmountError={errors.collectedFundsTotalAmount}
@@ -330,7 +363,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 onImageChange={(v) => {
                                     setFormState((prev) => ({
                                         ...prev,
-                                        collectedFunds: { ...prev.collectedFunds, image: v, imageId: null },
+                                        collectedFunds: { ...prev.collectedFunds, image: v },
                                     }));
                                     setErrors((prev) => ({ ...prev, collectedFundsImage: undefined }));
                                 }}
@@ -364,7 +397,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 onImageChange={(v) => {
                                     setFormState((prev) => ({
                                         ...prev,
-                                        changedLives: { ...prev.changedLives, image: v, imageId: null },
+                                        changedLives: { ...prev.changedLives, image: v },
                                     }));
                                     setErrors((prev) => ({ ...prev, changedLivesImage: undefined }));
                                 }}

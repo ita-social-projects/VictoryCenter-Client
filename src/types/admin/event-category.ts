@@ -1,7 +1,9 @@
 export interface EventCategoryDto {
     id: number;
     name: string;
+    createdAt?: string;
     relatedEventNewsCount: number;
+    localizations?: EventCategoryLocalizationDto[];
 }
 
 export interface EventCategoryCreate {
@@ -11,4 +13,14 @@ export interface EventCategoryCreate {
 export interface EventCategoryUpdate {
     id: number;
     name: string;
+}
+
+export interface EventCategoryLocalizationDto {
+    entityId: number;
+    language: {
+        id: number;
+        code: string;
+    };
+    name: string;
+    translationStatus: number;
 }

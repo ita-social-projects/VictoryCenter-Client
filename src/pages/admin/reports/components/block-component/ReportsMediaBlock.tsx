@@ -71,9 +71,7 @@ export const ReportsMediaBlock = ({
     const handleTitleBlur = useCallback(
         (_e: React.FocusEvent<HTMLTextAreaElement>) => {
             const normalizedTitle = getNormalizedInputText(values.title);
-            if (normalizedTitle !== values.title) {
-                onTitleBlur(normalizedTitle);
-            }
+            onTitleBlur(normalizedTitle);
         },
         [onTitleBlur, values.title],
     );
@@ -88,9 +86,7 @@ export const ReportsMediaBlock = ({
     const handleTitleEnBlur = useCallback(
         (_e: React.FocusEvent<HTMLTextAreaElement>) => {
             const normalizedTitle = getNormalizedInputText(values.titleEn);
-            if (normalizedTitle !== values.titleEn) {
-                onTitleEnBlur(normalizedTitle);
-            }
+            onTitleEnBlur(normalizedTitle);
         },
         [onTitleEnBlur, values.titleEn],
     );
@@ -207,9 +203,9 @@ export const ReportsMediaBlock = ({
                             }}
                             deleteConfirmationText={REPORTS_TEXT.DELETE_IMAGE.TITLE}
                         />
-                        <div className={styles['image-error']}>
-                            <InputError error={imageError} />
-                        </div>
+                    </div>
+                    <div className={styles['image-error']}>
+                        <InputError error={imageError} />
                     </div>
                 </div>
             </div>

@@ -47,6 +47,16 @@ describe('mapHippotherapyPageToAbout', () => {
         expect(result.anotherQuoteSection.imgURL).toBe('');
     });
 
+    it('adds the image version so a replaced image is not served from the browser cache', () => {
+        const updatedAt = '2025-01-01T00:00:00Z';
+        const dto = buildDto();
+        dto.introSection.image = { ...withImage('intro').image, updatedAt };
+
+        expect(mapHippotherapyPageToAbout(dto).introSection.imgURL).toBe(
+            `https://example.com/intro.png?v=${new Date(updatedAt).getTime()}`,
+        );
+    });
+
     it('keeps html in the sections that render it', () => {
         expect(result.introSection.title).toBe('<h3>Intro title</h3>');
         expect(result.descriptionSection.text).toBe('<p>Description text</p>');

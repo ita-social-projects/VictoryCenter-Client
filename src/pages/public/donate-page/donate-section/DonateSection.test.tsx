@@ -77,19 +77,24 @@ describe('DonateSection', () => {
         expect(input).toHaveValue(`${eurLarge}`);
     });
 
-    it('shows correct submit button label for one-time and subscription tabs', () => {
+    it('switches between one-time and subscription donations', () => {
         render(<DonateSection />);
-        const oneTimeBtn = screen.getByRole('button', { name: /Разовий донат/i });
-        const submitBtn = screen.getByRole('button', { name: /Донатити/i });
-        expect(submitBtn).toBeInTheDocument();
-        fireEvent.click(oneTimeBtn); // Should stay on one-time
-        expect(submitBtn).toHaveTextContent(/Донатити/i);
-    });
+        const form = screen.getByTestId('donate-section-form');
+        const tabs = form.querySelectorAll<HTMLButtonElement>('button.tab');
+        const oneTimeTab = tabs[0];
+        const subscriptionTab = tabs[1];
+        const subscriptionInput = form.querySelector<HTMLInputElement>('input[name="isSubscription"]');
 
-    it('renders tooltip for subscription tab', () => {
-        render(<DonateSection />);
-        expect(screen.getByText(/Not yet available/i)).toBeInTheDocument();
-        expect(screen.getByText(/Please check back later/i)).toBeInTheDocument();
+        expect(subscriptionTab).toBeEnabled();
+        expect(subscriptionInput).toHaveValue('false');
+
+        fireEvent.click(subscriptionTab);
+        expect(subscriptionInput).toHaveValue('true');
+        expect(subscriptionTab).toHaveClass('active');
+
+        fireEvent.click(oneTimeTab);
+        expect(subscriptionInput).toHaveValue('false');
+        expect(oneTimeTab).toHaveClass('active');
     });
 
     it('does not submit form if amount is 0 or not integer', () => {

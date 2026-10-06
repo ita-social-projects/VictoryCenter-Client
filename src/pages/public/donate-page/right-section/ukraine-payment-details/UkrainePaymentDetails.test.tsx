@@ -13,7 +13,7 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
 
 jest.mock('@/const/public/donate-page', () => ({
     UKRAINE_PAYMENT_DETAILS: {
-        UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',
+        UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів у гривнях',
         UIDSREOU_LABEL: 'ЄДРПОУ',
         BANK_LABEL: 'Банк',
         IBAN_UAH_LABEL: 'IBAN (UAH)',
@@ -48,7 +48,7 @@ describe('UkrainePaymentDetails', () => {
         );
 
     const expectAllLabelsToBePresent = () => {
-        expect(screen.getByText('Реквізити для донатів в Україні')).toBeInTheDocument();
+        expect(screen.getByText('Реквізити для донатів у гривнях')).toBeInTheDocument();
         expect(screen.getAllByText('Одержувач')).toHaveLength(1);
         expect(screen.getAllByText('ЄДРПОУ')).toHaveLength(1);
         expect(screen.getAllByText('Банк')).toHaveLength(1);
@@ -101,7 +101,7 @@ describe('UkrainePaymentDetails', () => {
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
-            expect(screen.getByText('Реквізити для донатів в Україні')).toBeInTheDocument();
+            expect(screen.getByText('Реквізити для донатів у гривнях')).toBeInTheDocument();
 
             expect(screen.getAllByText('Одержувач')).toHaveLength(2);
             expect(screen.getAllByText('ЄДРПОУ')).toHaveLength(2);
@@ -118,7 +118,7 @@ describe('UkrainePaymentDetails', () => {
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
-            const container = screen.getByText('Реквізити для донатів в Україні').closest('.UkrainePaymentDetails');
+            const container = screen.getByText('Реквізити для донатів у гривнях').closest('.UkrainePaymentDetails');
             const paymentDetailsContainers = container?.querySelectorAll('.paymentDetails');
 
             expect(paymentDetailsContainers).toHaveLength(2);
@@ -186,7 +186,7 @@ describe('UkrainePaymentDetails', () => {
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
-            const mainContainer = screen.getByText('Реквізити для донатів в Україні').closest('.UkrainePaymentDetails');
+            const mainContainer = screen.getByText('Реквізити для донатів у гривнях').closest('.UkrainePaymentDetails');
             expect(mainContainer).toBeInTheDocument();
 
             const paymentDetailsContainers = mainContainer?.querySelectorAll('.paymentDetails');
@@ -212,7 +212,7 @@ describe('UkrainePaymentDetails', () => {
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
             const mainHeading = screen.getByRole('heading', { level: 2 });
-            expect(mainHeading).toHaveTextContent('Реквізити для донатів в Україні');
+            expect(mainHeading).toHaveTextContent('Реквізити для донатів у гривнях');
 
             const subHeadings = screen.getAllByRole('heading', { level: 3 });
             expect(subHeadings).toHaveLength(10);
@@ -229,7 +229,7 @@ describe('UkrainePaymentDetails', () => {
             expectCopyButtonsWithCorrectData(bankDetails);
 
             const separatedContainers = screen
-                .getByText('Реквізити для донатів в Україні')
+                .getByText('Реквізити для донатів у гривнях')
                 .closest('.UkrainePaymentDetails')
                 ?.querySelectorAll('.paymentDetails.separated');
 
@@ -246,7 +246,7 @@ describe('UkrainePaymentDetails', () => {
             expectCopyButtonsWithCorrectData(sortedBankDetails);
 
             const separatedContainers = screen
-                .getByText('Реквізити для донатів в Україні')
+                .getByText('Реквізити для донатів у гривнях')
                 .closest('.UkrainePaymentDetails')
                 ?.querySelectorAll('.paymentDetails.separated');
 

@@ -38,6 +38,7 @@ export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     AddItemButtonText: string;
     onSuggestionSelect: (itemKey: string | number, item: T) => void;
     maxCharactersToSearch?: number;
+    minCharactersToSearch?: number;
 }
 
 export const AdminPanelToolbar = <T,>({
@@ -55,6 +56,7 @@ export const AdminPanelToolbar = <T,>({
     AddItemButtonText,
     onSuggestionSelect,
     maxCharactersToSearch,
+    minCharactersToSearch = UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH,
     languages,
     onLanguageChange,
     onTranslationStatusFilterChange,
@@ -79,16 +81,19 @@ export const AdminPanelToolbar = <T,>({
         initialData: [],
         fetchHandler: getSearchItems,
         autoFetchDependencies: [currentSearchTerm],
-        autoFetchDisabled: currentSearchTerm.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH,
+        autoFetchDisabled: currentSearchTerm.length < minCharactersToSearch,
         pageSize: searchPageSize,
     });
 
-    const onSearch = useCallback((query: string) => {
-        setCurrentSearchTerm(query);
-        if (query.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH) {
-            setLocalSearchItems([]);
-        }
-    }, []);
+    const onSearch = useCallback(
+        (query: string) => {
+            setCurrentSearchTerm(query);
+            if (query.length < minCharactersToSearch) {
+                setLocalSearchItems([]);
+            }
+        },
+        [minCharactersToSearch],
+    );
 
     useEffect(() => {
         setLocalSearchItems(fetchedSearchItems);
@@ -127,7 +132,7 @@ export const AdminPanelToolbar = <T,>({
                     onClear={handleSearchClear}
                     placeholder={placeholder}
                     notFoundMessage={suggestionsNotFoundMessage}
-                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    minCharactersToSearch={minCharactersToSearch}
                     maxCharactersToSearch={maxCharactersToSearch}
                     searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
                 />

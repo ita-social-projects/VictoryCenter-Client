@@ -44,7 +44,10 @@ export const HistoryTimeline = ({ safeTopAnchorLine, safeDirectorLine }: History
                                           ...(config.topAnchor && safeTopAnchorLine !== undefined
                                               ? { '--safe-topanchor-line': `${safeTopAnchorLine}px` }
                                               : {}),
-                                          ...(!config.topAnchor && config.photo && safeDirectorLine !== undefined
+                                          ...(!config.topAnchor &&
+                                          config.photo &&
+                                          config.safeLine &&
+                                          safeDirectorLine !== undefined
                                               ? { '--safe-director-line': `${safeDirectorLine}px` }
                                               : {}),
                                       } as React.CSSProperties)

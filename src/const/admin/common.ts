@@ -71,6 +71,10 @@ export const COMMON_TEXT_ADMIN = {
         FAIL_TO_FETCH_DATA: 'Виникла помилка під час завантаження даних',
         TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
         TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
+        NAVIGATION_BLOCKED: 'Завершіть звіт перед переходом на іншу сторінку',
+        DATA_MODIFIED_BY_ANOTHER_USER: 'Дані змінено іншим користувачем. Перезавантажте сторінку',
+        ERROR_TRY_AGAIN: 'Виникла помилка, спробуйте ще раз',
+        ERROR_LOAD_DATA: 'Помилка завантаження даних',
     },
 
     BUTTON: {
@@ -79,6 +83,7 @@ export const COMMON_TEXT_ADMIN = {
         SAVE: 'Зберегти',
         DELETE: 'Видалити',
         CANCEL: 'Відмінити',
+        OK: 'ОК',
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         SAVE_TRANSLATION: 'Зберегти переклад',

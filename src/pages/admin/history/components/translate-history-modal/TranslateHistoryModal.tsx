@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
+import cn from 'classnames';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HistorySectionDto } from '@/types/common/history-sections';
 import { LocalizationLanguage } from '@/types/common/language';
 import { ContentType } from '@/types/common/section-contents';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { useTranslateHistorySection } from '@/hooks/admin/use-translate-history-section/useTranslateHistorySection';
 import {
     TranslateHistorySectionForm,
@@ -12,34 +14,34 @@ import {
     TranslateHistorySectionFormValues,
 } from './TranslateHistorySectionForm';
 import { renderHistorySection } from '@/utils/functions/render-history-section';
-import { SectionMode } from '@/types/common/sections';
+import { getHistorySectionData, getOrderedHistoryContentsByType } from '@/utils/functions/history-section-data';
 import styles from './TranslateHistoryModal.module.scss';
+
+export type HistoryImagePosition = 'top' | 'bottom' | 'right';
+
+export const HISTORY_TEMPLATE_IMAGE_POSITION: Partial<Record<SectionTemplate, HistoryImagePosition>> = {
+    [SectionTemplate.SingleImageTop]: 'top',
+    [SectionTemplate.SingleImageRight]: 'right',
+    [SectionTemplate.SingleImageBottom]: 'bottom',
+    [SectionTemplate.DualImagesBottom]: 'bottom',
+    [SectionTemplate.TripleImagesBottom]: 'bottom',
+    [SectionTemplate.QuadImagesBottom]: 'bottom',
+};
+
+export const getHistoryImagePosition = (template: SectionTemplate): HistoryImagePosition =>
+    HISTORY_TEMPLATE_IMAGE_POSITION[template] ?? 'bottom';
 
 const getInitialData = (section: HistorySectionDto, languageId?: number): TranslateHistorySectionFormValues | null => {
     if (!languageId) return null;
 
-    let title = '';
-    let description = '';
-    let hasData = false;
+    const titleContent = getOrderedHistoryContentsByType(section.contents, ContentType.Title)[0];
+    const descriptionContent = getOrderedHistoryContentsByType(section.contents, ContentType.Description)[0];
 
-    for (const content of section.contents) {
-        if (content.contentType === ContentType.Title) {
-            const loc = content.localizations?.find((l) => l.localizationInfoDto.id === languageId);
-            if (loc?.title) {
-                title = loc.title;
-                hasData = true;
-            }
-        }
-        if (content.contentType === ContentType.Description) {
-            const loc = content.localizations?.find((l) => l.localizationInfoDto.id === languageId);
-            if (loc?.description) {
-                description = loc.description;
-                hasData = true;
-            }
-        }
-    }
+    const title = titleContent?.localizations?.find((l) => l.localizationInfoDto.id === languageId)?.title ?? '';
+    const description =
+        descriptionContent?.localizations?.find((l) => l.localizationInfoDto.id === languageId)?.description ?? '';
 
-    return hasData ? { title, description } : null;
+    return title || description ? { title, description } : null;
 };
 
 interface TranslateHistoryModalProps {
@@ -160,34 +162,11 @@ export const TranslateHistoryModal = ({
                 {sectionStates.map((state, index) => {
                     const { section, formRef } = state;
 
-                    const hasImage = section.contents.some((c) => c.contentType === ContentType.Image);
-
-                    const sectionPreview = hasImage
-                        ? renderHistorySection({
-                              templateId: section.template,
-                              data: {
-                                  title: '',
-                                  description: '',
-                                  images: section.contents
-                                      .filter((c) => c.contentType === ContentType.Image)
-                                      .map((c) => c.image ?? null),
-                              },
-                              mode: SectionMode.View,
-                              validationResetKey: 0,
-                              handlers: {
-                                  onTitleChange: () => undefined,
-                                  onDescriptionChange: () => undefined,
-                                  onImagesChange: () => undefined,
-                              },
-                          })
-                        : null;
-
                     return (
                         <SectionTranslationRow
                             key={`${section.id ?? index}-${language?.id}`}
                             index={index}
                             formRef={formRef}
-                            sectionPreview={sectionPreview}
                             section={section}
                             languageId={language?.id}
                             updateSectionState={updateSectionState}
@@ -202,7 +181,6 @@ export const TranslateHistoryModal = ({
 interface SectionTranslationRowProps {
     index: number;
     formRef: React.RefObject<TranslateHistorySectionFormRef | null>;
-    sectionPreview: React.ReactNode;
     section: HistorySectionDto;
     languageId?: number;
     updateSectionState: (
@@ -214,7 +192,6 @@ interface SectionTranslationRowProps {
 const SectionTranslationRow = ({
     index,
     formRef,
-    sectionPreview,
     section,
     languageId,
     updateSectionState,
@@ -231,16 +208,42 @@ const SectionTranslationRow = ({
         [index, updateSectionState],
     );
 
+    const hasImage = section.contents.some((c) => c.contentType === ContentType.Image);
+    const imagesPreview = hasImage
+        ? renderHistorySection({
+              templateId: section.template,
+              data: {
+                  title: '',
+                  description: '',
+                  images: getHistorySectionData(section).images,
+              },
+              mode: SectionMode.View,
+              validationResetKey: 0,
+          })
+        : null;
+    const imagePosition = getHistoryImagePosition(section.template);
+    const previewNode = imagesPreview ? (
+        <div className={styles['section-preview']} data-testid="history-section-images-preview">
+            {imagesPreview}
+        </div>
+    ) : null;
+
     return (
-        <div className={styles['section-row']} data-testid="translate-section-row">
-            {sectionPreview && <div className={styles['section-preview']}>{sectionPreview}</div>}
+        <div
+            className={cn(styles['section-row'], styles[`section-row--${imagePosition}`])}
+            data-testid="translate-section-row"
+            data-image-position={imagePosition}
+        >
+            {imagePosition === 'top' && previewNode}
             <TranslateHistorySectionForm
                 ref={formRef}
                 initialData={initialData}
                 onSubmit={() => {}}
                 onValidationChange={handleValidationChange}
                 onDirtyChange={handleDirtyChange}
+                stacked={imagePosition === 'right'}
             />
+            {imagePosition !== 'top' && previewNode}
         </div>
     );
 };

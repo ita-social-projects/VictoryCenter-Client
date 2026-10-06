@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
 import { SectionMode } from '@/types/common/sections';
@@ -63,6 +65,21 @@ describe('SingleImageRight', () => {
             const p = container.querySelector('p');
             expect(p).toBeInTheDocument();
             expect(p).toHaveTextContent('Test Description');
+        });
+
+        it('marks the text column with data-section-text so previews can hide it', () => {
+            const { container } = render(
+                <SingleImageRight
+                    title="Test"
+                    description="Desc"
+                    image={{ id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
+
+            const textColumn = container.querySelector('[data-section-text]');
+            expect(textColumn).toBeInTheDocument();
+            expect(textColumn).toContainElement(container.querySelector('h2'));
+            expect(textColumn).not.toContainElement(container.querySelector('img'));
         });
 
         it('renders image when provided', () => {
@@ -308,5 +325,21 @@ describe('SingleImageRight', () => {
 
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
+    });
+});
+
+describe('ViewSingleImageRight styles', () => {
+    const scss = fs.readFileSync(path.join(__dirname, 'ViewSingleImageRight.module.scss'), 'utf-8');
+
+    const getRuleBody = (selector: string) => {
+        const start = scss.indexOf(`\n${selector} {`);
+        return start === -1 ? '' : scss.slice(start, scss.indexOf('}', start));
+    };
+
+    it.each(['.title', '.description'])('%s wraps long unbroken words within its flex container', (selector) => {
+        const body = getRuleBody(selector);
+
+        expect(body).toMatch(/overflow-wrap:\s*anywhere;/);
+        expect(body).toMatch(/min-width:\s*0;/);
     });
 });

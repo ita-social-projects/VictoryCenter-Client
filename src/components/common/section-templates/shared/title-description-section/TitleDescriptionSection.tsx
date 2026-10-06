@@ -62,6 +62,7 @@ export const TitleDescriptionSection = ({
 
     return (
         <div
+            data-section-text
             className={cn(
                 baseStyles.container,
                 {
@@ -106,6 +107,7 @@ export const TitleDescriptionSection = ({
                         value={description}
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
+                        placeholder={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER}
                         maxLength={descriptionMaxLength}
                         rows={10}
                         autoGrow={true}

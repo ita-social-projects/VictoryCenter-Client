@@ -17,6 +17,7 @@ interface FundsExpendituresToolbarProps {
     controlsDisabled?: boolean;
     isAddIncomeDisabled: boolean;
     isAddExpenseDisabled: boolean;
+    categoryLimitMessage?: string;
     onTypeChange: (value: TypeFilterValue) => void;
     onCategoryChange: (value: CategoryFilterValue) => void;
     onExchangeRateChange?: (value: string) => void;
@@ -35,6 +36,7 @@ export const FundsExpendituresToolbar = ({
     controlsDisabled = false,
     isAddIncomeDisabled,
     isAddExpenseDisabled,
+    categoryLimitMessage,
     onTypeChange,
     onCategoryChange,
     onExchangeRateChange,
@@ -124,6 +126,7 @@ export const FundsExpendituresToolbar = ({
                             controlsDisabled={controlsDisabled}
                             isAddExpenseDisabled={isAddExpenseDisabled}
                             isAddIncomeDisabled={isAddIncomeDisabled}
+                            categoryLimitMessage={categoryLimitMessage}
                             onAddExpense={onAddExpense}
                             onAddIncome={onAddIncome}
                             testId="editing-actions"

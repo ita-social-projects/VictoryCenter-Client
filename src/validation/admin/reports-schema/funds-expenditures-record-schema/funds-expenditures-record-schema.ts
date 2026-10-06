@@ -134,7 +134,6 @@ export const validateFundsExpendituresCategory = ({
         return undefined;
     }
 
-    return recordType === 'income'
-        ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME
-        : FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE;
+    // Income duplicate and expense duplicate have the same validation message.
+    return FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE;
 };

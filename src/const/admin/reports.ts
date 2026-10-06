@@ -28,6 +28,7 @@ export const REPORTS_TEXT = {
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         INVALID_VALUE: 'Поле може містити лише цілі цифри',
+        NO_CHANGES_FOUND: 'Змін не виявлено',
     },
     REPORT_AND_ANALYTICS: {
         TITLE: 'Управління фінансами',
@@ -46,7 +47,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     collectedAmount: {
         max: 10,
@@ -61,7 +62,7 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
         min: 2,
         max: 50,
-        getRequiredError: () => `Заголовок обов'язковий`,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
     changedLives: {
         min: 2,
@@ -202,6 +203,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         FAIL_TO_TRANSLATE_CATEGORY: 'Не вдалося зберегти переклад категорії. Спробуйте ще раз',
         FAIL_TO_UPDATE_CATEGORY_TRANSLATION: 'Не вдалося оновити переклад категорії. Спробуйте ще раз',
+        LIMIT_INCOME: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій надходжень вичерпано`,
+        LIMIT_EXPENSE: `Ліміт ${FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType} категорій витрат вичерпано`,
+        LIMIT_BOTH: 'Ліміт по категоріях вичерпано',
     },
     MODAL: {
         SHARED: {
@@ -283,7 +287,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
-        ADD_EXPENSE: 'Витрати',
+        ADD_EXPENSE: 'Витрата',
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
         EDIT_CATEGORY: 'Редагувати',
@@ -310,6 +314,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY: 'Категорія',
             AMOUNT_UAH: 'Сума UAH',
             AMOUNT_USD: 'Сума USD',
+            ACTIONS: 'Дії',
         },
         TYPE_LABELS: {
             INCOME: 'Надходження',
@@ -323,8 +328,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
-        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
+        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_MAX_DECIMALS: 'Не більше 2 цифр після коми',
@@ -369,7 +373,8 @@ export const PROGRAM_EXPENSES_TEXT = {
         },
     },
     VALIDATION: {
-        PROGRAM_UNIQUE: 'Така категорія вже додана. Оберіть іншу категорію',
+        PROGRAM_ALREADY_ADDED: 'Така категорія вже додана. Оберіть іншу категорію',
+        PROGRAM_MUST_BE_UNIQUE: 'Категорія має бути унікальною',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',

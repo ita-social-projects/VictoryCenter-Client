@@ -55,18 +55,14 @@ export const DonateSection = () => {
             onSubmit={handleSubmit}
             data-testid="donate-section-form"
         >
-            <input
-                type="hidden"
-                name="isSubscription"
-                value={(activeTab === DonateTab.subscription).toString()}
-            ></input>
-            <input type="hidden" name="paymentSystem" value={PaymentSystem.WayForPay}></input>
+            <input type="hidden" name="isSubscription" value={(activeTab === DonateTab.subscription).toString()} />
+            <input type="hidden" name="paymentSystem" value={PaymentSystem.WayForPay} />
             <Tabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 tabs={[
                     { id: DonateTab.oneTime, label: t('DONATE_ONE_TIME_LABEL') },
-                    { id: DonateTab.subscription, label: t('DONATE_SUBSCRIPTION_LABEL'), disabled: true },
+                    { id: DonateTab.subscription, label: t('DONATE_SUBSCRIPTION_LABEL') },
                 ]}
             ></Tabs>
             <div className="donateAmountSection">

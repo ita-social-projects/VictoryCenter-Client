@@ -1,19 +1,21 @@
 import { DeleteEventCategoryModal } from '../delete-event-category-modal/DeleteEventCategoryModal';
 import { EventCategoryModal } from '../event-category-modal/EventCategoryModal';
 import { EventModal } from '../event-modal/EventModal';
-import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { TranslateEventCategoryModal } from '../translate-event-category-modal/TranslateEventCategoryModal';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
-import { EventsNews } from '@/types/admin/events-news';
+import { EventItemDto } from '@/types/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ModalMode } from '@/types/admin/common';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface EventsPageModalsProps {
-    modalsStateControl: UseModalsStateResult<EventsNews>;
+    modalsStateControl: UseModalsStateResult<EventItemDto>;
     categories: EventCategoryDto[];
     currentCategory: EventCategoryDto | null;
     onAddCategory(category: EventCategoryDto): void;
     onUpdateCategory(category: EventCategoryDto): void;
     onDeleteCategory(categoryId: number): void;
+    translationLanguages: LocalizationLanguage[];
 }
 
 export const EventsPageModals = ({
@@ -23,16 +25,28 @@ export const EventsPageModals = ({
     onAddCategory,
     onUpdateCategory,
     onDeleteCategory,
+    translationLanguages,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
     return (
         <>
             <EventModal
+                mode={ModalMode.Add}
                 isOpen={modalState.isAddModalOpen}
                 onClose={closeModalActions.closeAddItemModal}
                 currentCategory={currentCategory}
             />
+
+            {modalState.itemToEdit && (
+                <EventModal
+                    mode={ModalMode.Edit}
+                    isOpen
+                    onClose={closeModalActions.closeEditItemModal}
+                    currentCategory={currentCategory}
+                    eventToEdit={modalState.itemToEdit}
+                />
+            )}
 
             <EventCategoryModal
                 mode={ModalMode.Add}
@@ -56,7 +70,13 @@ export const EventsPageModals = ({
                 onClose={closeModalActions.closeDeleteCategoryModal}
                 onConfirm={onDeleteCategory}
             />
-            <ToastContainer />
+
+            <TranslateEventCategoryModal
+                isOpen={modalState.isCategoryToTranslate}
+                categories={categories}
+                onClose={closeModalActions.closeTranslateCategoryModal}
+                translationLanguages={translationLanguages}
+            />
         </>
     );
 };

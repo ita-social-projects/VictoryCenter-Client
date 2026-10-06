@@ -178,10 +178,10 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     categoryId: 2,
                     records,
                 }),
-            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME);
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
         });
 
-        it('should return expense-specific unique error for duplicate expense category', () => {
+        it('should return unique error for duplicate expense category in same type', () => {
             expect(
                 validateFundsExpendituresCategory({
                     recordId: 1,
@@ -189,7 +189,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     categoryId: 3,
                     records,
                 }),
-            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE);
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
         });
 
         it('should pass for unique category', () => {

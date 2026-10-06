@@ -9,7 +9,7 @@ import { PdfReportDto } from '@/types/admin/pdf-section';
 import { useSignalR } from '@/hooks/public/SignalR/useSignalR';
 import styles from './ReportsSection.module.scss';
 
-const INITIAL_VISIBLE_COUNT = 2;
+const INITIAL_VISIBLE_COUNT = 5;
 const FETCH_LIMIT = 50;
 
 export const ReportsSection = () => {

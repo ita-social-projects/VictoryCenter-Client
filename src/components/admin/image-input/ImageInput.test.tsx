@@ -39,11 +39,17 @@ jest.mock('@/assets/icons/delete.svg', () => ({
 }));
 
 jest.mock('../cropper-modal/CropperModal', () => ({
-    CropModal: ({ isOpen, onCancel }: any) =>
+    CropModal: ({ isOpen, onCancel, onChange }: any) =>
         isOpen ? (
             <div data-testid="cropper">
                 <button data-testid="crop-cancel-button" onClick={onCancel}>
                     Cancel Crop
+                </button>
+                <button
+                    data-testid="crop-confirm-button"
+                    onClick={() => onChange({ base64: 'CROPPED_BASE64', mimeType: 'image/png' })}
+                >
+                    Confirm Crop
                 </button>
             </div>
         ) : null,
@@ -63,6 +69,8 @@ jest.mock('@/validation/admin/image-dimension-schema/image-dimension-schema', ()
 
 const mockImageValidate = IMAGE_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 const mockDimensionValidate = IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
+
+const DIMENSION_MISMATCH_ERROR = 'Image dimensions do not match';
 
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
@@ -92,6 +100,7 @@ describe('ImageInput', () => {
         globalThis.crypto.randomUUID = jest.fn(() => '00000000-0000-0000-0000-000000000000') as any;
 
         jest.clearAllMocks();
+        mockDimensionValidate.mockResolvedValue(DIMENSION_MISMATCH_ERROR);
         jest.spyOn(globalThis, 'FileReader').mockImplementation(() => {
             const mock = {
                 result: 'data:image/png;base64,MOCKED_BASE64',
@@ -124,22 +133,6 @@ describe('ImageInput', () => {
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
         expect(previewImage).toHaveAttribute('src', MockImage.url);
-    });
-
-    it('calls onChange when file is selected via input', async () => {
-        const file = createImageFile();
-
-        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
-
-        const fileInput = screen.getByTestId('image-input-hidden');
-
-        fireEvent.change(fileInput, {
-            target: { files: [file] },
-        });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('cropper')).toBeInTheDocument();
-        });
     });
 
     it('calls onChange immediately when file is selected and enableCrop is false', async () => {
@@ -183,10 +176,101 @@ describe('ImageInput', () => {
         });
     });
 
-    it('displays error when dimension validation fails after crop cancel', async () => {
-        const dimensionError = 'Image dimensions do not match';
+    it('uploads image directly without cropper when it already matches the crop size', async () => {
+        mockDimensionValidate.mockResolvedValueOnce(undefined);
 
-        mockDimensionValidate.mockResolvedValueOnce(dimensionError);
+        render(
+            <ImageInput
+                value={null}
+                onChange={onChangeMock}
+                setError={setErrorMock}
+                cropWidth={360}
+                cropHeight={390}
+            />,
+        );
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    base64: expect.any(String),
+                    mimeType: 'image/png',
+                }),
+            );
+        });
+
+        expect(mockDimensionValidate).toHaveBeenCalledWith(
+            expect.objectContaining({ base64: expect.any(String) }),
+            360,
+            390,
+        );
+        expect(setErrorMock).toHaveBeenCalledWith(null);
+        expect(screen.queryByTestId('cropper')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('crop-photo-button')).not.toBeInTheDocument();
+    });
+
+    it('opens cropper when image does not match the crop size', async () => {
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('cropper')).toBeInTheDocument();
+        });
+
+        expect(onChangeMock).not.toHaveBeenCalled();
+    });
+
+    it('hides crop button for the previous image after uploading one that matches the crop size', async () => {
+        const { rerender } = render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('cropper')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('crop-confirm-button'));
+        const croppedImage = onChangeMock.mock.calls[0][0];
+        rerender(<ImageInput value={croppedImage} onChange={onChangeMock} setError={setErrorMock} />);
+
+        expect(screen.getByTestId('crop-photo-button')).toBeInTheDocument();
+
+        mockDimensionValidate.mockResolvedValueOnce(undefined);
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledTimes(2);
+        });
+
+        expect(screen.queryByTestId('crop-photo-button')).not.toBeInTheDocument();
+    });
+
+    it('does not check dimensions when enableCrop is false', async () => {
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalled();
+        });
+
+        expect(mockDimensionValidate).not.toHaveBeenCalled();
+    });
+
+    it('displays error when dimension validation fails after crop cancel', async () => {
+        const dimensionError = DIMENSION_MISMATCH_ERROR;
 
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
 

@@ -12,7 +12,13 @@ export const useCounterAnimation = (
     const rafIdRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (!isVisible || animatedRef.current) return;
+        if (!isVisible) return;
+
+        if (animatedRef.current) {
+            setDisplayValue(targetValue);
+            return;
+        }
+
         animatedRef.current = true;
 
         let startTime: number | null = null;
@@ -23,7 +29,7 @@ export const useCounterAnimation = (
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            setDisplayValue(Math.round(targetValue * progress));
+            setDisplayValue(progress < 1 ? Math.round(targetValue * progress) : targetValue);
 
             if (progress < 1) {
                 rafIdRef.current = requestAnimationFrame(animate);

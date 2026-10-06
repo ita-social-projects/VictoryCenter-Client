@@ -1,8 +1,8 @@
-import { ReactComponent as DragIcon } from '@/assets/icons/dragger.svg';
 import React, { useCallback, useState } from 'react';
-import './DraggableListItem.scss';
-import { DragPreviewModel } from '@/types/admin/common';
 import { DragPreview } from '../drag-preview/DragPreview';
+import { DragPreviewModel } from '@/types/admin/common';
+import { ReactComponent as DragIcon } from '@/assets/icons/dragger.svg';
+import './DraggableListItem.scss';
 
 export interface DraggableListItemProps<TEntity> {
     entity: TEntity;
@@ -12,6 +12,8 @@ export interface DraggableListItemProps<TEntity> {
     entities: TEntity[];
     idSelector: (entity: TEntity) => number | string;
     onEntitiesReordered: (entities: TEntity[]) => void;
+    reorderDisabled?: boolean;
+    hideDragHandle?: boolean;
 }
 
 export const DraggableListItem = <TEntity,>({
@@ -22,6 +24,8 @@ export const DraggableListItem = <TEntity,>({
     entities,
     idSelector,
     onEntitiesReordered,
+    reorderDisabled = false,
+    hideDragHandle = false,
 }: DraggableListItemProps<TEntity>) => {
     const emptyDragImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
     const [dragPreview, setDragPreview] = useState<DragPreviewModel<TEntity>>({
@@ -30,13 +34,32 @@ export const DraggableListItem = <TEntity,>({
         y: 0,
         item: null,
     });
+
+    const hideDragPreview = useCallback(() => {
+        setDragPreview({
+            visible: false,
+            x: 0,
+            y: 0,
+            item: null,
+        });
+    }, []);
+
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        if (reorderDisabled || hideDragHandle) {
+            return;
+        }
+
         e.preventDefault();
     };
 
     const handleDrop = useCallback(
         (e: React.DragEvent<HTMLDivElement>, id: number | string) => {
+            if (reorderDisabled || hideDragHandle) {
+                return;
+            }
+
             e.preventDefault();
+            hideDragPreview();
 
             const draggedIdStr = e.dataTransfer.getData('text/plain');
             const draggedId = isNaN(Number(draggedIdStr)) ? draggedIdStr : Number(draggedIdStr);
@@ -51,20 +74,20 @@ export const DraggableListItem = <TEntity,>({
 
             onEntitiesReordered(updatedEntities);
         },
-        [entities, idSelector, onEntitiesReordered],
+        [entities, idSelector, onEntitiesReordered, reorderDisabled, hideDragHandle, hideDragPreview],
     );
 
     const handleDragEnd = () => {
-        setDragPreview({
-            visible: false,
-            x: 0,
-            y: 0,
-            item: null,
-        });
+        hideDragPreview();
     };
 
     const handleDragStart = useCallback(
         (e: React.DragEvent<HTMLDivElement>, id: number | string) => {
+            if (reorderDisabled || hideDragHandle) {
+                e.preventDefault();
+                return;
+            }
+
             const entity = entities.find((x) => idSelector(x) === id);
             if (!entity) return;
 
@@ -81,7 +104,7 @@ export const DraggableListItem = <TEntity,>({
             dragImage.src = emptyDragImage;
             e.dataTransfer.setDragImage(dragImage, 0, 0);
         },
-        [entities, idSelector],
+        [entities, idSelector, reorderDisabled, hideDragHandle],
     );
 
     const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -103,18 +126,20 @@ export const DraggableListItem = <TEntity,>({
         >
             <DragPreview entity={entity} dragPreview={dragPreview} renderEntityComponent={renderEntityComponent} />
             <div className={'draggable-item'} key={id}>
-                <div
-                    className="dragger"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, id)}
-                    onDrag={handleDrag}
-                    onDragEnd={handleDragEnd}
-                    role="button"
-                    aria-label={ariaLabel}
-                    tabIndex={0}
-                >
-                    <DragIcon />
-                </div>
+                {!hideDragHandle && (
+                    <div
+                        className="dragger"
+                        draggable={!reorderDisabled}
+                        onDragStart={(e) => handleDragStart(e, id)}
+                        onDrag={handleDrag}
+                        onDragEnd={handleDragEnd}
+                        role="button"
+                        aria-label={ariaLabel}
+                        tabIndex={reorderDisabled ? -1 : 0}
+                    >
+                        <DragIcon />
+                    </div>
+                )}
                 <div className="item-data">{renderEntityComponent(entity)}</div>
             </div>
         </div>

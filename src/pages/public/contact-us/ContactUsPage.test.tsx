@@ -65,6 +65,27 @@ jest.mock('./components/contact-form-card/ContactFormCard', () => ({
     ),
 }));
 
+const mockProfile = (data: unknown, error: string | null = null) =>
+    (useDataFetch as jest.Mock).mockReturnValue({
+        data,
+        isLoading: false,
+        error,
+        refetch: jest.fn(),
+        setData: jest.fn(),
+    });
+
+const renderAndGetSocialLinks = () => {
+    render(
+        <MemoryRouter>
+            <ContactUsPage />
+        </MemoryRouter>,
+    );
+
+    const props = JSON.parse(screen.getByTestId('contact-details-section').getAttribute('data-props') ?? '{}');
+
+    return props.socialLinks;
+};
+
 describe('ContactUsPage', () => {
     beforeEach(() => {
         (useDataFetch as jest.Mock).mockReturnValue({
@@ -122,6 +143,32 @@ describe('ContactUsPage', () => {
             { label: 'Facebook', url: 'https://facebook.com/from-api' },
             { label: 'Telegram', url: 'https://t.me/from-api' },
         ]);
+    });
+
+    it('renders no social links when the API returns an empty list', () => {
+        mockProfile({ contacts: {}, socialLinks: [] });
+
+        expect(renderAndGetSocialLinks()).toEqual([]);
+    });
+
+    it('renders no social links when the API omits socialLinks', () => {
+        mockProfile({ contacts: {} });
+
+        expect(renderAndGetSocialLinks()).toEqual([]);
+    });
+
+    it('filters out links with empty or blank URLs and unknown platforms', () => {
+        mockProfile({
+            contacts: {},
+            socialLinks: [
+                { socialPlatform: 1, url: '' },
+                { socialPlatform: 2, url: '   ' },
+                { socialPlatform: 999, url: 'https://unknown.example.com' },
+                { socialPlatform: 3, url: 'https://youtube.com/valid' },
+            ],
+        });
+
+        expect(renderAndGetSocialLinks()).toEqual([{ label: 'YouTube', url: 'https://youtube.com/valid' }]);
     });
 
     it('copies email and phone via contact details callbacks', async () => {
@@ -184,5 +231,11 @@ describe('ContactUsPage', () => {
         expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
         expect(screen.getByTestId('contact-details-section')).toBeInTheDocument();
         expect(screen.getByTestId('contact-form-card')).toBeInTheDocument();
+    });
+
+    it('falls back to mock social links when profile fetch fails', () => {
+        mockProfile(null, 'Failed to fetch data');
+
+        expect(renderAndGetSocialLinks()).toEqual(CONTACT_US_PAGE_DATA.socialLinks);
     });
 });

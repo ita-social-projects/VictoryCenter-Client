@@ -3,6 +3,7 @@ import { ContactDetailsSection } from './components/contact-details-section/Cont
 import { ContactFormCard } from './components/contact-form-card/ContactFormCard';
 import { CONTACT_US_PAGE_DATA } from '@/utils/mock-data/public';
 import styles from './ContactUsPage.module.scss';
+import { PLATFORM_LABEL } from '@/const/public/platform-labels';
 import { useTranslation } from 'react-i18next';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
@@ -12,20 +13,6 @@ import {
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { EntityLocalization, TranslationStatus } from '@/types/common/language';
 import { LinearProgress } from '@mui/material';
-
-const PLATFORM_LABEL: Record<number, string> = {
-    0: 'Instagram',
-    1: 'Facebook',
-    2: 'Telegram',
-    3: 'YouTube',
-    4: 'X',
-    5: 'WhatsApp',
-    6: 'LinkedIn',
-    7: 'Viber',
-};
-
-const mapPlatformToLabel = (socialPlatform: number): string =>
-    PLATFORM_LABEL[socialPlatform] ?? `Social ${socialPlatform}`;
 
 export const ContactUsPage: React.FC = () => {
     const { t } = useTranslation('contactUsPage');
@@ -69,11 +56,13 @@ export const ContactUsPage: React.FC = () => {
     }, [data]);
 
     const { address } = useGetLocalization(localizations, fallback);
-    const socialLinks = data?.socialLinks?.length
-        ? data.socialLinks.map((link) => ({
-              label: mapPlatformToLabel(link.socialPlatform),
-              url: link.url,
-          }))
+    const socialLinks = data
+        ? (data.socialLinks ?? [])
+              .filter((link) => link.url?.trim() && link.socialPlatform in PLATFORM_LABEL)
+              .map((link) => ({
+                  label: PLATFORM_LABEL[link.socialPlatform],
+                  url: link.url,
+              }))
         : CONTACT_US_PAGE_DATA.socialLinks;
 
     if (isLoading) {

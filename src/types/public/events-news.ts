@@ -34,3 +34,37 @@ export interface EventsNews {
     slug: string;
     sections: HippotherapyProgramSectionDto[];
 }
+
+export interface EventNewsCategoryLocalizationDto {
+    languageCode: string;
+    name: string;
+}
+
+export interface EventNewsCategoryDto {
+    id: number;
+    name: string;
+    localizations: EventNewsCategoryLocalizationDto[];
+}
+
+export interface PublishedEventNewsLocalizationDto {
+    languageCode: string;
+    title?: string | null;
+    description?: string | null;
+    additionalDescription?: string | null;
+    resource?: string | null;
+}
+
+export interface PublishedEventNewsDto {
+    id: number;
+    title?: string | null;
+    description?: string | null;
+    additionalDescription?: string | null;
+    slug?: string | null;
+    resource?: string | null;
+    resourceEn?: string | null;
+    publishedAt?: string | null;
+    previewImage?: Image | null;
+    backgroundImage?: Image | null;
+    categories: EventNewsCategoryDto[];
+    localizations: PublishedEventNewsLocalizationDto[];
+}

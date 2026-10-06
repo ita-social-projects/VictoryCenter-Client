@@ -30,7 +30,7 @@ export const Events = ({ title, tags }: EventsData) => {
 
     const getEvents = useCallback(
         async (params: PaginationRequestParams) => {
-            return EventsNewsApi.get(selectedTag?.id || '', offset, params.limit as number);
+            return EventsNewsApi.get(selectedTag?.id, offset, params.limit as number);
         },
         [selectedTag, offset],
     );

@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventModal } from './EventModal';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { EventItemDto } from '@/types/admin/events';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -23,6 +25,10 @@ const openDatePickerAndSelectToday = (todayLabel: string) => {
 
 const expectDatePickerClosed = () => {
     expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+};
+
+const fillTextField = (label: string, value: string) => {
+    fireEvent.change(screen.getByRole('textbox', { name: label }), { target: { value } });
 };
 
 jest.mock('@/components/common/modal/Modal', () => ({
@@ -105,9 +111,29 @@ const currentCategory: EventCategoryDto | null = {
 };
 
 const defaultProps = {
+    mode: ModalMode.Add as const,
     isOpen: true,
     onClose: jest.fn(),
     currentCategory,
+};
+
+const eventToEdit: EventItemDto = {
+    id: 1,
+    priority: 1,
+    resource: 'https://example.com',
+    resourceEn: 'https://example.com/en/news',
+    publishedAt: '2026-08-18T00:00:00Z',
+    title: 'Завершилась програма',
+    description: 'Цього тижня ми успішно завершили програму реабілітації',
+    additionalDescription: 'Київ, 18:00',
+    status: VisibilityStatus.Draft,
+    previewImage: null,
+    backgroundImage: null,
+};
+
+const eventWithImage: EventItemDto = {
+    ...eventToEdit,
+    previewImage: { id: 7, url: 'https://example.com/event.png', mimeType: 'image/png' },
 };
 
 describe('EventModal', () => {
@@ -117,6 +143,23 @@ describe('EventModal', () => {
 
             expect(screen.getByTestId('modal-title')).toBeInTheDocument();
             expect(screen.getByTestId('modal-title')).toHaveTextContent(EVENTS_TEXT.FORM.MODAL_TITLE);
+        });
+
+        it('prefills the form with the event data in edit mode', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByDisplayValue(eventToEdit.title)).toBeInTheDocument();
+            expect(screen.getByDisplayValue(eventToEdit.description)).toBeInTheDocument();
+            expect(screen.getByDisplayValue(eventToEdit.resource)).toBeInTheDocument();
+            expect(screen.getByText('18/08/2026')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Київ, 18:00')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('https://example.com/en/news')).toBeInTheDocument();
+        });
+
+        it('shows the edit title in edit mode', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(EVENTS_TEXT.FORM.EDIT_MODAL_TITLE);
         });
 
         it('renders link section title', () => {
@@ -186,6 +229,74 @@ describe('EventModal', () => {
                     mockEventValidation.title.getRequiredError(),
                 );
             });
+        });
+
+        it('enables saving as draft immediately after entering a valid title', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('disables both actions immediately when a valid title becomes invalid', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'short');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('keeps publishing disabled when required publishing fields are missing', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('enables publishing when every required field is valid', () => {
+            render(<EventModal {...defaultProps} />);
+            const todayLabel = getTodayLabel();
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+            openDatePickerAndSelectToday(todayLabel);
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('keeps saving as draft enabled when optional fields are invalid', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'bad');
+            fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_ENG, 'bad');
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('keeps saving as draft enabled when image validation fails', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByTestId('trigger-image-error'));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
     });
 
@@ -393,6 +504,66 @@ describe('EventModal', () => {
             fireEvent.click(screen.getByTestId('modal-close'));
 
             expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+        });
+    });
+
+    describe('edit mode', () => {
+        it('keeps the save buttons disabled in edit mode until something changes', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('enables both buttons after a valid change when all publish fields are filled', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventWithImage} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventWithImage.title), { target: { value: 'Нова назва події' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('enables only the draft button when a field required for publishing is empty', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Нова назва події' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeEnabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('keeps the save buttons disabled in edit mode when the change is invalid', async () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Коротко' } });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            });
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
+        it('collapses repeated spaces in the title while typing', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.title), { target: { value: 'Нова  назва  події' } });
+
+            expect(screen.getByDisplayValue('Нова назва події')).toBeInTheDocument();
+        });
+
+        it('collapses repeated spaces in the link while typing', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fireEvent.change(screen.getByDisplayValue(eventToEdit.resource), {
+                target: { value: 'https://example.com/  news' },
+            });
+
+            expect(screen.getByDisplayValue('https://example.com/ news')).toBeInTheDocument();
         });
     });
 });

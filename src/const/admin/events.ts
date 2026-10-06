@@ -36,6 +36,7 @@ export const EVENTS_TEXT = {
     },
     FORM: {
         MODAL_TITLE: 'Додати матеріал',
+        EDIT_MODAL_TITLE: 'Редагувати матеріал',
         LINKS_SECTION_TITLE: 'Додати посилання на матеріал',
         LABEL: {
             TITLE: 'Заголовок',
@@ -165,6 +166,7 @@ export const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 export const EVENT_ITEMS_TEXT = {
     MESSAGE: {
         FAILED_TO_FETCH_ITEMS: 'Виникла помилка, не вдалось завантажити новини та події',
+        FAILED_TO_REORDER_ITEMS: 'Виникла помилка, не вдалось змінити порядок елементів',
     },
     ACTIONS: {
         REORDER: 'Змінити порядок елемента',

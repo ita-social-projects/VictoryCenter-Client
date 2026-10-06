@@ -66,4 +66,7 @@ export const EventsApi = {
         });
         return response.data;
     },
+    reorder: async (client: AxiosInstance, categoryId: number, ids: number[]) => {
+        await client.put(API_ROUTES.EVENTS.REORDER, { categoryId, ids });
+    },
 };

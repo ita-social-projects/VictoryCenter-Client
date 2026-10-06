@@ -243,6 +243,7 @@ describe('EventsPageModals', () => {
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
                 translationLanguages={translationLanguages}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 

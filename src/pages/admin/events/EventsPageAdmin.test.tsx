@@ -106,6 +106,7 @@ const mockOpenAddCategoryModal = jest.fn();
 const mockOpenEditCategoryModal = jest.fn();
 const mockOpenDeleteCategoryModal = jest.fn();
 const mockOpenAddItemModal = jest.fn();
+const mockCloseTranslateCategoryModal = jest.fn();
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => ({
@@ -114,6 +115,9 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
             openEditCategoryModal: mockOpenEditCategoryModal,
             openDeleteCategoryModal: mockOpenDeleteCategoryModal,
             openAddItemModal: mockOpenAddItemModal,
+        },
+        closeModalActions: {
+            closeTranslateCategoryModal: mockCloseTranslateCategoryModal,
         },
     }),
 }));
@@ -154,20 +158,24 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 const mockOnAddCategory = jest.fn();
 const mockOnUpdateCategory = jest.fn();
 const mockOnDeleteCategory = jest.fn();
+const mockOnTranslateCategory = jest.fn();
 
 jest.mock('./event-page-modals/EventsPageModals', () => ({
     EventsPageModals: ({
         onAddCategory,
         onUpdateCategory,
         onDeleteCategory,
+        onTranslateCategory,
     }: {
         onAddCategory: (category: EventCategoryDto) => void;
         onUpdateCategory: (category: EventCategoryDto) => void;
         onDeleteCategory: (categoryId: number) => void;
+        onTranslateCategory: (category: EventCategoryDto) => void;
     }) => {
         mockOnAddCategory.mockImplementation(onAddCategory);
         mockOnUpdateCategory.mockImplementation(onUpdateCategory);
         mockOnDeleteCategory.mockImplementation(onDeleteCategory);
+        mockOnTranslateCategory.mockImplementation(onTranslateCategory);
 
         return <div data-testid="events-page-modals" />;
     },
@@ -375,7 +383,7 @@ describe('EventsPageAdmin', () => {
             localizations: [
                 {
                     entityId: 1,
-                    language: { id: 2, code: 'en' },
+                    language: { id: 2, code: 'en' } as any,
                     name: 'Localized Cat 1',
                     translationStatus: 1,
                 },
@@ -433,10 +441,12 @@ describe('EventsPageAdmin', () => {
         mockOpenEditCategoryModal.mockClear();
         mockOpenDeleteCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
+        mockCloseTranslateCategoryModal.mockClear();
 
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
         mockOnDeleteCategory.mockClear();
+        mockOnTranslateCategory.mockClear();
     });
 
     it('passes languages and localizedEntity props to LocalizationStatuses for each category', async () => {
@@ -524,7 +534,7 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection = resolve;
         });
 
-        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise);
+        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise as any);
 
         render(<EventsPageAdmin />);
 
@@ -698,7 +708,7 @@ describe('EventsPageAdmin', () => {
             resolvePublish = resolve;
         });
 
-        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise);
+        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise as any);
 
         render(<EventsPageAdmin />);
 
@@ -776,8 +786,8 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.updateEventsIntroSection
-            .mockReturnValueOnce(descriptionPublishPromise)
-            .mockReturnValueOnce(titlePublishPromise);
+            .mockReturnValueOnce(descriptionPublishPromise as any)
+            .mockReturnValueOnce(titlePublishPromise as any);
 
         await renderEventsPage();
         await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
@@ -1066,6 +1076,33 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
+
+    it('updates a category translation and displays a success toast', async () => {
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+
+        const translatedCategory: EventCategoryDto = {
+            id: 1,
+            name: 'Translated Category Name',
+            relatedEventNewsCount: 0,
+            localizations: [],
+        };
+
+        act(() => {
+            mockOnTranslateCategory(translatedCategory);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Translated Category Name')).toBeInTheDocument();
+        });
+
+        expect(mockCloseTranslateCategoryModal).toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+            ToastType.Success,
+        );
     });
 
     it('fetches and renders event items for the selected category', async () => {

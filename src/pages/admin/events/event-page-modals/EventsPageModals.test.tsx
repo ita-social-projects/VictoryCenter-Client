@@ -52,13 +52,14 @@ describe('EventsPageModals', () => {
         relatedEventNewsCount: 0,
     };
 
-    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'Англійська' }];
+    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'English' }];
 
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
     const closeAddItemModal = jest.fn();
     const closeDeleteCategoryModal = jest.fn();
     const closeTranslateCategoryModal = jest.fn();
+
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
@@ -194,37 +195,11 @@ describe('EventsPageModals', () => {
         const eventModalProps = mockedEventModal.mock.calls[0][0];
         const translateModalProps = mockedTranslateEventCategoryModal.mock.calls[0][0];
 
-        expect(addModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Add,
-                isOpen: false,
-            }),
-        );
-
-        expect(editModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Edit,
-                isOpen: false,
-            }),
-        );
-
-        expect(deleteModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(eventModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(translateModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
+        expect(addModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Add, isOpen: false }));
+        expect(editModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Edit, isOpen: false }));
+        expect(deleteModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(eventModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(translateModalProps).toEqual(expect.objectContaining({ isOpen: false }));
     });
 
     it('renders add event modal', () => {
@@ -252,7 +227,7 @@ describe('EventsPageModals', () => {
         );
     });
 
-    it('renders translate category modal', () => {
+    it('renders translate category modal with correct props', () => {
         render(
             <EventsPageModals
                 modalsStateControl={createModalsStateControl(false, false, false, false, true)}

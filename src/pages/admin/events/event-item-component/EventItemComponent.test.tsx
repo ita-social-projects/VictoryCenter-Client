@@ -3,7 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { EventItemComponent } from './EventItemComponent';
 import { VisibilityStatus } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events';
+import { TranslationStatus } from '@/types/common/language';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
+import localizationStatusStyles from '@/components/admin/localization-statuses/LocalizationStatuses.module.scss';
 
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: number }) => (
@@ -46,6 +48,52 @@ describe('EventItemComponent', () => {
         render(<EventItemComponent item={item} onEdit={jest.fn()} />);
 
         expect(screen.getByText(item.description)).toBeInTheDocument();
+    });
+
+    it('renders the selected language translation and its status badge', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+        const translatedEvent: EventItemDto = {
+            ...item,
+            localizations: [
+                {
+                    language: { id: english.id, code: english.code },
+                    translationStatus: TranslationStatus.Relevant,
+                    title: 'Translated event',
+                    description: 'Translated event description',
+                },
+            ],
+        };
+
+        render(
+            <EventItemComponent
+                item={translatedEvent}
+                onEdit={jest.fn()}
+                language={english}
+                translationLanguages={[english]}
+            />,
+        );
+
+        expect(screen.getByText('Translated event')).toBeInTheDocument();
+        expect(screen.getByText('Translated event description')).toBeInTheDocument();
+        expect(screen.getByText('EN')).toHaveClass(localizationStatusStyles.relevant);
+    });
+
+    it('falls back to the Ukrainian content and indicates a missing translation', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+
+        render(
+            <EventItemComponent
+                item={item}
+                onEdit={jest.fn()}
+                language={english}
+                translationLanguages={[english]}
+            />,
+        );
+
+        expect(screen.getByText(item.title)).toBeInTheDocument();
+        expect(screen.getByText(item.description)).toBeInTheDocument();
+        expect(screen.getByText('EN')).not.toHaveClass(localizationStatusStyles.relevant);
+        expect(screen.getByText('EN')).not.toHaveClass(localizationStatusStyles.outdated);
     });
 
     it('renders the published date in Ukrainian locale', () => {

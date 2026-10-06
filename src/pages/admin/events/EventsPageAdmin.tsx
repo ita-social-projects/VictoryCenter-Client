@@ -27,6 +27,7 @@ import {
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
+import { TranslationStatusFilter } from '@/types/common/language';
 import {
     EVENT_ITEMS_TEXT,
     EVENT_NOTIFICATION_TIMERS,
@@ -130,11 +131,25 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
-        useLocalizationToolkit({
-            setErrorState,
-        });
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        translationStatusFilter,
+        onLanguageChange,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({
+        setErrorState,
+    });
     const { openModalActions } = modalsStateControl;
+
+    const handleTranslationStatusFilterChange = useCallback(
+        (filter: TranslationStatusFilter | undefined) => {
+            onTranslationStatusFilterChange(filter);
+            resetEventItemsState();
+        },
+        [onTranslationStatusFilterChange, resetEventItemsState],
+    );
 
     const getEventSearchItems = useCallback(
         async (
@@ -300,8 +315,15 @@ export const EventsPageAdmin = () => {
     }, [updatePageSize]);
 
     const renderEntityComponent = useCallback(
-        (item: EventItemDto) => <EventItemComponent item={item} onEdit={openModalActions.openEditItemModal} />,
-        [openModalActions],
+        (item: EventItemDto) => (
+            <EventItemComponent
+                item={item}
+                language={selectedLanguage}
+                translationLanguages={translationLanguages}
+                onEdit={openModalActions.openEditItemModal}
+            />
+        ),
+        [openModalActions, selectedLanguage, translationLanguages],
     );
 
     const handleEntitiesReordered = useCallback(
@@ -387,7 +409,7 @@ export const EventsPageAdmin = () => {
                     categoryId,
                     offset,
                     pageSize,
-                    undefined,
+                    translationStatusFilter,
                     statusFilter,
                 );
 
@@ -430,7 +452,7 @@ export const EventsPageAdmin = () => {
                 }
             }
         },
-        [client, pageSize, addToast, setErrorState, statusFilter],
+        [client, pageSize, addToast, setErrorState, statusFilter, translationStatusFilter],
     );
 
     useEffect(() => {
@@ -466,19 +488,6 @@ export const EventsPageAdmin = () => {
             fetchEventItems(selectedCategory.id);
         }
     }, [fetchEventItems, selectedCategory]);
-
-    const addMaterialButton = statusFilter === undefined && (
-        <Button
-            className="btn-add"
-            onClick={() => {
-                /*TODO: add implementation.*/
-            }}
-            buttonStyle="secondary"
-        >
-            {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
-            <PlusIcon className="plus-icon" aria-hidden="true" />
-        </Button>
-    );
 
     const handleSectionDraftChange = useCallback((sectionId: EditableHeaderSectionId, value: string) => {
         const field = introSectionFieldById[sectionId];
@@ -582,8 +591,22 @@ export const EventsPageAdmin = () => {
 
     const isAnySectionEditing = Object.values(editingSections).some(Boolean);
 
-    const emptyStateMessage =
-        statusFilter !== undefined ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
+    const isTranslationFilterActive =
+        translationStatusFilter !== undefined && translationStatusFilter !== TranslationStatusFilter.All;
+    const isFilteredView = statusFilter !== undefined || isTranslationFilterActive;
+    const emptyStateMessage = isFilteredView ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
+    const addMaterialButton = !isFilteredView && (
+        <Button
+            className="btn-add"
+            onClick={() => {
+                /*TODO: add implementation.*/
+            }}
+            buttonStyle="secondary"
+        >
+            {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
+            <PlusIcon className="plus-icon" aria-hidden="true" />
+        </Button>
+    );
 
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
@@ -601,7 +624,7 @@ export const EventsPageAdmin = () => {
                     onSuggestionSelect={() => null}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
-                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                    onTranslationStatusFilterChange={handleTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
                 />
             </div>

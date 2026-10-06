@@ -9,6 +9,7 @@ import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
 import { EventItemDto } from '@/types/admin/events';
+import { TranslationStatusFilter } from '@/types/common/language';
 import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
@@ -19,13 +20,23 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 }));
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
-    useLocalizationToolkit: () => ({
-        allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
-        translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
-        selectedLanguage: { code: 'en', id: 2 },
-        onLanguageChange: jest.fn(),
-        onTranslationStatusFilterChange: jest.fn(),
-    }),
+    useLocalizationToolkit: () => {
+        const ReactActual = require('react') as {
+            useState: <T>(initialState: T) => [T, (nextState: T) => void];
+        };
+        const [translationStatusFilter, setTranslationStatusFilter] = ReactActual.useState<number | undefined>(
+            undefined,
+        );
+
+        return {
+            allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
+            translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
+            selectedLanguage: { code: 'en', id: 2 },
+            translationStatusFilter,
+            onLanguageChange: jest.fn(),
+            onTranslationStatusFilterChange: setTranslationStatusFilter,
+        };
+    },
 }));
 
 jest.mock('@/services/api/admin/events/events-api', () => ({
@@ -51,6 +62,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         onSearchClear,
         onSuggestionSelect,
         onStatusFilterChange,
+        onTranslationStatusFilterChange,
         statusFilter,
         fetchSearchItems,
     }: any) => (
@@ -75,6 +87,14 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 
             <button type="button" data-testid="clear-status-filter" onClick={() => onStatusFilterChange?.(undefined)}>
                 Clear status filter
+            </button>
+
+            <button
+                type="button"
+                data-testid="enable-translation-filter"
+                onClick={() => onTranslationStatusFilterChange?.(2)}
+            >
+                Enable translation filter
             </button>
 
             <button type="button" onClick={() => fetchSearchItems?.('query', { offset: 0, limit: 10 })}>
@@ -1144,6 +1164,44 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, 1);
+        });
+    });
+
+    it('applies the translation filter to the active category and keeps it when switching categories', async () => {
+        const user = userEvent.setup();
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        await renderEventsPage();
+        await user.click(screen.getByTestId('enable-translation-filter'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[0].id,
+                0,
+                5,
+                TranslationStatusFilter.Missing,
+                undefined,
+            );
+        });
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('category-2'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[1].id,
+                0,
+                5,
+                TranslationStatusFilter.Missing,
+                undefined,
+            );
         });
     });
 

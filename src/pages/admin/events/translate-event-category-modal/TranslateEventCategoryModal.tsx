@@ -5,6 +5,7 @@ import { LocalizationModal } from '@/components/admin/localization-modal/Localiz
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { LocalizationLanguage } from '@/types/common/language';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { useTranslateEventCategory } from '@/hooks/admin/use-translate-event-category/useTranslateEventCategory';
 import {
     TranslateEventCategoryForm,
     TranslateEventCategoryFormRef,
@@ -16,6 +17,7 @@ export interface TranslateEventCategoryModalProps {
     categories: EventCategoryDto[];
     onClose: () => void;
     translationLanguages: LocalizationLanguage[];
+    onTranslateCategory?: (category: EventCategoryDto) => void;
 }
 
 export const TranslateEventCategoryModal = ({
@@ -23,6 +25,7 @@ export const TranslateEventCategoryModal = ({
     categories,
     onClose,
     translationLanguages,
+    onTranslateCategory,
 }: TranslateEventCategoryModalProps) => {
     const formRef = useRef<TranslateEventCategoryFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
@@ -58,35 +61,42 @@ export const TranslateEventCategoryModal = ({
         onClose();
     };
 
+    const { translateEventCategory, isSubmitting, error } = useTranslateEventCategory({
+        category: selectedCategory,
+        language: language as LocalizationLanguage,
+        onSuccess: (updatedCategory) => {
+            onTranslateCategory?.(updatedCategory);
+            handleClose();
+        },
+    });
+
     const handleSaveClick = () => {
         if (!isCompleteFormValid || !formRef.current?.isValid()) return;
         formRef.current.submit();
     };
 
-    const handleFormSubmit = async (_data: TranslateEventCategoryFormValues) => {
-        // TODO: submit the form
-        handleClose();
+    const handleFormSubmit = async (data: TranslateEventCategoryFormValues) => {
+        await translateEventCategory(data);
     };
 
     const checkIsDirty = () => {
         return isDirty;
     };
 
-    const modalTitle = EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE;
-
     return (
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
-            title={modalTitle}
+            title={EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE}
             onSave={handleSaveClick}
-            isSubmitting={false}
+            isSubmitting={isSubmitting}
             isFormValid={isCompleteFormValid}
             isDirty={isDirty}
             checkIsDirty={checkIsDirty}
         >
+            {error && <div className="error-message">{error}</div>}
             <TranslationControls
-                isSubmitting={false}
+                isSubmitting={isSubmitting}
                 languages={availableLanguages}
                 selectedLanguage={language}
                 onLanguageChange={setLanguage}
@@ -98,7 +108,7 @@ export const TranslateEventCategoryModal = ({
                 onCategoryChange={setSelectedCategory}
                 onValidationChange={setIsFormValid}
                 onSubmit={handleFormSubmit}
-                formDisabled={false}
+                formDisabled={isSubmitting}
                 onDirtyChange={setIsDirty}
             />
         </LocalizationModal>

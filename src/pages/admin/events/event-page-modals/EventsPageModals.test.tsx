@@ -62,6 +62,7 @@ describe('EventsPageModals', () => {
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
+    const onTranslateCategory = jest.fn();
 
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
@@ -103,6 +104,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -129,6 +131,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -155,6 +158,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -179,6 +183,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -231,6 +236,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -255,6 +261,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -267,6 +274,7 @@ describe('EventsPageModals', () => {
                 categories,
                 onClose: closeTranslateCategoryModal,
                 translationLanguages,
+                onTranslateCategory,
             }),
         );
     });

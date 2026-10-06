@@ -91,6 +91,9 @@ export const EVENT_CATEGORY_TEXT = {
         },
         NAME_PLACEHOLDER: 'Введіть назву категорії',
         CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+        MESSAGE: {
+            FAIL_TO_TRANSLATE: 'Не вдалось перекласти категорію',
+        },
     },
     TRANSLATION_MODAL: {
         TITLE: 'Переклад категорії',

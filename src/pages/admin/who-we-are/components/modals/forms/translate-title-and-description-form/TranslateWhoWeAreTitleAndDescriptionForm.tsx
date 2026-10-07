@@ -150,6 +150,8 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
                             disabled={isSubmitting || formDisabled}
                             maxLength={limits.titleLimit!}
                             error={errors.title}
+                            normalizeSpaces
+                            trimOnBlur
                         />
                         <RichTextInputGroup
                             label={WHO_WE_ARE_TEXT.FORM?.LABEL?.DESCRIPTION || 'Description'}
@@ -162,6 +164,8 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
                             disabled={isSubmitting || formDisabled}
                             maxLength={limits.descriptionLimit}
                             error={errors.description}
+                            normalizeSpaces
+                            trimOnBlur
                         />
                     </div>
                 </div>

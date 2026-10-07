@@ -82,6 +82,8 @@ export const CardContent = ({
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
+                    normalizeSpaces
+                    trimOnBlur
                 />
             </div>
         </div>

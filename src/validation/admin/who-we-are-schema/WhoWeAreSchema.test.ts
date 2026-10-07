@@ -25,6 +25,22 @@ describe('text validation', () => {
         );
     });
 
+    it('checks the min length against text with trimmed and collapsed spaces', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(' 123   4567 ')).toBe(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH),
+        );
+    });
+
+    it('treats a value containing only spaces as empty', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('     ')).toBe(
+            WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED,
+        );
+    });
+
+    it('accepts text that reaches the min length after normalization', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('  12345   67890  ')).toBeUndefined();
+    });
+
     it('Accept validation', () => {
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText('Correct text')).toBeUndefined();
     });

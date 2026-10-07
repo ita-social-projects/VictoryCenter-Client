@@ -91,6 +91,8 @@ export const DescriptionSection = ({
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
+                    normalizeSpaces
+                    trimOnBlur
                 />
                 {isBaseLanguage && (
                     <Button

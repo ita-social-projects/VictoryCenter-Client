@@ -39,6 +39,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         placeholder,
         showCounter,
         enforceMaxLength,
+        normalizeSpaces,
         onLengthChange,
     }: {
         id: string;
@@ -53,6 +54,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         placeholder?: string;
         showCounter?: boolean;
         enforceMaxLength?: boolean;
+        normalizeSpaces?: boolean;
         onLengthChange?: (length: number) => void;
     }) => (
         <div
@@ -66,6 +68,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
             data-placeholder={placeholder}
             data-show-counter={showCounter}
             data-enforce-max-length={enforceMaxLength}
+            data-normalize-spaces={normalizeSpaces}
         >
             <button data-testid="mock-on-change" onClick={() => onChange('<p>Changed</p>')}>
                 Change
@@ -173,6 +176,11 @@ describe('RichTextInputGroup', () => {
         it('forwards enforceMaxLength prop to RichTextInput', () => {
             renderRichTextInputGroup({ enforceMaxLength: false });
             expect(getRichTextInput()).toHaveAttribute('data-enforce-max-length', 'false');
+        });
+
+        it('forwards normalizeSpaces prop to RichTextInput', () => {
+            renderRichTextInputGroup({ normalizeSpaces: true });
+            expect(getRichTextInput()).toHaveAttribute('data-normalize-spaces', 'true');
         });
 
         it('forwards disabled prop to RichTextInput', () => {

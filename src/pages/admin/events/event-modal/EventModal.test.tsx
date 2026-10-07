@@ -225,6 +225,13 @@ describe('EventModal', () => {
             expect(screen.queryByText(currentCategory.name)).not.toBeInTheDocument();
         });
 
+        it('disables save actions when currentCategory is null', () => {
+            render(<EventModal {...defaultProps} currentCategory={null} />);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).toBeDisabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        });
+
         it('renders modal buttons in disable state initially', () => {
             render(<EventModal {...defaultProps} />);
 
@@ -467,6 +474,19 @@ describe('EventModal', () => {
             expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE })).toHaveValue(
                 'Valid event title',
             );
+        });
+
+        it('closes the action confirmation without saving when currentCategory becomes unavailable', () => {
+            const { rerender } = render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }));
+
+            rerender(<EventModal {...defaultProps} currentCategory={null} />);
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            expect(mockedEventsApi.createEvent).not.toHaveBeenCalled();
         });
 
         it('creates a draft only after confirmation with the active category', async () => {

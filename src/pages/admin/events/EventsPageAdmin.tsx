@@ -226,8 +226,12 @@ export const EventsPageAdmin = () => {
     }, [client, setErrorState]);
 
     const handleAddEvent = useCallback(() => {
+        if (!selectedCategory) {
+            return;
+        }
+
         openModalActions.openAddItemModal();
-    }, [openModalActions]);
+    }, [openModalActions, selectedCategory]);
 
     const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
         setCategories((prev) => [...prev, newCategory]);
@@ -518,7 +522,7 @@ export const EventsPageAdmin = () => {
     );
 
     const addMaterialButton = statusFilter === undefined && (
-        <Button className="btn-add" onClick={handleAddEvent} buttonStyle="secondary">
+        <Button className="btn-add" onClick={handleAddEvent} buttonStyle="secondary" disabled={!selectedCategory}>
             {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
             <PlusIcon className="plus-icon" aria-hidden="true" />
         </Button>

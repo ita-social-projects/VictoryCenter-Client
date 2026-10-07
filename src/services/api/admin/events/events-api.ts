@@ -19,6 +19,30 @@ interface EventSaveData {
     existingPreviewImageId: number | null;
 }
 
+const getPreviewImageSaveData = async (
+    client: AxiosInstance,
+    image: Image | ImageValues | null,
+    existingPreviewImageId: number | null,
+): Promise<{ previewImageId: number | null; createdImageId: number | null; imageIdToDelete: number | null }> => {
+    if (image && 'base64' in image) {
+        const createdImage = await ImageApi.post(client, image);
+
+        return {
+            previewImageId: createdImage.id,
+            createdImageId: createdImage.id,
+            imageIdToDelete: existingPreviewImageId,
+        };
+    }
+
+    const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(client, image, existingPreviewImageId);
+
+    return {
+        previewImageId: finalImageId,
+        createdImageId: null,
+        imageIdToDelete,
+    };
+};
+
 const saveEvent = async (
     client: AxiosInstance,
     method: 'post' | 'put',
@@ -28,15 +52,10 @@ const saveEvent = async (
     let createdImageId: number | null = null;
 
     try {
-        const { finalImageId: previewImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
-            client,
-            data.image,
-            data.existingPreviewImageId,
-        );
+        const imageSaveData = await getPreviewImageSaveData(client, data.image, data.existingPreviewImageId);
 
-        if (data.image && 'base64' in data.image && !data.existingPreviewImageId) {
-            createdImageId = previewImageId;
-        }
+        const { previewImageId, imageIdToDelete } = imageSaveData;
+        createdImageId = imageSaveData.createdImageId;
 
         const request = { ...data.request, previewImageId };
         const response =

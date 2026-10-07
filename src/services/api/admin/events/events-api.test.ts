@@ -12,6 +12,7 @@ jest.mock('@/services/api/admin/image/image-api', () => ({
     ImageApi: {
         delete: jest.fn(),
         getUpdateImageId: jest.fn(),
+        post: jest.fn(),
     },
 }));
 
@@ -29,6 +30,7 @@ describe('EventsApi', () => {
         mockPost.mockReset();
         mockedImageApi.delete.mockReset();
         mockedImageApi.getUpdateImageId.mockReset();
+        mockedImageApi.post.mockReset();
     });
 
     describe('updateEventsIntroSection', () => {
@@ -212,7 +214,11 @@ describe('EventsApi', () => {
 
         it('uploads a new preview image before creating an event', async () => {
             mockPost.mockResolvedValueOnce({ data: { id: 1 } });
-            mockedImageApi.getUpdateImageId.mockResolvedValueOnce({ finalImageId: 15, imageIdToDelete: null });
+            mockedImageApi.post.mockResolvedValueOnce({
+                id: 15,
+                url: 'https://example.com/image.png',
+                mimeType: 'image/png',
+            });
 
             await EventsApi.createEvent(client, {
                 request,
@@ -220,20 +226,20 @@ describe('EventsApi', () => {
                 existingPreviewImageId: null,
             });
 
-            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(
-                client,
-                { base64: 'image-base64', mimeType: 'image/png' },
-                null,
-            );
+            expect(mockedImageApi.post).toHaveBeenCalledWith(client, { base64: 'image-base64', mimeType: 'image/png' });
             expect(mockPost).toHaveBeenCalledWith(API_ROUTES.EVENTS.BASE, {
                 ...request,
                 previewImageId: 15,
             });
         });
 
-        it('updates the existing preview image before updating an event', async () => {
+        it('creates a replacement preview image and deletes the previous image after updating an event', async () => {
             mockPut.mockResolvedValueOnce({ data: { id: 1 } });
-            mockedImageApi.getUpdateImageId.mockResolvedValueOnce({ finalImageId: 14, imageIdToDelete: null });
+            mockedImageApi.post.mockResolvedValueOnce({
+                id: 15,
+                url: 'https://example.com/image.png',
+                mimeType: 'image/png',
+            });
 
             await EventsApi.updateEvent(client, 1, {
                 request,
@@ -241,20 +247,25 @@ describe('EventsApi', () => {
                 existingPreviewImageId: 14,
             });
 
-            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(
-                client,
-                { base64: 'replacement-image', mimeType: 'image/png' },
-                14,
-            );
+            expect(mockedImageApi.post).toHaveBeenCalledWith(client, {
+                base64: 'replacement-image',
+                mimeType: 'image/png',
+            });
+            expect(mockedImageApi.getUpdateImageId).not.toHaveBeenCalled();
             expect(mockPut).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.BASE}/1`, {
                 ...request,
-                previewImageId: 14,
+                previewImageId: 15,
             });
+            expect(mockedImageApi.delete).toHaveBeenCalledWith(client, 14);
         });
 
         it('removes a newly created image when the event request fails', async () => {
             const requestError = new Error('Failed to create event');
-            mockedImageApi.getUpdateImageId.mockResolvedValueOnce({ finalImageId: 15, imageIdToDelete: null });
+            mockedImageApi.post.mockResolvedValueOnce({
+                id: 15,
+                url: 'https://example.com/image.png',
+                mimeType: 'image/png',
+            });
             mockPost.mockRejectedValueOnce(requestError);
             mockedImageApi.delete.mockResolvedValueOnce(undefined);
 
@@ -269,9 +280,13 @@ describe('EventsApi', () => {
             expect(mockedImageApi.delete).toHaveBeenCalledWith(client, 15);
         });
 
-        it('does not delete an existing preview image when the event update fails', async () => {
+        it('keeps the existing preview image when event update with a replacement image fails', async () => {
             const requestError = new Error('Failed to update event');
-            mockedImageApi.getUpdateImageId.mockResolvedValueOnce({ finalImageId: 14, imageIdToDelete: null });
+            mockedImageApi.post.mockResolvedValueOnce({
+                id: 15,
+                url: 'https://example.com/image.png',
+                mimeType: 'image/png',
+            });
             mockPut.mockRejectedValueOnce(requestError);
 
             await expect(
@@ -282,7 +297,8 @@ describe('EventsApi', () => {
                 }),
             ).rejects.toBe(requestError);
 
-            expect(mockedImageApi.delete).not.toHaveBeenCalled();
+            expect(mockedImageApi.delete).toHaveBeenCalledWith(client, 15);
+            expect(mockedImageApi.delete).not.toHaveBeenCalledWith(client, 14);
         });
 
         it('returns the saved event when cleanup of a removed image fails', async () => {

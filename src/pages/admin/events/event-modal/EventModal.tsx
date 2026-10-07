@@ -172,8 +172,8 @@ export const EventModal = (props: EventModalProps) => {
     const isPublishValid =
         EventValidationSchema.isValidSync(formValues, { context: { isPublishing: true } }) && !errors.image;
 
-    const isSaveAsDraftDisabled = !isDirty || !isDraftValid;
-    const isPublishDisabled = !isDirty || !isPublishValid;
+    const isSaveAsDraftDisabled = !currentCategory || !isDirty || !isDraftValid;
+    const isPublishDisabled = !currentCategory || !isDirty || !isPublishValid;
 
     const handleTextFieldBlur = useCallback(
         (field: ControllerRenderProps<EventFormValues>) => () => {
@@ -318,7 +318,12 @@ export const EventModal = (props: EventModalProps) => {
     }, [isSubmitting]);
 
     const handleConfirmAction = useCallback(async () => {
-        if (pendingStatus === null || isSubmitting || (!isEditMode && !currentCategory)) return;
+        if (pendingStatus === null || isSubmitting) return;
+
+        if (!currentCategory) {
+            setPendingStatus(null);
+            return;
+        }
 
         const statusToSubmit = pendingStatus;
         setPendingStatus(null);
@@ -331,7 +336,7 @@ export const EventModal = (props: EventModalProps) => {
                 formValues,
                 status: statusToSubmit,
                 currentEvent,
-                currentCategoryId: currentCategory!.id,
+                currentCategoryId: currentCategory.id,
                 fallbackBackgroundImage: eventToEdit?.backgroundImage,
             });
             const savedEvent = isEditMode

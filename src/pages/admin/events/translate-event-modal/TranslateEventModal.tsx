@@ -51,16 +51,9 @@ export const TranslateEventModal = ({
 
         setIsSubmitting(true);
         try {
-            console.log('Mock submit translation:', {
-                eventId: eventToTranslate.id,
-                language: language.code,
-                data,
-            });
             await new Promise((resolve) => setTimeout(resolve, 1000));
-
             onClose();
         } catch (error) {
-            console.error('Failed to translate event', error);
         } finally {
             setIsSubmitting(false);
         }

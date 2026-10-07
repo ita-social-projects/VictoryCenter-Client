@@ -15,6 +15,52 @@ export interface EventItemDto {
     priority: number;
 }
 
+export interface EventCategoryReference {
+    id: number;
+}
+
+export interface EventLocalizationDetails {
+    language: {
+        id: number;
+    };
+    title: string;
+    description?: string | null;
+    additionalDescription?: string | null;
+}
+
+export interface EventDetailsDto extends EventItemDto {
+    categories: EventCategoryReference[];
+    localizations: EventLocalizationDetails[];
+}
+
+export interface EventLocalizationRequest {
+    languageId: number;
+    title: string;
+    description: string;
+    additionalDescription: string;
+}
+
+export interface EventCreateUpdateRequest {
+    title: string;
+    description: string;
+    additionalDescription: string;
+    resource: string;
+    resourceEn: string;
+    publishedAt: string | null;
+    status: VisibilityStatus;
+    previewImageId: number | null;
+    backgroundImageId: number | null;
+    categoryIds: number[];
+    localizations: EventLocalizationRequest[];
+}
+
+export interface EventSaveSuccessData {
+    event: EventItemDto;
+    categoryId: number | null;
+    isFirstPublication: boolean;
+    shouldMoveDraftToTop: boolean;
+}
+
 export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
 
 export interface ErrorState {

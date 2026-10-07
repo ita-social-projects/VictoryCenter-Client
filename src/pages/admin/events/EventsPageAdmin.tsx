@@ -18,6 +18,7 @@ import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import {
     EventItemDto,
+    EventSaveSuccessData,
     EventSearchItemData,
     ErrorState,
     EventsErrorType,
@@ -467,14 +468,57 @@ export const EventsPageAdmin = () => {
         }
     }, [fetchEventItems, selectedCategory]);
 
+    const moveDraftToTop = useCallback(
+        async (event: EventItemDto, categoryId: number) => {
+            const initialResponse = await EventsApi.fetchEvents(client, categoryId, 0, DEFAULT_LOAD_ITEMS_COUNT);
+            const response =
+                initialResponse.totalItemsCount > initialResponse.items.length
+                    ? await EventsApi.fetchEvents(client, categoryId, 0, initialResponse.totalItemsCount)
+                    : initialResponse;
+            const orderedIds = [
+                event.id,
+                ...response.items.filter((item) => item.id !== event.id).map((item) => item.id),
+            ];
+
+            if (orderedIds.length > 1) {
+                await EventsApi.reorder(client, categoryId, orderedIds);
+            }
+        },
+        [client],
+    );
+
+    const handleEventSaveSuccess = useCallback(
+        async ({ event, categoryId, isFirstPublication, shouldMoveDraftToTop }: EventSaveSuccessData) => {
+            if (shouldMoveDraftToTop && categoryId) {
+                try {
+                    await moveDraftToTop(event, categoryId);
+                } catch {
+                    addToast(
+                        EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+                        ToastType.Error,
+                        EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+                    );
+                    setErrorState(EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS, 'events-reorder');
+                }
+            }
+
+            if (selectedCategory?.id === categoryId) {
+                fetchEventItems(categoryId, true);
+            }
+
+            if (isFirstPublication) {
+                addToast(
+                    EVENTS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+                    ToastType.Info,
+                    EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
+                );
+            }
+        },
+        [addToast, fetchEventItems, moveDraftToTop, selectedCategory?.id, setErrorState],
+    );
+
     const addMaterialButton = statusFilter === undefined && (
-        <Button
-            className="btn-add"
-            onClick={() => {
-                /*TODO: add implementation.*/
-            }}
-            buttonStyle="secondary"
-        >
+        <Button className="btn-add" onClick={handleAddEvent} buttonStyle="secondary">
             {EVENTS_TEXT.BUTTON.ADD_MATERIAL}
             <PlusIcon className="plus-icon" aria-hidden="true" />
         </Button>
@@ -700,6 +744,7 @@ export const EventsPageAdmin = () => {
                 modalsStateControl={modalsStateControl}
                 categories={categories}
                 currentCategory={selectedCategory}
+                onEventSaveSuccess={handleEventSaveSuccess}
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}

@@ -2,12 +2,60 @@ import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import {
+    EventCreateUpdateRequest,
+    EventDetailsDto,
     EventItemDto,
     EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { Image, ImageValues } from '@/types/common/image';
+
+interface EventSaveData {
+    request: EventCreateUpdateRequest;
+    image: Image | ImageValues | null;
+    existingPreviewImageId: number | null;
+}
+
+const saveEvent = async (
+    client: AxiosInstance,
+    method: 'post' | 'put',
+    data: EventSaveData,
+    eventId?: number,
+): Promise<EventItemDto> => {
+    let createdImageId: number | null = null;
+
+    try {
+        const { finalImageId: previewImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+            client,
+            data.image,
+            data.existingPreviewImageId,
+        );
+
+        if (data.image && 'base64' in data.image && !data.existingPreviewImageId) {
+            createdImageId = previewImageId;
+        }
+
+        const request = { ...data.request, previewImageId };
+        const response =
+            method === 'post'
+                ? await client.post<EventItemDto>(API_ROUTES.EVENTS.BASE, request)
+                : await client.put<EventItemDto>(`${API_ROUTES.EVENTS.BASE}/${eventId}`, request);
+
+        if (imageIdToDelete) {
+            await Promise.allSettled([ImageApi.delete(client, imageIdToDelete)]);
+        }
+
+        return response.data;
+    } catch (error) {
+        if (createdImageId) {
+            await Promise.allSettled([ImageApi.delete(client, createdImageId)]);
+        }
+        throw error;
+    }
+};
 
 export const EventsApi = {
     getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
@@ -47,6 +95,16 @@ export const EventsApi = {
             },
         });
         return response.data;
+    },
+    getEventById: async (client: AxiosInstance, id: number): Promise<EventDetailsDto> => {
+        const response = await client.get<EventDetailsDto>(`${API_ROUTES.EVENTS.BASE}/${id}`);
+        return response.data;
+    },
+    createEvent: async (client: AxiosInstance, data: EventSaveData): Promise<EventItemDto> => {
+        return saveEvent(client, 'post', data);
+    },
+    updateEvent: async (client: AxiosInstance, id: number, data: EventSaveData): Promise<EventItemDto> => {
+        return saveEvent(client, 'put', data, id);
     },
     fetchEventSearchItems: async (
         client: AxiosInstance,

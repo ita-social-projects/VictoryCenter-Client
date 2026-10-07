@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, ControllerRenderProps } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Modal } from '@/components/common/modal/Modal';
@@ -13,7 +13,7 @@ import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { EventValidationSchema, EventFormValues } from '@/validation/admin/event-schema/event-schema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
+import { EVENTS_TEXT, EVENT_NOTIFICATION_TIMERS, EVENT_VALIDATION } from '@/const/admin/events';
 import { IMAGE_VALIDATION as BASE_IMAGE_VALIDATION } from '@/const/admin/image';
 import {
     getNormalizedInputText,
@@ -23,8 +23,16 @@ import styles from './EventModal.module.scss';
 import { ReactComponent as CalendarIcon } from '@/assets/icons/calendar.svg';
 import { ReactComponent as ChevronRightIcon } from '@/assets/icons/chevron-right.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
-import { ModalMode } from '@/types/admin/common';
-import { EventItemDto } from '@/types/admin/events';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { EventItemDto, EventSaveSuccessData } from '@/types/admin/events';
+import { EventsApi } from '@/services/api/admin/events/events-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import {
+    getEventImageId,
+    mapEventFormValuesToCreateUpdateRequest,
+} from '@/utils/functions/mappers/admin/events-mappers/event-request-mapper';
 
 type PickerLayer = 'date-picker' | 'month-year-selector' | 'calendar';
 
@@ -32,6 +40,7 @@ type EventModalBaseProps = {
     isOpen: boolean;
     onClose: () => void;
     currentCategory: EventCategoryDto | null;
+    onSaveSuccess?: (data: EventSaveSuccessData) => void;
 };
 
 export type EventModalProps =
@@ -119,8 +128,11 @@ const mapEventImageError = (error: string | null): string | undefined => {
 };
 
 export const EventModal = (props: EventModalProps) => {
-    const { isOpen, onClose, currentCategory, mode } = props;
+    const { isOpen, onClose, currentCategory, mode, onSaveSuccess } = props;
     const isEditMode = mode === ModalMode.Edit;
+    const eventToEdit = props.mode === ModalMode.Edit ? props.eventToEdit : undefined;
+    const client = useAdminClient();
+    const { addToast } = useToast();
 
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -136,8 +148,10 @@ export const EventModal = (props: EventModalProps) => {
     const selectableYears = [currentDate.getFullYear() - 1, currentDate.getFullYear()];
 
     const [isPublishing, setIsPublishing] = useState(false);
+    const [pendingStatus, setPendingStatus] = useState<VisibilityStatus | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const initialFormState = props.mode === ModalMode.Edit ? getEditFormState(props.eventToEdit) : defaultFormState;
+    const initialFormState = eventToEdit ? getEditFormState(eventToEdit) : defaultFormState;
 
     const {
         control,
@@ -162,8 +176,8 @@ export const EventModal = (props: EventModalProps) => {
     const isPublishDisabled = !isDirty || !isPublishValid;
 
     const handleTextFieldBlur = useCallback(
-        (field: any) => () => {
-            if (field.value) {
+        (field: ControllerRenderProps<EventFormValues>) => () => {
+            if (typeof field.value === 'string' && field.value) {
                 field.onChange(getNormalizedInputText(field.value));
             }
             field.onBlur();
@@ -188,13 +202,15 @@ export const EventModal = (props: EventModalProps) => {
     );
 
     const handleClose = useCallback(() => {
+        if (isSubmitting) return;
+
         if (isDirty) {
             setShowCloseConfirmModal(true);
             return;
         }
 
         onClose();
-    }, [isDirty, onClose]);
+    }, [isDirty, isSubmitting, onClose]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
@@ -269,13 +285,97 @@ export const EventModal = (props: EventModalProps) => {
         setHasDeselectedDate(false);
     };
 
+    const getConfirmationTitle = (status: VisibilityStatus) => {
+        if (!isEditMode) {
+            return status === VisibilityStatus.Draft
+                ? EVENTS_TEXT.QUESTION.SAVE_NEW_MATERIAL
+                : EVENTS_TEXT.QUESTION.PUBLISH_NEW_MATERIAL;
+        }
+
+        if (eventToEdit?.status === VisibilityStatus.Published) {
+            return status === VisibilityStatus.Draft
+                ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
+                : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
+        }
+
+        return status === VisibilityStatus.Draft
+            ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
+            : EVENTS_TEXT.QUESTION.PUBLISH_MATERIAL;
+    };
+
     const handleSaveAsDraft = () => {
         setIsPublishing(false);
+        setPendingStatus(VisibilityStatus.Draft);
     };
 
     const handlePublish = () => {
         setIsPublishing(true);
+        setPendingStatus(VisibilityStatus.Published);
     };
+
+    const closeActionConfirmation = useCallback(() => {
+        if (!isSubmitting) setPendingStatus(null);
+    }, [isSubmitting]);
+
+    const handleConfirmAction = useCallback(async () => {
+        if (pendingStatus === null || isSubmitting || (!isEditMode && !currentCategory)) return;
+
+        const statusToSubmit = pendingStatus;
+        setPendingStatus(null);
+        setIsSubmitting(true);
+
+        try {
+            const currentEvent = eventToEdit ? await EventsApi.getEventById(client, eventToEdit.id) : null;
+            const previewImage = formValues.image ?? null;
+            const request = mapEventFormValuesToCreateUpdateRequest({
+                formValues,
+                status: statusToSubmit,
+                currentEvent,
+                currentCategoryId: currentCategory!.id,
+                fallbackBackgroundImage: eventToEdit?.backgroundImage,
+            });
+            const savedEvent = isEditMode
+                ? await EventsApi.updateEvent(client, eventToEdit!.id, {
+                      request,
+                      image: previewImage,
+                      existingPreviewImageId: getEventImageId(currentEvent?.previewImage),
+                  })
+                : await EventsApi.createEvent(client, {
+                      request,
+                      image: previewImage,
+                      existingPreviewImageId: null,
+                  });
+
+            onSaveSuccess?.({
+                event: savedEvent,
+                categoryId: currentCategory?.id ?? null,
+                isFirstPublication:
+                    statusToSubmit === VisibilityStatus.Published &&
+                    (!isEditMode || eventToEdit?.status === VisibilityStatus.Draft),
+                shouldMoveDraftToTop: statusToSubmit === VisibilityStatus.Draft,
+            });
+            onClose();
+        } catch {
+            addToast(
+                isEditMode ? EVENTS_TEXT.MESSAGE.FAIL_TO_UPDATE_EVENT : EVENTS_TEXT.MESSAGE.FAIL_TO_CREATE_EVENT,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [
+        addToast,
+        client,
+        currentCategory,
+        formValues,
+        isEditMode,
+        isSubmitting,
+        onClose,
+        pendingStatus,
+        eventToEdit,
+        onSaveSuccess,
+    ]);
 
     useEffect(() => {
         if (isOpen) {
@@ -289,6 +389,8 @@ export const EventModal = (props: EventModalProps) => {
         setInitialPickerDate(null);
         setSelectedMonth(null);
         setHasDeselectedDate(false);
+        setPendingStatus(null);
+        setIsSubmitting(false);
     }, [isOpen, reset]);
 
     return (
@@ -645,7 +747,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="secondary"
-                            disabled={isSaveAsDraftDisabled}
+                            disabled={isSaveAsDraftDisabled || isSubmitting}
                             className={styles['action-button']}
                             onClick={handleSaveAsDraft}
                         >
@@ -654,7 +756,7 @@ export const EventModal = (props: EventModalProps) => {
                         <Button
                             type="button"
                             buttonStyle="primary"
-                            disabled={isPublishDisabled}
+                            disabled={isPublishDisabled || isSubmitting}
                             className={styles['action-button']}
                             onClick={handlePublish}
                         >
@@ -670,6 +772,16 @@ export const EventModal = (props: EventModalProps) => {
                 onClose={handleCloseConfirmModalClose}
                 onCancel={handleCloseConfirmModalClose}
                 onConfirm={handleConfirmClose}
+            />
+            <ConfirmationModal
+                isOpen={pendingStatus !== null}
+                title={pendingStatus === null ? '' : getConfirmationTitle(pendingStatus)}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onClose={closeActionConfirmation}
+                onCancel={closeActionConfirmation}
+                onConfirm={handleConfirmAction}
+                isButtonsDisabled={isSubmitting}
             />
         </>
     );

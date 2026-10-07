@@ -8,6 +8,29 @@ import { EventItemDto } from '@/types/admin/events';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { EVENTS_TEXT, EVENT_VALIDATION as mockEventValidation } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
+import { EventsApi } from '@/services/api/admin/events/events-api';
+
+const mockAddToast = jest.fn();
+const mockClient = {};
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => mockClient,
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: mockAddToast }),
+}));
+
+jest.mock('@/services/api/admin/events/events-api', () => ({
+    EventsApi: {
+        getEventById: jest.fn(),
+        createEvent: jest.fn(),
+        updateEvent: jest.fn(),
+    },
+}));
+
+const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
 
 const getTodayLabel = () => {
     const today = new Date();
@@ -137,6 +160,10 @@ const eventWithImage: EventItemDto = {
 };
 
 describe('EventModal', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     describe('elements rendering', () => {
         it('renders modal title', () => {
             render(<EventModal {...defaultProps} />);
@@ -349,6 +376,297 @@ describe('EventModal', () => {
             });
 
             executeConfirmCloseFlow(onClose);
+        });
+    });
+
+    describe('save and publish confirmations', () => {
+        it.each([
+            [
+                ModalMode.Add,
+                VisibilityStatus.Draft,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT,
+                EVENTS_TEXT.QUESTION.SAVE_NEW_MATERIAL,
+            ],
+            [
+                ModalMode.Add,
+                VisibilityStatus.Published,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+                EVENTS_TEXT.QUESTION.PUBLISH_NEW_MATERIAL,
+            ],
+            [
+                ModalMode.Edit,
+                VisibilityStatus.Draft,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT,
+                COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES,
+            ],
+            [
+                ModalMode.Edit,
+                VisibilityStatus.Draft,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+                EVENTS_TEXT.QUESTION.PUBLISH_MATERIAL,
+            ],
+            [
+                ModalMode.Edit,
+                VisibilityStatus.Published,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+                COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES,
+            ],
+            [
+                ModalMode.Edit,
+                VisibilityStatus.Published,
+                COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT,
+                COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION,
+            ],
+        ])('shows %s confirmation and leaves data intact after No', (mode, status, buttonText, confirmationText) => {
+            const editedEvent = { ...eventToEdit, status };
+            render(
+                mode === ModalMode.Edit ? (
+                    <EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={editedEvent} />
+                ) : (
+                    <EventModal {...defaultProps} mode={ModalMode.Add} />
+                ),
+            );
+
+            if (mode === ModalMode.Add) {
+                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            } else {
+                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Changed event title');
+            }
+
+            if (buttonText === COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED) {
+                if (mode === ModalMode.Add) {
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+                    openDatePickerAndSelectToday(getTodayLabel());
+                    fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+                }
+                fireEvent.click(screen.getByTestId('upload-valid-image'));
+            }
+
+            fireEvent.click(screen.getByRole('button', { name: buttonText as string }));
+
+            expect(screen.getByTestId('confirmation-modal')).toHaveTextContent(confirmationText as string);
+            fireEvent.click(screen.getByTestId('confirmation-cancel'));
+
+            expect(mockedEventsApi.createEvent).not.toHaveBeenCalled();
+            expect(mockedEventsApi.updateEvent).not.toHaveBeenCalled();
+            expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE })).toHaveValue(
+                mode === ModalMode.Add ? 'Valid event title' : 'Changed event title',
+            );
+        });
+
+        it('does not call the API or change data when the confirmation popup is closed', () => {
+            render(<EventModal {...defaultProps} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }));
+            fireEvent.click(screen.getByTestId('confirmation-close'));
+
+            expect(mockedEventsApi.createEvent).not.toHaveBeenCalled();
+            expect(mockedEventsApi.updateEvent).not.toHaveBeenCalled();
+            expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE })).toHaveValue(
+                'Valid event title',
+            );
+        });
+
+        it('creates a draft only after confirmation with the active category', async () => {
+            const onClose = jest.fn();
+            const onSaveSuccess = jest.fn();
+            mockedEventsApi.createEvent.mockResolvedValueOnce({ ...eventToEdit, status: VisibilityStatus.Draft });
+            render(<EventModal {...defaultProps} onClose={onClose} onSaveSuccess={onSaveSuccess} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }));
+            expect(mockedEventsApi.createEvent).not.toHaveBeenCalled();
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            await waitFor(() => expect(mockedEventsApi.createEvent).toHaveBeenCalledTimes(1));
+            expect(mockedEventsApi.createEvent).toHaveBeenCalledWith(
+                mockClient,
+                expect.objectContaining({
+                    existingPreviewImageId: null,
+                    request: expect.objectContaining({
+                        status: VisibilityStatus.Draft,
+                        categoryIds: [currentCategory.id],
+                    }),
+                }),
+            );
+            expect(onClose).toHaveBeenCalledTimes(1);
+            expect(onSaveSuccess).toHaveBeenCalledWith({
+                event: { ...eventToEdit, status: VisibilityStatus.Draft },
+                categoryId: currentCategory.id,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
+            });
+        });
+
+        it('preserves fetched category ids on edit', async () => {
+            const fullEvent = {
+                ...eventToEdit,
+                categories: [{ id: 7 }, { id: 8 }],
+                localizations: [
+                    {
+                        language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
+                        title: eventToEdit.title,
+                        description: eventToEdit.description,
+                        additionalDescription: eventToEdit.additionalDescription,
+                    },
+                    {
+                        language: { id: 2 },
+                        title: 'English title',
+                        description: 'English description',
+                        additionalDescription: 'English additional description',
+                    },
+                ],
+            };
+            mockedEventsApi.getEventById.mockResolvedValueOnce(fullEvent);
+            mockedEventsApi.updateEvent.mockResolvedValueOnce({ ...eventToEdit, status: VisibilityStatus.Published });
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Changed event title');
+            fireEvent.click(screen.getByTestId('upload-valid-image'));
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            await waitFor(() => expect(mockedEventsApi.updateEvent).toHaveBeenCalledTimes(1));
+            expect(mockedEventsApi.updateEvent).toHaveBeenCalledWith(
+                mockClient,
+                eventToEdit.id,
+                expect.objectContaining({
+                    request: expect.objectContaining({
+                        categoryIds: [7, 8],
+                        localizations: [
+                            expect.objectContaining({
+                                languageId: DEFAULT_UKRAINIAN_LANGUAGE_ID,
+                                title: 'Changed event title',
+                            }),
+                            {
+                                languageId: 2,
+                                title: 'English title',
+                                description: 'English description',
+                                additionalDescription: 'English additional description',
+                            },
+                        ],
+                    }),
+                }),
+            );
+        });
+
+        it.each([
+            { mode: ModalMode.Add, targetStatus: VisibilityStatus.Draft },
+            { mode: ModalMode.Add, targetStatus: VisibilityStatus.Published },
+            { mode: ModalMode.Edit, initialStatus: VisibilityStatus.Draft, targetStatus: VisibilityStatus.Draft },
+            { mode: ModalMode.Edit, initialStatus: VisibilityStatus.Draft, targetStatus: VisibilityStatus.Published },
+            {
+                mode: ModalMode.Edit,
+                initialStatus: VisibilityStatus.Published,
+                targetStatus: VisibilityStatus.Published,
+            },
+            {
+                mode: ModalMode.Edit,
+                initialStatus: VisibilityStatus.Published,
+                targetStatus: VisibilityStatus.Draft,
+            },
+        ])('submits the expected $mode/$targetStatus request only after confirmation', async (scenario) => {
+            const onClose = jest.fn();
+            const isPublish = scenario.targetStatus === VisibilityStatus.Published;
+            const buttonText = isPublish
+                ? COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED
+                : COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT;
+
+            if (scenario.mode === ModalMode.Edit) {
+                const fullEvent = {
+                    ...eventToEdit,
+                    status: scenario.initialStatus!,
+                    categories: [{ id: 7 }, { id: 8 }],
+                    localizations: [
+                        {
+                            language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
+                            title: eventToEdit.title,
+                            description: eventToEdit.description,
+                            additionalDescription: eventToEdit.additionalDescription,
+                        },
+                    ],
+                };
+                mockedEventsApi.getEventById.mockResolvedValueOnce(fullEvent);
+                mockedEventsApi.updateEvent.mockResolvedValueOnce({ ...eventToEdit, status: scenario.targetStatus });
+                render(
+                    <EventModal
+                        {...defaultProps}
+                        mode={ModalMode.Edit}
+                        eventToEdit={{ ...eventToEdit, status: scenario.initialStatus! }}
+                        onClose={onClose}
+                    />,
+                );
+                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Changed event title');
+            } else {
+                mockedEventsApi.createEvent.mockResolvedValueOnce({ ...eventToEdit, status: scenario.targetStatus });
+                render(<EventModal {...defaultProps} onClose={onClose} />);
+                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            }
+
+            if (isPublish) {
+                if (scenario.mode === ModalMode.Add) {
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+                    openDatePickerAndSelectToday(getTodayLabel());
+                    fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+                }
+                fireEvent.click(screen.getByTestId('upload-valid-image'));
+            }
+
+            fireEvent.click(screen.getByRole('button', { name: buttonText }));
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(
+                    mockedEventsApi.updateEvent.mock.calls.length + mockedEventsApi.createEvent.mock.calls.length,
+                ).toBe(1);
+            });
+
+            expect(mockedEventsApi.updateEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Edit ? 1 : 0);
+            expect(mockedEventsApi.createEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Add ? 1 : 0);
+
+            const request =
+                scenario.mode === ModalMode.Edit
+                    ? mockedEventsApi.updateEvent.mock.calls[0][2].request
+                    : mockedEventsApi.createEvent.mock.calls[0][1].request;
+
+            expect(request).toEqual(
+                expect.objectContaining({
+                    status: scenario.targetStatus,
+                    categoryIds: scenario.mode === ModalMode.Edit ? [7, 8] : [currentCategory.id],
+                }),
+            );
+
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps the form open and allows retry when the event request fails', async () => {
+            const onClose = jest.fn();
+            mockedEventsApi.createEvent
+                .mockRejectedValueOnce(new Error('Request failed'))
+                .mockResolvedValueOnce({ ...eventToEdit, status: VisibilityStatus.Draft });
+            render(<EventModal {...defaultProps} onClose={onClose} />);
+
+            fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }));
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            await waitFor(() => expect(mockAddToast).toHaveBeenCalledTimes(1));
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.getByRole('textbox', { name: EVENTS_TEXT.FORM.LABEL.TITLE })).toHaveValue(
+                'Valid event title',
+            );
+
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }));
+            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+            await waitFor(() => expect(mockedEventsApi.createEvent).toHaveBeenCalledTimes(2));
+            expect(onClose).toHaveBeenCalledTimes(1);
         });
     });
 

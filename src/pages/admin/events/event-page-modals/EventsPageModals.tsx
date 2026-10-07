@@ -17,7 +17,6 @@ export interface EventsPageModalsProps {
     onUpdateCategory(category: EventCategoryDto): void;
     onDeleteCategory(categoryId: number): void;
     translationLanguages: LocalizationLanguage[];
-    // onTranslateEvent видалено
 }
 
 export const EventsPageModals = ({

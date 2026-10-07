@@ -1,32 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { AddFeedbackHistoryModal } from './AddFeedbackHistoryModal';
+import { AddFeedbackHistoryModal, AddFeedbackHistoryModalProps } from './AddFeedbackHistoryModal';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
-import { ImageApi } from '@/services/api/admin/image/image-api';
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
-import { VisibilityStatus } from '@/types/admin/common';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto } from '@/types/admin/feedback';
 import { ImageValues } from '@/types/common/image';
-
-jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: jest.fn(),
-}));
-
-jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
-    FeedbackApi: {
-        createHistory: jest.fn(),
-        updateHistory: jest.fn(),
-    },
-}));
-
-jest.mock('@/services/api/admin/image/image-api', () => ({
-    ImageApi: {
-        post: jest.fn(),
-        getUpdateImageId: jest.fn(),
-    },
-}));
 
 jest.mock('@/validation/admin/image-schema/image-schema', () => ({
     IMAGE_VALIDATION_FUNCTIONS: {
@@ -58,7 +37,20 @@ jest.mock('@/components/admin/cropper-modal/CropperModal', () => ({
 
 describe('AddFeedbackHistoryModal', () => {
     const onClose = jest.fn();
-    const onAddHistory = jest.fn();
+    const onSubmit = jest.fn();
+    const onSuccess = jest.fn();
+
+    const renderModal = (props: Partial<AddFeedbackHistoryModalProps> = {}) =>
+        render(
+            <AddFeedbackHistoryModal
+                mode={ModalMode.Add}
+                isOpen={true}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                onSuccess={onSuccess}
+                {...props}
+            />,
+        );
 
     const mockCreatedHistory: FeedbackHistoryDto = {
         id: 1,
@@ -72,14 +64,13 @@ describe('AddFeedbackHistoryModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useAdminClient as jest.Mock).mockReturnValue({});
         (IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage as jest.Mock).mockResolvedValue(
             'Image dimensions do not match',
         );
     });
 
     const setupDirtyFormAndClose = async (titleValue: string) => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: titleValue } });
         await waitFor(() => {
@@ -101,7 +92,7 @@ describe('AddFeedbackHistoryModal', () => {
     };
 
     it('renders modal with correct title, empty fields, live counters, active X button, and disabled publish button', () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         expect(screen.getByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).toBeInTheDocument();
 
@@ -128,12 +119,12 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('does not render modal when isOpen is false', () => {
-        render(<AddFeedbackHistoryModal isOpen={false} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal({ isOpen: false });
         expect(screen.queryByText(FEEDBACK_TEXT.ADD_HISTORY_MODAL.TITLE)).not.toBeInTheDocument();
     });
 
     it('updates text fields and counters when typing', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Тестова історія' } });
@@ -151,7 +142,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('shows validation error when inputs are too short', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.change(titleInput, { target: { value: 'Коротко' } });
@@ -169,7 +160,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('validates text fields in real-time during typing (onChange)', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
 
@@ -202,7 +193,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('clears field when clean-up icon is clicked', async () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
         fireEvent.focus(titleInput);
@@ -223,7 +214,7 @@ describe('AddFeedbackHistoryModal', () => {
     });
 
     it('closes modal directly when X button is clicked and all fields are empty', () => {
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         const closeBtn = screen.getByRole('button', { name: 'Close modal' });
         fireEvent.click(closeBtn);
@@ -267,11 +258,16 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
-    it('enables publish button when title, story and image are provided, and submits successfully', async () => {
-        (FeedbackApi.createHistory as jest.Mock).mockResolvedValueOnce(mockCreatedHistory);
-        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 10, imageIdToDelete: null });
+    it('does not render the draft button', () => {
+        renderModal();
 
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).not.toBeInTheDocument();
+    });
+
+    it('enables publish button when title, story and image are provided, and submits successfully', async () => {
+        onSubmit.mockResolvedValueOnce(mockCreatedHistory);
+
+        renderModal();
 
         const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishBtn).toBeDisabled();
@@ -288,24 +284,24 @@ describe('AddFeedbackHistoryModal', () => {
         fireEvent.click(confirmBtn);
 
         await waitFor(() => {
-            expect(FeedbackApi.createHistory).toHaveBeenCalledWith(
-                expect.anything(),
+            expect(onSubmit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     title: 'Перемога 2026',
                     story: 'Неймовірна історія успіху та реабілітації',
+                    image: expect.objectContaining({ base64: 'cropped-base64' }),
                     status: VisibilityStatus.Published,
                 }),
+                undefined,
             );
-            expect(onAddHistory).toHaveBeenCalledWith(mockCreatedHistory);
+            expect(onSuccess).toHaveBeenCalledWith(mockCreatedHistory, ModalMode.Add);
             expect(onClose).toHaveBeenCalledTimes(1);
         });
     });
 
     it('displays error message when history creation fails', async () => {
-        (FeedbackApi.createHistory as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 10, imageIdToDelete: null });
+        onSubmit.mockRejectedValueOnce(new Error('Network error'));
 
-        render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} onAddHistory={onAddHistory} />);
+        renderModal();
 
         await fillValidForm('Тестовий заголовок', 'Довгий опис для тестування');
 
@@ -320,11 +316,11 @@ describe('AddFeedbackHistoryModal', () => {
         fireEvent.click(confirmBtn);
 
         await waitFor(() => {
-            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_CREATE_HISTORY)).toBeInTheDocument();
+            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH)).toBeInTheDocument();
         });
 
         expect(onClose).not.toHaveBeenCalled();
-        expect(onAddHistory).not.toHaveBeenCalled();
+        expect(onSuccess).not.toHaveBeenCalled();
     });
 
     describe('Edit Mode', () => {
@@ -339,7 +335,7 @@ describe('AddFeedbackHistoryModal', () => {
         };
 
         it('pre-populates fields with initialData and disables publish button initially', async () => {
-            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+            renderModal({ mode: ModalMode.Edit, historyToEdit: mockInitialData });
 
             await waitFor(() => {
                 expect(screen.getByRole('textbox', { name: /заголовок/i })).toHaveValue('Існуючий заголовок');
@@ -355,7 +351,7 @@ describe('AddFeedbackHistoryModal', () => {
         });
 
         it('enables publish button when story is changed', async () => {
-            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+            renderModal({ mode: ModalMode.Edit, historyToEdit: mockInitialData });
 
             const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
             fireEvent.change(storyTextarea, { target: { value: 'Оновлена історія' } });
@@ -367,7 +363,7 @@ describe('AddFeedbackHistoryModal', () => {
         });
 
         it('enables publish button when image is changed', async () => {
-            render(<AddFeedbackHistoryModal isOpen={true} onClose={onClose} initialData={mockInitialData} />);
+            renderModal({ mode: ModalMode.Edit, historyToEdit: mockInitialData });
 
             const fileInput = screen.getByTestId('image-input-hidden');
             const file = new File(['dummy'], 'photo.png', { type: 'image/png' });
@@ -382,15 +378,8 @@ describe('AddFeedbackHistoryModal', () => {
             });
         });
 
-        const setupEditModeAndClickPublish = async (onEditHistory?: jest.Mock) => {
-            render(
-                <AddFeedbackHistoryModal
-                    isOpen={true}
-                    onClose={onClose}
-                    onEditHistory={onEditHistory}
-                    initialData={mockInitialData}
-                />,
-            );
+        const setupEditModeAndClickPublish = async (historyToEdit: FeedbackHistoryDto = mockInitialData) => {
+            renderModal({ mode: ModalMode.Edit, historyToEdit });
 
             const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
             fireEvent.change(titleInput, { target: { value: 'Оновлений заголовок' } });
@@ -407,30 +396,25 @@ describe('AddFeedbackHistoryModal', () => {
         };
 
         it('enables publish button when a field is changed, shows confirm modal and calls update API', async () => {
-            (FeedbackApi.updateHistory as jest.Mock).mockResolvedValueOnce({
-                ...mockInitialData,
-                title: 'Оновлений заголовок',
-            });
-            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValueOnce({ finalImageId: 20, imageIdToDelete: null });
+            const updatedHistory = { ...mockInitialData, title: 'Оновлений заголовок' };
+            onSubmit.mockResolvedValueOnce(updatedHistory);
 
-            const onEditHistory = jest.fn();
-            await setupEditModeAndClickPublish(onEditHistory);
+            await setupEditModeAndClickPublish();
 
             const yesBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
             fireEvent.click(yesBtn);
 
             await waitFor(() => {
-                expect(FeedbackApi.updateHistory).toHaveBeenCalledWith(
-                    expect.anything(),
-                    2,
-                    expect.objectContaining({
+                expect(onSubmit).toHaveBeenCalledWith(
+                    {
                         title: 'Оновлений заголовок',
                         story: 'Це існуюча історія для перевірки редагування',
-                        imageId: 20,
+                        image: mockInitialData.image,
                         status: VisibilityStatus.Published,
-                    }),
+                    },
+                    mockInitialData,
                 );
-                expect(onEditHistory).toHaveBeenCalled();
+                expect(onSuccess).toHaveBeenCalledWith(updatedHistory, ModalMode.Edit);
                 expect(onClose).toHaveBeenCalledTimes(1);
             });
         });
@@ -443,8 +427,19 @@ describe('AddFeedbackHistoryModal', () => {
 
             await waitFor(() => {
                 expect(screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).not.toBeInTheDocument();
-                expect(FeedbackApi.updateHistory).not.toHaveBeenCalled();
+                expect(onSubmit).not.toHaveBeenCalled();
             });
+        });
+
+        it('displays error message when history update fails', async () => {
+            onSubmit.mockRejectedValueOnce(new Error('Network error'));
+
+            await setupEditModeAndClickPublish();
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+            expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE)).toBeInTheDocument();
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onClose).not.toHaveBeenCalled();
         });
     });
 });

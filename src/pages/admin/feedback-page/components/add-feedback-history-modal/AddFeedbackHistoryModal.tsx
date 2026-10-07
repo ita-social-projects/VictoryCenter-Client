@@ -12,7 +12,6 @@ import {
     getFeedbackConfirmTitle,
     getFeedbackErrorMessage,
     getFeedbackFormKey,
-    getFeedbackStatus,
 } from '../feedback-modal-config/feedbackModalConfig';
 import styles from './AddFeedbackHistoryModal.module.scss';
 
@@ -56,12 +55,11 @@ export const AddFeedbackHistoryModal = ({
             transformFormData: (
                 formData: FeedbackHistoryFormValues,
                 status: VisibilityStatus,
-                history?: FeedbackHistoryDto,
             ): FeedbackHistoryPayload => ({
                 title: getNormalizedInputText(formData.title),
                 story: getNormalizedInputText(formData.story),
                 image: formData.image,
-                status: getFeedbackStatus(status, history),
+                status,
             }),
         }),
         [mode, isOpen, onClose, historyToEdit, onSubmit, onSuccess],

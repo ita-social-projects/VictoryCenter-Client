@@ -11,7 +11,6 @@ import {
     getFeedbackConfirmTitle,
     getFeedbackErrorMessage,
     getFeedbackFormKey,
-    getFeedbackStatus,
 } from '../feedback-modal-config/feedbackModalConfig';
 
 export interface FeedbackReviewPayload {
@@ -53,11 +52,10 @@ export const AddFeedbackReviewModal = ({
             transformFormData: (
                 formData: FeedbackReviewFormValues,
                 status: VisibilityStatus,
-                review?: FeedbackReviewDto,
             ): FeedbackReviewPayload => ({
                 authorName: getNormalizedInputText(formData.authorName),
                 text: getNormalizedInputText(formData.text),
-                status: getFeedbackStatus(status, review),
+                status,
             }),
         }),
         [mode, isOpen, onClose, reviewToEdit, onSubmit, onSuccess],

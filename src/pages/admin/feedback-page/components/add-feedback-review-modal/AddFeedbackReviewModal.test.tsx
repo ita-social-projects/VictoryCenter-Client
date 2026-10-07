@@ -1,25 +1,27 @@
-import '@/utils/test-mocks/feedback-review-modal-mocks-setup';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, getDefaultNormalizer, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AddFeedbackReviewModal } from './AddFeedbackReviewModal';
+import { AddFeedbackReviewModal, AddFeedbackReviewModalProps } from './AddFeedbackReviewModal';
 import { FEEDBACK_REVIEW_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
-import { VisibilityStatus } from '@/types/admin/common';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
-import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
-import { getAuthorNameInput, getPublishButton, getTextInput } from '@/utils/test-mocks/feedback-review-form-mocks';
 
-jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: () => ({}),
-}));
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
 
-jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
-    FeedbackApi: {
-        updateReview: jest.fn(),
-        createReview: jest.fn(),
-    },
-}));
+const getAuthorNameInput = () =>
+    screen.getByRole('textbox', { name: new RegExp(FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.AUTHOR_NAME) });
+const getTextInput = () => screen.getByRole('textbox', { name: new RegExp(FEEDBACK_TEXT.ADD_REVIEW_MODAL.LABEL.TEXT) });
+const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+const getCloseButton = () => screen.getByRole('button', { name: 'Close modal' });
+
+const createProps = (overrides: Partial<AddFeedbackReviewModalProps> = {}): AddFeedbackReviewModalProps => ({
+    mode: ModalMode.Add,
+    isOpen: true,
+    onClose: jest.fn(),
+    onSubmit: jest.fn(),
+    onSuccess: jest.fn(),
+    ...overrides,
+});
 
 describe('AddFeedbackReviewModal', () => {
     beforeEach(() => {
@@ -27,102 +29,103 @@ describe('AddFeedbackReviewModal', () => {
     });
 
     describe('add mode', () => {
-        const defaultProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            onAddReview: jest.fn(),
-            onSubmitError: jest.fn(),
-        };
-
         const fillValidValues = () => {
             fireEvent.change(getAuthorNameInput(), { target: { value: 'Анастасія' } });
             fireEvent.change(getTextInput(), { target: { value: 'Дуже вдячна центру за підтримку' } });
         };
 
+        const fillAndClickPublish = async () => {
+            fillValidValues();
+
+            await waitFor(() => {
+                expect(getPublishButton()).toBeEnabled();
+            });
+
+            fireEvent.click(getPublishButton());
+            await screen.findByTestId('confirm-modal');
+        };
+
         describe('elements rendering', () => {
             it('renders modal title', () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
-                expect(screen.getByTestId('modal-title')).toHaveTextContent(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE);
+                expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
             });
 
             it('renders both fields empty', () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 expect(getAuthorNameInput()).toHaveValue('');
                 expect(getTextInput()).toHaveValue('');
             });
 
             it('renders publish button disabled initially', () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 expect(getPublishButton()).toBeDisabled();
             });
 
-            it('does not render modal content when closed', () => {
-                render(<AddFeedbackReviewModal {...defaultProps} isOpen={false} />);
+            it('does not render the draft button', () => {
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
-                expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+                expect(
+                    screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT }),
+                ).not.toBeInTheDocument();
+            });
+
+            it('does not render modal content when closed', () => {
+                render(<AddFeedbackReviewModal {...createProps({ isOpen: false })} />);
+
+                expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
             });
         });
 
         describe('validation', () => {
             it('shows required error for author name on blur when empty', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
-                fireEvent.change(getAuthorNameInput(), { target: { value: '' } });
                 fireEvent.blur(getAuthorNameInput());
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('author-name-error')).toHaveTextContent(
-                        FEEDBACK_REVIEW_VALIDATION.authorName.getRequiredError(),
-                    );
-                });
+                expect(
+                    await screen.findByText(FEEDBACK_REVIEW_VALIDATION.authorName.getRequiredError()),
+                ).toBeInTheDocument();
             });
 
             it('shows min length error for author name on blur', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'А' } });
                 fireEvent.blur(getAuthorNameInput());
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('author-name-error')).toHaveTextContent(
-                        FEEDBACK_REVIEW_VALIDATION.authorName.getMinError(),
-                    );
-                });
+                expect(
+                    await screen.findByText(FEEDBACK_REVIEW_VALIDATION.authorName.getMinError()),
+                ).toBeInTheDocument();
             });
 
             it('shows min length error for review text on blur', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fireEvent.change(getTextInput(), { target: { value: 'Коротко' } });
                 fireEvent.blur(getTextInput());
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('text-error')).toHaveTextContent(
-                        FEEDBACK_REVIEW_VALIDATION.text.getMinError(),
-                    );
-                });
+                expect(await screen.findByText(FEEDBACK_REVIEW_VALIDATION.text.getMinError())).toBeInTheDocument();
             });
 
             it('treats a value of only spaces as empty', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: '   ' } });
                 fireEvent.blur(getAuthorNameInput());
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('author-name-error')).toHaveTextContent(
-                        FEEDBACK_REVIEW_VALIDATION.authorName.getRequiredError(),
-                    );
-                });
+                expect(
+                    await screen.findByText(FEEDBACK_REVIEW_VALIDATION.authorName.getRequiredError()),
+                ).toBeInTheDocument();
             });
         });
 
         describe('publish button state', () => {
             it('enables the button when both fields are valid', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fillValidValues();
 
@@ -132,7 +135,7 @@ describe('AddFeedbackReviewModal', () => {
             });
 
             it('disables the button again when a field becomes invalid', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fillValidValues();
 
@@ -149,34 +152,24 @@ describe('AddFeedbackReviewModal', () => {
         });
 
         describe('publish flow', () => {
-            const fillAndClickPublish = async () => {
-                fillValidValues();
-
-                await waitFor(() => {
-                    expect(getPublishButton()).toBeEnabled();
-                });
-
-                fireEvent.click(getPublishButton());
-            };
-
             it('shows publish confirmation with the new-review title', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 await fillAndClickPublish();
 
-                expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
                 expect(screen.getByText(FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW)).toBeInTheDocument();
             });
 
             it('does not save and keeps the modal open when publish is cancelled', async () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                const props = createProps();
+                render(<AddFeedbackReviewModal {...props} />);
 
                 await fillAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-cancel'));
+                fireEvent.click(screen.getByTestId('confirm-no'));
 
-                expect(FeedbackApi.createReview).not.toHaveBeenCalled();
-                expect(defaultProps.onClose).not.toHaveBeenCalled();
+                expect(props.onSubmit).not.toHaveBeenCalled();
+                expect(props.onClose).not.toHaveBeenCalled();
                 expect(getAuthorNameInput()).toHaveValue('Анастасія');
             });
 
@@ -189,82 +182,88 @@ describe('AddFeedbackReviewModal', () => {
                     priority: 1,
                     localizations: [],
                 };
-                (FeedbackApi.createReview as jest.Mock).mockResolvedValue(newReview);
-
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+                const props = createProps({ onSubmit: jest.fn().mockResolvedValue(newReview) });
+                render(<AddFeedbackReviewModal {...props} />);
 
                 await fillAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+                fireEvent.click(screen.getByTestId('confirm-yes'));
 
                 await waitFor(() => {
-                    expect(FeedbackApi.createReview).toHaveBeenCalledWith(expect.anything(), {
-                        authorName: 'Анастасія',
-                        text: 'Дуже вдячна центру за підтримку',
-                        status: VisibilityStatus.Published,
-                    });
-                    expect(defaultProps.onAddReview).toHaveBeenCalledWith(newReview);
-                    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+                    expect(props.onSubmit).toHaveBeenCalledWith(
+                        {
+                            authorName: 'Анастасія',
+                            text: 'Дуже вдячна центру за підтримку',
+                            status: VisibilityStatus.Published,
+                        },
+                        undefined,
+                    );
+                    expect(props.onSuccess).toHaveBeenCalledWith(newReview, ModalMode.Add);
+                    expect(props.onClose).toHaveBeenCalledTimes(1);
                 });
             });
 
-            it('calls onSubmitError and keeps the modal open when creation fails', async () => {
-                (FeedbackApi.createReview as jest.Mock).mockRejectedValue(new Error('Create failed'));
-
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+            it('shows an error and keeps the modal open when creation fails', async () => {
+                const props = createProps({ onSubmit: jest.fn().mockRejectedValue(new Error('Create failed')) });
+                render(<AddFeedbackReviewModal {...props} />);
 
                 await fillAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+                fireEvent.click(screen.getByTestId('confirm-yes'));
 
-                await waitFor(() => {
-                    expect(defaultProps.onSubmitError).toHaveBeenCalledTimes(1);
-                });
-
-                expect(defaultProps.onAddReview).not.toHaveBeenCalled();
-                expect(defaultProps.onClose).not.toHaveBeenCalled();
+                expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH)).toBeInTheDocument();
+                expect(props.onSuccess).not.toHaveBeenCalled();
+                expect(props.onClose).not.toHaveBeenCalled();
+                expect(getAuthorNameInput()).toHaveValue('Анастасія');
             });
         });
 
         describe('close behavior', () => {
             it('calls onClose immediately when form is not dirty', () => {
-                const onClose = jest.fn();
+                const props = createProps();
+                render(<AddFeedbackReviewModal {...props} />);
 
-                render(<AddFeedbackReviewModal {...defaultProps} onClose={onClose} />);
+                fireEvent.click(getCloseButton());
 
-                fireEvent.click(screen.getByTestId('modal-close'));
-
-                expect(onClose).toHaveBeenCalledTimes(1);
-                expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+                expect(props.onClose).toHaveBeenCalledTimes(1);
+                expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
             });
 
-            it('shows confirmation modal when form has unsaved changes', () => {
-                render(<AddFeedbackReviewModal {...defaultProps} />);
+            it('shows confirmation modal when form has unsaved changes', async () => {
+                render(<AddFeedbackReviewModal {...createProps()} />);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Анастасія' } });
-                fireEvent.click(screen.getByTestId('modal-close'));
+                fireEvent.click(getCloseButton());
 
-                expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+                expect(await screen.findByTestId('confirm-modal')).toBeInTheDocument();
+                expect(
+                    screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                        normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                    }),
+                ).toBeInTheDocument();
             });
 
-            it('does not close the modal when confirmation is cancelled', () => {
-                const onClose = jest.fn();
-
-                render(<AddFeedbackReviewModal {...defaultProps} onClose={onClose} />);
+            it('does not close the modal when confirmation is cancelled', async () => {
+                const props = createProps();
+                render(<AddFeedbackReviewModal {...props} />);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Анастасія' } });
+                fireEvent.click(getCloseButton());
+                fireEvent.click(await screen.findByTestId('confirm-no'));
 
-                executeCancelCofirmationFlow(onClose);
+                expect(props.onClose).not.toHaveBeenCalled();
+                expect(getAuthorNameInput()).toHaveValue('Анастасія');
             });
 
-            it('closes the modal when unsaved changes are confirmed', () => {
-                const onClose = jest.fn();
-
-                render(<AddFeedbackReviewModal {...defaultProps} onClose={onClose} />);
+            it('closes the modal when unsaved changes are confirmed', async () => {
+                const props = createProps();
+                render(<AddFeedbackReviewModal {...props} />);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Анастасія' } });
+                fireEvent.click(getCloseButton());
+                fireEvent.click(await screen.findByTestId('confirm-yes'));
 
-                executeConfirmCloseFlow(onClose);
+                expect(props.onClose).toHaveBeenCalledTimes(1);
             });
         });
     });
@@ -279,16 +278,11 @@ describe('AddFeedbackReviewModal', () => {
             localizations: [],
         };
 
-        const defaultProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            initialData: mockReview,
-            onEditReview: jest.fn(),
-            onSubmitError: jest.fn(),
-        };
+        const createEditProps = (overrides: Partial<AddFeedbackReviewModalProps> = {}) =>
+            createProps({ mode: ModalMode.Edit, reviewToEdit: mockReview, ...overrides });
 
-        const renderAndWaitForPrefill = async (props = {}) => {
-            render(<AddFeedbackReviewModal {...defaultProps} {...props} />);
+        const renderAndWaitForPrefill = async (props: AddFeedbackReviewModalProps) => {
+            render(<AddFeedbackReviewModal {...props} />);
 
             await waitFor(() => {
                 expect(getAuthorNameInput()).toHaveValue(mockReview.authorName);
@@ -303,24 +297,25 @@ describe('AddFeedbackReviewModal', () => {
             });
 
             fireEvent.click(getPublishButton());
+            await screen.findByTestId('confirm-modal');
         };
 
         describe('elements rendering', () => {
             it('renders edit modal title', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
-                expect(screen.getByTestId('modal-title')).toHaveTextContent(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE);
+                expect(screen.getByText(FEEDBACK_TEXT.EDIT_REVIEW_MODAL.TITLE)).toBeInTheDocument();
             });
 
             it('pre-populates fields with the review data', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 expect(getAuthorNameInput()).toHaveValue(mockReview.authorName);
                 expect(getTextInput()).toHaveValue(mockReview.text);
             });
 
             it('renders publish button disabled initially', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 expect(getPublishButton()).toBeDisabled();
             });
@@ -328,7 +323,7 @@ describe('AddFeedbackReviewModal', () => {
 
         describe('publish button state', () => {
             it('enables the button when a value is changed and valid', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Олена' } });
 
@@ -338,7 +333,7 @@ describe('AddFeedbackReviewModal', () => {
             });
 
             it('disables the button again when the value is changed back to the original', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Олена' } });
 
@@ -354,7 +349,7 @@ describe('AddFeedbackReviewModal', () => {
             });
 
             it('keeps the button disabled when a changed value is invalid', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'А' } });
                 fireEvent.blur(getAuthorNameInput());
@@ -367,101 +362,97 @@ describe('AddFeedbackReviewModal', () => {
 
         describe('publish flow', () => {
             it('shows publish confirmation when publish is clicked', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
                 await changeAndClickPublish();
 
-                expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
                 expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
             });
 
             it('does not save and keeps the modal open when publish is cancelled', async () => {
-                await renderAndWaitForPrefill();
+                const props = createEditProps();
+                await renderAndWaitForPrefill(props);
                 await changeAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-cancel'));
+                fireEvent.click(screen.getByTestId('confirm-no'));
 
-                expect(FeedbackApi.updateReview).not.toHaveBeenCalled();
-                expect(defaultProps.onClose).not.toHaveBeenCalled();
-                expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+                expect(props.onSubmit).not.toHaveBeenCalled();
+                expect(props.onClose).not.toHaveBeenCalled();
+                expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
                 expect(getAuthorNameInput()).toHaveValue('Олена');
             });
 
             it('saves changes, notifies parent and closes when publish is confirmed', async () => {
                 const updatedReview = { ...mockReview, authorName: 'Олена' };
-                (FeedbackApi.updateReview as jest.Mock).mockResolvedValue(updatedReview);
-
-                await renderAndWaitForPrefill();
+                const props = createEditProps({ onSubmit: jest.fn().mockResolvedValue(updatedReview) });
+                await renderAndWaitForPrefill(props);
                 await changeAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+                fireEvent.click(screen.getByTestId('confirm-yes'));
 
                 await waitFor(() => {
-                    expect(FeedbackApi.updateReview).toHaveBeenCalledWith(expect.anything(), mockReview.id, {
-                        authorName: 'Олена',
-                        text: mockReview.text,
-                        status: mockReview.status,
-                    });
-                    expect(defaultProps.onEditReview).toHaveBeenCalledWith(updatedReview);
-                    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+                    expect(props.onSubmit).toHaveBeenCalledWith(
+                        { authorName: 'Олена', text: mockReview.text, status: VisibilityStatus.Published },
+                        mockReview,
+                    );
+                    expect(props.onSuccess).toHaveBeenCalledWith(updatedReview, ModalMode.Edit);
+                    expect(props.onClose).toHaveBeenCalledTimes(1);
                 });
             });
 
-            it('calls onSubmitError and keeps the modal open when saving fails', async () => {
-                (FeedbackApi.updateReview as jest.Mock).mockRejectedValue(new Error('Update failed'));
-
-                await renderAndWaitForPrefill();
+            it('shows an error and keeps the modal open when saving fails', async () => {
+                const props = createEditProps({ onSubmit: jest.fn().mockRejectedValue(new Error('Update failed')) });
+                await renderAndWaitForPrefill(props);
                 await changeAndClickPublish();
 
-                fireEvent.click(screen.getByTestId('confirmation-confirm'));
+                fireEvent.click(screen.getByTestId('confirm-yes'));
 
-                await waitFor(() => {
-                    expect(defaultProps.onSubmitError).toHaveBeenCalledTimes(1);
-                });
-
-                expect(defaultProps.onEditReview).not.toHaveBeenCalled();
-                expect(defaultProps.onClose).not.toHaveBeenCalled();
+                expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE)).toBeInTheDocument();
+                expect(props.onSuccess).not.toHaveBeenCalled();
+                expect(props.onClose).not.toHaveBeenCalled();
             });
         });
 
         describe('close behavior', () => {
             it('calls onClose immediately when nothing was changed', async () => {
-                const onClose = jest.fn();
+                const props = createEditProps();
+                await renderAndWaitForPrefill(props);
 
-                await renderAndWaitForPrefill({ onClose });
+                fireEvent.click(getCloseButton());
 
-                fireEvent.click(screen.getByTestId('modal-close'));
-
-                expect(onClose).toHaveBeenCalledTimes(1);
-                expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+                expect(props.onClose).toHaveBeenCalledTimes(1);
+                expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
             });
 
             it('shows confirmation when closing with unsaved changes', async () => {
-                await renderAndWaitForPrefill();
+                await renderAndWaitForPrefill(createEditProps());
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Олена' } });
-                fireEvent.click(screen.getByTestId('modal-close'));
+                fireEvent.click(getCloseButton());
 
-                expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+                expect(await screen.findByTestId('confirm-modal')).toBeInTheDocument();
             });
 
             it('does not close the modal when close confirmation is cancelled', async () => {
-                const onClose = jest.fn();
-
-                await renderAndWaitForPrefill({ onClose });
+                const props = createEditProps();
+                await renderAndWaitForPrefill(props);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Олена' } });
+                fireEvent.click(getCloseButton());
+                fireEvent.click(await screen.findByTestId('confirm-no'));
 
-                executeCancelCofirmationFlow(onClose);
+                expect(props.onClose).not.toHaveBeenCalled();
+                expect(getAuthorNameInput()).toHaveValue('Олена');
             });
 
             it('closes the modal when unsaved changes are confirmed', async () => {
-                const onClose = jest.fn();
-
-                await renderAndWaitForPrefill({ onClose });
+                const props = createEditProps();
+                await renderAndWaitForPrefill(props);
 
                 fireEvent.change(getAuthorNameInput(), { target: { value: 'Олена' } });
+                fireEvent.click(getCloseButton());
+                fireEvent.click(await screen.findByTestId('confirm-yes'));
 
-                executeConfirmCloseFlow(onClose);
+                expect(props.onClose).toHaveBeenCalledTimes(1);
             });
         });
     });

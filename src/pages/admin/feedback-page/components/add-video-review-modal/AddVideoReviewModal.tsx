@@ -10,7 +10,6 @@ import {
     getFeedbackConfirmTitle,
     getFeedbackErrorMessage,
     getFeedbackFormKey,
-    getFeedbackStatus,
 } from '../feedback-modal-config/feedbackModalConfig';
 
 export interface VideoReviewPayload {
@@ -49,14 +48,10 @@ export const AddVideoReviewModal = ({
             getConfirmTitle: getFeedbackConfirmTitle,
             getErrorMessage: getFeedbackErrorMessage,
             getFormKey: getFeedbackFormKey,
-            transformFormData: (
-                formData: VideoReviewFormValues,
-                status: VisibilityStatus,
-                video?: FeedbackVideoDto,
-            ): VideoReviewPayload => ({
+            transformFormData: (formData: VideoReviewFormValues, status: VisibilityStatus): VideoReviewPayload => ({
                 title: getNormalizedInputText(formData.title),
                 link: getNormalizedInputText(formData.link),
-                status: getFeedbackStatus(status, video),
+                status,
             }),
         }),
         [mode, isOpen, onClose, videoToEdit, onSubmit, onSuccess],

@@ -1,23 +1,11 @@
 import { render, screen, fireEvent, waitFor, act, getDefaultNormalizer } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
 import { FeedbackVideoDto } from '@/types/admin/feedback';
-import { VisibilityStatus } from '@/types/admin/common';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { AddVideoReviewModal, AddVideoReviewModalProps } from './AddVideoReviewModal';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
-
-jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: jest.fn(),
-}));
-
-jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
-    FeedbackApi: {
-        updateVideo: jest.fn(),
-    },
-}));
 
 describe('AddVideoReviewModal', () => {
     const SUBMIT_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED;
@@ -35,14 +23,26 @@ describe('AddVideoReviewModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        (useAdminClient as jest.Mock).mockReturnValue({});
     });
 
     const renderOpen = (
         onClose = jest.fn(),
-        onSubmit?: jest.Mock,
+        onSubmit: jest.Mock = jest.fn(),
         extraProps: Partial<AddVideoReviewModalProps> = {},
-    ) => render(<AddVideoReviewModal isOpen={true} onClose={onClose} onSubmit={onSubmit} {...extraProps} />);
+    ) => {
+        const onSuccess = jest.fn();
+        const utils = render(
+            <AddVideoReviewModal
+                mode={ModalMode.Add}
+                isOpen={true}
+                onClose={onClose}
+                onSubmit={onSubmit}
+                onSuccess={onSuccess}
+                {...extraProps}
+            />,
+        );
+        return { ...utils, onClose, onSubmit, onSuccess };
+    };
 
     const getSubmitButton = () => screen.getByRole('button', { name: SUBMIT_BUTTON_NAME });
     const getTitleInput = () =>
@@ -68,6 +68,11 @@ describe('AddVideoReviewModal', () => {
         renderOpen();
         expect(screen.getByText(`0/${VIDEO_REVIEW_VALIDATION.title.max}`)).toBeInTheDocument();
         expect(screen.queryByText(`0/${VIDEO_REVIEW_VALIDATION.link.max}`)).not.toBeInTheDocument();
+    });
+
+    it('does not render the draft button', () => {
+        renderOpen();
+        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT })).not.toBeInTheDocument();
     });
 
     it('updates counters as the admin types', () => {
@@ -192,7 +197,7 @@ describe('AddVideoReviewModal', () => {
         });
 
         it('does not call onSubmit when the publish confirmation is cancelled', () => {
-            const onSubmit = jest.fn().mockResolvedValue(true);
+            const onSubmit = jest.fn();
             renderOpen(jest.fn(), onSubmit);
             fillForm();
             fireEvent.click(getSubmitButton());
@@ -203,40 +208,47 @@ describe('AddVideoReviewModal', () => {
         });
 
         it('calls onSubmit with normalized values', async () => {
-            const onSubmit = jest.fn().mockResolvedValue(true);
+            const onSubmit = jest.fn().mockResolvedValue(mockInitialData);
             renderOpen(jest.fn(), onSubmit);
             fillForm('  Valid title  ', `  ${validLink}  `);
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
-            await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ title: 'Valid title', link: validLink }));
+            await waitFor(() =>
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { title: 'Valid title', link: validLink, status: VisibilityStatus.Published },
+                    undefined,
+                ),
+            );
         });
 
-        it('resets the form and closes when onSubmit resolves true', async () => {
-            const onClose = jest.fn();
-            const onSubmit = jest.fn().mockResolvedValue(true);
-            renderOpen(onClose, onSubmit);
+        it('closes when onSubmit resolves', async () => {
+            const createdVideo = { ...mockInitialData, id: 6 };
+            const { onClose, onSuccess } = renderOpen(jest.fn(), jest.fn().mockResolvedValue(createdVideo));
             fillForm();
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
-            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+            await waitFor(() => {
+                expect(onSuccess).toHaveBeenCalledWith(createdVideo, ModalMode.Add);
+                expect(onClose).toHaveBeenCalledTimes(1);
+            });
         });
 
-        it('keeps the modal open when onSubmit resolves false', async () => {
-            const onClose = jest.fn();
-            const onSubmit = jest.fn().mockResolvedValue(false);
-            renderOpen(onClose, onSubmit);
+        it('keeps the modal open and shows an error when onSubmit rejects', async () => {
+            const { onClose, onSuccess } = renderOpen(jest.fn(), jest.fn().mockRejectedValue(new Error('fail')));
             fillForm();
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
-            await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+            expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH)).toBeInTheDocument();
+            expect(onSuccess).not.toHaveBeenCalled();
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
+            expect(getTitleInput()).toHaveValue(validTitle);
         });
 
         it('disables the submit button while submitting', async () => {
-            let resolveSubmit!: (value: boolean) => void;
+            let resolveSubmit!: (value: FeedbackVideoDto) => void;
             const onSubmit = jest.fn().mockReturnValue(
-                new Promise<boolean>((resolve) => {
+                new Promise<FeedbackVideoDto>((resolve) => {
                     resolveSubmit = resolve;
                 }),
             );
@@ -246,7 +258,7 @@ describe('AddVideoReviewModal', () => {
             fireEvent.click(screen.getByTestId('confirm-yes'));
             expect(getSubmitButton()).toBeDisabled();
             await act(async () => {
-                resolveSubmit(true);
+                resolveSubmit(mockInitialData);
             });
         });
     });
@@ -293,18 +305,8 @@ describe('AddVideoReviewModal', () => {
     });
 
     describe('edit mode (#3467)', () => {
-        const renderEdit = (props: Partial<AddVideoReviewModalProps> = {}) => {
-            const onClose = jest.fn();
-            const onEditVideoReview = jest.fn();
-            const onEditError = jest.fn();
-            renderOpen(onClose, undefined, {
-                initialData: mockInitialData,
-                onEditVideoReview,
-                onEditError,
-                ...props,
-            });
-            return { onClose, onEditVideoReview, onEditError };
-        };
+        const renderEdit = (onSubmit: jest.Mock = jest.fn(), props: Partial<AddVideoReviewModalProps> = {}) =>
+            renderOpen(jest.fn(), onSubmit, { mode: ModalMode.Edit, videoToEdit: mockInitialData, ...props });
 
         it('pre-fills both fields with the current data and shows the edit title', () => {
             renderEdit();
@@ -346,29 +348,28 @@ describe('AddVideoReviewModal', () => {
 
             expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
             expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
-            expect(FeedbackApi.updateVideo).not.toHaveBeenCalled();
         });
 
         it('keeps the modal open with unsaved changes when cancelling the publish-confirmation', () => {
-            renderEdit();
+            const { onSubmit } = renderEdit();
             fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-no'));
 
             expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-            expect(FeedbackApi.updateVideo).not.toHaveBeenCalled();
+            expect(onSubmit).not.toHaveBeenCalled();
             expect(getTitleInput()).toHaveValue('Updated title value');
         });
 
         it('closes the confirmation and disables the form while the save request is in flight', async () => {
             let resolveUpdate!: (video: FeedbackVideoDto) => void;
-            (FeedbackApi.updateVideo as jest.Mock).mockReturnValueOnce(
+            const pendingSubmit = jest.fn().mockReturnValue(
                 new Promise<FeedbackVideoDto>((resolve) => {
                     resolveUpdate = resolve;
                 }),
             );
 
-            renderEdit();
+            renderEdit(pendingSubmit);
             fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
@@ -376,67 +377,67 @@ describe('AddVideoReviewModal', () => {
             expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
             expect(getTitleInput()).toBeDisabled();
             expect(getSubmitButton()).toBeDisabled();
-            expect(FeedbackApi.updateVideo).toHaveBeenCalledTimes(1);
+            expect(pendingSubmit).toHaveBeenCalledTimes(1);
 
             await act(async () => {
                 resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
             });
         });
 
-        it('ignores an attempt to close the modal while the save request is in flight', async () => {
+        it('saves with normalized values on confirm', async () => {
             let resolveUpdate!: (video: FeedbackVideoDto) => void;
-            (FeedbackApi.updateVideo as jest.Mock).mockReturnValueOnce(
+            const pendingSubmit = jest.fn().mockReturnValue(
                 new Promise<FeedbackVideoDto>((resolve) => {
                     resolveUpdate = resolve;
                 }),
             );
 
-            const { onClose } = renderEdit();
+            const { onClose } = renderEdit(pendingSubmit);
             fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
             fireEvent.click(getCloseButton());
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
 
             await act(async () => {
                 resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
             });
         });
 
-        it('saves via FeedbackApi.updateVideo with normalized values and preserved status on confirm', async () => {
+        it('saves with normalized values and preserved status on confirm', async () => {
             const updatedVideo: FeedbackVideoDto = { ...mockInitialData, title: 'Updated title value' };
-            (FeedbackApi.updateVideo as jest.Mock).mockResolvedValueOnce(updatedVideo);
 
-            const { onClose, onEditVideoReview } = renderEdit();
+            const { onClose, onSubmit, onSuccess } = renderEdit(jest.fn().mockResolvedValue(updatedVideo));
             fireEvent.change(getTitleInput(), { target: { value: '  Updated title value  ' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
             await waitFor(() => {
-                expect(FeedbackApi.updateVideo).toHaveBeenCalledWith({}, mockInitialData.id, {
-                    title: 'Updated title value',
-                    link: mockInitialData.link,
-                    status: mockInitialData.status,
-                });
-                expect(onEditVideoReview).toHaveBeenCalledWith(updatedVideo);
+                expect(onSubmit).toHaveBeenCalledWith(
+                    {
+                        title: 'Updated title value',
+                        link: mockInitialData.link,
+                        status: mockInitialData.status,
+                    },
+                    mockInitialData,
+                );
+                expect(onSuccess).toHaveBeenCalledWith(updatedVideo, ModalMode.Edit);
                 expect(onClose).toHaveBeenCalledTimes(1);
             });
         });
 
-        it('keeps the modal open and reports the error when the update request fails', async () => {
-            (FeedbackApi.updateVideo as jest.Mock).mockRejectedValueOnce(new Error('network error'));
-
-            const { onClose, onEditError, onEditVideoReview } = renderEdit();
+        it('keeps the modal open and shows an error when the update request fails', async () => {
+            const { onClose, onSubmit, onSuccess } = renderEdit(
+                jest.fn().mockRejectedValue(new Error('network error')),
+            );
             fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
-            await waitFor(() => {
-                expect(onEditError).toHaveBeenCalledTimes(1);
-            });
-            expect(onEditVideoReview).not.toHaveBeenCalled();
+            expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE)).toBeInTheDocument();
+            expect(onSubmit).toHaveBeenCalledTimes(1);
+            expect(onSuccess).not.toHaveBeenCalled();
             expect(onClose).not.toHaveBeenCalled();
             expect(getTitleInput()).toHaveValue('Updated title value');
         });
@@ -457,8 +458,9 @@ describe('AddVideoReviewModal', () => {
         });
 
         it('refills the fields when reopened with a different record', () => {
+            const baseProps = { mode: ModalMode.Edit, onClose: jest.fn(), onSubmit: jest.fn(), onSuccess: jest.fn() };
             const { rerender } = render(
-                <AddVideoReviewModal isOpen={true} onClose={jest.fn()} initialData={mockInitialData} />,
+                <AddVideoReviewModal {...baseProps} isOpen={true} videoToEdit={mockInitialData} />,
             );
             expect(getTitleInput()).toHaveValue(mockInitialData.title);
 
@@ -470,8 +472,8 @@ describe('AddVideoReviewModal', () => {
                 priority: 2,
                 localizations: [],
             };
-            rerender(<AddVideoReviewModal isOpen={false} onClose={jest.fn()} initialData={mockInitialData} />);
-            rerender(<AddVideoReviewModal isOpen={true} onClose={jest.fn()} initialData={otherVideo} />);
+            rerender(<AddVideoReviewModal {...baseProps} isOpen={false} videoToEdit={mockInitialData} />);
+            rerender(<AddVideoReviewModal {...baseProps} isOpen={true} videoToEdit={otherVideo} />);
 
             expect(getTitleInput()).toHaveValue(otherVideo.title);
             expect(getLinkInput()).toHaveValue(otherVideo.link);

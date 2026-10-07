@@ -1,17 +1,13 @@
-import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
 import * as Yup from 'yup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENT_CATEGORY_VALIDATION } from '@/const/admin/events';
 import { EventCategoryDto } from '@/types/admin/event-category';
+import { createEventCategoryNameSchema } from '../event-category-name/event-category-name';
 
 export const EventCategoryTranslationValidationSchema = Yup.object({
-    name: Yup.string()
-        .required(EVENT_CATEGORY_VALIDATION.name.getRequiredError())
-        .min(EVENT_CATEGORY_VALIDATION.name.min, EVENT_CATEGORY_VALIDATION.name.getMinError())
-        .max(
-            EVENT_CATEGORY_VALIDATION.name.max,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max),
-        ),
-
+    name: createEventCategoryNameSchema({
+        maxError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max),
+    }),
     category: Yup.mixed<EventCategoryDto>().nullable().required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED),
 });
 

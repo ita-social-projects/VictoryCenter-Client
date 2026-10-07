@@ -330,7 +330,7 @@ describe('WhoWeAreContent Component', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+            expect(mockAddToast).toHaveBeenCalledWith(WHO_WE_ARE_TEXT.PUBLISH_SUCCESS, ToastType.Info);
         });
 
         await waitFor(() => {

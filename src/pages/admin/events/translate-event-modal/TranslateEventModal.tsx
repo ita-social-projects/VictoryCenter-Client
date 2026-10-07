@@ -46,7 +46,7 @@ export const TranslateEventModal = ({
         return formRef.current?.isDirty() ?? false;
     };
 
-    const handleFormSubmit = async (data: TranslateEventFormValues) => {
+    const handleFormSubmit = async () => {
         if (!eventToTranslate || !language) return;
 
         setIsSubmitting(true);

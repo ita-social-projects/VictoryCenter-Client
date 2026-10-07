@@ -500,6 +500,7 @@ export const FeedbackPageAdmin = () => {
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FEEDBACK}
                     minCharactersToSearch={2}
                     searchPageSize={FEEDBACK_SEARCH_PAGE_SIZE}
+                    showStatusFilter={false}
                 />
             </div>
 

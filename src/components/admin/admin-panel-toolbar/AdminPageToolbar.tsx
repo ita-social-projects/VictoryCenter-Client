@@ -39,6 +39,7 @@ export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     onSuggestionSelect: (itemKey: string | number, item: T) => void;
     maxCharactersToSearch?: number;
     minCharactersToSearch?: number;
+    showStatusFilter?: boolean;
 }
 
 export const AdminPanelToolbar = <T,>({
@@ -57,6 +58,7 @@ export const AdminPanelToolbar = <T,>({
     onSuggestionSelect,
     maxCharactersToSearch,
     minCharactersToSearch = UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH,
+    showStatusFilter = true,
     languages,
     onLanguageChange,
     onTranslationStatusFilterChange,
@@ -144,7 +146,9 @@ export const AdminPanelToolbar = <T,>({
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
-                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
+                {showStatusFilter && (
+                    <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
+                )}
                 <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />
                 </Button>

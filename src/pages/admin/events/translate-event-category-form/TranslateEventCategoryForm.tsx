@@ -103,7 +103,7 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
             onCategoryChange?.(category);
             setErrors((prev) => ({
                 ...prev,
-                category: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateCategory(category as any),
+                category: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateCategory(category),
             }));
         };
 

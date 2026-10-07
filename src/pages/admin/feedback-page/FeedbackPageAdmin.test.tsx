@@ -4,6 +4,7 @@ import { FeedbackPageAdmin, isFeedbackHistory, isFeedbackReview, isFeedbackVideo
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 import { FeedbackCategory } from '@/types/admin/feedback';
 import { ToastType } from '@/types/admin/toast';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -153,28 +154,52 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     ),
 }));
 
-jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => ({
-    AddVideoReviewModal: ({ isOpen, onClose, onSubmit, initialData, onEditVideoReview, onEditError }: any) =>
-        isOpen ? (
-            <div data-testid="add-video-review-modal">
-                {initialData && <span data-testid="add-video-review-initial-title">{initialData.title}</span>}
-                <button data-testid="add-video-review-close" onClick={onClose}>
-                    Close
-                </button>
-                <button data-testid="add-video-review-submit" onClick={() => onSubmit?.({ title: 't', link: 'l' })}>
-                    Submit
-                </button>
-                <button
-                    data-testid="add-video-review-confirm-edit"
-                    onClick={() => onEditVideoReview?.({ ...initialData, title: 'Updated title' })}
-                >
-                    Confirm Edit
-                </button>
-                <button data-testid="add-video-review-edit-error" onClick={() => onEditError?.()}>
-                    Trigger Edit Error
-                </button>
-            </div>
-        ) : null,
+jest.mock('@/pages/admin/feedback-page/components/add-feedback-history-modal/AddFeedbackHistoryModal', () => {
+    const { createMockFeedbackModal } = require('@/utils/test-mocks/feedback-modal-mocks');
+    const { FEEDBACK_TEXT: TEXT } = require('@/const/admin/feedback');
+    return {
+        AddFeedbackHistoryModal: createMockFeedbackModal({
+            testIdPrefix: 'add-history',
+            entityProp: 'historyToEdit',
+            addTitle: TEXT.ADD_HISTORY_MODAL.TITLE,
+            editTitle: TEXT.EDIT_HISTORY_MODAL.TITLE,
+            payload: { title: 'History title', story: 'History story', image: null, status: 1 },
+        }),
+    };
+});
+
+jest.mock('@/pages/admin/feedback-page/components/add-feedback-review-modal/AddFeedbackReviewModal', () => {
+    const { createMockFeedbackModal } = require('@/utils/test-mocks/feedback-modal-mocks');
+    const { FEEDBACK_TEXT: TEXT } = require('@/const/admin/feedback');
+    return {
+        AddFeedbackReviewModal: createMockFeedbackModal({
+            testIdPrefix: 'add-review',
+            entityProp: 'reviewToEdit',
+            addTitle: TEXT.ADD_REVIEW_MODAL.TITLE,
+            editTitle: TEXT.EDIT_REVIEW_MODAL.TITLE,
+            payload: { authorName: 'Author', text: 'Review text', status: 1 },
+        }),
+    };
+});
+
+jest.mock('@/pages/admin/feedback-page/components/add-video-review-modal/AddVideoReviewModal', () => {
+    const { createMockFeedbackModal } = require('@/utils/test-mocks/feedback-modal-mocks');
+    const { FEEDBACK_TEXT: TEXT } = require('@/const/admin/feedback');
+    return {
+        AddVideoReviewModal: createMockFeedbackModal({
+            testIdPrefix: 'add-video-review',
+            entityProp: 'videoToEdit',
+            addTitle: TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE,
+            editTitle: TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE,
+            payload: { title: 't', link: 'l', status: 1 },
+        }),
+    };
+});
+
+jest.mock('@/services/api/admin/image/image-api', () => ({
+    ImageApi: {
+        getUpdateImageId: jest.fn(),
+    },
 }));
 
 jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
@@ -184,13 +209,17 @@ jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
         fetchVideos: jest.fn(),
         reorderFeedback: jest.fn(),
         deleteFeedback: jest.fn(),
+        createHistory: jest.fn(),
+        updateHistory: jest.fn(),
         createReview: jest.fn(),
+        updateReview: jest.fn(),
         createVideoReview: jest.fn(),
         updateVideo: jest.fn(),
     },
 }));
 
 const mockFeedbackApi = FeedbackApi as jest.Mocked<typeof FeedbackApi>;
+const mockImageApi = ImageApi as jest.Mocked<typeof ImageApi>;
 
 const mockHistoryData = {
     items: [
@@ -253,6 +282,7 @@ describe('FeedbackPageAdmin', () => {
         mockFeedbackApi.reorderFeedback.mockResolvedValue();
         mockFeedbackApi.deleteFeedback.mockResolvedValue();
         mockFeedbackApi.createVideoReview.mockResolvedValue(mockVideosData.items[0]);
+        mockImageApi.getUpdateImageId.mockResolvedValue({ finalImageId: 15, imageIdToDelete: null } as any);
     });
 
     it('should render page content with toolbar, categories and list container', async () => {
@@ -352,7 +382,12 @@ describe('FeedbackPageAdmin', () => {
                 status: VisibilityStatus.Published,
             });
             expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+            expect(mockFeedbackApi.fetchVideos).toHaveBeenCalledTimes(2);
         });
+        expect(mockFeedbackApi.fetchVideos).toHaveBeenLastCalledWith(
+            mockAdminClient,
+            expect.objectContaining({ skip: 0 }),
+        );
     });
 
     it('should close AddVideoReviewModal when its onClose is called', async () => {
@@ -414,35 +449,52 @@ describe('FeedbackPageAdmin', () => {
             fireEvent.click(editBtns[0]);
         };
 
-        it('opens AddVideoReviewModal with the clicked record as initialData instead of showing a toast', async () => {
+        it('opens AddVideoReviewModal with the clicked record instead of showing a toast', async () => {
             await openEditVideoReviewModal();
 
             expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
+            expect(screen.getByText(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE)).toBeInTheDocument();
             expect(screen.getByTestId('add-video-review-initial-title')).toHaveTextContent(
                 mockVideosData.items[0].title,
             );
             expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);
         });
 
-        it('replaces the record in the list and shows a success toast when the edit is confirmed', async () => {
+        it('refetches the list and shows a success toast when the edit is confirmed', async () => {
+            const updatedVideo = { ...mockVideosData.items[0], title: 'Updated title' };
+            mockFeedbackApi.updateVideo.mockResolvedValueOnce(updatedVideo);
             await openEditVideoReviewModal();
+            mockFeedbackApi.fetchVideos.mockResolvedValueOnce({ items: [updatedVideo], totalItemsCount: 1 });
 
-            fireEvent.click(screen.getByTestId('add-video-review-confirm-edit'));
+            fireEvent.click(screen.getByTestId('add-video-review-submit'));
 
             const list = screen.getByTestId('infinite-scroll-list');
             await waitFor(() => {
                 expect(within(list).getByText('Updated title')).toBeInTheDocument();
             });
-            expect(within(list).queryByText(mockVideosData.items[0].title)).not.toBeInTheDocument();
+            expect(mockFeedbackApi.updateVideo).toHaveBeenCalledWith(mockAdminClient, mockVideosData.items[0].id, {
+                title: 't',
+                link: 'l',
+                status: VisibilityStatus.Published,
+            });
+            expect(mockFeedbackApi.fetchVideos).toHaveBeenLastCalledWith(
+                mockAdminClient,
+                expect.objectContaining({ skip: 0 }),
+            );
             expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         });
 
-        it('shows a failure toast and keeps the original record when the edit request fails', async () => {
+        it('keeps the original record and shows no success toast when the edit request fails', async () => {
+            mockFeedbackApi.updateVideo.mockRejectedValueOnce(new Error('network error'));
             await openEditVideoReviewModal();
 
-            fireEvent.click(screen.getByTestId('add-video-review-edit-error'));
+            fireEvent.click(screen.getByTestId('add-video-review-submit'));
 
-            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE, ToastType.Error);
+            await waitFor(() => {
+                expect(mockFeedbackApi.updateVideo).toHaveBeenCalledTimes(1);
+            });
+            expect(mockAddToast).not.toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
+            expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
             expect(
                 within(screen.getByTestId('infinite-scroll-list')).getByText(mockVideosData.items[0].title),
             ).toBeInTheDocument();
@@ -456,6 +508,120 @@ describe('FeedbackPageAdmin', () => {
 
             fireEvent.click(screen.getByTestId('toolbar-add-button'));
             expect(screen.queryByTestId('add-video-review-initial-title')).not.toBeInTheDocument();
+            expect(screen.getByText(FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+        });
+    });
+
+    describe('saving histories and reviews (#4276)', () => {
+        const openReviewsTab = async () => {
+            render(<FeedbackPageAdmin />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByRole('button', { name: FEEDBACK_TEXT.TABS.REVIEWS }));
+            await waitFor(() => {
+                expect(screen.getByText('Відгук учасника 10')).toBeInTheDocument();
+            });
+        };
+
+        it('should upload the image, create a history, refetch the list and show the publish toast', async () => {
+            mockFeedbackApi.createHistory.mockResolvedValueOnce(mockHistoryData.items[0] as any);
+            render(<FeedbackPageAdmin />);
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('toolbar-add-button'));
+            fireEvent.click(screen.getByTestId('add-history-submit'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+            });
+            expect(mockImageApi.getUpdateImageId).toHaveBeenCalledWith(mockAdminClient, null, null);
+            expect(mockFeedbackApi.createHistory).toHaveBeenCalledWith(mockAdminClient, {
+                title: 'History title',
+                story: 'History story',
+                imageId: 15,
+                status: VisibilityStatus.Published,
+            });
+            expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledTimes(2);
+            expect(mockFeedbackApi.fetchHistory).toHaveBeenLastCalledWith(
+                mockAdminClient,
+                expect.objectContaining({ skip: 0 }),
+            );
+        });
+
+        it('should update an existing history and show the update toast', async () => {
+            mockFeedbackApi.updateHistory.mockResolvedValueOnce(mockHistoryData.items[0] as any);
+            render(<FeedbackPageAdmin />);
+            await waitFor(() => {
+                expect(screen.getByText('Історія 1')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT })[0]);
+            fireEvent.click(screen.getByTestId('add-history-submit'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
+            });
+            expect(mockFeedbackApi.updateHistory).toHaveBeenCalledWith(
+                mockAdminClient,
+                mockHistoryData.items[0].id,
+                expect.objectContaining({ imageId: 15, status: VisibilityStatus.Published }),
+            );
+            expect(mockFeedbackApi.createHistory).not.toHaveBeenCalled();
+        });
+
+        it('should create a review, refetch the list and show the publish toast', async () => {
+            mockFeedbackApi.createReview.mockResolvedValueOnce(mockReviewsData.items[0] as any);
+            await openReviewsTab();
+
+            fireEvent.click(screen.getByTestId('toolbar-add-button'));
+            expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+            fireEvent.click(screen.getByTestId('add-review-submit'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
+            });
+            expect(mockFeedbackApi.createReview).toHaveBeenCalledWith(mockAdminClient, {
+                authorName: 'Author',
+                text: 'Review text',
+                status: VisibilityStatus.Published,
+            });
+            expect(mockFeedbackApi.fetchReviews).toHaveBeenCalledTimes(2);
+        });
+
+        it('should update an existing review and show the update toast', async () => {
+            mockFeedbackApi.updateReview.mockResolvedValueOnce(mockReviewsData.items[0] as any);
+            await openReviewsTab();
+
+            fireEvent.click(screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT })[0]);
+            expect(screen.getByTestId('add-review-initial-title')).toHaveTextContent(
+                mockReviewsData.items[0].authorName,
+            );
+            fireEvent.click(screen.getByTestId('add-review-submit'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
+            });
+            expect(mockFeedbackApi.updateReview).toHaveBeenCalledWith(mockAdminClient, mockReviewsData.items[0].id, {
+                authorName: 'Author',
+                text: 'Review text',
+                status: VisibilityStatus.Published,
+            });
+        });
+
+        it('should reset the edited review when the modal is closed', async () => {
+            await openReviewsTab();
+
+            fireEvent.click(screen.getAllByRole('button', { name: FEEDBACK_TEXT.ACTIONS.EDIT })[0]);
+            fireEvent.click(screen.getByTestId('add-review-close'));
+            fireEvent.click(screen.getByTestId('toolbar-add-button'));
+
+            expect(screen.queryByTestId('add-review-initial-title')).not.toBeInTheDocument();
+            expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
         });
     });
 

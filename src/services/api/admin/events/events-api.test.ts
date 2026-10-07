@@ -150,4 +150,55 @@ describe('EventsApi', () => {
             await expect(EventsApi.fetchEvents(client, 1, 0, 5)).rejects.toBe(error);
         });
     });
+
+    describe('reorder', () => {
+        it('calls the reorder endpoint with categoryId and ids', async () => {
+            mockPut.mockResolvedValueOnce({});
+
+            await EventsApi.reorder(client, 3, [1, 2]);
+
+            expect(mockPut).toHaveBeenCalledWith(API_ROUTES.EVENTS.REORDER, {
+                categoryId: 3,
+                ids: [1, 2],
+            });
+        });
+    });
+
+    describe('translateEvent', () => {
+        it('delegates to EventLocalizationsApi.create and returns the result', async () => {
+            const mockResponse = { title: 'English Title' };
+            const mockPost = jest.fn().mockResolvedValueOnce({ data: mockResponse });
+            const mockClient = { post: mockPost } as unknown as AxiosInstance;
+
+            const payload = {
+                entityId: 1,
+                languageId: 2,
+                title: 'English Title',
+                description: 'English description',
+            };
+
+            const result = await EventsApi.translateEvent(mockClient, payload);
+
+            expect(mockPost).toHaveBeenCalledWith(API_ROUTES.EVENT_LOCALIZATIONS.BASE, payload);
+            expect(result).toEqual(mockResponse);
+        });
+    });
+
+    describe('updateEventLocalization', () => {
+        it('delegates to EventLocalizationsApi.update and returns the result', async () => {
+            const mockResponse = { title: 'Updated Title' };
+            const mockPutClient = jest.fn().mockResolvedValueOnce({ data: mockResponse });
+            const mockClient = { put: mockPutClient } as unknown as AxiosInstance;
+
+            const payload = {
+                title: 'Updated Title',
+                description: 'Updated description',
+            };
+
+            const result = await EventsApi.updateEventLocalization(mockClient, 1, 2, payload);
+
+            expect(mockPutClient).toHaveBeenCalledWith(`${API_ROUTES.EVENT_LOCALIZATIONS.BASE}/1/2`, payload);
+            expect(result).toEqual(mockResponse);
+        });
+    });
 });

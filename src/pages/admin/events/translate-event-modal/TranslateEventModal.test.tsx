@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TranslateEventModal, TranslateEventModalProps } from './TranslateEventModal';
 import { EventItemDto } from '@/types/admin/events';
 import { VisibilityStatus } from '@/types/admin/common';
+import { useTranslateEvent } from '@/hooks/admin/use-translate-event/useTranslateEvent';
 
 jest.mock('@/const/common/locales', () => ({
     DEFAULT_LOCALE: 'uk',
@@ -42,6 +43,18 @@ jest.mock('@/components/admin/translation-controls/TranslationControls', () => (
 const mockFormSubmit = jest.fn();
 const mockIsValid = jest.fn();
 const mockIsDirty = jest.fn();
+const mockTranslateEvent = jest.fn();
+
+jest.mock('@/hooks/admin/use-translate-event/useTranslateEvent', () => ({
+    useTranslateEvent: jest.fn(() => ({
+        translateEvent: mockTranslateEvent,
+        isSubmitting: false,
+        error: '',
+        clearError: jest.fn(),
+    })),
+}));
+
+const mockUseTranslateEvent = jest.mocked(useTranslateEvent);
 
 jest.mock('@/pages/admin/events/translate-event-form/TranslateEventForm', () => {
     const React = require('react');
@@ -97,6 +110,12 @@ describe('TranslateEventModal', () => {
         jest.clearAllMocks();
         mockIsValid.mockReturnValue(true);
         mockIsDirty.mockReturnValue(false);
+        mockUseTranslateEvent.mockReturnValue({
+            translateEvent: mockTranslateEvent,
+            isSubmitting: false,
+            error: '',
+            clearError: jest.fn(),
+        });
     });
 
     it('returns null and does not render when eventToTranslate is null', () => {
@@ -138,5 +157,55 @@ describe('TranslateEventModal', () => {
         fireEvent.click(screen.getByTestId('make-dirty'));
 
         expect(screen.getByTestId('form-status')).toHaveTextContent('Dirty: true, Valid: true');
+    });
+
+    it('submits form, calls onTranslateEvent and onClose on success', async () => {
+        const mockOnTranslateEvent = jest.fn();
+        mockTranslateEvent.mockImplementation(async () => {
+            const hookCall = mockUseTranslateEvent.mock.calls[mockUseTranslateEvent.mock.calls.length - 1][0];
+            hookCall.onSuccess(mockEvent);
+        });
+
+        render(<TranslateEventModal {...defaultProps} onTranslateEvent={mockOnTranslateEvent} />);
+
+        fireEvent.click(screen.getByTestId('make-valid'));
+        fireEvent.click(screen.getByTestId('modal-save'));
+
+        await waitFor(() => {
+            expect(mockFormSubmit).toHaveBeenCalled();
+            expect(mockTranslateEvent).toHaveBeenCalled();
+            expect(mockOnTranslateEvent).toHaveBeenCalledWith(mockEvent);
+            expect(mockOnClose).toHaveBeenCalled();
+        });
+    });
+
+    it('renders error message when useTranslateEvent returns error', () => {
+        mockUseTranslateEvent.mockReturnValue({
+            translateEvent: mockTranslateEvent,
+            isSubmitting: false,
+            error: 'Mock Error',
+            clearError: jest.fn(),
+        });
+        render(<TranslateEventModal {...defaultProps} />);
+        expect(screen.getByText('Mock Error')).toBeInTheDocument();
+    });
+
+    it('renders edit mode title when event already has localization for the selected language', () => {
+        const eventWithLoc: EventItemDto = {
+            ...mockEvent,
+            localizations: [
+                {
+                    language: { id: 2, code: 'en' },
+                    title: 'Existing EN Title',
+                    description: 'Existing EN Desc',
+                    additionalDescription: 'Existing extra',
+                    translationStatus: 1 as any,
+                },
+            ],
+        };
+
+        render(<TranslateEventModal {...defaultProps} eventToTranslate={eventWithLoc} />);
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
     });
 });

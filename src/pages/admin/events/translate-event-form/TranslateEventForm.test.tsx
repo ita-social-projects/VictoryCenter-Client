@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import React, { useRef } from 'react';
+import React from 'react';
 import { TranslateEventForm, TranslateEventFormRef, TranslateEventFormProps } from './TranslateEventForm';
 import { EVENTS_TEXT } from '@/const/admin/events';
 

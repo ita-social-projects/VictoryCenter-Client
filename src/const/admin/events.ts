@@ -169,6 +169,7 @@ export const EVENT_ITEMS_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати матеріал',
         DELETE: 'Видалити матеріал',
+        TRANSLATE: 'Перекласти',
     },
     NO_RECORDS: 'Ще немає матеріалу',
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ButtonValidationState } from '@/hooks/admin/use-generic-modal/useGenericModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -37,6 +37,8 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
     isExitConfirmationOpen: boolean;
     onExitConfirm: () => void;
     onExitCancel: () => void;
+    className?: string;
+    showDraftButton?: boolean;
 }
 
 export const GenericModalWrapper = <TFormValues, TFormRef>({
@@ -63,10 +65,20 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     renderForm,
     categories,
     fullScreen = false,
+    className,
+    showDraftButton = true,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
+    const isConfirmationOpen = isActionConfirmationOpen || isExitConfirmationOpen;
+
+    const handleModalClose = useCallback(() => {
+        if (!isConfirmationOpen) {
+            onClose();
+        }
+    }, [isConfirmationOpen, onClose]);
+
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose} fullscreen={fullScreen}>
+            <Modal isOpen={isOpen} onClose={handleModalClose} fullscreen={fullScreen} className={className}>
                 {title && <Modal.Title>{title}</Modal.Title>}
                 <Modal.Content>
                     {renderForm({
@@ -81,13 +93,15 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                     {error && <div className="modal-content-error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button
-                        buttonStyle="secondary"
-                        onClick={onDraftSubmit}
-                        disabled={isSubmitting || !buttonStates.isDraftValid}
-                    >
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
-                    </Button>
+                    {showDraftButton && (
+                        <Button
+                            buttonStyle="secondary"
+                            onClick={onDraftSubmit}
+                            disabled={isSubmitting || !buttonStates.isDraftValid}
+                        >
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
+                        </Button>
+                    )}
                     <Button
                         buttonStyle="primary"
                         onClick={onPublishSubmit}

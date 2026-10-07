@@ -43,6 +43,7 @@ export const FEEDBACK_TEXT = {
         SUCCESS_TRANSLATE: 'Переклад успішно збережено',
         FAIL_TO_TRANSLATE: 'Виникла помилка під час збереження перекладу',
         FAIL_TO_PUBLISH: 'Виникла помилка під час збереження',
+        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
     },
     DELETE_MODAL: {
         TITLE: 'Видалити матеріал?',

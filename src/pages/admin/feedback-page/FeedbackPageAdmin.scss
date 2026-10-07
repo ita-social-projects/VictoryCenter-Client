@@ -60,3 +60,14 @@
         }
     }
 }
+
+.feedback-form-modal {
+    .modal-footer {
+        justify-content: center;
+
+        button {
+            width: auto;
+            min-width: 227px;
+        }
+    }
+}

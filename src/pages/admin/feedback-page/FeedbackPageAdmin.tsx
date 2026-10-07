@@ -2,7 +2,7 @@ import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { ModalMode, PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
@@ -27,9 +27,16 @@ import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/Infi
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { FeedbackComponent } from './components/feedback-component/FeedbackComponent';
 import { DeleteFeedbackModal } from './components/delete-feedback-modal/DeleteFeedbackModal';
-import { AddFeedbackHistoryModal } from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
-import { AddVideoReviewModal } from './components/add-video-review-modal/AddVideoReviewModal';
-import { AddFeedbackReviewModal } from './components/add-feedback-review-modal/AddFeedbackReviewModal';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import {
+    AddFeedbackHistoryModal,
+    FeedbackHistoryPayload,
+} from './components/add-feedback-history-modal/AddFeedbackHistoryModal';
+import {
+    AddFeedbackReviewModal,
+    FeedbackReviewPayload,
+} from './components/add-feedback-review-modal/AddFeedbackReviewModal';
+import { AddVideoReviewModal, VideoReviewPayload } from './components/add-video-review-modal/AddVideoReviewModal';
 import { TranslateFeedbackHistoryModal } from './components/translate-feedback-history-modal/TranslateFeedbackHistoryModal';
 import { TranslateFeedbackReviewModal } from './components/translate-feedback-review-modal/TranslateFeedbackReviewModal';
 import { TranslateFeedbackVideoModal } from './components/translate-feedback-video-modal/TranslateFeedbackVideoModal';
@@ -153,10 +160,6 @@ export const FeedbackPageAdmin = () => {
         [selectedSearchItem, addToast],
     );
 
-    const handleReviewSubmitError = useCallback(() => {
-        addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
-    }, [addToast]);
-
     const handleTranslateClick = useCallback(
         (item: FeedbackListItem) => {
             if (isAnyModalOpened) return;
@@ -229,42 +232,69 @@ export const FeedbackPageAdmin = () => {
         }
     }, [activeCategory, fetchCategoryItems, selectedSearchItem]);
 
-    const handleAddHistorySuccess = useCallback(
-        (_newHistory: FeedbackHistoryDto) => {
-            setSelectedSearchItem(null);
-            fetchCategoryItems(activeCategory, 0);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
-        },
-        [fetchCategoryItems, activeCategory, addToast],
-    );
-
-    const handleAddVideoReviewSubmit = useCallback(
-        async (data: { title: string; link: string }) => {
-            try {
-                await FeedbackApi.createVideoReview(client, {
-                    ...data,
-                    status: VisibilityStatus.Published,
-                });
-                setSelectedSearchItem(null);
-                fetchCategoryItems(activeCategory, 0);
-                addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
-                return true;
-            } catch {
-                addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
-                return false;
-            }
-        },
-        [client, fetchCategoryItems, activeCategory, addToast],
-    );
-
-    const handleAddReviewSuccess = useCallback(() => {
-        setSelectedSearchItem(null);
-        fetchCategoryItems(activeCategory, 0);
-        addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH, ToastType.Success);
-    }, [fetchCategoryItems, activeCategory, addToast]);
-
     const isTranslationFilterActive =
         translationStatusFilter !== undefined && translationStatusFilter !== TranslationStatusFilter.All;
+
+    const handleSaveSuccess = useCallback(
+        (savedItem: FeedbackListItem, mode: ModalMode) => {
+            if (mode === ModalMode.Edit && selectedSearchItem) {
+                setSelectedSearchItem((prev) => (prev?.id === savedItem.id ? savedItem : prev));
+            } else {
+                setSelectedSearchItem(null);
+                fetchCategoryItems(activeCategory, 0);
+            }
+
+            addToast(
+                mode === ModalMode.Edit ? FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE : FEEDBACK_TEXT.MESSAGE.SUCCESS_PUBLISH,
+                ToastType.Success,
+            );
+        },
+        [selectedSearchItem, fetchCategoryItems, activeCategory, addToast],
+    );
+
+    const handleSubmitReview = useCallback(
+        (payload: FeedbackReviewPayload, reviewToEdit?: FeedbackReviewDto) =>
+            reviewToEdit
+                ? FeedbackApi.updateReview(client, reviewToEdit.id, payload)
+                : FeedbackApi.createReview(client, payload),
+        [client],
+    );
+
+    const handleCloseReviewModal = useCallback(() => {
+        setIsAddReviewModalOpen(false);
+        setReviewToEdit(null);
+    }, []);
+
+    const handleSubmitHistory = useCallback(
+        async (payload: FeedbackHistoryPayload, historyToEdit?: FeedbackHistoryDto) => {
+            const initialImageId = historyToEdit?.image && 'id' in historyToEdit.image ? historyToEdit.image.id : null;
+            const { finalImageId } = await ImageApi.getUpdateImageId(client, payload.image, initialImageId);
+
+            const request = {
+                title: payload.title,
+                story: payload.story,
+                imageId: finalImageId,
+                status: payload.status,
+            };
+
+            return historyToEdit
+                ? FeedbackApi.updateHistory(client, historyToEdit.id, request)
+                : FeedbackApi.createHistory(client, request);
+        },
+        [client],
+    );
+
+    const handleCloseHistoryModal = useCallback(() => {
+        setIsAddHistoryModalOpen(false);
+        setHistoryToEdit(null);
+    }, []);
+
+    const handleSubmitVideo = useCallback(
+        (payload: VideoReviewPayload) => FeedbackApi.createVideoReview(client, payload),
+        [client],
+    );
+
+    const handleCloseVideoModal = useCallback(() => setIsAddVideoReviewModalOpen(false), []);
 
     const applyUpdatedItem = useCallback(
         (updatedItem: FeedbackListItem) => {
@@ -285,22 +315,6 @@ export const FeedbackPageAdmin = () => {
             );
         },
         [isTranslationFilterActive, fetchCategoryItems, activeCategory, statusFilter, selectedSearchItem],
-    );
-
-    const handleEditHistorySuccess = useCallback(
-        (updatedHistory: FeedbackHistoryDto) => {
-            applyUpdatedItem(updatedHistory);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
-        },
-        [applyUpdatedItem, addToast],
-    );
-
-    const handleEditReviewSuccess = useCallback(
-        (updatedReview: FeedbackReviewDto) => {
-            applyUpdatedItem(updatedReview);
-            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
-        },
-        [applyUpdatedItem, addToast],
     );
 
     const handleTranslateSuccess = useCallback(
@@ -526,30 +540,27 @@ export const FeedbackPageAdmin = () => {
                 onDeleteItem={handleDeleteConfirm}
             />
             <AddFeedbackHistoryModal
+                mode={historyToEdit ? ModalMode.Edit : ModalMode.Add}
                 isOpen={isAddHistoryModalOpen}
-                onClose={() => {
-                    setIsAddHistoryModalOpen(false);
-                    setHistoryToEdit(null);
-                }}
-                onAddHistory={handleAddHistorySuccess}
-                onEditHistory={handleEditHistorySuccess}
-                initialData={historyToEdit || undefined}
+                onClose={handleCloseHistoryModal}
+                historyToEdit={historyToEdit ?? undefined}
+                onSubmit={handleSubmitHistory}
+                onSuccess={handleSaveSuccess}
             />
             <AddVideoReviewModal
+                mode={ModalMode.Add}
                 isOpen={isAddVideoReviewModalOpen}
-                onClose={() => setIsAddVideoReviewModalOpen(false)}
-                onSubmit={handleAddVideoReviewSubmit}
+                onClose={handleCloseVideoModal}
+                onSubmit={handleSubmitVideo}
+                onSuccess={handleSaveSuccess}
             />
             <AddFeedbackReviewModal
+                mode={reviewToEdit ? ModalMode.Edit : ModalMode.Add}
                 isOpen={isAddReviewModalOpen}
-                onClose={() => {
-                    setIsAddReviewModalOpen(false);
-                    setReviewToEdit(null);
-                }}
-                onAddReview={handleAddReviewSuccess}
-                onEditReview={handleEditReviewSuccess}
-                onSubmitError={handleReviewSubmitError}
-                initialData={reviewToEdit || undefined}
+                onClose={handleCloseReviewModal}
+                reviewToEdit={reviewToEdit ?? undefined}
+                onSubmit={handleSubmitReview}
+                onSuccess={handleSaveSuccess}
             />
             <TranslateFeedbackHistoryModal
                 isOpen={!!historyToTranslate}

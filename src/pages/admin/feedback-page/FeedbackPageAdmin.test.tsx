@@ -434,10 +434,7 @@ describe('FeedbackPageAdmin', () => {
                 expect(within(list).getByText('Updated title')).toBeInTheDocument();
             });
             expect(within(list).queryByText(mockVideosData.items[0].title)).not.toBeInTheDocument();
-            expect(mockAddToast).toHaveBeenCalledWith(
-                FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.SUCCESS_UPDATE,
-                ToastType.Success,
-            );
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         });
 
         it('shows a failure toast and keeps the original record when the edit request fails', async () => {
@@ -445,10 +442,7 @@ describe('FeedbackPageAdmin', () => {
 
             fireEvent.click(screen.getByTestId('add-video-review-edit-error'));
 
-            expect(mockAddToast).toHaveBeenCalledWith(
-                FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.FAIL_TO_UPDATE,
-                ToastType.Error,
-            );
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE, ToastType.Error);
             expect(
                 within(screen.getByTestId('infinite-scroll-list')).getByText(mockVideosData.items[0].title),
             ).toBeInTheDocument();

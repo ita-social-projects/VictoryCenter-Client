@@ -64,6 +64,7 @@ export const AddVideoReviewModal = ({
 
     const isDirty = title.trim().length > 0 || link.trim().length > 0;
     const hasChanges = title.trim() !== initialTitle.trim() || link.trim() !== initialLink.trim();
+    const hasUnsavedInput = isEditMode ? hasChanges : isDirty;
 
     const isSubmitDisabled = useMemo(() => {
         const hasValidationError =
@@ -124,7 +125,6 @@ export const AddVideoReviewModal = ({
                 onClose();
             } catch {
                 onEditError?.();
-            } finally {
                 setIsSubmitting(false);
             }
             return;
@@ -151,14 +151,14 @@ export const AddVideoReviewModal = ({
     const handleRequestClose = useCallback(() => {
         if (isSubmitting) return;
 
-        if (isDirty) {
+        if (hasUnsavedInput) {
             setShowCloseConfirmModal(true);
             return;
         }
 
         resetForm();
         onClose();
-    }, [isSubmitting, isDirty, onClose, resetForm]);
+    }, [isSubmitting, hasUnsavedInput, onClose, resetForm]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);

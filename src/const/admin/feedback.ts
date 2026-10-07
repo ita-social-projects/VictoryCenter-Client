@@ -39,6 +39,7 @@ export const FEEDBACK_TEXT = {
         FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
         SUCCESS_PUBLISH: 'Відгук успішно опубліковано',
         SUCCESS_UPDATE: 'Зміни успішно опубліковано',
+        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
         FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
         SUCCESS_TRANSLATE: 'Переклад успішно збережено',
         FAIL_TO_TRANSLATE: 'Виникла помилка під час збереження перекладу',
@@ -72,8 +73,6 @@ export const FEEDBACK_TEXT = {
     },
     EDIT_VIDEO_REVIEW_MODAL: {
         TITLE: 'Редагувати відео відгук',
-        SUCCESS_UPDATE: 'Зміни успішно опубліковано',
-        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
     },
     ADD_REVIEW_MODAL: {
         TITLE: 'Додати відгук',

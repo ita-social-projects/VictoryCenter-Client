@@ -441,9 +441,18 @@ describe('AddVideoReviewModal', () => {
             expect(getTitleInput()).toHaveValue('Updated title value');
         });
 
-        it('shows the unsaved-changes confirmation on "X" even without edits, since fields are pre-filled', () => {
-            renderEdit();
+        it('closes immediately on "X" without edits, since pre-filled values are not unsaved changes', () => {
+            const { onClose } = renderEdit();
             fireEvent.click(getCloseButton());
+            expect(onClose).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+        });
+
+        it('shows the unsaved-changes confirmation on "X" once a field actually changes', () => {
+            const { onClose } = renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getCloseButton());
+            expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
         });
 

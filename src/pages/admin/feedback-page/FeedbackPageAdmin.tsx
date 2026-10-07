@@ -129,11 +129,9 @@ export const FeedbackPageAdmin = () => {
             } else if (activeCategory === FeedbackCategory.VIDEOS && isFeedbackVideo(item)) {
                 setVideoToEdit(item);
                 setIsAddVideoReviewModalOpen(true);
-            } else {
-                handleNotImplemented();
             }
         },
-        [activeCategory, handleNotImplemented],
+        [activeCategory],
     );
 
     const handleDeleteClick = useCallback(
@@ -318,13 +316,13 @@ export const FeedbackPageAdmin = () => {
                 setSelectedSearchItem(updatedVideo);
             }
             setItems((prev) => prev.map((item) => (item.id === updatedVideo.id ? updatedVideo : item)));
-            addToast(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.SUCCESS_UPDATE, ToastType.Success);
+            addToast(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         },
         [selectedSearchItem, addToast],
     );
 
     const handleEditVideoReviewError = useCallback(() => {
-        addToast(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.FAIL_TO_UPDATE, ToastType.Error);
+        addToast(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE, ToastType.Error);
     }, [addToast]);
 
     const getFeedbackSearchItems = useCallback(

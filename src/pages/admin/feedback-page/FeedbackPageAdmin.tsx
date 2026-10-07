@@ -114,12 +114,14 @@ export const FeedbackPageAdmin = () => {
     const [isAddVideoReviewModalOpen, setIsAddVideoReviewModalOpen] = useState(false);
     const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
     const [reviewToEdit, setReviewToEdit] = useState<FeedbackReviewDto | null>(null);
+    const [videoToEdit, setVideoToEdit] = useState<FeedbackVideoDto | null>(null);
 
     const handleAddItemClick = useCallback(() => {
         if (activeCategory === FeedbackCategory.HISTORY) {
             setHistoryToEdit(null);
             setIsAddHistoryModalOpen(true);
         } else if (activeCategory === FeedbackCategory.VIDEOS) {
+            setVideoToEdit(null);
             setIsAddVideoReviewModalOpen(true);
         } else if (activeCategory === FeedbackCategory.REVIEWS) {
             setIsAddReviewModalOpen(true);
@@ -136,11 +138,12 @@ export const FeedbackPageAdmin = () => {
             } else if (activeCategory === FeedbackCategory.REVIEWS && isFeedbackReview(item)) {
                 setReviewToEdit(item);
                 setIsAddReviewModalOpen(true);
-            } else {
-                handleNotImplemented();
+            } else if (activeCategory === FeedbackCategory.VIDEOS && isFeedbackVideo(item)) {
+                setVideoToEdit(item);
+                setIsAddVideoReviewModalOpen(true);
             }
         },
-        [activeCategory, handleNotImplemented],
+        [activeCategory],
     );
 
     const handleDeleteClick = useCallback(
@@ -253,9 +256,9 @@ export const FeedbackPageAdmin = () => {
     );
 
     const handleSubmitReview = useCallback(
-        (payload: FeedbackReviewPayload, reviewToEdit?: FeedbackReviewDto) =>
-            reviewToEdit
-                ? FeedbackApi.updateReview(client, reviewToEdit.id, payload)
+        (payload: FeedbackReviewPayload, itemToEdit?: FeedbackReviewDto) =>
+            itemToEdit
+                ? FeedbackApi.updateReview(client, itemToEdit.id, payload)
                 : FeedbackApi.createReview(client, payload),
         [client],
     );
@@ -266,8 +269,8 @@ export const FeedbackPageAdmin = () => {
     }, []);
 
     const handleSubmitHistory = useCallback(
-        async (payload: FeedbackHistoryPayload, historyToEdit?: FeedbackHistoryDto) => {
-            const initialImageId = historyToEdit?.image && 'id' in historyToEdit.image ? historyToEdit.image.id : null;
+        async (payload: FeedbackHistoryPayload, itemToEdit?: FeedbackHistoryDto) => {
+            const initialImageId = itemToEdit?.image && 'id' in itemToEdit.image ? itemToEdit.image.id : null;
             const { finalImageId } = await ImageApi.getUpdateImageId(client, payload.image, initialImageId);
 
             const request = {
@@ -277,8 +280,8 @@ export const FeedbackPageAdmin = () => {
                 status: payload.status,
             };
 
-            return historyToEdit
-                ? FeedbackApi.updateHistory(client, historyToEdit.id, request)
+            return itemToEdit
+                ? FeedbackApi.updateHistory(client, itemToEdit.id, request)
                 : FeedbackApi.createHistory(client, request);
         },
         [client],
@@ -290,11 +293,17 @@ export const FeedbackPageAdmin = () => {
     }, []);
 
     const handleSubmitVideo = useCallback(
-        (payload: VideoReviewPayload) => FeedbackApi.createVideoReview(client, payload),
+        (payload: VideoReviewPayload, itemToEdit?: FeedbackVideoDto) =>
+            itemToEdit
+                ? FeedbackApi.updateVideo(client, itemToEdit.id, payload)
+                : FeedbackApi.createVideoReview(client, payload),
         [client],
     );
 
-    const handleCloseVideoModal = useCallback(() => setIsAddVideoReviewModalOpen(false), []);
+    const handleCloseVideoModal = useCallback(() => {
+        setIsAddVideoReviewModalOpen(false);
+        setVideoToEdit(null);
+    }, []);
 
     const applyUpdatedItem = useCallback(
         (updatedItem: FeedbackListItem) => {
@@ -548,9 +557,10 @@ export const FeedbackPageAdmin = () => {
                 onSuccess={handleSaveSuccess}
             />
             <AddVideoReviewModal
-                mode={ModalMode.Add}
+                mode={videoToEdit ? ModalMode.Edit : ModalMode.Add}
                 isOpen={isAddVideoReviewModalOpen}
                 onClose={handleCloseVideoModal}
+                videoToEdit={videoToEdit ?? undefined}
                 onSubmit={handleSubmitVideo}
                 onSuccess={handleSaveSuccess}
             />

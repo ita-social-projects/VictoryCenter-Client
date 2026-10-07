@@ -72,7 +72,9 @@ export const AddVideoReviewModal = ({
     return (
         <GenericModalWrapper
             isOpen={isOpen}
-            title={FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE}
+            title={
+                isEditMode ? FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE : FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE
+            }
             className="feedback-form-modal"
             showDraftButton={false}
             onClose={modalHookData.handleClose}

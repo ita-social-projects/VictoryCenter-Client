@@ -25,6 +25,7 @@ const PLATFORM_LABEL: Record<number, string> = {
 export const Footer = () => {
     const { t, i18n } = useTranslation('footer');
     const [profile, setProfile] = useState<PublicCompanyProfileDto | null>(null);
+    const [newsletterEmail, setNewsletterEmail] = useState('');
 
     useEffect(() => {
         let mounted = true;
@@ -60,8 +61,34 @@ export const Footer = () => {
         navigator.clipboard.writeText(text);
     };
 
+    const handleNewsletterSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log('Submitted email:', newsletterEmail);
+        setNewsletterEmail('');
+    };
+
     return (
         <div className="footer-content">
+            <div className="newsletter-block">
+                <div className="logo-container">
+                    <Link to="/">
+                        <VictoryCenterLogo className="logo" />
+                    </Link>
+                </div>
+                <h3 className="newsletter-title">{t('STAY_UP_TO_DATE_WITH_THE_NEWS')}</h3>
+                <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+                    <input
+                        type="email"
+                        placeholder={t('ENTER_YOUR_EMAIL')}
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        required
+                    />
+                    <button type="submit" className="submit-btn" aria-label={t('SIGN_UP')}>
+                        ↗
+                    </button>
+                </form>
+            </div>
             <div className="main-block">
                 <div className="logo-container">
                     <Link to="/">

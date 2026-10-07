@@ -3,6 +3,7 @@ import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminP
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
 import { EventItemComponent } from './event-item-component/EventItemComponent';
+import { EventSearchItem } from './event-search-item/EventSearchItem';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -159,6 +160,21 @@ export const EventsPageAdmin = () => {
             resetEventItemsState();
         },
         [resetEventItemsState],
+    );
+
+    const handleEventSearchSelect = useCallback(
+        (_key: string | number, item: EventSearchItemData) => {
+            const targetCategoryId = item.categories[0]?.id;
+            const targetCategory = categories.find((category) => category.id === targetCategoryId);
+
+            setStatusFilter(undefined);
+
+            if (targetCategory && targetCategory.id !== selectedCategory?.id) {
+                resetEventItemsState();
+                setSelectedCategory(targetCategory);
+            }
+        },
+        [categories, selectedCategory?.id, resetEventItemsState],
     );
 
     // Category handlers
@@ -590,7 +606,7 @@ export const EventsPageAdmin = () => {
             <div className="events-page-toolbar-container">
                 <AdminPanelToolbar<EventSearchItemData>
                     getSearchItemKey={(item) => item.id}
-                    getSearchItemLabel={(item) => item.name}
+                    getSearchItemLabel={(item) => item.title}
                     fetchSearchItems={getEventSearchItems}
                     placeholder={EVENTS_TEXT.PLACEHOLDER.SEARCH_EVENTS}
                     onSearchClear={() => null}
@@ -598,11 +614,13 @@ export const EventsPageAdmin = () => {
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddEvent}
                     AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
-                    onSuggestionSelect={() => null}
+                    onSuggestionSelect={handleEventSearchSelect}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
+                    searchPageSize={5}
+                    renderSearchItemComponent={EventSearchItem}
                 />
             </div>
             <div

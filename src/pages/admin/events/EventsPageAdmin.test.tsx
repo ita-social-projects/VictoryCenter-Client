@@ -65,8 +65,27 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 Clear Search
             </button>
 
-            <button type="button" onClick={() => onSuggestionSelect?.({})}>
+            <button
+                type="button"
+                onClick={() =>
+                    onSuggestionSelect?.(1, { id: 1, title: 'Test event', categories: [{ id: 1, name: 'Category' }] })
+                }
+            >
                 Select Suggestion
+            </button>
+
+            <button
+                type="button"
+                data-testid="select-suggestion-category-2"
+                onClick={() =>
+                    onSuggestionSelect?.(2, {
+                        id: 2,
+                        title: 'Other category event',
+                        categories: [{ id: 2, name: 'Category 2' }],
+                    })
+                }
+            >
+                Select Suggestion From Category 2
             </button>
 
             <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
@@ -1283,6 +1302,77 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('switches the category tab and clears the status filter when a search suggestion from another category is selected', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, categoryId) =>
+            categoryId === categories[1].id
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('select-suggestion-category-2'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[1].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
+
+            expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
+        });
+    });
+
+    it('clears the status filter and keeps the current category when the selected suggestion already belongs to it', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
+        });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[0].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
+        });
     });
 
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {

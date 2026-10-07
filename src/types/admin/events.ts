@@ -22,11 +22,15 @@ export interface ErrorState {
     type: EventsErrorType | null;
 }
 
-// this is a test interface and most probably will need adjustments in the future
-export interface EventSearchItemData {
+export interface EventSearchItemCategory {
     id: number;
     name: string;
-    categories: string[];
+}
+
+export interface EventSearchItemData {
+    id: number;
+    title: string;
+    categories: EventSearchItemCategory[];
 }
 
 // this is a test interface and most probably will need adjustments in the future

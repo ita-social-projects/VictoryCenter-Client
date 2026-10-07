@@ -553,96 +553,139 @@ describe('EventModal', () => {
         });
 
         it.each([
-            { mode: ModalMode.Add, targetStatus: VisibilityStatus.Draft },
-            { mode: ModalMode.Add, targetStatus: VisibilityStatus.Published },
-            { mode: ModalMode.Edit, initialStatus: VisibilityStatus.Draft, targetStatus: VisibilityStatus.Draft },
-            { mode: ModalMode.Edit, initialStatus: VisibilityStatus.Draft, targetStatus: VisibilityStatus.Published },
+            {
+                mode: ModalMode.Add,
+                targetStatus: VisibilityStatus.Draft,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
+            },
+            {
+                mode: ModalMode.Add,
+                targetStatus: VisibilityStatus.Published,
+                isFirstPublication: true,
+                shouldMoveDraftToTop: false,
+            },
+            {
+                mode: ModalMode.Edit,
+                initialStatus: VisibilityStatus.Draft,
+                targetStatus: VisibilityStatus.Draft,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
+            },
+            {
+                mode: ModalMode.Edit,
+                initialStatus: VisibilityStatus.Draft,
+                targetStatus: VisibilityStatus.Published,
+                isFirstPublication: true,
+                shouldMoveDraftToTop: false,
+            },
             {
                 mode: ModalMode.Edit,
                 initialStatus: VisibilityStatus.Published,
                 targetStatus: VisibilityStatus.Published,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: false,
             },
             {
                 mode: ModalMode.Edit,
                 initialStatus: VisibilityStatus.Published,
                 targetStatus: VisibilityStatus.Draft,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
             },
-        ])('submits the expected $mode/$targetStatus request only after confirmation', async (scenario) => {
-            const onClose = jest.fn();
-            const isPublish = scenario.targetStatus === VisibilityStatus.Published;
-            const buttonText = isPublish
-                ? COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED
-                : COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT;
+        ])(
+            'submits the expected $mode/$targetStatus request and success flags only after confirmation',
+            async (scenario) => {
+                const onClose = jest.fn();
+                const onSaveSuccess = jest.fn();
+                const isPublish = scenario.targetStatus === VisibilityStatus.Published;
+                const buttonText = isPublish
+                    ? COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED
+                    : COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT;
 
-            if (scenario.mode === ModalMode.Edit) {
-                const fullEvent = {
-                    ...eventToEdit,
-                    status: scenario.initialStatus!,
-                    categories: [{ id: 7 }, { id: 8 }],
-                    localizations: [
-                        {
-                            language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
-                            title: eventToEdit.title,
-                            description: eventToEdit.description,
-                            additionalDescription: eventToEdit.additionalDescription,
-                        },
-                    ],
-                };
-                mockedEventsApi.getEventById.mockResolvedValueOnce(fullEvent);
-                mockedEventsApi.updateEvent.mockResolvedValueOnce({ ...eventToEdit, status: scenario.targetStatus });
-                render(
-                    <EventModal
-                        {...defaultProps}
-                        mode={ModalMode.Edit}
-                        eventToEdit={{ ...eventToEdit, status: scenario.initialStatus! }}
-                        onClose={onClose}
-                    />,
-                );
-                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Changed event title');
-            } else {
-                mockedEventsApi.createEvent.mockResolvedValueOnce({ ...eventToEdit, status: scenario.targetStatus });
-                render(<EventModal {...defaultProps} onClose={onClose} />);
-                fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
-            }
-
-            if (isPublish) {
-                if (scenario.mode === ModalMode.Add) {
-                    fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
-                    fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
-                    openDatePickerAndSelectToday(getTodayLabel());
-                    fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+                if (scenario.mode === ModalMode.Edit) {
+                    const fullEvent = {
+                        ...eventToEdit,
+                        status: scenario.initialStatus!,
+                        categories: [{ id: 7 }, { id: 8 }],
+                        localizations: [
+                            {
+                                language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
+                                title: eventToEdit.title,
+                                description: eventToEdit.description,
+                                additionalDescription: eventToEdit.additionalDescription,
+                            },
+                        ],
+                    };
+                    mockedEventsApi.getEventById.mockResolvedValueOnce(fullEvent);
+                    mockedEventsApi.updateEvent.mockResolvedValueOnce({
+                        ...eventToEdit,
+                        status: scenario.targetStatus,
+                    });
+                    render(
+                        <EventModal
+                            {...defaultProps}
+                            mode={ModalMode.Edit}
+                            eventToEdit={{ ...eventToEdit, status: scenario.initialStatus! }}
+                            onClose={onClose}
+                            onSaveSuccess={onSaveSuccess}
+                        />,
+                    );
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Changed event title');
+                } else {
+                    mockedEventsApi.createEvent.mockResolvedValueOnce({
+                        ...eventToEdit,
+                        status: scenario.targetStatus,
+                    });
+                    render(<EventModal {...defaultProps} onClose={onClose} onSaveSuccess={onSaveSuccess} />);
+                    fillTextField(EVENTS_TEXT.FORM.LABEL.TITLE, 'Valid event title');
                 }
-                fireEvent.click(screen.getByTestId('upload-valid-image'));
-            }
 
-            fireEvent.click(screen.getByRole('button', { name: buttonText }));
-            fireEvent.click(screen.getByTestId('confirmation-confirm'));
+                if (isPublish) {
+                    if (scenario.mode === ModalMode.Add) {
+                        fillTextField(EVENTS_TEXT.FORM.LABEL.DESCRIPTION, 'Valid event description');
+                        fillTextField(EVENTS_TEXT.FORM.LABEL.LINK_UKR, 'valid link');
+                        openDatePickerAndSelectToday(getTodayLabel());
+                        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+                    }
+                    fireEvent.click(screen.getByTestId('upload-valid-image'));
+                }
 
-            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+                fireEvent.click(screen.getByRole('button', { name: buttonText }));
+                fireEvent.click(screen.getByTestId('confirmation-confirm'));
 
-            await waitFor(() => {
-                expect(
-                    mockedEventsApi.updateEvent.mock.calls.length + mockedEventsApi.createEvent.mock.calls.length,
-                ).toBe(1);
-            });
+                expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
 
-            expect(mockedEventsApi.updateEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Edit ? 1 : 0);
-            expect(mockedEventsApi.createEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Add ? 1 : 0);
+                await waitFor(() => {
+                    expect(
+                        mockedEventsApi.updateEvent.mock.calls.length + mockedEventsApi.createEvent.mock.calls.length,
+                    ).toBe(1);
+                });
 
-            const request =
-                scenario.mode === ModalMode.Edit
-                    ? mockedEventsApi.updateEvent.mock.calls[0][2].request
-                    : mockedEventsApi.createEvent.mock.calls[0][1].request;
+                expect(mockedEventsApi.updateEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Edit ? 1 : 0);
+                expect(mockedEventsApi.createEvent).toHaveBeenCalledTimes(scenario.mode === ModalMode.Add ? 1 : 0);
 
-            expect(request).toEqual(
-                expect.objectContaining({
-                    status: scenario.targetStatus,
-                    categoryIds: scenario.mode === ModalMode.Edit ? [7, 8] : [currentCategory.id],
-                }),
-            );
+                const request =
+                    scenario.mode === ModalMode.Edit
+                        ? mockedEventsApi.updateEvent.mock.calls[0][2].request
+                        : mockedEventsApi.createEvent.mock.calls[0][1].request;
 
-            expect(onClose).toHaveBeenCalledTimes(1);
-        });
+                expect(request).toEqual(
+                    expect.objectContaining({
+                        status: scenario.targetStatus,
+                        categoryIds: scenario.mode === ModalMode.Edit ? [7, 8] : [currentCategory.id],
+                    }),
+                );
+
+                expect(onSaveSuccess).toHaveBeenCalledWith({
+                    event: { ...eventToEdit, status: scenario.targetStatus },
+                    categoryId: currentCategory.id,
+                    isFirstPublication: scenario.isFirstPublication,
+                    shouldMoveDraftToTop: scenario.shouldMoveDraftToTop,
+                });
+                expect(onClose).toHaveBeenCalledTimes(1);
+            },
+        );
 
         it('keeps the form open and allows retry when the event request fails', async () => {
             const onClose = jest.fn();

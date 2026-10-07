@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 
 import { ReviewsSection } from './ReviewsSection';
 import { StoriesOfVictoryReview } from '@/types/public/stories-of-victory';
+import { TranslationStatus } from '@/types/common/language';
+
+let mockCurrentLanguage = 'uk';
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
+}));
 
 // Mock react-i18next FIRST, before importing components
 jest.mock('react-i18next', () => ({
@@ -41,34 +47,36 @@ describe('ReviewsSection', () => {
         );
     });
 
+    const singleReview: StoriesOfVictoryReview[] = [{ id: 1, name: 'John Doe', review: 'Great service!' }];
+
     it('should render section element', () => {
-        const { container } = render(<ReviewsSection content={null} />);
+        const { container } = render(<ReviewsSection content={singleReview} />);
         expect(container.querySelector('section')).toBeInTheDocument();
     });
 
     it('should render title with correct translation', () => {
-        render(<ReviewsSection content={null} />);
+        render(<ReviewsSection content={singleReview} />);
         expect(screen.getByText('REVIEWS.TITLE')).toBeInTheDocument();
         expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
     });
 
     it('should call useTranslation with successPage namespace', () => {
         const { useTranslation } = require('react-i18next');
-        render(<ReviewsSection content={null} />);
+        render(<ReviewsSection content={singleReview} />);
         expect(useTranslation).toHaveBeenCalledWith('successPage');
     });
 
     it('should render Swiper component', () => {
         const { Swiper } = require('@/components/public/swiper/Swiper');
-        render(<ReviewsSection content={null} />);
+        render(<ReviewsSection content={singleReview} />);
         expect(Swiper).toHaveBeenCalled();
     });
 
-    it('should pass null items to Swiper when content is null', () => {
+    it.each([[null], [[]]])('should render nothing, including the title, when content is %p', (content) => {
         const { Swiper } = require('@/components/public/swiper/Swiper');
-        render(<ReviewsSection content={null} />);
-        const calls = (Swiper as jest.Mock).mock.calls;
-        expect(calls[0][0].items).toBeNull();
+        const { container } = render(<ReviewsSection content={content} />);
+        expect(container).toBeEmptyDOMElement();
+        expect(Swiper).not.toHaveBeenCalled();
     });
 
     it('should pass content items to Swiper component', () => {
@@ -121,8 +129,41 @@ describe('ReviewsSection', () => {
         expect(slideClass).toHaveAttribute('data-class');
     });
 
-    it('should render with empty content array', () => {
-        render(<ReviewsSection content={[]} />);
-        expect(screen.getByTestId('swiper-component')).toHaveAttribute('data-items-length', '0');
+    describe('localization', () => {
+        afterEach(() => {
+            mockCurrentLanguage = 'uk';
+        });
+
+        it('shows the English translation on the English site', () => {
+            mockCurrentLanguage = 'en';
+            const content: StoriesOfVictoryReview[] = [
+                {
+                    id: 1,
+                    name: 'Олена',
+                    review: 'Дякуємо!',
+                    localizations: [
+                        {
+                            language: { id: 2, code: 'en' },
+                            translationStatus: TranslationStatus.Relevant,
+                            authorName: 'Olena',
+                            text: 'Thank you!',
+                        },
+                    ],
+                },
+            ];
+
+            render(<ReviewsSection content={content} />);
+
+            expect(screen.getByText('"Thank you!"')).toBeInTheDocument();
+            expect(screen.getByText('Olena')).toBeInTheDocument();
+        });
+
+        it('falls back to the Ukrainian text on the English site when there is no translation', () => {
+            mockCurrentLanguage = 'en';
+            render(<ReviewsSection content={[{ id: 1, name: 'Олена', review: 'Дякуємо!' }]} />);
+
+            expect(screen.getByText('"Дякуємо!"')).toBeInTheDocument();
+            expect(screen.getByText('Олена')).toBeInTheDocument();
+        });
     });
 });

@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './VideoReviewsSection.module.scss';
+import { VideoCard } from './VideoCard';
 import { StoriesOfVictoryReviewVideo } from '@/types/public/stories-of-victory';
-import { ReactComponent as PlayIcon } from '@/assets/icons/play-video.svg';
-import RidingVideo from '@/assets/videos/child-riding-horse.webm';
+import styles from './VideoReviewsSection.module.scss';
 
 interface VideoReviewsSectionProps {
     content: StoriesOfVictoryReviewVideo[] | null;
@@ -11,74 +10,17 @@ interface VideoReviewsSectionProps {
 
 export const VideoReviewsSection: React.FC<VideoReviewsSectionProps> = ({ content }) => {
     const { t } = useTranslation('successPage');
-    const [playingVideoId, setPlayingVideoId] = useState<number | null>(null);
-    const videoRefs = React.useRef<{ [key: number]: HTMLVideoElement }>({});
 
-    const handleVideoClick = (videoId: number) => {
-        const videoElement = videoRefs.current[videoId];
-        if (!videoElement) return;
-
-        if (playingVideoId === videoId && !videoElement.paused) {
-            // Stop video
-            videoElement.pause();
-            videoElement.currentTime = 0;
-            setPlayingVideoId(null);
-        } else {
-            // Pause all other videos
-            Object.keys(videoRefs.current).forEach((id) => {
-                const video = videoRefs.current[parseInt(id)];
-                if (video && video !== videoElement) {
-                    video.pause();
-                    video.currentTime = 0;
-                }
-            });
-            // Play selected video
-            videoElement.play();
-            setPlayingVideoId(videoId);
-        }
-    };
-
-    const handleVideoEnd = (_videoId: number) => {
-        setPlayingVideoId(null);
-    };
+    if (!content || content.length === 0) return null;
 
     return (
         <section className={styles.container}>
-            <h4 className={styles.title}>{t('videoReviewsTitle', 'Video Reviews')}</h4>
-            {content && content.length > 0 && (
-                <div className={styles.videos}>
-                    {content.map((video) => (
-                        <div key={video.id} className={styles.video}>
-                            {video.link && (
-                                <div
-                                    className={styles.videoWrapper}
-                                    onClick={() => handleVideoClick(video.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            handleVideoClick(video.id);
-                                        }
-                                    }}
-                                >
-                                    <video
-                                        ref={(el) => {
-                                            if (el) videoRefs.current[video.id] = el;
-                                        }}
-                                        playsInline
-                                        aria-hidden="true"
-                                        onEnded={() => handleVideoEnd(video.id)}
-                                    >
-                                        <source src={RidingVideo} type="video/webm" />
-                                    </video>
-                                    {playingVideoId !== video.id && <PlayIcon className={styles.playIcon} />}
-                                </div>
-                            )}
-                            <h3 className={styles.videoTitle}>{video.title}</h3>
-                        </div>
-                    ))}
-                </div>
-            )}
+            <h4 className={styles.title}>{t('VIDEO_SECTION.TITLE')}</h4>
+            <div className={styles.videos}>
+                {content.map((video) => (
+                    <VideoCard key={video.id} video={video} />
+                ))}
+            </div>
         </section>
     );
 };

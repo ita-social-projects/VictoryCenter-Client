@@ -1,17 +1,48 @@
 import { render, screen, fireEvent, waitFor, act, getDefaultNormalizer } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
-import { AddVideoReviewModal } from './AddVideoReviewModal';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
+import { FeedbackVideoDto } from '@/types/admin/feedback';
+import { VisibilityStatus } from '@/types/admin/common';
+import { AddVideoReviewModal, AddVideoReviewModalProps } from './AddVideoReviewModal';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+jest.mock('@/services/api/admin/feedback/feedback-api', () => ({
+    FeedbackApi: {
+        updateVideo: jest.fn(),
+    },
+}));
 
 describe('AddVideoReviewModal', () => {
     const SUBMIT_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED;
     const validTitle = 'A valid video review title';
     const validLink = 'https://example.com/video';
 
-    const renderOpen = (onClose = jest.fn(), onSubmit?: jest.Mock) =>
-        render(<AddVideoReviewModal isOpen={true} onClose={onClose} onSubmit={onSubmit} />);
+    const mockInitialData: FeedbackVideoDto = {
+        id: 5,
+        title: 'Existing title',
+        link: 'https://example.com/existing',
+        status: VisibilityStatus.Published,
+        priority: 1,
+        localizations: [],
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        (useAdminClient as jest.Mock).mockReturnValue({});
+    });
+
+    const renderOpen = (
+        onClose = jest.fn(),
+        onSubmit?: jest.Mock,
+        extraProps: Partial<AddVideoReviewModalProps> = {},
+    ) => render(<AddVideoReviewModal isOpen={true} onClose={onClose} onSubmit={onSubmit} {...extraProps} />);
 
     const getSubmitButton = () => screen.getByRole('button', { name: SUBMIT_BUTTON_NAME });
     const getTitleInput = () =>
@@ -150,7 +181,7 @@ describe('AddVideoReviewModal', () => {
         });
     });
 
-    describe('submit behaviour', () => {
+    describe('submit behaviour (add mode)', () => {
         it('shows the publish confirmation when the submit button is clicked', () => {
             renderOpen();
             fillForm();
@@ -258,6 +289,192 @@ describe('AddVideoReviewModal', () => {
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(onClose).not.toHaveBeenCalled();
             expect(getTitleInput()).toHaveValue('draft');
+        });
+    });
+
+    describe('edit mode (#3467)', () => {
+        const renderEdit = (props: Partial<AddVideoReviewModalProps> = {}) => {
+            const onClose = jest.fn();
+            const onEditVideoReview = jest.fn();
+            const onEditError = jest.fn();
+            renderOpen(onClose, undefined, {
+                initialData: mockInitialData,
+                onEditVideoReview,
+                onEditError,
+                ...props,
+            });
+            return { onClose, onEditVideoReview, onEditError };
+        };
+
+        it('pre-fills both fields with the current data and shows the edit title', () => {
+            renderEdit();
+            expect(screen.getByText(FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+            expect(getTitleInput()).toHaveValue(mockInitialData.title);
+            expect(getLinkInput()).toHaveValue(mockInitialData.link);
+        });
+
+        it('keeps the publish button disabled until a field actually changes', () => {
+            renderEdit();
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('enables the publish button once a field differs from the initial value', () => {
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            expect(getSubmitButton()).not.toBeDisabled();
+        });
+
+        it('disables the publish button again when the value is reverted back to the original', () => {
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            expect(getSubmitButton()).not.toBeDisabled();
+
+            fireEvent.change(getTitleInput(), { target: { value: mockInitialData.title } });
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('stays disabled when the changed value is invalid', () => {
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'ab' } });
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('opens the publish-confirmation popup instead of saving immediately', () => {
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getSubmitButton());
+
+            expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
+            expect(FeedbackApi.updateVideo).not.toHaveBeenCalled();
+        });
+
+        it('keeps the modal open with unsaved changes when cancelling the publish-confirmation', () => {
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-no'));
+
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+            expect(FeedbackApi.updateVideo).not.toHaveBeenCalled();
+            expect(getTitleInput()).toHaveValue('Updated title value');
+        });
+
+        it('closes the confirmation and disables the form while the save request is in flight', async () => {
+            let resolveUpdate!: (video: FeedbackVideoDto) => void;
+            (FeedbackApi.updateVideo as jest.Mock).mockReturnValueOnce(
+                new Promise<FeedbackVideoDto>((resolve) => {
+                    resolveUpdate = resolve;
+                }),
+            );
+
+            renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
+
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+            expect(getTitleInput()).toBeDisabled();
+            expect(getSubmitButton()).toBeDisabled();
+            expect(FeedbackApi.updateVideo).toHaveBeenCalledTimes(1);
+
+            await act(async () => {
+                resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
+            });
+        });
+
+        it('ignores an attempt to close the modal while the save request is in flight', async () => {
+            let resolveUpdate!: (video: FeedbackVideoDto) => void;
+            (FeedbackApi.updateVideo as jest.Mock).mockReturnValueOnce(
+                new Promise<FeedbackVideoDto>((resolve) => {
+                    resolveUpdate = resolve;
+                }),
+            );
+
+            const { onClose } = renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
+
+            fireEvent.click(getCloseButton());
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+
+            await act(async () => {
+                resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
+            });
+        });
+
+        it('saves via FeedbackApi.updateVideo with normalized values and preserved status on confirm', async () => {
+            const updatedVideo: FeedbackVideoDto = { ...mockInitialData, title: 'Updated title value' };
+            (FeedbackApi.updateVideo as jest.Mock).mockResolvedValueOnce(updatedVideo);
+
+            const { onClose, onEditVideoReview } = renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: '  Updated title value  ' } });
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
+
+            await waitFor(() => {
+                expect(FeedbackApi.updateVideo).toHaveBeenCalledWith({}, mockInitialData.id, {
+                    title: 'Updated title value',
+                    link: mockInitialData.link,
+                    status: mockInitialData.status,
+                });
+                expect(onEditVideoReview).toHaveBeenCalledWith(updatedVideo);
+                expect(onClose).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        it('keeps the modal open and reports the error when the update request fails', async () => {
+            (FeedbackApi.updateVideo as jest.Mock).mockRejectedValueOnce(new Error('network error'));
+
+            const { onClose, onEditError, onEditVideoReview } = renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getSubmitButton());
+            fireEvent.click(screen.getByTestId('confirm-yes'));
+
+            await waitFor(() => {
+                expect(onEditError).toHaveBeenCalledTimes(1);
+            });
+            expect(onEditVideoReview).not.toHaveBeenCalled();
+            expect(onClose).not.toHaveBeenCalled();
+            expect(getTitleInput()).toHaveValue('Updated title value');
+        });
+
+        it('closes immediately on "X" without edits, since pre-filled values are not unsaved changes', () => {
+            const { onClose } = renderEdit();
+            fireEvent.click(getCloseButton());
+            expect(onClose).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+        });
+
+        it('shows the unsaved-changes confirmation on "X" once a field actually changes', () => {
+            const { onClose } = renderEdit();
+            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
+            fireEvent.click(getCloseButton());
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+        });
+
+        it('refills the fields when reopened with a different record', () => {
+            const { rerender } = render(
+                <AddVideoReviewModal isOpen={true} onClose={jest.fn()} initialData={mockInitialData} />,
+            );
+            expect(getTitleInput()).toHaveValue(mockInitialData.title);
+
+            const otherVideo: FeedbackVideoDto = {
+                id: 9,
+                title: 'Another video title',
+                link: 'https://example.com/other',
+                status: VisibilityStatus.Published,
+                priority: 2,
+                localizations: [],
+            };
+            rerender(<AddVideoReviewModal isOpen={false} onClose={jest.fn()} initialData={mockInitialData} />);
+            rerender(<AddVideoReviewModal isOpen={true} onClose={jest.fn()} initialData={otherVideo} />);
+
+            expect(getTitleInput()).toHaveValue(otherVideo.title);
+            expect(getLinkInput()).toHaveValue(otherVideo.link);
         });
     });
 });

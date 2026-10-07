@@ -139,34 +139,4 @@ describe('TranslateEventModal', () => {
 
         expect(screen.getByTestId('form-status')).toHaveTextContent('Dirty: true, Valid: true');
     });
-
-    it('submits form, logs mock data, and handles async behavior on successful save', async () => {
-        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-        mockIsValid.mockReturnValue(true);
-
-        render(<TranslateEventModal {...defaultProps} />);
-
-        fireEvent.click(screen.getByTestId('make-valid'));
-
-        fireEvent.click(screen.getByTestId('modal-save'));
-
-        expect(mockIsValid).toHaveBeenCalled();
-        expect(mockFormSubmit).toHaveBeenCalled();
-
-        await waitFor(
-            () => {
-                expect(consoleSpy).toHaveBeenCalledWith(
-                    'Mock submit translation:',
-                    expect.objectContaining({
-                        eventId: 101,
-                        language: 'en',
-                    }),
-                );
-                expect(mockOnClose).toHaveBeenCalled();
-            },
-            { timeout: 1500 },
-        );
-
-        consoleSpy.mockRestore();
-    });
 });

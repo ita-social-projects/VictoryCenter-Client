@@ -7,7 +7,6 @@ import { useRef, useState, useEffect } from 'react';
 import {
     TranslateEventForm,
     TranslateEventFormRef,
-    TranslateEventFormValues,
 } from '@/pages/admin/events/translate-event-form/TranslateEventForm';
 
 export interface TranslateEventModalProps {

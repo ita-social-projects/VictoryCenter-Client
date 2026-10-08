@@ -202,4 +202,51 @@ describe('TranslateEventCategoryModal', () => {
         expect(modalProps.isDirty).toBe(true);
         expect(modalProps.checkIsDirty()).toBe(true);
     });
+
+    describe('edit mode', () => {
+        const translatedCategory: EventCategoryDto = {
+            id: 3,
+            name: 'Новини',
+            relatedEventNewsCount: 0,
+            localizations: [{ entityId: 3, language: { id: 2, code: 'en' }, name: 'News', translationStatus: 1 }],
+        };
+
+        const renderOpenedModal = () => {
+            const props = {
+                categories: [...categories, translatedCategory],
+                onClose,
+                translationLanguages,
+            };
+            const { rerender } = render(<TranslateEventCategoryModal isOpen={false} {...props} />);
+            rerender(<TranslateEventCategoryModal isOpen={true} {...props} />);
+        };
+
+        it('shows the edit title and prefills the name when the category already has a translation', () => {
+            renderOpenedModal();
+
+            act(() => {
+                mockFormRender.mock.calls.at(-1)[0].onCategoryChange(translatedCategory);
+            });
+
+            const formProps = mockFormRender.mock.calls.at(-1)[0];
+            expect(mockedLocalizationModal.mock.calls.at(-1)[0].title).toBe(
+                EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.EDIT_TITLE,
+            );
+            expect(formProps.initialData).toEqual({ name: 'News' });
+            expect(formProps.selectedCategory).toEqual(translatedCategory);
+        });
+
+        it('keeps the translation title and an empty name when the category has no translation', () => {
+            renderOpenedModal();
+
+            act(() => {
+                mockFormRender.mock.calls.at(-1)[0].onCategoryChange(categories[0]);
+            });
+
+            expect(mockedLocalizationModal.mock.calls.at(-1)[0].title).toBe(
+                EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE,
+            );
+            expect(mockFormRender.mock.calls.at(-1)[0].initialData).toBeNull();
+        });
+    });
 });

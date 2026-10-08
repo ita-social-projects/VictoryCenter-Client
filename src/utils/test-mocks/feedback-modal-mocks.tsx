@@ -24,7 +24,7 @@ export const createMockFeedbackModal = ({
             props
                 .onSubmit(payload, entity)
                 .then((savedItem: unknown) => props.onSuccess(savedItem, props.mode))
-                .catch(() => undefined);
+                .catch(() => props.onError(props.mode));
 
         return (
             <div data-testid={`${testIdPrefix}-modal`}>

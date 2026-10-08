@@ -39,6 +39,7 @@ describe('AddFeedbackHistoryModal', () => {
     const onClose = jest.fn();
     const onSubmit = jest.fn();
     const onSuccess = jest.fn();
+    const onError = jest.fn();
 
     const renderModal = (props: Partial<AddFeedbackHistoryModalProps> = {}) =>
         render(
@@ -48,6 +49,7 @@ describe('AddFeedbackHistoryModal', () => {
                 onClose={onClose}
                 onSubmit={onSubmit}
                 onSuccess={onSuccess}
+                onError={onError}
                 {...props}
             />,
         );
@@ -298,7 +300,7 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
-    it('displays error message when history creation fails', async () => {
+    it('calls onError when history creation fails', async () => {
         onSubmit.mockRejectedValueOnce(new Error('Network error'));
 
         renderModal();
@@ -316,7 +318,7 @@ describe('AddFeedbackHistoryModal', () => {
         fireEvent.click(confirmBtn);
 
         await waitFor(() => {
-            expect(screen.getByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH)).toBeInTheDocument();
+            expect(onError).toHaveBeenCalledWith(ModalMode.Add);
         });
 
         expect(onClose).not.toHaveBeenCalled();
@@ -431,15 +433,32 @@ describe('AddFeedbackHistoryModal', () => {
             });
         });
 
-        it('displays error message when history update fails', async () => {
+        it('calls onError when history update fails', async () => {
             onSubmit.mockRejectedValueOnce(new Error('Network error'));
 
             await setupEditModeAndClickPublish();
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
-            expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE)).toBeInTheDocument();
+            await waitFor(() => {
+                expect(onError).toHaveBeenCalledWith(ModalMode.Edit);
+            });
             expect(onSuccess).not.toHaveBeenCalled();
             expect(onClose).not.toHaveBeenCalled();
+        });
+
+        it('keeps the current status of the history when saving', async () => {
+            const draftHistory = { ...mockInitialData, status: VisibilityStatus.Draft };
+            onSubmit.mockResolvedValueOnce(draftHistory);
+
+            await setupEditModeAndClickPublish(draftHistory);
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+            await waitFor(() => {
+                expect(onSubmit).toHaveBeenCalledWith(
+                    expect.objectContaining({ status: VisibilityStatus.Draft }),
+                    draftHistory,
+                );
+            });
         });
     });
 });

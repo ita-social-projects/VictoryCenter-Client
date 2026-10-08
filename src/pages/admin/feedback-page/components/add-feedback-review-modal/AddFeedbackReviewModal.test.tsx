@@ -20,6 +20,7 @@ const createProps = (overrides: Partial<AddFeedbackReviewModalProps> = {}): AddF
     onClose: jest.fn(),
     onSubmit: jest.fn(),
     onSuccess: jest.fn(),
+    onError: jest.fn(),
     ...overrides,
 });
 
@@ -203,7 +204,7 @@ describe('AddFeedbackReviewModal', () => {
                 });
             });
 
-            it('shows an error and keeps the modal open when creation fails', async () => {
+            it('calls onError and keeps the modal open when creation fails', async () => {
                 const props = createProps({ onSubmit: jest.fn().mockRejectedValue(new Error('Create failed')) });
                 render(<AddFeedbackReviewModal {...props} />);
 
@@ -211,7 +212,9 @@ describe('AddFeedbackReviewModal', () => {
 
                 fireEvent.click(screen.getByTestId('confirm-yes'));
 
-                expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH)).toBeInTheDocument();
+                await waitFor(() => {
+                    expect(props.onError).toHaveBeenCalledWith(ModalMode.Add);
+                });
                 expect(props.onSuccess).not.toHaveBeenCalled();
                 expect(props.onClose).not.toHaveBeenCalled();
                 expect(getAuthorNameInput()).toHaveValue('Анастасія');
@@ -399,16 +402,37 @@ describe('AddFeedbackReviewModal', () => {
                 });
             });
 
-            it('shows an error and keeps the modal open when saving fails', async () => {
+            it('calls onError and keeps the modal open when saving fails', async () => {
                 const props = createEditProps({ onSubmit: jest.fn().mockRejectedValue(new Error('Update failed')) });
                 await renderAndWaitForPrefill(props);
                 await changeAndClickPublish();
 
                 fireEvent.click(screen.getByTestId('confirm-yes'));
 
-                expect(await screen.findByText(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE)).toBeInTheDocument();
+                await waitFor(() => {
+                    expect(props.onError).toHaveBeenCalledWith(ModalMode.Edit);
+                });
                 expect(props.onSuccess).not.toHaveBeenCalled();
                 expect(props.onClose).not.toHaveBeenCalled();
+            });
+
+            it('keeps the current status of the review when saving', async () => {
+                const draftReview = { ...mockReview, status: VisibilityStatus.Draft };
+                const props = createEditProps({
+                    reviewToEdit: draftReview,
+                    onSubmit: jest.fn().mockResolvedValue(draftReview),
+                });
+                await renderAndWaitForPrefill(props);
+                await changeAndClickPublish();
+
+                fireEvent.click(screen.getByTestId('confirm-yes'));
+
+                await waitFor(() => {
+                    expect(props.onSubmit).toHaveBeenCalledWith(
+                        expect.objectContaining({ status: VisibilityStatus.Draft }),
+                        draftReview,
+                    );
+                });
             });
         });
 

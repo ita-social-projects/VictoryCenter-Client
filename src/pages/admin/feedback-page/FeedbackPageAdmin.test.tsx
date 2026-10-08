@@ -89,9 +89,11 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 <button data-testid="toolbar-add-button" onClick={onAddItem}>
                     {AddItemButtonText}
                 </button>
-                <button data-testid="toolbar-filter-published" onClick={() => onStatusFilterChange?.(1)}>
-                    Filter Published
-                </button>
+                {onStatusFilterChange && (
+                    <button data-testid="toolbar-filter-published" onClick={() => onStatusFilterChange(1)}>
+                        Filter Published
+                    </button>
+                )}
                 <button
                     data-testid="toolbar-fetch-search"
                     onClick={() => fetchSearchItems?.('search', { offset: 7, limit: 7 })}
@@ -484,7 +486,7 @@ describe('FeedbackPageAdmin', () => {
             expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.SUCCESS_UPDATE, ToastType.Success);
         });
 
-        it('keeps the original record and shows no success toast when the edit request fails', async () => {
+        it('shows a failure toast and keeps the original record when the edit request fails', async () => {
             mockFeedbackApi.updateVideo.mockRejectedValueOnce(new Error('network error'));
             await openEditVideoReviewModal();
 
@@ -498,6 +500,7 @@ describe('FeedbackPageAdmin', () => {
             expect(
                 within(screen.getByTestId('infinite-scroll-list')).getByText(mockVideosData.items[0].title),
             ).toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE, ToastType.Error);
         });
 
         it('resets the edited record when the modal is closed without saving', async () => {
@@ -622,6 +625,19 @@ describe('FeedbackPageAdmin', () => {
 
             expect(screen.queryByTestId('add-review-initial-title')).not.toBeInTheDocument();
             expect(screen.getByText(FEEDBACK_TEXT.ADD_REVIEW_MODAL.TITLE)).toBeInTheDocument();
+        });
+
+        it('should show the publish failure toast when creating a review fails', async () => {
+            mockFeedbackApi.createReview.mockRejectedValueOnce(new Error('network error'));
+            await openReviewsTab();
+
+            fireEvent.click(screen.getByTestId('toolbar-add-button'));
+            fireEvent.click(screen.getByTestId('add-review-submit'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH, ToastType.Error);
+            });
+            expect(screen.getByTestId('add-review-modal')).toBeInTheDocument();
         });
     });
 
@@ -856,22 +872,14 @@ describe('FeedbackPageAdmin', () => {
         expect(isFeedbackVideo(null as any)).toBe(false);
     });
 
-    it('should refetch items when status filter changes', async () => {
+    it('should not show the status filter on the feedback page', async () => {
         render(<FeedbackPageAdmin />);
 
         await waitFor(() => {
             expect(screen.getByText('Історія 1')).toBeInTheDocument();
         });
 
-        const filterBtn = screen.getByTestId('toolbar-filter-published');
-        fireEvent.click(filterBtn);
-
-        await waitFor(() => {
-            expect(mockFeedbackApi.fetchHistory).toHaveBeenCalledWith(
-                mockAdminClient,
-                expect.objectContaining({ status: VisibilityStatus.Published }),
-            );
-        });
+        expect(screen.queryByTestId('toolbar-filter-published')).not.toBeInTheDocument();
     });
 
     describe('translation indicators and language/translation filtering', () => {

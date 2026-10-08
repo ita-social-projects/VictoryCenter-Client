@@ -59,20 +59,16 @@ export const VideoReviewForm = forwardRef<VideoReviewFormRef, VideoReviewFormPro
         }, [isValid, isDirty, onValidationChange]);
 
         const handleTitleBlur = useCallback(() => {
-            setTitle((current) => {
-                const normalized = getNormalizedInputText(current);
-                setTitleError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateTitle(normalized));
-                return normalized;
-            });
-        }, []);
+            const normalized = getNormalizedInputText(title);
+            setTitle(normalized);
+            setTitleError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateTitle(normalized));
+        }, [title]);
 
         const handleLinkBlur = useCallback(() => {
-            setLink((current) => {
-                const normalized = getNormalizedInputText(current);
-                setLinkError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateLink(normalized));
-                return normalized;
-            });
-        }, []);
+            const normalized = getNormalizedInputText(link);
+            setLink(normalized);
+            setLinkError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateLink(normalized));
+        }, [link]);
 
         return (
             <form onSubmit={(e) => e.preventDefault()} noValidate data-testid="video-review-form">

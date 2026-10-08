@@ -1,16 +1,15 @@
-import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { forwardRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { VisibilityStatus } from '@/types/admin/common';
 import { GenericFormRef } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { useFeedbackForm } from '@/hooks/admin/use-feedback-form/useFeedbackForm';
 import {
     FeedbackReviewFormValues,
     FeedbackReviewValidationSchema,
 } from '@/validation/admin/feedback-review-schema/feedback-review-schema';
 import { FeedbackReviewFormFields } from '../feedback-review-form-fields/FeedbackReviewFormFields';
-
-export type FeedbackReviewFormRef = GenericFormRef;
 
 export interface FeedbackReviewFormProps {
     initialData: FeedbackReviewFormValues | null;
@@ -24,42 +23,21 @@ const DEFAULT_FORM_STATE: FeedbackReviewFormValues = {
     text: '',
 };
 
-export const FeedbackReviewForm = forwardRef<FeedbackReviewFormRef, FeedbackReviewFormProps>(
+export const FeedbackReviewForm = forwardRef<GenericFormRef, FeedbackReviewFormProps>(
     ({ initialData, formDisabled, onSubmit, onValidationChange }, ref) => {
-        const {
-            control,
-            handleSubmit,
-            reset,
-            formState: { errors, isDirty, isValid },
-        } = useForm<FeedbackReviewFormValues>({
+        const form = useForm<FeedbackReviewFormValues>({
             resolver: yupResolver(FeedbackReviewValidationSchema as Yup.ObjectSchema<FeedbackReviewFormValues>),
             defaultValues: initialData ?? DEFAULT_FORM_STATE,
             mode: 'onTouched',
         });
 
-        useEffect(() => {
-            reset(initialData ?? DEFAULT_FORM_STATE);
-        }, [initialData, reset]);
-
-        useImperativeHandle(
-            ref,
-            () => ({
-                submit: (status: VisibilityStatus) => handleSubmit((data) => onSubmit(data, status))(),
-                isDirty: () => isDirty,
-                isValid: () => isValid,
-            }),
-            [handleSubmit, onSubmit, isDirty, isValid],
-        );
-
-        useEffect(() => {
-            onValidationChange?.(isValid);
-        }, [isValid, isDirty, onValidationChange]);
+        useFeedbackForm({ form, ref, initialData, defaultValues: DEFAULT_FORM_STATE, onSubmit, onValidationChange });
 
         return (
             <form onSubmit={(e) => e.preventDefault()} noValidate data-testid="feedback-review-form">
                 <FeedbackReviewFormFields
-                    control={control}
-                    errors={errors}
+                    control={form.control}
+                    errors={form.formState.errors}
                     idPrefix="feedback-review"
                     disabled={formDisabled}
                 />

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { forwardRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
@@ -8,6 +8,7 @@ import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { FEEDBACK_HISTORY_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { VisibilityStatus } from '@/types/admin/common';
+import { useFeedbackForm } from '@/hooks/admin/use-feedback-form/useFeedbackForm';
 import { GenericFormRef } from '@/hooks/admin/use-generic-modal/useGenericModal';
 import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 import {
@@ -15,8 +16,6 @@ import {
     FeedbackHistoryValidationSchema,
 } from '@/validation/admin/feedback-history-schema/feedback-history-schema';
 import styles from './FeedbackHistoryForm.module.scss';
-
-export type FeedbackHistoryFormRef = GenericFormRef;
 
 export interface FeedbackHistoryFormProps {
     initialData: FeedbackHistoryFormValues | null;
@@ -38,38 +37,21 @@ const mapImageInputError = (error: string | null): string | undefined => {
     return error;
 };
 
-export const FeedbackHistoryForm = forwardRef<FeedbackHistoryFormRef, FeedbackHistoryFormProps>(
+export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFormProps>(
     ({ initialData, formDisabled, onSubmit, onValidationChange }, ref) => {
-        const {
-            control,
-            handleSubmit,
-            reset,
-            setError,
-            clearErrors,
-            formState: { errors, isDirty, isValid },
-        } = useForm<FeedbackHistoryFormValues>({
+        const form = useForm<FeedbackHistoryFormValues>({
             resolver: yupResolver(FeedbackHistoryValidationSchema),
             defaultValues: initialData ?? DEFAULT_FORM_STATE,
             mode: 'onChange',
         });
+        const {
+            control,
+            setError,
+            clearErrors,
+            formState: { errors },
+        } = form;
 
-        useEffect(() => {
-            reset(initialData ?? DEFAULT_FORM_STATE);
-        }, [initialData, reset]);
-
-        useImperativeHandle(
-            ref,
-            () => ({
-                submit: (status: VisibilityStatus) => handleSubmit((data) => onSubmit(data, status))(),
-                isDirty: () => isDirty,
-                isValid: () => isValid,
-            }),
-            [handleSubmit, onSubmit, isDirty, isValid],
-        );
-
-        useEffect(() => {
-            onValidationChange?.(isValid);
-        }, [isValid, isDirty, onValidationChange]);
+        useFeedbackForm({ form, ref, initialData, defaultValues: DEFAULT_FORM_STATE, onSubmit, onValidationChange });
 
         return (
             <form onSubmit={(e) => e.preventDefault()} className={styles['feedback-history-form']} noValidate>

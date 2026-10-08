@@ -366,7 +366,7 @@ describe('AddVideoReviewModal', () => {
             expect(getTitleInput()).toHaveValue('Updated title value');
         });
 
-        it('closes the confirmation and disables the form while the save request is in flight', async () => {
+        it('disables the form and ignores close attempts while the save request is in flight', async () => {
             let resolveUpdate!: (video: FeedbackVideoDto) => void;
             const pendingSubmit = jest.fn().mockReturnValue(
                 new Promise<FeedbackVideoDto>((resolve) => {
@@ -374,7 +374,7 @@ describe('AddVideoReviewModal', () => {
                 }),
             );
 
-            renderEdit(pendingSubmit);
+            const { onClose } = renderEdit(pendingSubmit);
             fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
             fireEvent.click(getSubmitButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
@@ -384,48 +384,9 @@ describe('AddVideoReviewModal', () => {
             expect(getSubmitButton()).toBeDisabled();
             expect(pendingSubmit).toHaveBeenCalledTimes(1);
 
-            await act(async () => {
-                resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
-            });
-        });
-
-        it('ignores an attempt to close the modal while the save request is in flight', async () => {
-            let resolveUpdate!: (video: FeedbackVideoDto) => void;
-            const pendingSubmit = jest.fn().mockReturnValue(
-                new Promise<FeedbackVideoDto>((resolve) => {
-                    resolveUpdate = resolve;
-                }),
-            );
-
-            const { onClose } = renderEdit(pendingSubmit);
-            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
-            fireEvent.click(getSubmitButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-
             fireEvent.click(getCloseButton());
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-
-            await act(async () => {
-                resolveUpdate({ ...mockInitialData, title: 'Updated title value' });
-            });
-        });
-
-        it('saves with normalized values on confirm', async () => {
-            let resolveUpdate!: (video: FeedbackVideoDto) => void;
-            const pendingSubmit = jest.fn().mockReturnValue(
-                new Promise<FeedbackVideoDto>((resolve) => {
-                    resolveUpdate = resolve;
-                }),
-            );
-
-            const { onClose } = renderEdit(pendingSubmit);
-            fireEvent.change(getTitleInput(), { target: { value: 'Updated title value' } });
-            fireEvent.click(getSubmitButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-
-            fireEvent.click(getCloseButton());
-            expect(onClose).not.toHaveBeenCalled();
 
             await act(async () => {
                 resolveUpdate({ ...mockInitialData, title: 'Updated title value' });

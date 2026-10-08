@@ -42,7 +42,9 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                 <button data-testid="add-member-btn" onClick={props.onAddMember}>
                     Add Member
                 </button>
-                <button onClick={() => props.onStatusFilterChange(VisibilityStatus.Published)}>Filter Published</button>
+                <button onClick={() => props.onStatusFilterChange?.(VisibilityStatus.Published)}>
+                    Filter Published
+                </button>
                 <button onClick={props.onSearchLoadMore} data-testid="search-load-more">
                     Load More Results
                 </button>
@@ -71,7 +73,7 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                     data-testid="translation-status-filter"
                     onChange={(e) => {
                         const value = e.target.value;
-                        props.onTranslationStatusFilterChange(value);
+                        props.onTranslationStatusFilterChange?.(value);
                     }}
                 >
                     <option value={TranslationStatusFilter.All}>All</option>
@@ -82,7 +84,7 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                     data-testid="status-filter"
                     onChange={(e) => {
                         const value = e.target.value;
-                        props.onStatusFilterChange(value === 'all' ? undefined : (value as any));
+                        props.onStatusFilterChange?.(value === 'all' ? undefined : (value as any));
                     }}
                 >
                     <option value="all">All</option>

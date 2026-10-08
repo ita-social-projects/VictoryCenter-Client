@@ -252,17 +252,17 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
                     />
                     <button
                         data-testid="filter-published"
-                        onClick={() => props.onStatusFilterChange(mockVisibilityStatus.Published)}
+                        onClick={() => props.onStatusFilterChange?.(mockVisibilityStatus.Published)}
                     >
                         Filter Published
                     </button>
                     <button
                         data-testid="filter-draft"
-                        onClick={() => props.onStatusFilterChange(mockVisibilityStatus.Draft)}
+                        onClick={() => props.onStatusFilterChange?.(mockVisibilityStatus.Draft)}
                     >
                         Filter Draft
                     </button>
-                    <button data-testid="filter-clear" onClick={() => props.onStatusFilterChange(undefined)}>
+                    <button data-testid="filter-clear" onClick={() => props.onStatusFilterChange?.(undefined)}>
                         Clear Filters
                     </button>
                     <button data-testid="add-faq-button" onClick={props.onAddItem}>

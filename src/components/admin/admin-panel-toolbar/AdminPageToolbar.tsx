@@ -32,8 +32,8 @@ export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     searchPageSize?: number;
     suggestionsNotFoundMessage?: string;
     onSearchClear?: () => void;
-    statusFilter: VisibilityStatus | undefined;
-    onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;
+    statusFilter?: VisibilityStatus;
+    onStatusFilterChange?: (statusFilter: VisibilityStatus | undefined) => void;
     onAddItem: () => void;
     AddItemButtonText: string;
     onSuggestionSelect: (itemKey: string | number, item: T) => void;
@@ -144,7 +144,9 @@ export const AdminPanelToolbar = <T,>({
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
-                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
+                {onStatusFilterChange && (
+                    <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
+                )}
                 <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />
                 </Button>

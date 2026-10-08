@@ -2,7 +2,7 @@ import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { ModalMode, PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { ModalMode, PaginationResult } from '@/types/admin/common';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
@@ -62,7 +62,6 @@ export const isFeedbackVideo = (item: FeedbackListItem): item is FeedbackVideoDt
     typeof item === 'object' && item !== null && 'link' in item;
 
 export const FeedbackPageAdmin = () => {
-    const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<{
         message: string | null;
         type: string | null;
@@ -197,7 +196,6 @@ export const FeedbackPageAdmin = () => {
                 setError({ message: null, type: null });
 
                 const params = {
-                    status: statusFilter,
                     translationStatusFilter,
                     skip,
                     take: FEEDBACK_PAGINATION_LIMIT,
@@ -225,7 +223,7 @@ export const FeedbackPageAdmin = () => {
                 }
             }
         },
-        [client, statusFilter, translationStatusFilter, selectedSearchItem],
+        [client, translationStatusFilter, selectedSearchItem],
     );
 
     useEffect(() => {
@@ -253,6 +251,16 @@ export const FeedbackPageAdmin = () => {
             );
         },
         [selectedSearchItem, fetchCategoryItems, activeCategory, addToast],
+    );
+
+    const handleSaveError = useCallback(
+        (mode: ModalMode) => {
+            addToast(
+                mode === ModalMode.Edit ? FEEDBACK_TEXT.MESSAGE.FAIL_TO_UPDATE : FEEDBACK_TEXT.MESSAGE.FAIL_TO_PUBLISH,
+                ToastType.Error,
+            );
+        },
+        [addToast],
     );
 
     const handleSubmitReview = useCallback(
@@ -316,14 +324,9 @@ export const FeedbackPageAdmin = () => {
                 return;
             }
 
-            const passesStatusFilter = statusFilter === undefined || updatedItem.status === statusFilter;
-            setItems((prev) =>
-                passesStatusFilter
-                    ? prev.map((item) => (item.id === updatedItem.id ? updatedItem : item))
-                    : prev.filter((item) => item.id !== updatedItem.id),
-            );
+            setItems((prev) => prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)));
         },
-        [isTranslationFilterActive, fetchCategoryItems, activeCategory, statusFilter, selectedSearchItem],
+        [isTranslationFilterActive, fetchCategoryItems, activeCategory, selectedSearchItem],
     );
 
     const handleTranslateSuccess = useCallback(
@@ -343,7 +346,6 @@ export const FeedbackPageAdmin = () => {
             const skip = requestOptions?.skip ?? requestOptions?.offset ?? 0;
             const take = requestOptions?.take ?? requestOptions?.limit ?? FEEDBACK_PAGINATION_LIMIT;
             const params = {
-                status: statusFilter,
                 translationStatusFilter,
                 searchTerm,
                 skip,
@@ -353,12 +355,8 @@ export const FeedbackPageAdmin = () => {
             if (activeCategory === FeedbackCategory.REVIEWS) return FeedbackApi.fetchReviews(client, params);
             return FeedbackApi.fetchVideos(client, params);
         },
-        [client, activeCategory, statusFilter, translationStatusFilter],
+        [client, activeCategory, translationStatusFilter],
     );
-
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
-    }, []);
 
     const handleCategorySelect = useCallback((category: FeedbackCategoryItem) => {
         setActiveCategory(category.id);
@@ -367,13 +365,11 @@ export const FeedbackPageAdmin = () => {
 
     const handleSearchItemSelect = useCallback((key: string | number, item: FeedbackListItem) => {
         setSelectedSearchItem(item);
-        setStatusFilter(undefined);
     }, []);
 
     const handleSearchClearSelection = useCallback(() => {
         const wasSelected = selectedSearchItem !== null;
         setSelectedSearchItem(null);
-        setStatusFilter(undefined);
         setActiveCategory(FeedbackCategory.HISTORY);
         if (!wasSelected) {
             fetchCategoryItems(FeedbackCategory.HISTORY);
@@ -477,8 +473,7 @@ export const FeedbackPageAdmin = () => {
         ],
     );
 
-    const isFilteredView =
-        Boolean(selectedSearchItem) || statusFilter !== undefined || translationStatusFilter !== undefined;
+    const isFilteredView = Boolean(selectedSearchItem) || translationStatusFilter !== undefined;
 
     return (
         <div className="feedback-page-wrapper" data-testid="feedback-page-content">
@@ -489,8 +484,6 @@ export const FeedbackPageAdmin = () => {
                     fetchSearchItems={getFeedbackSearchItems}
                     placeholder={searchPlaceholder}
                     onSearchClear={handleSearchClearSelection}
-                    statusFilter={statusFilter}
-                    onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddItemClick}
                     AddItemButtonText={FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleSearchItemSelect}
@@ -500,7 +493,6 @@ export const FeedbackPageAdmin = () => {
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FEEDBACK}
                     minCharactersToSearch={2}
                     searchPageSize={FEEDBACK_SEARCH_PAGE_SIZE}
-                    showStatusFilter={false}
                 />
             </div>
 
@@ -556,6 +548,7 @@ export const FeedbackPageAdmin = () => {
                 historyToEdit={historyToEdit ?? undefined}
                 onSubmit={handleSubmitHistory}
                 onSuccess={handleSaveSuccess}
+                onError={handleSaveError}
             />
             <AddVideoReviewModal
                 mode={videoToEdit ? ModalMode.Edit : ModalMode.Add}
@@ -564,6 +557,7 @@ export const FeedbackPageAdmin = () => {
                 videoToEdit={videoToEdit ?? undefined}
                 onSubmit={handleSubmitVideo}
                 onSuccess={handleSaveSuccess}
+                onError={handleSaveError}
             />
             <AddFeedbackReviewModal
                 mode={reviewToEdit ? ModalMode.Edit : ModalMode.Add}
@@ -572,6 +566,7 @@ export const FeedbackPageAdmin = () => {
                 reviewToEdit={reviewToEdit ?? undefined}
                 onSubmit={handleSubmitReview}
                 onSuccess={handleSaveSuccess}
+                onError={handleSaveError}
             />
             <TranslateFeedbackHistoryModal
                 isOpen={!!historyToTranslate}

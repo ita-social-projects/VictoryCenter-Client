@@ -15,37 +15,26 @@
 }
 
 .popup {
-    width: 100%;
+    width: 100vw;
     height: 100vh;
     background-color: c.$grey-50;
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 60px 56px;
+    padding: 49px 24px 48px;
     overflow-y: auto;
     animation: slideInRight 0.3s ease-out forwards;
 
-    @media (min-width: 576px) {
-        width: 432px;
-        padding: 48px;
-    }
-
-    @media (min-width: 768px) {
-        width: 480px;
-        padding: 49px 56px 48px 56px;
-    }
-
-    @media (min-width: 1440px) {
+    @media (min-width: 560px) {
         width: 544px;
-        max-width: 544px;
-        padding: 49px 56px 48px 56px;
+        padding: 49px 56px 48px;
     }
 }
 
 .closeBtn {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: 41px;
+    right: 16px;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -58,6 +47,10 @@
 
     &:hover {
         opacity: 0.6;
+    }
+
+    @media (min-width: 560px) {
+        right: 48px;
     }
 }
 

@@ -175,6 +175,7 @@ export const useGenericModal = <
     }, []);
 
     const handleClose = useCallback(() => {
+        if (isSubmitting) return;
         if (formRef.current?.isDirty()) {
             if (pendingAction === PendingAction.Draft) {
                 onClose();

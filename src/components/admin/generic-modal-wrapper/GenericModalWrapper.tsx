@@ -5,6 +5,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
+import './GenericModalWrapper.scss';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
     isOpen: boolean;

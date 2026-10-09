@@ -1,9 +1,11 @@
 import * as Yup from 'yup';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 const createTextValidationRule = (requiredError: string) =>
     Yup.string()
+        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(requiredError)
         .min(WHO_WE_ARE_TEXT.MIN_LENGTH, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH));
 

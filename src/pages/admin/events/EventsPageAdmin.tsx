@@ -115,28 +115,27 @@ export const EventsPageAdmin = () => {
         setError((currentError) => (currentError.type === type ? EMPTY_ERROR : currentError));
     }, []);
 
-    const resetEventItemsState = useCallback(() => {
-        eventItemsContextIdRef.current += 1;
-        requestIdRef.current += 1;
+    const resetEventItemsState = useCallback(
+        (nextCategory?: EventCategoryDto | null) => {
+            eventItemsContextIdRef.current += 1;
+            requestIdRef.current += 1;
 
-        setEventItems([]);
-        setHasMore(true);
+            setEventItems([]);
+            setHasMore(true);
 
-        if (error.type === 'events-items') {
-            clearError('events-items');
-        }
+            if (error.type === 'events-items') {
+                clearError('events-items');
+            }
 
-        currentPageRef.current = 0;
-        currentItemsCountRef.current = 0;
-        hasMoreRef.current = true;
-    }, [error.type, clearError]);
+            currentPageRef.current = 0;
+            currentItemsCountRef.current = 0;
+            hasMoreRef.current = true;
 
-    const switchSelectedCategory = useCallback(
-        (category: EventCategoryDto | null) => {
-            resetEventItemsState();
-            setSelectedCategory(category);
+            if (nextCategory !== undefined) {
+                setSelectedCategory(nextCategory);
+            }
         },
-        [resetEventItemsState],
+        [error.type, clearError],
     );
 
     const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
@@ -285,9 +284,9 @@ export const EventsPageAdmin = () => {
             }
 
             setSelectedSearchItem(null);
-            switchSelectedCategory(nextCategories[0] ?? null);
+            resetEventItemsState(nextCategories[0] ?? null);
         },
-        [categories, selectedCategory?.id, switchSelectedCategory],
+        [categories, selectedCategory?.id, resetEventItemsState],
     );
 
     const getCategoryName = useCallback(
@@ -492,9 +491,9 @@ export const EventsPageAdmin = () => {
                 return;
             }
 
-            switchSelectedCategory(category);
+            resetEventItemsState(category);
         },
-        [selectedCategoryId, switchSelectedCategory],
+        [selectedCategoryId, resetEventItemsState],
     );
 
     const handleOnLoadMore = useCallback(() => {

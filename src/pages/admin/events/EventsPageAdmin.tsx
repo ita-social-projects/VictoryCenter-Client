@@ -592,7 +592,7 @@ export const EventsPageAdmin = () => {
             closeModalActions.closeTranslateCategoryModal();
             addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
         },
-        [selectedCategory?.id, closeModalActions, addToast],
+        [handleUpdateCategory, closeModalActions, addToast],
     );
 
     return (

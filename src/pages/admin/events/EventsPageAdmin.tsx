@@ -131,6 +131,14 @@ export const EventsPageAdmin = () => {
         hasMoreRef.current = true;
     }, [error.type, clearError]);
 
+    const switchSelectedCategory = useCallback(
+        (category: EventCategoryDto | null) => {
+            resetEventItemsState();
+            setSelectedCategory(category);
+        },
+        [resetEventItemsState],
+    );
+
     const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
         useLocalizationToolkit({
             setErrorState,
@@ -277,10 +285,9 @@ export const EventsPageAdmin = () => {
             }
 
             setSelectedSearchItem(null);
-            resetEventItemsState();
-            setSelectedCategory(nextCategories[0] ?? null);
+            switchSelectedCategory(nextCategories[0] ?? null);
         },
-        [categories, selectedCategory?.id, resetEventItemsState],
+        [categories, selectedCategory?.id, switchSelectedCategory],
     );
 
     const getCategoryName = useCallback(
@@ -485,10 +492,9 @@ export const EventsPageAdmin = () => {
                 return;
             }
 
-            resetEventItemsState();
-            setSelectedCategory(category);
+            switchSelectedCategory(category);
         },
-        [selectedCategoryId, resetEventItemsState],
+        [selectedCategoryId, switchSelectedCategory],
     );
 
     const handleOnLoadMore = useCallback(() => {

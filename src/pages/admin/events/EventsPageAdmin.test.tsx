@@ -1304,23 +1304,30 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 
-    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
-        const user = userEvent.setup();
-
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
+    const setUpSingleEventPage = async () => {
         mockedEventsApi.fetchEvents.mockResolvedValue({
             items: [eventItems[0]],
             totalItemsCount: 1,
         });
 
+        const user = userEvent.setup();
         render(<EventsPageAdmin />);
 
         expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
 
+        return user;
+    };
+
+    const enableStatusFilter = async (user: ReturnType<typeof userEvent.setup>) => {
         await user.click(screen.getByTestId('enable-status-filter'));
 
         expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+    };
+
+    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
 
         await user.click(screen.getByTestId('select-suggestion-category-2'));
 
@@ -1332,22 +1339,9 @@ describe('EventsPageAdmin', () => {
     });
 
     it('narrows the list to the selected event and clears the status filter when the suggestion already belongs to the current category', async () => {
-        const user = userEvent.setup();
+        const user = await setUpSingleEventPage();
 
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
-        mockedEventsApi.fetchEvents.mockResolvedValue({
-            items: [eventItems[0]],
-            totalItemsCount: 1,
-        });
-
-        render(<EventsPageAdmin />);
-
-        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
-
-        await user.click(screen.getByTestId('enable-status-filter'));
-
-        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+        await enableStatusFilter(user);
 
         await user.click(screen.getByText('Select Suggestion'));
 
@@ -1358,18 +1352,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('restores the full paginated list for the active category when the search is cleared after selecting a suggestion', async () => {
-        const user = userEvent.setup();
-
-        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
-
-        mockedEventsApi.fetchEvents.mockResolvedValue({
-            items: [eventItems[0]],
-            totalItemsCount: 1,
-        });
-
-        render(<EventsPageAdmin />);
-
-        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        const user = await setUpSingleEventPage();
 
         await user.click(screen.getByText('Select Suggestion'));
 

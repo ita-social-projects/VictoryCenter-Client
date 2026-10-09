@@ -128,6 +128,14 @@ export const ImageSection = ({
         onPublish();
     };
 
+    const isPublishDisabled =
+        !isPublishButtonActive ||
+        !!imageError ||
+        !!titleError ||
+        !!descriptionError ||
+        !!(titleContent && WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))) ||
+        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getPlainTextFromHtml(displayedDescription ?? ''));
+
     return (
         <div className="image-section">
             <div className="image-wrapper">
@@ -204,7 +212,7 @@ export const ImageSection = ({
                             buttonStyle="primary"
                             onClick={handlePublish}
                             type="submit"
-                            disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
+                            disabled={isPublishDisabled}
                         >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>

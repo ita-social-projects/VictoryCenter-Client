@@ -3,6 +3,7 @@ import { ReactComponent as VictoryCenterLogo } from '@/assets/icons/logo-with-te
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { PLATFORM_LABEL } from '@/const/public/platform-labels';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -10,17 +11,6 @@ import {
     PublicCompanyProfileDto,
 } from '@/services/api/public/company-profile/company-profile-api';
 import './Footer.scss';
-
-const PLATFORM_LABEL: Record<number, string> = {
-    0: 'Instagram',
-    1: 'Facebook',
-    2: 'Telegram',
-    3: 'YouTube',
-    4: 'X',
-    5: 'WhatsApp',
-    6: 'LinkedIn',
-    7: 'Viber',
-};
 
 export const Footer = () => {
     const { t, i18n } = useTranslation('footer');

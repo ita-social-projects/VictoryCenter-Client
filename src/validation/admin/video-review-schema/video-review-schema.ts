@@ -2,15 +2,7 @@ import * as Yup from 'yup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
 import { requiredNotWhitespaceOnlyTest } from '@/utils/functions/yup-string-validation-helper/yup-string-validation-helper';
-
-const isHttpOrHttpsUrl = (value: string): boolean => {
-    try {
-        const url = new URL(value);
-        return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-        return false;
-    }
-};
+import { isHttpOrHttpsUrl } from '@/utils/functions/url';
 
 const trimTransform = (value: string | undefined) => (typeof value === 'string' ? value.trim() : value);
 

@@ -98,6 +98,7 @@ export const EVENT_CATEGORY_TEXT = {
     },
     TRANSLATION_MODAL: {
         TITLE: 'Переклад категорії',
+        EDIT_TITLE: 'Редагувати категорію',
         LANGUAGE_EN: 'Англійська',
         SAVE_BUTTON: 'Зберегти переклад',
     },

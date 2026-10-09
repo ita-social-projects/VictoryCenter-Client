@@ -672,10 +672,14 @@ describe('EventsPageAdmin', () => {
             .mockResolvedValueOnce({
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             })
             .mockResolvedValueOnce({
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
 
         await renderEventsPage();
@@ -821,6 +825,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         const user = userEvent.setup();
@@ -856,6 +862,8 @@ describe('EventsPageAdmin', () => {
             resolveTitlePublish({
                 eventsBlockTitle: '<p>Updated title</p>',
                 pageDescription: '<p>Loaded description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
             await titlePublishPromise;
         });
@@ -863,6 +871,8 @@ describe('EventsPageAdmin', () => {
             resolveDescriptionPublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
             await descriptionPublishPromise;
         });

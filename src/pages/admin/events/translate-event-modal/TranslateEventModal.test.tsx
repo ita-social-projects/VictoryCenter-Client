@@ -1,7 +1,13 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TranslateEventModal, TranslateEventModalProps } from './TranslateEventModal';
 import { EventItemDto } from '@/types/admin/events';
 import { VisibilityStatus } from '@/types/admin/common';
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+    }),
+}));
 
 jest.mock('@/const/common/locales', () => ({
     DEFAULT_LOCALE: 'uk',

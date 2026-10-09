@@ -8,6 +8,9 @@ import {
     TranslateEventForm,
     TranslateEventFormRef,
 } from '@/pages/admin/events/translate-event-form/TranslateEventForm';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
 
 export interface TranslateEventModalProps {
     isOpen: boolean;
@@ -26,6 +29,7 @@ export const TranslateEventModal = ({
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addToast } = useToast();
 
     const [language, setLanguage] = useState<LocalizationLanguage | null>(null);
 
@@ -53,6 +57,7 @@ export const TranslateEventModal = ({
             await new Promise((resolve) => setTimeout(resolve, 1000));
             onClose();
         } catch (error) {
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN, ToastType.Error, 3000);
         } finally {
             setIsSubmitting(false);
         }
@@ -64,7 +69,7 @@ export const TranslateEventModal = ({
         <LocalizationModal
             isOpen={isOpen}
             onClose={onClose}
-            title="Додати переклад"
+            title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
             onSave={handleSaveClick}
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}

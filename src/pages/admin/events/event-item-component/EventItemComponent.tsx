@@ -52,7 +52,9 @@ export const EventItemComponent = ({ item, onEdit, onTranslate }: EventItemCompo
                 <IconButton
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
-                    onClick={() => {}}
+                    onClick={() => {
+                        /*  TODO: add implementation */
+                    }}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}
                 />

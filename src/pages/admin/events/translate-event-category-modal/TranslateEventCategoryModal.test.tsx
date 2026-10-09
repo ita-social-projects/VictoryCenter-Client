@@ -13,6 +13,19 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { EVENT_CATEGORY_TEXT } from '@/const/admin/events';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 
+jest.mock('@/hooks/admin/use-translate-event-category/useTranslateEventCategory', () => ({
+    useTranslateEventCategory: ({ onSuccess }: any) => ({
+        translateEventCategory: async (data: any) => {
+            if (onSuccess) {
+                onSuccess({ id: 1, name: data.name });
+            }
+        },
+        isSubmitting: false,
+        error: '',
+        clearError: jest.fn(),
+    }),
+}));
+
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
     LocalizationModal: jest.fn(),
 }));

@@ -52,7 +52,7 @@ describe('EventsPageModals', () => {
         relatedEventNewsCount: 0,
     };
 
-    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'Англійська' }];
+    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'English' }];
 
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
@@ -60,9 +60,11 @@ describe('EventsPageModals', () => {
     const closeDeleteCategoryModal = jest.fn();
     const closeEditItemModal = jest.fn();
     const closeTranslateCategoryModal = jest.fn();
+
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
+    const onTranslateCategory = jest.fn();
 
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
@@ -107,6 +109,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -133,6 +136,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -159,6 +163,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -183,6 +188,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -193,37 +199,11 @@ describe('EventsPageModals', () => {
         const eventModalProps = mockedEventModal.mock.calls[0][0];
         const translateModalProps = mockedTranslateEventCategoryModal.mock.calls[0][0];
 
-        expect(addModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Add,
-                isOpen: false,
-            }),
-        );
-
-        expect(editModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Edit,
-                isOpen: false,
-            }),
-        );
-
-        expect(deleteModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(eventModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(translateModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
+        expect(addModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Add, isOpen: false }));
+        expect(editModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Edit, isOpen: false }));
+        expect(deleteModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(eventModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(translateModalProps).toEqual(expect.objectContaining({ isOpen: false }));
     });
 
     it('renders add event modal', () => {
@@ -235,6 +215,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -262,6 +243,7 @@ describe('EventsPageModals', () => {
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
                 translationLanguages={translationLanguages}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -288,6 +270,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -300,6 +283,7 @@ describe('EventsPageModals', () => {
                 categories,
                 onClose: closeTranslateCategoryModal,
                 translationLanguages,
+                onTranslateCategory,
             }),
         );
     });

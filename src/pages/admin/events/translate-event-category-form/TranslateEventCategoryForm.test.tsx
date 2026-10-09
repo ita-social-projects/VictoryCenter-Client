@@ -51,8 +51,8 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 
 describe('TranslateEventCategoryForm', () => {
     const categories: EventCategoryDto[] = [
-        { id: 1, name: 'Category A', relatedEventNewsCount: 0 },
-        { id: 2, name: 'Category B', relatedEventNewsCount: 0 },
+        { id: 1, name: 'Category A', relatedEventNewsCount: 0, localizations: [] },
+        { id: 2, name: 'Category B', relatedEventNewsCount: 0, localizations: [] },
     ];
 
     const onSubmit = jest.fn();
@@ -135,6 +135,20 @@ describe('TranslateEventCategoryForm', () => {
         expect(screen.getByTestId('name-error')).toHaveTextContent(
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(EVENT_CATEGORY_VALIDATION.name.max),
         );
+    });
+
+    it('disables inputs when formDisabled is true', () => {
+        render(
+            <TranslateEventCategoryForm
+                categories={categories}
+                onSubmit={onSubmit}
+                selectedCategory={categories[0]}
+                formDisabled={true}
+            />,
+        );
+
+        expect(screen.getByTestId('category-select')).toBeDisabled();
+        expect(screen.getByTestId('name-input')).toBeDisabled();
     });
 
     it('submits valid data via ref', async () => {

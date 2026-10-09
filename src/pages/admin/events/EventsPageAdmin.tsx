@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
 import { EventItemComponent } from './event-item-component/EventItemComponent';
 import { EventSearchItem } from './event-search-item/EventSearchItem';
@@ -14,6 +14,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoryContextMenu } from '@/hooks/admin/use-category-context-menu/useCategoryContextMenu';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
@@ -190,30 +191,7 @@ export const EventsPageAdmin = () => {
     }, []);
 
     // Category handlers
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            } else if (id === 'translate') {
-                openModalActions.openTranslateCategoryModal();
-            }
-        },
-        [openModalActions],
-    );
-
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
-        ],
-        [],
-    );
+    const { categoryContextMenuOptions, onContextMenuOptionSelected } = useCategoryContextMenu(openModalActions);
 
     // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
@@ -712,7 +690,7 @@ export const EventsPageAdmin = () => {
                     getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
-                    contextMenuOptions={categoryBarContextMenuOptions}
+                    contextMenuOptions={categoryContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                     renderCategoryExtra={(category) => (
                         <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />

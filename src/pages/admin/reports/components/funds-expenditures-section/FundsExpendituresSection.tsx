@@ -25,6 +25,7 @@ import {
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
     ReportFundsExpendituresSettingsLocalization,
+    ReportFundsExpendituresRecordState,
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage } from '@/types/common/language';
@@ -66,6 +67,15 @@ const enrichRecords = (
         categoryName: categoryMap.get(r.categoryId) ?? String(r.categoryId),
     }));
 };
+
+let tempIdCounter = 0;
+
+const getTempId = (): number => {
+    tempIdCounter += 1;
+    return -tempIdCounter;
+};
+
+const isTempId = (id: number): boolean => id < 0;
 
 const getCategoryLimitMessage = (
     hasReachedIncomeCategoryLimit: boolean,
@@ -144,9 +154,9 @@ export const FundsExpenditureSection = ({
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
-    const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
+    const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecordState[]>([]);
 
-    const [modifiedRecordIds, setModifiedRecordIds] = useState<number[]>([]);
+    const [updatedRecordIds, setUpdatedRecordIds] = useState<number[]>([]);
     const [deletedRecordIds, setDeletedRecordIds] = useState<number[]>([]);
 
     const [localIsRowEditMode, setLocalIsRowEditMode] = useState(false);
@@ -267,7 +277,11 @@ export const FundsExpenditureSection = ({
         fetchHandler: fetchCategories,
     });
 
-    const { data: allRecords, isLoading: isRecordsLoading } = useDataFetch<ReportFundsExpendituresRecord[]>({
+    const {
+        data: allRecords,
+        isLoading: isRecordsLoading,
+        refetch: refetchRecords,
+    } = useDataFetch<ReportFundsExpendituresRecord[]>({
         initialData: [],
         fetchHandler: fetchRecords,
     });
@@ -343,7 +357,12 @@ export const FundsExpenditureSection = ({
     }, [refetchProgramSummary]);
 
     useEffect(() => {
-        setRecordsState(allRecords);
+        setRecordsState(
+            allRecords.map((record) => ({
+                ...record,
+                lastEditedField: 'amountUah' as FundsExpendituresAmountField,
+            })),
+        );
     }, [allRecords]);
 
     useEffect(() => {
@@ -506,14 +525,9 @@ export const FundsExpenditureSection = ({
                 ),
             );
 
-            setModifiedRecordIds((prev) => {
-                if (prev.includes(recordId)) {
-                    return prev;
-
-                }
-
-                return [...prev, recordId];
-            });
+            if (!isTempId(recordId)) {
+                setUpdatedRecordIds((prev) => (prev.includes(recordId) ? prev : [...prev, recordId]));
+            }
 
             onDataChange?.();
             addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
@@ -531,35 +545,26 @@ export const FundsExpenditureSection = ({
             amountUsd: string;
             lastEditedField: FundsExpendituresAmountField;
             type: FundsExpendituresTransactionType;
-        }): Promise<boolean> => {
-            try {
-                const createdRecord = await FundsExpendituresApi.createRecord(adminClient, {
-                    categoryId: data.categoryId,
-                    reportingYear: data.reportingYear,
-                    amountUah: data.amountUah,
-                    amountUsd: data.amountUsd,
-                    lastEditedField: data.lastEditedField,
-                    type: data.type,
-                });
+        }) => {
+            const newRecord: ReportFundsExpendituresRecordState = {
+                id: getTempId(),
+                categoryId: data.categoryId,
+                reportingYear: data.reportingYear,
+                amountUah: data.amountUah,
+                amountUsd: data.amountUsd,
+                type: data.type,
+                lastEditedField: data.lastEditedField,
+            };
 
-                setRecordsState((prev) => [...prev, createdRecord]);
-                onDataChange?.();
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
-                setActiveRecordModalType(null);
+            setRecordsState((prev) => [...prev, newRecord]);
 
-                try {
-                    await refetchSummary(true);
-                } catch {
-                    // Refetch error handled by useDataFetch
-                }
+            onDataChange?.();
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+            setActiveRecordModalType(null);
 
-                return true;
-            } catch {
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
-                return false;
-            }
+            return true;
         },
-        [addToast, adminClient, refetchSummary, onDataChange],
+        [addToast, onDataChange],
     );
 
     const handleCreateCategory = useCallback(
@@ -687,13 +692,18 @@ export const FundsExpenditureSection = ({
         }
 
         setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
-        setDeletedRecordIds((prev) => {
-            const newIds = selectedRecordIds.filter((id) => !prev.includes(id));
-            return [...prev, ...newIds];
-        });
+
+        const realIdsToDelete = selectedRecordIds.filter((id) => !isTempId(id));
+
+        if (realIdsToDelete.length > 0) {
+            setDeletedRecordIds((prev) => {
+                const newIds = realIdsToDelete.filter((id) => !prev.includes(id));
+                return [...prev, ...newIds];
+            });
+            setUpdatedRecordIds((prev) => prev.filter((id) => !realIdsToDelete.includes(id)));
+        }
 
         onDataChange?.();
-
         setSelectedRecordIds([]);
         setIsBulkDeleteModalOpen(false);
         addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
@@ -703,16 +713,13 @@ export const FundsExpenditureSection = ({
         if (!recordToDelete) return;
 
         setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
-        setDeletedRecordIds((prev) => {
-            if (prev.includes(recordToDelete.id)) {
-                return prev;
-            }
 
-            return [...prev, recordToDelete.id];
-        });
+        if (!isTempId(recordToDelete.id)) {
+            setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));
+            setUpdatedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
+        }
 
         onDataChange?.();
-
         addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
         setIsDeleteModalOpen(false);
         setRecordToDelete(null);
@@ -741,27 +748,22 @@ export const FundsExpenditureSection = ({
                 programExpendituresReportingYear: programYearValue,
             });
 
-            const modifiedRecords = recordsState.filter((record) => modifiedRecordIds.includes(record.id));
+            const recordsToCreate = recordsState.filter((record) => isTempId(record.id));
+            const recordsToUpdate = recordsState.filter((record) => updatedRecordIds.includes(record.id));
 
-            if (modifiedRecords.length > 0) {
-                await Promise.all(
-                    modifiedRecords.map((record) =>
-                        FundsExpendituresApi.updateRecord(adminClient, record.id, {
-                            categoryId: record.categoryId,
-                            type: record.type,
-                            reportingYear: record.reportingYear,
-                            amountUah: record.amountUah,
-                            amountUsd: record.amountUsd,
-                        }),
-                    ),
-                );
+            const hasRecordChanges =
+                recordsToCreate.length > 0 || recordsToUpdate.length > 0 || deletedRecordIds.length > 0;
+
+            if (hasRecordChanges) {
+                await FundsExpendituresApi.batchSaveRecords(adminClient, {
+                    recordsToCreate: recordsToCreate,
+                    recordsToUpdate: recordsToUpdate,
+                    recordIdsToDelete: deletedRecordIds,
+                });
             }
 
-            if (deletedRecordIds.length > 0) {
-                await FundsExpendituresApi.bulkDeleteRecords(adminClient, deletedRecordIds);
-            }
-
-            setModifiedRecordIds([]);
+            setUpdatedRecordIds([]);
+            setDeletedRecordIds([]);
 
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
             setExchangeRateValue(updatedSettings.exchangeRate ?? '');
@@ -771,6 +773,9 @@ export const FundsExpenditureSection = ({
 
             try {
                 await refetchSettings(true);
+                if (hasRecordChanges) {
+                    await refetchRecords(true);
+                }
             } catch {}
 
             return true;
@@ -786,8 +791,9 @@ export const FundsExpenditureSection = ({
         fetchDisclaimerLocalizations,
         onExchangeRateValueChange,
         refetchSettings,
+        refetchRecords,
         programYearValue,
-        modifiedRecordIds,
+        updatedRecordIds,
         recordsState,
         deletedRecordIds,
     ]);

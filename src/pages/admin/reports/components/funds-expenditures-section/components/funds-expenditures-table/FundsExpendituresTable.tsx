@@ -692,11 +692,7 @@ export const FundsExpendituresTable = ({
                                                                 )}
                                                                 aria-label="Edit program reporting year"
                                                                 onClick={handleStartProgramYearEdit}
-                                                                disabled={
-                                                                    isAnyRowEditing ||
-                                                                    isSavingInProgress ||
-                                                                    isRowActionsDisabled
-                                                                }
+                                                                disabled={isAnyRowEditing || isRowActionsDisabled}
                                                                 DefaultIcon={ACTION_ICONS.edit.default}
                                                                 FilledIcon={ACTION_ICONS.edit.hover}
                                                             />

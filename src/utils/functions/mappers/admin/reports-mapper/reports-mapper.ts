@@ -22,6 +22,8 @@ import {
     UpdateReportFundsExpendituresCategoryDto,
     UpdateReportFundsExpendituresRecordDto,
     UpdateReportFundsExpendituresSettingsDto,
+    BatchSaveReportFundsExpendituresRecordsPayload,
+    BatchSaveReportFundsExpendituresRecordsDto,
 } from '@/types/admin/reports';
 
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
@@ -157,4 +159,15 @@ export const mapReportFundsExpendituresSummaryDtoToSummary = (
     totalSpentUsd: dto.expenditureUsdTotal,
     incomeCategories: dto.incomeCategoriesCount,
     expenseCategories: dto.expenditureCategoriesCount,
+});
+
+export const mapBatchSaveReportFundsExpendituresRecordsToDto = (
+    payload: BatchSaveReportFundsExpendituresRecordsPayload,
+): BatchSaveReportFundsExpendituresRecordsDto => ({
+    recordsToCreate: payload.recordsToCreate.map(mapReportFundsExpendituresRecordToCreateDto),
+    recordsToUpdate: payload.recordsToUpdate.map((record) => ({
+        id: record.id,
+        ...mapReportFundsExpendituresRecordToUpdateDto(record),
+    })),
+    recordIdsToDelete: payload.recordIdsToDelete,
 });

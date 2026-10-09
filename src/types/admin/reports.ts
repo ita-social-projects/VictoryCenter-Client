@@ -151,6 +151,22 @@ export interface UpdateReportFundsExpendituresRecordDto {
     currency: ReportFundsExpendituresCurrencyDto;
 }
 
+export interface BatchUpdateReportFundsExpendituresRecordDto extends UpdateReportFundsExpendituresRecordDto {
+    id: number;
+}
+
+export interface BatchSaveReportFundsExpendituresRecordsDto {
+    recordsToCreate: CreateReportFundsExpendituresRecordDto[];
+    recordsToUpdate: BatchUpdateReportFundsExpendituresRecordDto[];
+    recordIdsToDelete: number[];
+}
+
+export interface BatchSaveReportFundsExpendituresRecordsPayload {
+    recordsToCreate: ReportFundsExpendituresRecordState[];
+    recordsToUpdate: ReportFundsExpendituresRecordState[];
+    recordIdsToDelete: number[];
+}
+
 export interface ReportFundsExpendituresSummaryDto {
     incomeUahTotal: number;
     incomeUsdTotal: number;
@@ -231,6 +247,10 @@ export interface ReportFundsExpendituresRecord {
     amountUah: string;
     amountUsd: string;
 }
+
+export type ReportFundsExpendituresRecordState = ReportFundsExpendituresRecordFormValues & {
+    id: number;
+};
 
 export type FundsExpendituresAmountField = 'amountUah' | 'amountUsd';
 

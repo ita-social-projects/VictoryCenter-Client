@@ -30,3 +30,5 @@ export interface CreateEventCategoryLocalizationDto {
     languageId: number;
     name: string;
 }
+
+export interface UpdateEventCategoryLocalizationDto extends CreateEventCategoryLocalizationDto {}

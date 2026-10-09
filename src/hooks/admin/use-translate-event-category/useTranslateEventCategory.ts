@@ -9,10 +9,16 @@ import { TranslateEventCategoryFormValues } from '@/pages/admin/events/translate
 interface UseTranslateEventCategoryParams {
     category: EventCategoryDto | null;
     language: LocalizationLanguage | null;
+    hasExistingTranslation?: boolean;
     onSuccess: (updatedCategory: EventCategoryDto) => void;
 }
 
-export const useTranslateEventCategory = ({ category, language, onSuccess }: UseTranslateEventCategoryParams) => {
+export const useTranslateEventCategory = ({
+    category,
+    language,
+    hasExistingTranslation,
+    onSuccess,
+}: UseTranslateEventCategoryParams) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string>('');
     const client = useAdminClient();
@@ -24,18 +30,34 @@ export const useTranslateEventCategory = ({ category, language, onSuccess }: Use
             setIsSubmitting(true);
             setError('');
 
-            const createdLocalizationDto = await EventCategoryLocalizationsApi.create(client, {
-                entityId: category.id,
-                languageId: language.id,
-                name: data.name,
-            });
+            let updatedLocalizations = category.localizations || [];
 
-            const createdCategory: EventCategoryDto = {
+            if (hasExistingTranslation) {
+                const updatedLocalizationDto = await EventCategoryLocalizationsApi.update(client, {
+                    entityId: category.id,
+                    languageId: language.id,
+                    name: data.name,
+                });
+
+                updatedLocalizations = updatedLocalizations.map((loc) =>
+                    loc.entityId === category.id && loc.language.id === language.id ? updatedLocalizationDto : loc,
+                );
+            } else {
+                const createdLocalizationDto = await EventCategoryLocalizationsApi.create(client, {
+                    entityId: category.id,
+                    languageId: language.id,
+                    name: data.name,
+                });
+
+                updatedLocalizations = [...updatedLocalizations, createdLocalizationDto];
+            }
+
+            const updatedCategory: EventCategoryDto = {
                 ...category,
-                localizations: [...(category.localizations || []), createdLocalizationDto],
+                localizations: updatedLocalizations,
             };
 
-            onSuccess(createdCategory);
+            onSuccess(updatedCategory);
         } catch (err) {
             setError(EVENT_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE);
         } finally {

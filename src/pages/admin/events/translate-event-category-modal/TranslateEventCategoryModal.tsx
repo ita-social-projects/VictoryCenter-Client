@@ -76,6 +76,7 @@ export const TranslateEventCategoryModal = ({
     const { translateEventCategory, isSubmitting, error } = useTranslateEventCategory({
         category: selectedCategory,
         language: language as LocalizationLanguage,
+        hasExistingTranslation: !!existingTranslation,
         onSuccess: (updatedCategory) => {
             onTranslateCategory?.(updatedCategory);
             handleClose();
@@ -103,7 +104,7 @@ export const TranslateEventCategoryModal = ({
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
-            title={EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE}
+            title={modalTitle}
             onSave={handleSaveClick}
             isSubmitting={isSubmitting}
             isFormValid={isCompleteFormValid}

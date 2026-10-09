@@ -587,13 +587,7 @@ export const EventsPageAdmin = () => {
 
     const handleTranslateCategory = useCallback(
         (updatedCategory: EventCategoryDto) => {
-            setCategories((prevCategories) =>
-                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
-            );
-
-            if (selectedCategory?.id === updatedCategory.id) {
-                setSelectedCategory(updatedCategory);
-            }
+            handleUpdateCategory(updatedCategory);
 
             closeModalActions.closeTranslateCategoryModal();
             addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);

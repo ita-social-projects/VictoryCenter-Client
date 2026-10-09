@@ -1,5 +1,12 @@
 import { Image, ImageValues } from '../common/image';
 import { VisibilityStatus } from './common';
+import { EntityLocalization, TranslationStatusInfo } from '@/types/common/language';
+
+export interface EventItemLocalizationDto extends EntityLocalization {
+    title?: string | null;
+    description?: string | null;
+    additionalDescription?: string | null;
+}
 
 export interface EventItemDto {
     id: number;
@@ -13,6 +20,8 @@ export interface EventItemDto {
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
+    localizations?: EventItemLocalizationDto[];
+    translationStatuses?: TranslationStatusInfo[];
 }
 
 export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';

@@ -3,6 +3,16 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 export const EVENTS_TEXT = {
+    QUESTION: {
+        SAVE_NEW_MATERIAL: 'Зберегти новий матеріал?',
+        PUBLISH_NEW_MATERIAL: 'Опублікувати новий матеріал?',
+        PUBLISH_MATERIAL: 'Опублікувати матеріал?',
+    },
+    MESSAGE: {
+        DONT_FORGET_TO_ORDER: 'Не забудьте налаштувати порядок відображення матеріалів на сайті',
+        FAIL_TO_CREATE_EVENT: 'Виникла помилка під час додавання матеріалу',
+        FAIL_TO_UPDATE_EVENT: 'Виникла помилка під час оновлення матеріалу',
+    },
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
         ADD_MATERIAL: 'Додати матеріал',

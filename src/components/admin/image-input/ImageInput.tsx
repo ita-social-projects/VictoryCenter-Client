@@ -13,6 +13,7 @@ import type { Image, ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
+import { detectImageMimeType } from '@/utils/functions/detect-image-mime-type/detect-image-mime-type';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
 import { CropModal } from '../cropper-modal/CropperModal';
@@ -95,7 +96,8 @@ export const ImageInput = ({
                 return;
             }
 
-            const imgItem = await convertFileToBase64(file);
+            const mimeType = (await detectImageMimeType(file)) ?? file.type;
+            const imgItem = await convertFileToBase64(file, mimeType);
 
             const needsCrop =
                 enableCrop &&
@@ -337,7 +339,7 @@ export const getImageSrc = (image: Image | ImageValues | null) => {
     return undefined;
 };
 
-export function convertFileToBase64(file: File): Promise<ImageValues> {
+export function convertFileToBase64(file: File, mimeType: string = file.type): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -350,7 +352,7 @@ export function convertFileToBase64(file: File): Promise<ImageValues> {
             }
             resolve({
                 base64: parts[1],
-                mimeType: file.type,
+                mimeType,
             });
         };
 

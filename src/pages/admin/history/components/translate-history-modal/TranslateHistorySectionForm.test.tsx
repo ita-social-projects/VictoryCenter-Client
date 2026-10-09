@@ -21,8 +21,8 @@ jest.mock('@/hooks/admin/use-form-manager/useFormManager', () => ({
 
 jest.mock('@/validation/admin/history-translation-schema/history-translation-schema', () => ({
     HISTORY_TRANSLATION_VALIDATION: {
-        title: { max: 100 },
-        description: { max: 600 },
+        title: { max: 100, getMaxError: () => 'title-max-error' },
+        description: { max: 600, getMaxError: () => 'description-max-error' },
     },
     HISTORY_TRANSLATION_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
@@ -47,6 +47,12 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
         className,
         error,
         disabled,
+        rows,
+        autoGrow,
+        maxRows,
+        showCounterBelow,
+        isRequired,
+        maxLimitWarning,
     }: {
         label: string;
         value: string;
@@ -59,8 +65,24 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
         className?: string;
         error?: string;
         disabled?: boolean;
+        rows?: number;
+        autoGrow?: boolean;
+        maxRows?: number;
+        showCounterBelow?: boolean;
+        isRequired?: boolean;
+        maxLimitWarning?: string;
     }) => (
-        <div data-testid={`input-group-${id}`} className={className} data-error={error || ''}>
+        <div
+            data-testid={`input-group-${id}`}
+            className={className}
+            data-error={error || ''}
+            data-rows={String(rows)}
+            data-auto-grow={String(!!autoGrow)}
+            data-max-rows={String(maxRows)}
+            data-counter-below={String(!!showCounterBelow)}
+            data-required={String(!!isRequired)}
+            data-max-limit-warning={maxLimitWarning ?? ''}
+        >
             <label htmlFor={id}>{label}</label>
             <input
                 id={id}
@@ -92,6 +114,8 @@ jest.mock(
             error,
             disabled,
             placeholder,
+            isRequired,
+            maxLimitWarning,
         }: {
             label: string;
             value: string;
@@ -105,8 +129,16 @@ jest.mock(
             error?: string;
             placeholder?: string;
             disabled?: boolean;
+            isRequired?: boolean;
+            maxLimitWarning?: string;
         }) => (
-            <div data-testid={`textarea-group-${id}`} data-error={error || ''} data-auto-grow={String(!!autoGrow)}>
+            <div
+                data-testid={`textarea-group-${id}`}
+                data-error={error || ''}
+                data-auto-grow={String(!!autoGrow)}
+                data-required={String(!!isRequired)}
+                data-max-limit-warning={maxLimitWarning ?? ''}
+            >
                 <label htmlFor={id}>{label}</label>
                 <textarea
                     id={id}
@@ -140,8 +172,8 @@ type FormManagerOverrides = {
 
 type FieldElement = HTMLInputElement | HTMLTextAreaElement;
 
-const TITLE_LABEL = '*Заголовок';
-const DESCRIPTION_LABEL = '*Опис';
+const TITLE_LABEL = SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT;
+const DESCRIPTION_LABEL = SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT;
 
 const validateTitleMock = HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateTitle as jest.Mock;
 const validateDescriptionMock = HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
@@ -246,6 +278,35 @@ describe('TranslateHistorySectionForm', () => {
             renderForm();
 
             expect(getDescriptionGroup()).toHaveAttribute('data-auto-grow', 'true');
+        });
+
+        it('renders the title as an auto-growing textarea with the counter below, matching the UA form', () => {
+            renderForm();
+
+            expect(getTitleGroup()).toHaveAttribute('data-rows', '1');
+            expect(getTitleGroup()).toHaveAttribute('data-auto-grow', 'true');
+            expect(getTitleGroup()).toHaveAttribute('data-max-rows', '3');
+            expect(getTitleGroup()).toHaveAttribute('data-counter-below', 'true');
+        });
+
+        it('marks both fields as required so the label shows the required marker', () => {
+            renderForm();
+
+            expect(getTitleGroup()).toHaveAttribute('data-required', 'true');
+            expect(getDescriptionGroup()).toHaveAttribute('data-required', 'true');
+        });
+
+        it('passes the max-length error as the limit warning to both fields', () => {
+            renderForm();
+
+            expect(getTitleGroup()).toHaveAttribute(
+                'data-max-limit-warning',
+                HISTORY_TRANSLATION_VALIDATION.title.getMaxError(),
+            );
+            expect(getDescriptionGroup()).toHaveAttribute(
+                'data-max-limit-warning',
+                HISTORY_TRANSLATION_VALIDATION.description.getMaxError(),
+            );
         });
 
         it('applies the title-input class to the title group', () => {

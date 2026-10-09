@@ -1,12 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
-import {
-    EventItemDto,
-    EventSearchItemData,
-    EventsIntroSectionDto,
-    EventsIntroSectionUpdateField,
-} from '@/types/admin/events';
+import { EventItemDto, EventsIntroSectionDto, EventsIntroSectionUpdateField } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const EventsApi = {
@@ -54,8 +49,8 @@ export const EventsApi = {
         offset: number,
         limit: number,
         signal?: AbortSignal,
-    ): Promise<PaginationResult<EventSearchItemData>> => {
-        const response = await client.get<PaginationResult<EventSearchItemData>>(`${API_ROUTES.EVENTS.BASE}/search`, {
+    ): Promise<PaginationResult<EventItemDto>> => {
+        const response = await client.get<PaginationResult<EventItemDto>>(`${API_ROUTES.EVENTS.BASE}/search`, {
             params: {
                 searchQuery: searchTerm,
                 offset,

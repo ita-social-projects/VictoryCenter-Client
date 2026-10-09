@@ -1304,16 +1304,15 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 
-    it('switches the category tab and clears the status filter when a search suggestion from another category is selected', async () => {
+    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
         const user = userEvent.setup();
 
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
 
-        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, categoryId) =>
-            categoryId === categories[1].id
-                ? { items: [eventItems[1]], totalItemsCount: 1 }
-                : { items: [eventItems[0]], totalItemsCount: 1 },
-        );
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
+        });
 
         render(<EventsPageAdmin />);
 
@@ -1326,22 +1325,13 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('select-suggestion-category-2'));
 
         expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
-
-        await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
-                {},
-                categories[1].id,
-                0,
-                5,
-                undefined,
-                undefined,
-            );
-
-            expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
-        });
+        expect(await screen.findByTestId('rendered-event-2')).toBeInTheDocument();
+        expect(screen.getByText('Other category event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('load-more-events')).toBeDisabled();
     });
 
-    it('clears the status filter and keeps the current category when the selected suggestion already belongs to it', async () => {
+    it('narrows the list to the selected event and clears the status filter when the suggestion already belongs to the current category', async () => {
         const user = userEvent.setup();
 
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
@@ -1362,17 +1352,34 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByText('Select Suggestion'));
 
         expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.getByText('Test event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
 
-        await waitFor(() => {
-            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
-                {},
-                categories[0].id,
-                0,
-                5,
-                undefined,
-                undefined,
-            );
+    it('restores the full paginated list for the active category when the search is cleared after selecting a suggestion', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
         });
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
     });
 
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {

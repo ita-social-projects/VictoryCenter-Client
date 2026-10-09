@@ -19,7 +19,6 @@ import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import {
     EventItemDto,
-    EventSearchItemData,
     ErrorState,
     EventsErrorType,
     EventsIntroSectionDto,
@@ -87,6 +86,7 @@ export const EventsPageAdmin = () => {
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const [selectedSearchItem, setSelectedSearchItem] = useState<EventItemDto | null>(null);
 
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
@@ -141,7 +141,7 @@ export const EventsPageAdmin = () => {
         async (
             searchTerm: string,
             paginationRequest: PaginationRequestParams,
-        ): Promise<PaginationResult<EventSearchItemData>> =>
+        ): Promise<PaginationResult<EventItemDto>> =>
             EventsApi.fetchEventSearchItems(
                 client,
                 searchTerm,
@@ -163,19 +163,24 @@ export const EventsPageAdmin = () => {
     );
 
     const handleEventSearchSelect = useCallback(
-        (_key: string | number, item: EventSearchItemData) => {
-            const targetCategoryId = item.categories[0]?.id;
+        (_key: string | number, item: EventItemDto) => {
+            const targetCategoryId = item.categories?.[0]?.id;
             const targetCategory = categories.find((category) => category.id === targetCategoryId);
 
             setStatusFilter(undefined);
 
             if (targetCategory && targetCategory.id !== selectedCategory?.id) {
-                resetEventItemsState();
                 setSelectedCategory(targetCategory);
             }
+
+            setSelectedSearchItem(item);
         },
-        [categories, selectedCategory?.id, resetEventItemsState],
+        [categories, selectedCategory?.id],
     );
+
+    const handleEventSearchClear = useCallback(() => {
+        setSelectedSearchItem(null);
+    }, []);
 
     // Category handlers
     const onContextMenuOptionSelected = useCallback(
@@ -271,6 +276,7 @@ export const EventsPageAdmin = () => {
                 return;
             }
 
+            setSelectedSearchItem(null);
             resetEventItemsState();
             setSelectedCategory(nextCategories[0] ?? null);
         },
@@ -365,6 +371,12 @@ export const EventsPageAdmin = () => {
         [client, selectedCategory, eventItems, setErrorState, addToast],
     );
 
+    const itemsToRender = useMemo(
+        () => (selectedSearchItem ? [selectedSearchItem] : eventItems),
+        [selectedSearchItem, eventItems],
+    );
+    const effectiveHasMore = selectedSearchItem ? false : hasMore;
+
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
             <DraggableListItem
@@ -373,14 +385,14 @@ export const EventsPageAdmin = () => {
                 id={item.id}
                 renderEntityComponent={renderEntityComponent}
                 ariaLabel={EVENT_ITEMS_TEXT.ACTIONS.REORDER}
-                entities={eventItems}
+                entities={itemsToRender}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
                 reorderDisabled={isReordering}
-                hideDragHandle={statusFilter !== undefined || eventItems.length < 2}
+                hideDragHandle={statusFilter !== undefined || itemsToRender.length < 2 || !!selectedSearchItem}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered, statusFilter, isReordering],
+        [renderEntityComponent, itemsToRender, handleEntitiesReordered, statusFilter, isReordering, selectedSearchItem],
     );
 
     const fetchEventItems = useCallback(
@@ -458,15 +470,17 @@ export const EventsPageAdmin = () => {
     const selectedCategoryId = selectedCategory?.id;
 
     useEffect(() => {
-        if (!selectedCategoryId) {
+        if (!selectedCategoryId || selectedSearchItem) {
             return;
         }
 
         fetchEventItems(selectedCategoryId, true);
-    }, [selectedCategoryId, fetchEventItems]);
+    }, [selectedCategoryId, fetchEventItems, selectedSearchItem]);
 
     const handleCategorySelect = useCallback(
         (category: EventCategoryDto) => {
+            setSelectedSearchItem(null);
+
             if (selectedCategoryId === category.id) {
                 return;
             }
@@ -478,10 +492,10 @@ export const EventsPageAdmin = () => {
     );
 
     const handleOnLoadMore = useCallback(() => {
-        if (selectedCategory) {
+        if (selectedCategory && !selectedSearchItem) {
             fetchEventItems(selectedCategory.id);
         }
-    }, [fetchEventItems, selectedCategory]);
+    }, [fetchEventItems, selectedCategory, selectedSearchItem]);
 
     const addMaterialButton = statusFilter === undefined && (
         <Button
@@ -604,12 +618,12 @@ export const EventsPageAdmin = () => {
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
-                <AdminPanelToolbar<EventSearchItemData>
+                <AdminPanelToolbar<EventItemDto>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.title}
                     fetchSearchItems={getEventSearchItems}
                     placeholder={EVENTS_TEXT.PLACEHOLDER.SEARCH_EVENTS}
-                    onSearchClear={() => null}
+                    onSearchClear={handleEventSearchClear}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddEvent}
@@ -703,10 +717,10 @@ export const EventsPageAdmin = () => {
 
                 {selectedCategory && error.type !== 'events-items' && (
                     <InfiniteScrollList<EventItemDto>
-                        items={eventItems}
+                        items={itemsToRender}
                         renderItem={renderEventItem}
                         onLoadMore={handleOnLoadMore}
-                        hasMore={hasMore}
+                        hasMore={effectiveHasMore}
                         isLoading={isEventItemsLoading}
                         emptyStateMessage={emptyStateMessage}
                         emptyStateAction={addMaterialButton}

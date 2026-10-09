@@ -13,6 +13,7 @@ export interface EventItemDto {
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
+    categories?: EventSearchItemCategory[];
 }
 
 export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
@@ -25,12 +26,6 @@ export interface ErrorState {
 export interface EventSearchItemCategory {
     id: number;
     name: string;
-}
-
-export interface EventSearchItemData {
-    id: number;
-    title: string;
-    categories: EventSearchItemCategory[];
 }
 
 // this is a test interface and most probably will need adjustments in the future

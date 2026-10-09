@@ -1,5 +1,25 @@
 import { Image, ImageValues } from '../common/image';
+import { EntityLocalization, EntityLocalizationDto } from '../common/language';
 import { VisibilityStatus } from './common';
+
+export interface EventLocalizableFields {
+    title: string;
+    description: string;
+    additionalDescription?: string | null;
+}
+
+export interface EventLocalization extends EntityLocalization, EventLocalizableFields {}
+
+export interface EventLocalizationDto extends EntityLocalizationDto, EventLocalizableFields {
+    entityId?: number;
+}
+
+export interface CreateEventLocalizationDto extends EventLocalizableFields {
+    entityId: number;
+    languageId: number;
+}
+
+export type UpdateEventLocalizationDto = EventLocalizableFields;
 
 export interface EventItemDto {
     id: number;
@@ -13,6 +33,7 @@ export interface EventItemDto {
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
+    localizations?: EventLocalization[];
 }
 
 export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';

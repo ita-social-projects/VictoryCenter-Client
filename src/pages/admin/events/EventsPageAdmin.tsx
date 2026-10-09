@@ -228,6 +228,14 @@ export const EventsPageAdmin = () => {
         openModalActions.openAddItemModal();
     }, [openModalActions]);
 
+    const handleTranslateEvent = useCallback(
+        (updatedEvent: EventItemDto) => {
+            setEventItems((prev) => prev.map((item) => (item.id === updatedEvent.id ? updatedEvent : item)));
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [addToast],
+    );
+
     const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
         setCategories((prev) => [...prev, newCategory]);
     }, []);
@@ -300,7 +308,13 @@ export const EventsPageAdmin = () => {
     }, [updatePageSize]);
 
     const renderEntityComponent = useCallback(
-        (item: EventItemDto) => <EventItemComponent item={item} onEdit={openModalActions.openEditItemModal} />,
+        (item: EventItemDto) => (
+            <EventItemComponent
+                item={item}
+                onEdit={openModalActions.openEditItemModal}
+                onTranslate={openModalActions.openTranslateItemModal}
+            />
+        ),
         [openModalActions],
     );
 
@@ -704,6 +718,7 @@ export const EventsPageAdmin = () => {
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}
                 translationLanguages={translationLanguages}
+                onTranslateEvent={handleTranslateEvent}
             />
             <ConfirmationModal
                 isOpen={!!publishConfirmation}

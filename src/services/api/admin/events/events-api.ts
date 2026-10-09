@@ -2,12 +2,16 @@ import { AxiosInstance } from 'axios';
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import {
+    CreateEventLocalizationDto,
     EventItemDto,
+    EventLocalizationDto,
     EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
+    UpdateEventLocalizationDto,
 } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { EventLocalizationsApi } from './event-localizations/event-localizations-api';
 
 export const EventsApi = {
     getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
@@ -68,5 +72,16 @@ export const EventsApi = {
     },
     reorder: async (client: AxiosInstance, categoryId: number, ids: number[]) => {
         await client.put(API_ROUTES.EVENTS.REORDER, { categoryId, ids });
+    },
+    translateEvent: async (client: AxiosInstance, data: CreateEventLocalizationDto): Promise<EventLocalizationDto> => {
+        return EventLocalizationsApi.create(client, data);
+    },
+    updateEventLocalization: async (
+        client: AxiosInstance,
+        entityId: number,
+        languageId: number,
+        data: UpdateEventLocalizationDto,
+    ): Promise<EventLocalizationDto> => {
+        return EventLocalizationsApi.update(client, entityId, languageId, data);
     },
 };

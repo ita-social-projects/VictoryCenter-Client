@@ -507,7 +507,7 @@ describe('EventModal', () => {
                     existingPreviewImageId: null,
                     request: expect.objectContaining({
                         status: VisibilityStatus.Draft,
-                        categoryIds: [currentCategory.id],
+                        categoryId: currentCategory.id,
                     }),
                 }),
             );
@@ -520,10 +520,10 @@ describe('EventModal', () => {
             });
         });
 
-        it('preserves fetched category ids on edit', async () => {
+        it('preserves the fetched category on edit', async () => {
             const fullEvent = {
                 ...eventToEdit,
-                categories: [{ id: 7 }, { id: 8 }],
+                category: { id: 7 },
                 localizations: [
                     {
                         language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
@@ -554,7 +554,7 @@ describe('EventModal', () => {
                 eventToEdit.id,
                 expect.objectContaining({
                     request: expect.objectContaining({
-                        categoryIds: [7, 8],
+                        categoryId: 7,
                         localizations: [
                             expect.objectContaining({
                                 languageId: DEFAULT_UKRAINIAN_LANGUAGE_ID,
@@ -627,7 +627,7 @@ describe('EventModal', () => {
                     const fullEvent = {
                         ...eventToEdit,
                         status: scenario.initialStatus!,
-                        categories: [{ id: 7 }, { id: 8 }],
+                        category: { id: 7 },
                         localizations: [
                             {
                                 language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID },
@@ -693,7 +693,7 @@ describe('EventModal', () => {
                 expect(request).toEqual(
                     expect.objectContaining({
                         status: scenario.targetStatus,
-                        categoryIds: scenario.mode === ModalMode.Edit ? [7, 8] : [currentCategory.id],
+                        categoryId: scenario.mode === ModalMode.Edit ? 7 : currentCategory.id,
                     }),
                 );
 

@@ -1,3 +1,11 @@
+import { HippotherapyPageLocalizedPartial } from '@/types/admin/hippotherapy-page';
+import { LocalizationInfo } from '@/types/common/language';
+
+export interface PublicHippotherapyLocalizationDto extends HippotherapyPageLocalizedPartial {
+    entityId?: number;
+    localizationInfoDto: LocalizationInfo;
+}
+
 export interface HippotherapyDefaultSection {
     title: string;
     text: string;
@@ -66,4 +74,5 @@ export interface HippotherapyAbout {
     anotherQuoteSection: Quote;
     participantsSection: HippotherapyParticipantsSection;
     ethicsSection: HippotherapyEthicsSection;
+    localizations: PublicHippotherapyLocalizationDto[];
 }

@@ -45,7 +45,7 @@ describe('Footer', () => {
 
         render(<Footer />, { wrapper: MemoryRouter });
 
-        expect(screen.getByTestId('victory-logo')).toBeInTheDocument();
+        expect(screen.getAllByTestId('victory-logo')).toHaveLength(2);
         expect(screen.getByTestId('mail-icon')).toBeInTheDocument();
         expect(screen.getByTestId('phone-icon')).toBeInTheDocument();
     });

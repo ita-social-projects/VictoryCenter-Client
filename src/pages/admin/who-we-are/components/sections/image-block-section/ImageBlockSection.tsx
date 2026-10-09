@@ -78,27 +78,23 @@ export const ImageSection = ({
     };
 
     const handleTitleChange = (value: string) => {
+        setTitleError(null);
+
         if (!titleContent || !isBaseLanguage) return;
         onChange({
             ...titleContent,
             title: value,
         });
-
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
-        setTitleError(error || null);
     };
 
     const handleDescriptionChange = (value: string) => {
+        setDescriptionError(null);
+
         if (!descriptionContent || !isBaseLanguage) return;
         onChange({
             ...descriptionContent,
             description: value,
         });
-
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
-        setDescriptionError(error || null);
     };
 
     const handleTitleBlur = () => {
@@ -113,6 +109,23 @@ export const ImageSection = ({
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
+    };
+
+    const handlePublish = () => {
+        const titleError = titleContent
+            ? WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))
+            : null;
+
+        const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(
+            getPlainTextFromHtml(displayedDescription ?? ''),
+        );
+
+        setTitleError(titleError || null);
+        setDescriptionError(descriptionError || null);
+
+        if (titleError || descriptionError || imageError) return;
+
+        onPublish();
     };
 
     return (
@@ -189,7 +202,7 @@ export const ImageSection = ({
                         <Button
                             className="button"
                             buttonStyle="primary"
-                            onClick={onPublish}
+                            onClick={handlePublish}
                             type="submit"
                             disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
                         >

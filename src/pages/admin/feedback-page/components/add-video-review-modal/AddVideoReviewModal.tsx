@@ -1,258 +1,45 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal } from '@/components/common/modal/Modal';
-import { Button } from '@/components/admin/button/Button';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { InputLabel } from '@/components/admin/input-label/InputLabel';
-import { InputError } from '@/components/admin/input-error/InputError';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import '@/components/admin/input-groups/input-group.scss';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
-import { VIDEO_REVIEW_VALIDATION_FUNCTIONS } from '@/validation/admin/video-review-schema/video-review-schema';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { FeedbackApi } from '@/services/api/admin/feedback/feedback-api';
+import { useMemo } from 'react';
+import { FEEDBACK_TEXT } from '@/const/admin/feedback';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackVideoDto } from '@/types/admin/feedback';
-import {
-    getNormalizedInputText,
-    getNormalizedInputTextWhileTyping,
-} from '@/utils/functions/formatters/text-formatters';
-import styles from './AddVideoReviewModal.module.scss';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { VideoReviewForm, VideoReviewFormValues } from '../video-review-form/VideoReviewForm';
+import { FeedbackFormModal, FeedbackModalProps } from '../feedback-form-modal/FeedbackFormModal';
 
-export interface AddVideoReviewModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit?: (data: { title: string; link: string }) => Promise<boolean>;
-    initialData?: FeedbackVideoDto;
-    onEditVideoReview?: (video: FeedbackVideoDto) => void;
-    onEditError?: () => void;
+export interface VideoReviewPayload {
+    title: string;
+    link: string;
+    status: VisibilityStatus;
 }
 
-export const AddVideoReviewModal = ({
-    isOpen,
-    onClose,
-    onSubmit,
-    initialData,
-    onEditVideoReview,
-    onEditError,
-}: AddVideoReviewModalProps) => {
-    const client = useAdminClient();
-    const isEditMode = Boolean(initialData);
+export interface AddVideoReviewModalProps extends FeedbackModalProps<FeedbackVideoDto, VideoReviewPayload> {
+    videoToEdit?: FeedbackVideoDto;
+}
 
-    const [title, setTitle] = useState('');
-    const [link, setLink] = useState('');
-    const [initialTitle, setInitialTitle] = useState('');
-    const [initialLink, setInitialLink] = useState('');
-    const [titleError, setTitleError] = useState<string | undefined>(undefined);
-    const [linkError, setLinkError] = useState<string | undefined>(undefined);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
-    const [showPublishConfirmModal, setShowPublishConfirmModal] = useState(false);
+const toVideoPayload = (formData: VideoReviewFormValues, status: VisibilityStatus): VideoReviewPayload => ({
+    title: getNormalizedInputText(formData.title),
+    link: getNormalizedInputText(formData.link),
+    status,
+});
 
-    useEffect(() => {
-        if (!isOpen) return;
+export const AddVideoReviewModal = ({ videoToEdit, ...modalProps }: AddVideoReviewModalProps) => {
+    const isEditMode = modalProps.mode === ModalMode.Edit;
 
-        const nextTitle = initialData?.title ?? '';
-        const nextLink = initialData?.link ?? '';
-        setTitle(nextTitle);
-        setLink(nextLink);
-        setInitialTitle(nextTitle);
-        setInitialLink(nextLink);
-        setTitleError(undefined);
-        setLinkError(undefined);
-    }, [isOpen, initialData]);
-
-    const isDirty = title.trim().length > 0 || link.trim().length > 0;
-    const hasChanges = title.trim() !== initialTitle.trim() || link.trim() !== initialLink.trim();
-    const hasUnsavedInput = isEditMode ? hasChanges : isDirty;
-
-    const isSubmitDisabled = useMemo(() => {
-        const hasValidationError =
-            VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateTitle(title) !== undefined ||
-            VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateLink(link) !== undefined;
-
-        if (isSubmitting || hasValidationError) return true;
-
-        return isEditMode ? !hasChanges : false;
-    }, [title, link, isSubmitting, isEditMode, hasChanges]);
-
-    const resetForm = useCallback(() => {
-        setTitle(initialData?.title ?? '');
-        setLink(initialData?.link ?? '');
-        setTitleError(undefined);
-        setLinkError(undefined);
-        setIsSubmitting(false);
-    }, [initialData]);
-
-    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value);
-    }, []);
-
-    const handleTitleBlur = useCallback(() => {
-        setTitle((currentTitle) => {
-            const normalized = getNormalizedInputText(currentTitle);
-            setTitleError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateTitle(normalized));
-            return normalized;
-        });
-    }, []);
-
-    const handleLinkChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setLink(e.target.value);
-    }, []);
-
-    const handleLinkBlur = useCallback(() => {
-        setLink((currentLink) => {
-            const normalized = getNormalizedInputText(currentLink);
-            setLinkError(VIDEO_REVIEW_VALIDATION_FUNCTIONS.validateLink(normalized));
-            return normalized;
-        });
-    }, []);
-
-    const handleConfirmPublish = useCallback(async () => {
-        if (isSubmitting) return;
-
-        setShowPublishConfirmModal(false);
-        setIsSubmitting(true);
-
-        if (initialData) {
-            try {
-                const updated = await FeedbackApi.updateVideo(client, initialData.id, {
-                    title: getNormalizedInputText(title),
-                    link: getNormalizedInputText(link),
-                    status: initialData.status,
-                });
-                onEditVideoReview?.(updated);
-                onClose();
-            } catch {
-                onEditError?.();
-                setIsSubmitting(false);
-            }
-            return;
-        }
-
-        if (!onSubmit) {
-            setIsSubmitting(false);
-            return;
-        }
-
-        const success = await onSubmit({
-            title: getNormalizedInputText(title),
-            link: getNormalizedInputText(link),
-        });
-
-        if (success) {
-            resetForm();
-            onClose();
-        } else {
-            setIsSubmitting(false);
-        }
-    }, [isSubmitting, initialData, title, link, client, onEditVideoReview, onClose, onEditError, onSubmit, resetForm]);
-
-    const handleRequestClose = useCallback(() => {
-        if (isSubmitting) return;
-
-        if (hasUnsavedInput) {
-            setShowCloseConfirmModal(true);
-            return;
-        }
-
-        resetForm();
-        onClose();
-    }, [isSubmitting, hasUnsavedInput, onClose, resetForm]);
-
-    const handleConfirmClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-        resetForm();
-        onClose();
-    }, [resetForm, onClose]);
-
-    const handleCancelClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-    }, []);
-
-    const handleCancelPublish = useCallback(() => {
-        if (isSubmitting) return;
-        setShowPublishConfirmModal(false);
-    }, [isSubmitting]);
+    const initialData = useMemo<VideoReviewFormValues | null>(
+        () => (isEditMode && videoToEdit ? { title: videoToEdit.title, link: videoToEdit.link } : null),
+        [isEditMode, videoToEdit],
+    );
 
     return (
-        <>
-            <Modal isOpen={isOpen && !showPublishConfirmModal && !showCloseConfirmModal} onClose={handleRequestClose}>
-                <Modal.Title>
-                    {isEditMode
-                        ? FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE
-                        : FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE}
-                </Modal.Title>
-                <Modal.Content>
-                    <InputWithCharacterLimitGroup
-                        isRequired
-                        label={FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.LABEL.TITLE}
-                        value={title}
-                        onChange={handleTitleChange}
-                        onBlur={handleTitleBlur}
-                        name="video-review-title"
-                        id="video-review-title"
-                        type="text"
-                        maxLength={VIDEO_REVIEW_VALIDATION.title.max}
-                        error={titleError}
-                        disabled={isSubmitting}
-                        showCounterBelow
-                        normalizeValue={getNormalizedInputTextWhileTyping}
-                    />
-
-                    <div className="input-group">
-                        <InputLabel
-                            htmlFor="video-review-link"
-                            text={FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.LABEL.LINK}
-                            isRequired
-                        />
-                        <TextAreaWithCharacterLimit
-                            value={link}
-                            onChange={handleLinkChange}
-                            onBlur={handleLinkBlur}
-                            name="video-review-link"
-                            id="video-review-link"
-                            maxLength={VIDEO_REVIEW_VALIDATION.link.max}
-                            hasError={!!linkError}
-                            disabled={isSubmitting}
-                            rows={4}
-                            autoGrow
-                            normalizeValue={getNormalizedInputTextWhileTyping}
-                        />
-                        <InputError error={linkError} />
-                    </div>
-                </Modal.Content>
-
-                <Modal.Actions>
-                    <div className={styles.actions}>
-                        <Button
-                            buttonStyle="primary"
-                            onClick={() => setShowPublishConfirmModal(true)}
-                            disabled={isSubmitDisabled}
-                        >
-                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                        </Button>
-                    </div>
-                </Modal.Actions>
-            </Modal>
-
-            <ConfirmationModal
-                isOpen={showCloseConfirmModal}
-                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                onClose={handleCancelClose}
-                onCancel={handleCancelClose}
-                onConfirm={handleConfirmClose}
-            />
-            <ConfirmationModal
-                isOpen={showPublishConfirmModal}
-                title={isEditMode ? COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES : FEEDBACK_TEXT.PUBLISH_MODAL.TITLE_NEW}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                isButtonsDisabled={isSubmitting}
-                onConfirm={handleConfirmPublish}
-                onCancel={handleCancelPublish}
-                onClose={handleCancelPublish}
-            />
-        </>
+        <FeedbackFormModal
+            {...modalProps}
+            entity={videoToEdit}
+            title={
+                isEditMode ? FEEDBACK_TEXT.EDIT_VIDEO_REVIEW_MODAL.TITLE : FEEDBACK_TEXT.ADD_VIDEO_REVIEW_MODAL.TITLE
+            }
+            initialData={initialData}
+            transformFormData={toVideoPayload}
+            renderForm={({ key, ...formProps }) => <VideoReviewForm key={key} {...formProps} />}
+        />
     );
 };

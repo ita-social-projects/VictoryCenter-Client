@@ -135,7 +135,7 @@ describe('EditableHeaderSection', () => {
 
         expect(screen.getByText('Опублікований')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /редагувати секцію/i })).toHaveAttribute('type', 'button');
-        expect(screen.getByRole('button', { name: /переглянути секцію/i })).toHaveAttribute('type', 'button');
+        expect(screen.getByRole('button', { name: /сховати секцію/i })).toHaveAttribute('type', 'button');
         expect(screen.queryByLabelText(defaultProps.inputLabel)).not.toBeInTheDocument();
     });
 
@@ -348,6 +348,12 @@ describe('EditableHeaderSection', () => {
         expect(clearButton).toHaveAttribute('type', 'button');
         fireEvent.click(clearButton);
         expect(defaultProps.onDraftChange).toHaveBeenLastCalledWith('');
+    });
+
+    it('disables the visibility toggle button when isToggleVisibilityDisabled is true', () => {
+        renderSection({ isToggleVisibilityDisabled: true });
+
+        expect(screen.getByRole('button', { name: /сховати секцію/i })).toBeDisabled();
     });
 });
 

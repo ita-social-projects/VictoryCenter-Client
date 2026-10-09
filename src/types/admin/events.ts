@@ -29,7 +29,7 @@ export interface EventLocalizationDetails {
 }
 
 export interface EventDetailsDto extends EventItemDto {
-    categories: EventCategoryReference[];
+    category: EventCategoryReference;
     localizations: EventLocalizationDetails[];
 }
 
@@ -50,7 +50,7 @@ export interface EventCreateUpdateRequest {
     status: VisibilityStatus;
     previewImageId: number | null;
     backgroundImageId: number | null;
-    categoryIds: number[];
+    categoryId: number;
     localizations: EventLocalizationRequest[];
 }
 

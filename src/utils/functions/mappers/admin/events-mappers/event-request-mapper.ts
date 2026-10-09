@@ -65,7 +65,7 @@ export const mapEventFormValuesToCreateUpdateRequest = ({
         status,
         previewImageId: null,
         backgroundImageId: getEventImageId(currentEvent?.backgroundImage) ?? getEventImageId(fallbackBackgroundImage),
-        categoryIds: currentEvent ? currentEvent.categories.map((category) => category.id) : [currentCategoryId],
+        categoryId: currentEvent?.category.id ?? currentCategoryId,
         localizations: mapEventLocalizations(currentEvent, ukrainianLocalization),
     };
 };

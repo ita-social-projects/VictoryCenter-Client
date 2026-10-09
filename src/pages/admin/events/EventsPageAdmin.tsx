@@ -300,7 +300,13 @@ export const EventsPageAdmin = () => {
     }, [updatePageSize]);
 
     const renderEntityComponent = useCallback(
-        (item: EventItemDto) => <EventItemComponent item={item} onEdit={openModalActions.openEditItemModal} />,
+        (item: EventItemDto) => (
+            <EventItemComponent
+                item={item}
+                onEdit={openModalActions.openEditItemModal}
+                onTranslate={openModalActions.openTranslateItemModal}
+            />
+        ),
         [openModalActions],
     );
 

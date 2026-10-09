@@ -1,5 +1,6 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/variables/colors' as c;
 
 .container {
     padding: 5% 8%;
@@ -7,6 +8,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
+    background-color: c.$white;
 
     .title {
         font-size: t.$h4-size;

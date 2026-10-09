@@ -10,3 +10,5 @@ export const CONTACT_FORM_LIMITS = {
         INFO_AT: 1800,
     },
 } as const;
+
+export const SUCCESS_CLOSE_DELAY_MS = 2000;

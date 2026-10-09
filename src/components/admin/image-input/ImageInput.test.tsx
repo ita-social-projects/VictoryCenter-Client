@@ -5,6 +5,7 @@ import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { Image, ImageValues } from '@/types/common/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
+import { detectImageMimeType } from '@/utils/functions/detect-image-mime-type/detect-image-mime-type';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
@@ -67,6 +68,11 @@ jest.mock('@/validation/admin/image-dimension-schema/image-dimension-schema', ()
     },
 }));
 
+jest.mock('@/utils/functions/detect-image-mime-type/detect-image-mime-type', () => ({
+    detectImageMimeType: jest.fn(),
+}));
+
+const mockDetectImageMimeType = detectImageMimeType as jest.Mock;
 const mockImageValidate = IMAGE_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 const mockDimensionValidate = IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 
@@ -101,6 +107,7 @@ describe('ImageInput', () => {
 
         jest.clearAllMocks();
         mockDimensionValidate.mockResolvedValue(DIMENSION_MISMATCH_ERROR);
+        mockDetectImageMimeType.mockResolvedValue('image/png');
         jest.spyOn(globalThis, 'FileReader').mockImplementation(() => {
             const mock = {
                 result: 'data:image/png;base64,MOCKED_BASE64',
@@ -126,6 +133,34 @@ describe('ImageInput', () => {
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
         expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
+    });
+
+    it('sends the MIME type detected from file content instead of the one from the extension', async () => {
+        mockDetectImageMimeType.mockResolvedValue('image/jpeg');
+
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ mimeType: 'image/jpeg' }));
+        });
+    });
+
+    it('falls back to the declared MIME type when the content type is not detected', async () => {
+        mockDetectImageMimeType.mockResolvedValue(null);
+
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+
+        fireEvent.change(screen.getByTestId('image-input-hidden'), {
+            target: { files: [createImageFile()] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(expect.objectContaining({ mimeType: 'image/png' }));
+        });
     });
 
     it('renders image preview when Image is provided', () => {

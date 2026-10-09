@@ -3,6 +3,7 @@ import { ContactDetailsSection } from './components/contact-details-section/Cont
 import { ContactFormCard } from './components/contact-form-card/ContactFormCard';
 import { CONTACT_US_PAGE_DATA } from '@/utils/mock-data/public';
 import styles from './ContactUsPage.module.scss';
+import { PLATFORM_LABEL } from '@/const/public/platform-labels';
 import { useTranslation } from 'react-i18next';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
@@ -55,6 +56,14 @@ export const ContactUsPage: React.FC = () => {
     }, [data]);
 
     const { address } = useGetLocalization(localizations, fallback);
+    const socialLinks = data
+        ? (data.socialLinks ?? [])
+              .filter((link) => link.url?.trim() && link.socialPlatform in PLATFORM_LABEL)
+              .map((link) => ({
+                  label: PLATFORM_LABEL[link.socialPlatform],
+                  url: link.url,
+              }))
+        : CONTACT_US_PAGE_DATA.socialLinks;
 
     if (isLoading) {
         return (
@@ -75,7 +84,7 @@ export const ContactUsPage: React.FC = () => {
                     email={data?.contacts?.email || CONTACT_US_PAGE_DATA.contacts.email}
                     phone={data?.contacts?.phone || CONTACT_US_PAGE_DATA.contacts.phone}
                     address={address}
-                    socialLinks={CONTACT_US_PAGE_DATA.socialLinks}
+                    socialLinks={socialLinks}
                     copyEmailLabel={t('copyEmailAria')}
                     copyPhoneLabel={t('copyPhoneAria')}
                     onCopyEmail={() => handleCopy(data?.contacts?.email || CONTACT_US_PAGE_DATA.contacts.email)}

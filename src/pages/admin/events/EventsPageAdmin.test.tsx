@@ -34,6 +34,7 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
         updateEventsIntroSection: jest.fn(),
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
+        reorder: jest.fn(),
     },
 }));
 
@@ -154,17 +155,26 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 const mockOnAddCategory = jest.fn();
 const mockOnUpdateCategory = jest.fn();
 const mockOnDeleteCategory = jest.fn();
+const mockOnEventSaveSuccess = jest.fn();
 
 jest.mock('./event-page-modals/EventsPageModals', () => ({
     EventsPageModals: ({
+        onEventSaveSuccess,
         onAddCategory,
         onUpdateCategory,
         onDeleteCategory,
     }: {
+        onEventSaveSuccess?: (data: {
+            event: EventItemDto;
+            categoryId: number | null;
+            isFirstPublication: boolean;
+            shouldMoveDraftToTop: boolean;
+        }) => void;
         onAddCategory: (category: EventCategoryDto) => void;
         onUpdateCategory: (category: EventCategoryDto) => void;
         onDeleteCategory: (categoryId: number) => void;
     }) => {
+        mockOnEventSaveSuccess.mockImplementation(onEventSaveSuccess);
         mockOnAddCategory.mockImplementation(onAddCategory);
         mockOnUpdateCategory.mockImplementation(onUpdateCategory);
         mockOnDeleteCategory.mockImplementation(onDeleteCategory);
@@ -455,6 +465,101 @@ describe('EventsPageAdmin', () => {
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
         mockOnDeleteCategory.mockClear();
+        mockOnEventSaveSuccess.mockClear();
+    });
+
+    it('refreshes the event list and shows the three-second order reminder after first publication', async () => {
+        await renderEventsPage();
+        const savedEvent = { ...eventItems[0], status: 1 };
+
+        await act(async () => {
+            await mockOnEventSaveSuccess({
+                event: savedEvent,
+                categoryId: categories[0].id,
+                isFirstPublication: true,
+                shouldMoveDraftToTop: false,
+            });
+        });
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(2);
+        });
+        expect(mockAddToast).toHaveBeenCalledWith(
+            EVENTS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+            ToastType.Info,
+            EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
+        );
+        expect(mockedEventsApi.reorder).not.toHaveBeenCalled();
+    });
+
+    it('does not show the order reminder when an already published event is updated', async () => {
+        await renderEventsPage();
+
+        await act(async () => {
+            await mockOnEventSaveSuccess({
+                event: { ...eventItems[0], status: 1 },
+                categoryId: categories[0].id,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: false,
+            });
+        });
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(2);
+        });
+        expect(mockAddToast).not.toHaveBeenCalled();
+        expect(mockedEventsApi.reorder).not.toHaveBeenCalled();
+    });
+
+    it('moves a saved draft to the first position of the active category', async () => {
+        const savedDraft = { ...eventItems[0], id: 103, status: 0 };
+        const reorderedItems = [eventItems[0], eventItems[1], savedDraft];
+        mockedEventsApi.fetchEvents
+            .mockResolvedValueOnce({ items: eventItems, totalItemsCount: eventItems.length })
+            .mockResolvedValueOnce({ items: reorderedItems, totalItemsCount: reorderedItems.length })
+            .mockResolvedValueOnce({ items: [savedDraft, ...eventItems], totalItemsCount: reorderedItems.length });
+        mockedEventsApi.reorder.mockResolvedValueOnce(undefined);
+
+        await renderEventsPage();
+
+        await act(async () => {
+            await mockOnEventSaveSuccess({
+                event: savedDraft,
+                categoryId: categories[0].id,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
+            });
+        });
+
+        expect(mockedEventsApi.reorder).toHaveBeenCalledWith({}, categories[0].id, [103, 101, 102]);
+        expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, undefined);
+    });
+
+    it('shows reorder error feedback without repeating a successful draft save', async () => {
+        const savedDraft = { ...eventItems[0], id: 103, status: 0 };
+        mockedEventsApi.fetchEvents
+            .mockResolvedValueOnce({ items: eventItems, totalItemsCount: eventItems.length })
+            .mockResolvedValueOnce({ items: [eventItems[0], savedDraft], totalItemsCount: 2 })
+            .mockResolvedValueOnce({ items: [eventItems[0], savedDraft], totalItemsCount: 2 });
+        mockedEventsApi.reorder.mockRejectedValueOnce(new Error('Reorder failed'));
+
+        await renderEventsPage();
+
+        await act(async () => {
+            await mockOnEventSaveSuccess({
+                event: savedDraft,
+                categoryId: categories[0].id,
+                isFirstPublication: false,
+                shouldMoveDraftToTop: true,
+            });
+        });
+
+        expect(mockedEventsApi.reorder).toHaveBeenCalledTimes(1);
+        expect(mockAddToast).toHaveBeenCalledWith(
+            EVENT_ITEMS_TEXT.MESSAGE.FAILED_TO_REORDER_ITEMS,
+            ToastType.Error,
+            EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+        );
     });
 
     it('passes languages and localizedEntity props to LocalizationStatuses for each category', async () => {

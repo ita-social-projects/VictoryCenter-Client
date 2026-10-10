@@ -390,11 +390,15 @@ describe('ImageSection', () => {
     });
 
     it('should not validate title on change', () => {
-        renderComponent({ isPublishButtonActive: true });
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'any' } });
+        const validateTitle = validateTitleMock();
 
-        expect(validateTitleMock()).not.toHaveBeenCalled();
+        fireEvent.change(screen.getByTestId('mock-rich-input-2'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateTitle).not.toHaveBeenCalledWith('any');
     });
 
     it('should normalize spaces and trim on blur in the title and description fields', () => {
@@ -408,11 +412,15 @@ describe('ImageSection', () => {
     });
 
     it('should not validate description on change', () => {
-        renderComponent({ isPublishButtonActive: true });
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'any' } });
+        const validateDescription = validateDescriptionMock();
 
-        expect(validateDescriptionMock()).not.toHaveBeenCalled();
+        fireEvent.change(screen.getByTestId('mock-rich-input-3'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateDescription).not.toHaveBeenCalledWith('any');
     });
 
     it('should disable publish button when title validation returns error on blur', () => {

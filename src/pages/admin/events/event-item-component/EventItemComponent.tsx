@@ -1,9 +1,8 @@
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EventItemDto } from '@/types/admin/events';
-import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
+import { LocalizationLanguage } from '@/types/common/language';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 import './EventItemComponent.scss';
 
@@ -14,7 +13,7 @@ export interface EventItemComponentProps {
     translationLanguages?: LocalizationLanguage[];
 }
 
-export const EventItemComponent = ({ item, onEdit, language, translationLanguages = [] }: EventItemComponentProps) => {
+export const EventItemComponent = ({ item, onEdit, language }: EventItemComponentProps) => {
     const displayedLocalization = language
         ? item.localizations?.find((localization) => localization.language.code === language.code)
         : undefined;

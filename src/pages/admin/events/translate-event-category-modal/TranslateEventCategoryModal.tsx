@@ -50,6 +50,18 @@ export const TranslateEventCategoryModal = ({
         return [...categories].sort((a, b) => a.name.localeCompare(b.name));
     }, [categories]);
 
+    const existingTranslation = useMemo(
+        () =>
+            selectedCategory?.localizations?.find((localization) => localization.language.code === language?.code) ??
+            null,
+        [selectedCategory, language],
+    );
+
+    const initialFormData = useMemo(
+        () => (existingTranslation ? { name: existingTranslation.name } : null),
+        [existingTranslation],
+    );
+
     const isCompleteFormValid = isFormValid && selectedCategory !== null;
 
     const handleClose = () => {
@@ -72,7 +84,9 @@ export const TranslateEventCategoryModal = ({
         return isDirty;
     };
 
-    const modalTitle = EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE;
+    const modalTitle = existingTranslation
+        ? EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.EDIT_TITLE
+        : EVENT_CATEGORY_TEXT.TRANSLATION_MODAL.TITLE;
 
     return (
         <LocalizationModal
@@ -92,6 +106,7 @@ export const TranslateEventCategoryModal = ({
                 onLanguageChange={setLanguage}
             />
             <TranslateEventCategoryForm
+                initialData={initialFormData}
                 ref={formRef}
                 categories={sortedCategories}
                 selectedCategory={selectedCategory}

@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
+import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 import styles from './EventsNewsIntro.module.scss';
 
 interface EventsNewsIntroProps {
     description: string;
+    isHidden?: boolean;
 }
 
-export const EventsNewsIntro = ({ description }: EventsNewsIntroProps) => {
+export const EventsNewsIntro = ({ description, isHidden }: EventsNewsIntroProps) => {
     const { t } = useTranslation('eventsNewsPage');
 
     return (
@@ -17,7 +19,7 @@ export const EventsNewsIntro = ({ description }: EventsNewsIntroProps) => {
                     <span className={styles['break-text']}>{t('SLOGAN.AND')} </span>
                     <span className={styles.highlight + ' ' + styles.blue}> {t('SLOGAN.CHANGES')}</span>
                 </h1>
-                <p className={styles.description}>{description}</p>
+                {!isHidden && <SafeHtml as="p" className={styles.description} html={description} />}
             </div>
         </section>
     );

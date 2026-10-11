@@ -120,7 +120,7 @@ describe('TranslateEventCategoryForm', () => {
         fireEvent.blur(nameInput);
 
         expect(nameInput).toHaveValue('');
-        expect(screen.getByTestId('name-error')).toHaveTextContent(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        expect(screen.getByTestId('name-error')).toHaveTextContent(EVENT_CATEGORY_VALIDATION.name.getRequiredError());
     });
 
     it('displays max length error if name exceeds maximum allowed characters on blur', () => {

@@ -10,6 +10,7 @@ export const WHO_WE_ARE_TEXT = {
 
     FAIL_TO_FETCH_PREVIEWS: 'Виникла помилка, не вдалось завантажити назви секцій',
     FAIL_TO_FETCH_SECTION: 'Виникла помилка, не вдалось завантажити секцію',
+    PUBLISH_SUCCESS: 'Зміни успішно опубліковано',
 
     FORM: {
         TITLE: {

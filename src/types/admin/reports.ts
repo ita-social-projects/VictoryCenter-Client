@@ -315,3 +315,27 @@ export interface UpdateReportProgramExpendituresRecordDto {
     amountUah: number;
     amountUsd: number;
 }
+
+export interface BatchUpdateReportProgramExpendituresRecordDto extends UpdateReportProgramExpendituresRecordDto {
+    id: number;
+}
+
+export interface BatchSaveReportProgramExpendituresRecordsDto {
+    recordsToCreate: CreateReportProgramExpendituresRecordDto[];
+    recordsToUpdate: BatchUpdateReportProgramExpendituresRecordDto[];
+    recordIdsToDelete: number[];
+}
+
+export interface BatchSaveReportProgramExpendituresRecordsPayload {
+    recordsToCreate: ReportProgramExpendituresRecordState[];
+    recordsToUpdate: ReportProgramExpendituresRecordState[];
+    recordIdsToDelete: number[];
+}
+
+export interface ReportProgramExpendituresRecordState {
+    id: number;
+    hippotherapyProgramCategoryId: number;
+    reportingYear: string;
+    amountUah: string;
+    amountUsd: string;
+}

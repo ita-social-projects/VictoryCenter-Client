@@ -34,11 +34,12 @@ export interface ProgramExpensesTableProps {
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
-        programId: number,
-        reportingYear: string,
-        amountUah: string,
-        amountUsd: string,
-    ) => Promise<boolean>;
+        data: {
+            programId: number;
+            amountUah: string;
+            amountUsd: string;
+        },
+    ) => boolean;
 }
 
 interface ProgramExpenseRowEditState {
@@ -265,13 +266,11 @@ export const ProgramExpensesTable = ({
             setSavingRecordId(record.id);
 
             try {
-                const isSaved = await onRecordSave?.(
-                    record.id,
-                    rowEditState.programId,
-                    record.reportingYear,
-                    preparedAmountUah,
-                    preparedAmountUsd,
-                );
+                const isSaved = onRecordSave?.(record.id, {
+                    programId: rowEditState.programId,
+                    amountUah: preparedAmountUah,
+                    amountUsd: preparedAmountUsd,
+                });
 
                 if (isSaved === false) {
                     return;

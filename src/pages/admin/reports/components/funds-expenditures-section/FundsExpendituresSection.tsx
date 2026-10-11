@@ -69,7 +69,6 @@ const enrichRecords = (
 };
 
 let tempIdCounter = 0;
-
 const getTempId = (): number => {
     tempIdCounter += 1;
     return -tempIdCounter;
@@ -526,7 +525,20 @@ export const FundsExpenditureSection = ({
             );
 
             if (!isTempId(recordId)) {
-                setUpdatedRecordIds((prev) => (prev.includes(recordId) ? prev : [...prev, recordId]));
+                const originalRecord = allRecords.find((record) => record.id === recordId);
+
+                const hasChanges =
+                    originalRecord?.categoryId !== data.categoryId ||
+                    originalRecord?.amountUah !== data.amountUah ||
+                    originalRecord?.amountUsd !== data.amountUsd;
+
+                setUpdatedRecordIds((prev) =>
+                    hasChanges
+                        ? prev.includes(recordId)
+                            ? prev
+                            : [...prev, recordId]
+                        : prev.filter((id) => id !== recordId),
+                );
             }
 
             onDataChange?.();
@@ -534,7 +546,7 @@ export const FundsExpenditureSection = ({
 
             return true;
         },
-        [addToast, onDataChange],
+        [addToast, allRecords, onDataChange],
     );
 
     const handleCreateRecord = useCallback(
@@ -740,7 +752,7 @@ export const FundsExpenditureSection = ({
         [addToast, onDataChange],
     );
 
-    const saveSettings = useCallback(async (): Promise<boolean> => {
+    const saveFundsExpenditures = useCallback(async (): Promise<boolean> => {
         try {
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
                 disclaimerTitle: disclaimerValue,
@@ -800,9 +812,9 @@ export const FundsExpenditureSection = ({
 
     useEffect(() => {
         if (registerSaveCallback) {
-            registerSaveCallback(saveSettings);
+            registerSaveCallback(saveFundsExpenditures);
         }
-    }, [registerSaveCallback, saveSettings]);
+    }, [registerSaveCallback, saveFundsExpenditures]);
 
     if (isInitialLoading) {
         return (

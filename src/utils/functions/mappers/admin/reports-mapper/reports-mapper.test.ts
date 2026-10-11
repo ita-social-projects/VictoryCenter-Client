@@ -6,6 +6,10 @@ import {
     ReportsMediaSettingsCollectedFundsDto,
     ReportsMediaSettingsChangedLivesDto,
     ReportsMediaSettingsDto,
+    ReportProgramExpendituresRecordState,
+    BatchSaveReportProgramExpendituresRecordsPayload,
+    ReportFundsExpendituresRecordState,
+    BatchSaveReportFundsExpendituresRecordsPayload,
 } from '@/types/admin/reports';
 import {
     mapFundsExpendituresTransactionTypeToTypeDto,
@@ -13,12 +17,16 @@ import {
     mapReportFundsExpendituresCategoryDtoToCategory,
     mapReportFundsExpendituresRecordToCreateDto,
     mapReportFundsExpendituresRecordToUpdateDto,
+    mapBatchSaveReportFundsExpendituresRecordsToDto,
     mapReportFundsExpendituresRecordDtoToRecord,
     mapReportFundsExpendituresSettingsDtoToSettings,
     mapReportFundsExpendituresSummaryDtoToSummary,
     mapReportsMediaSettingsDtoToMediaSettings,
     mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds,
     mapReportsMediaSettingsChangedLivesDtoToChangedLives,
+    mapReportProgramExpendituresRecordToCreateDto,
+    mapReportProgramExpendituresRecordToUpdateDto,
+    mapBatchSaveReportProgramExpendituresRecordsToDto,
 } from './reports-mapper';
 
 describe('reports-mapper', () => {
@@ -392,6 +400,138 @@ describe('reports-mapper', () => {
                 reportingYear: 2025,
                 amount: 9.5,
                 currency: 2,
+            });
+        });
+
+        it('should map batch save payload to dto', () => {
+            const payload: BatchSaveReportFundsExpendituresRecordsPayload = {
+                recordsToCreate: [
+                    {
+                        id: -1,
+                        categoryId: 2,
+                        type: 'expense',
+                        reportingYear: '2026',
+                        amountUah: '1 000,50',
+                        amountUsd: '25,5',
+                        lastEditedField: 'amountUah',
+                    } satisfies ReportFundsExpendituresRecordState,
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 15,
+                        categoryId: 3,
+                        type: 'income',
+                        reportingYear: '2025',
+                        amountUah: '2 000',
+                        amountUsd: '50',
+                        lastEditedField: 'amountUsd',
+                    } satisfies ReportFundsExpendituresRecordState,
+                ],
+                recordIdsToDelete: [21, 22],
+            };
+
+            expect(mapBatchSaveReportFundsExpendituresRecordsToDto(payload)).toEqual({
+                recordsToCreate: [
+                    {
+                        categoryId: 2,
+                        type: 2,
+                        reportingYear: 2026,
+                        amount: 1000.5,
+                        currency: 1,
+                    },
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 15,
+                        categoryId: 3,
+                        type: 1,
+                        reportingYear: 2025,
+                        amount: 50,
+                        currency: 2,
+                    },
+                ],
+                recordIdsToDelete: [21, 22],
+            });
+        });
+    });
+
+    describe('program expenditures mappers', () => {
+        it('should map record state to create dto', () => {
+            const record: ReportProgramExpendituresRecordState = {
+                id: -1,
+                hippotherapyProgramCategoryId: 5,
+                reportingYear: '2026',
+                amountUah: '1 000,50',
+                amountUsd: '50.75',
+            };
+
+            expect(mapReportProgramExpendituresRecordToCreateDto(record)).toEqual({
+                hippotherapyProgramCategoryId: 5,
+                reportingYear: 2026,
+                amountUah: 1000.5,
+                amountUsd: 50.75,
+            });
+        });
+
+        it('should map record state to update dto', () => {
+            const record: ReportProgramExpendituresRecordState = {
+                id: 42,
+                hippotherapyProgramCategoryId: 7,
+                reportingYear: '2026',
+                amountUah: '1000',
+                amountUsd: '25,5',
+            };
+
+            expect(mapReportProgramExpendituresRecordToUpdateDto(record)).toEqual({
+                hippotherapyProgramCategoryId: 7,
+                reportingYear: 2026,
+                amountUah: 1000,
+                amountUsd: 25.5,
+            });
+        });
+
+        it('should map batch save payload to dto', () => {
+            const payload: BatchSaveReportProgramExpendituresRecordsPayload = {
+                recordsToCreate: [
+                    {
+                        id: -1,
+                        hippotherapyProgramCategoryId: 3,
+                        reportingYear: '2026',
+                        amountUah: '500',
+                        amountUsd: '12,50',
+                    },
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 15,
+                        hippotherapyProgramCategoryId: 4,
+                        reportingYear: '2025',
+                        amountUah: '2 000',
+                        amountUsd: '50',
+                    },
+                ],
+                recordIdsToDelete: [21, 22],
+            };
+
+            expect(mapBatchSaveReportProgramExpendituresRecordsToDto(payload)).toEqual({
+                recordsToCreate: [
+                    {
+                        hippotherapyProgramCategoryId: 3,
+                        reportingYear: 2026,
+                        amountUah: 500,
+                        amountUsd: 12.5,
+                    },
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 15,
+                        hippotherapyProgramCategoryId: 4,
+                        reportingYear: 2025,
+                        amountUah: 2000,
+                        amountUsd: 50,
+                    },
+                ],
+                recordIdsToDelete: [21, 22],
             });
         });
     });

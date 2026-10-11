@@ -8,7 +8,13 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_EXPENSES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
-import { ProgramExpensesReadOnlyData, ProgramExpensesRecord } from '@/types/admin/reports';
+import {
+    FundsExpendituresTransactionType,
+    ProgramExpensesProgram,
+    ProgramExpensesReadOnlyData,
+    ProgramExpensesRecord,
+    ReportProgramExpendituresRecordState,
+} from '@/types/admin/reports';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
@@ -29,12 +35,21 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 
 const MAX_PROGRAM_EXPENSE_RECORDS = 4;
 
+let tempIdCounter = 0;
+const getTempId = (): number => {
+    tempIdCounter += 1;
+    return -tempIdCounter;
+};
+
+const isTempId = (id: number): boolean => id < 0;
+
 interface ProgramExpensesSectionProps {
     isEditing?: boolean;
     isRowEditMode?: boolean;
     onRowEditModeChange?: (isEditing: boolean) => void;
     onCountsChange?: (count: number) => void;
     onDataChange?: () => void;
+    registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     exchangeRate: string | null;
 }
 
@@ -44,6 +59,7 @@ export const ProgramExpensesSection = ({
     onRowEditModeChange,
     onCountsChange,
     onDataChange,
+    registerSaveCallback,
     exchangeRate,
 }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
@@ -52,10 +68,13 @@ export const ProgramExpensesSection = ({
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
-    const [isDeletingRecord, setIsDeletingRecord] = useState(false);
     const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
     const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
-    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+    const [programsState, setProgramsState] = useState<ProgramExpensesProgram[]>([]);
+    const [recordsState, setRecordsState] = useState<ReportProgramExpendituresRecordState[]>([]);
+    const [updatedRecordIds, setUpdatedRecordIds] = useState<number[]>([]);
+    const [deletedRecordIds, setDeletedRecordIds] = useState<number[]>([]);
 
     const [localIsRowEditMode, setLocalIsRowEditMode] = useState(false);
     const isRowEditMode = propIsRowEditMode ?? localIsRowEditMode;
@@ -85,15 +104,31 @@ export const ProgramExpensesSection = ({
     });
 
     useEffect(() => {
+        setRecordsState(
+            data.records.map((record) => ({
+                id: record.id,
+                hippotherapyProgramCategoryId: record.programId,
+                reportingYear: record.reportingYear,
+                amountUah: record.amountUah,
+                amountUsd: record.amountUsd,
+            })),
+        );
+    }, [data.records]);
+
+    useEffect(() => {
+        setProgramsState(data.programs);
+    }, [data.programs]);
+
+    useEffect(() => {
         setSelectedProgramIds((previousSelectedProgramIds) => {
-            const availableProgramIds = new Set(data.programs.map((program) => program.id));
+            const availableProgramIds = new Set(programsState.map((program) => program.id));
             const validSelectedProgramIds = previousSelectedProgramIds.filter((id) => availableProgramIds.has(id));
 
             return validSelectedProgramIds.length === previousSelectedProgramIds.length
                 ? previousSelectedProgramIds
                 : validSelectedProgramIds;
         });
-    }, [data.programs]);
+    }, [programsState]);
 
     useEffect(() => {
         if (!isEditing) {
@@ -105,17 +140,31 @@ export const ProgramExpensesSection = ({
         }
     }, [isEditing, refetchReadOnlyData, addToast]);
 
+    const tableRecords = useMemo(() => {
+        const programNames = new Map(programsState.map((program) => [program.id, program.name]));
+
+        return recordsState.map((record) => ({
+            id: record.id,
+            programId: record.hippotherapyProgramCategoryId,
+            programName: programNames.get(record.hippotherapyProgramCategoryId) ?? '',
+            type: 'expense' as FundsExpendituresTransactionType,
+            reportingYear: record.reportingYear,
+            amountUah: record.amountUah,
+            amountUsd: record.amountUsd,
+        }));
+    }, [recordsState, programsState]);
+
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {
-            return data.records;
+            return tableRecords;
         }
 
-        return data.records.filter((record) => selectedProgramIds.includes(record.programId));
-    }, [data.records, selectedProgramIds]);
+        return tableRecords.filter((record) => selectedProgramIds.includes(record.programId));
+    }, [tableRecords, selectedProgramIds]);
 
-    const programExpenseRecordsCount = data.records.length;
+    const programExpenseRecordsCount = recordsState.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
-    const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
+    const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && programsState.length === 0;
     const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS || isRowEditMode;
     const currentExchangeRate = isEditing ? exchangeRate : data.exchangeRate;
     const hasExchangeRateError = Boolean(validateFundsExpendituresExchangeRate(currentExchangeRate ?? '', 'blur'));
@@ -133,38 +182,50 @@ export const ProgramExpensesSection = ({
     }, []);
 
     const handleRecordSave = useCallback(
-        async (
+        (
             recordId: number,
-            programId: number,
-            reportingYear: string,
-            amountUah: string,
-            amountUsd: string,
-        ): Promise<boolean> => {
-            try {
-                const payload = {
-                    reportingYear: Number.parseInt(reportingYear, 10),
-                    hippotherapyProgramCategoryId: programId,
-                    amountUah: Number.parseFloat(amountUah.replace(/\s/g, '').replace(',', '.')),
-                    amountUsd: Number.parseFloat(amountUsd.replace(/\s/g, '').replace(',', '.')),
-                };
+            recordData: {
+                programId: number;
+                amountUah: string;
+                amountUsd: string;
+            },
+        ): boolean => {
+            setRecordsState((prev) =>
+                prev.map((record) =>
+                    record.id === recordId
+                        ? {
+                              ...record,
+                              hippotherapyProgramCategoryId: recordData.programId,
+                              amountUah: recordData.amountUah,
+                              amountUsd: recordData.amountUsd,
+                          }
+                        : record,
+                ),
+            );
 
-                await ProgramExpensesApi.update(adminClient, recordId, payload);
-                onDataChange?.();
-                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+            if (!isTempId(recordId)) {
+                const originalRecord = data.records.find((record) => record.id === recordId);
 
-                try {
-                    await refetchReadOnlyData(true);
-                } catch {
-                    // Refetch error handled by useDataFetch
-                }
+                const hasChanges =
+                    originalRecord?.programId !== recordData.programId ||
+                    originalRecord?.amountUah !== recordData.amountUah ||
+                    originalRecord?.amountUsd !== recordData.amountUsd;
 
-                return true;
-            } catch {
-                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
-                return false;
+                setUpdatedRecordIds((prev) =>
+                    hasChanges
+                        ? prev.includes(recordId)
+                            ? prev
+                            : [...prev, recordId]
+                        : prev.filter((id) => id !== recordId),
+                );
             }
+
+            onDataChange?.();
+            addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+
+            return true;
         },
-        [adminClient, refetchReadOnlyData, addToast, onDataChange],
+        [addToast, data.records, onDataChange],
     );
 
     const handleSubmitAddProgramExpense = useCallback(
@@ -174,15 +235,7 @@ export const ProgramExpensesSection = ({
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
-        }) => {
-            const reportingYear = Number.parseInt(submitData.reportingYear, 10);
-            const amountUah = Number.parseFloat(submitData.amountUah.replace(/\s/g, '').replace(',', '.'));
-            const amountUsd = Number.parseFloat(submitData.amountUsd.replace(/\s/g, '').replace(',', '.'));
-
-            if (!Number.isFinite(reportingYear) || !Number.isFinite(amountUah) || !Number.isFinite(amountUsd)) {
-                return false;
-            }
-
+        }): Promise<boolean> => {
             try {
                 let categoryId = submitData.programId;
 
@@ -192,26 +245,29 @@ export const ProgramExpensesSection = ({
                         adminClient,
                     );
                     categoryId = createdCategory.id;
+
+                    setProgramsState((prev) => [
+                        ...prev,
+                        {
+                            id: createdCategory.id,
+                            name: createdCategory.name,
+                        },
+                    ]);
                 }
 
-                const payload = {
-                    reportingYear,
+                const newRecord: ReportProgramExpendituresRecordState = {
+                    id: getTempId(),
                     hippotherapyProgramCategoryId: categoryId,
-                    amountUah,
-                    amountUsd,
+                    reportingYear: submitData.reportingYear,
+                    amountUah: submitData.amountUah,
+                    amountUsd: submitData.amountUsd,
                 };
 
-                await ProgramExpensesApi.post(adminClient, payload);
+                setRecordsState((prev) => [...prev, newRecord]);
+
                 onDataChange?.();
                 addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
-
                 setIsAddProgramExpenseModalOpen(false);
-
-                try {
-                    await refetchReadOnlyData(true);
-                } catch {
-                    // Refetch error handled by useDataFetch
-                }
 
                 return true;
             } catch {
@@ -219,7 +275,7 @@ export const ProgramExpensesSection = ({
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast, onDataChange],
+        [adminClient, addToast, onDataChange],
     );
 
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
@@ -230,26 +286,18 @@ export const ProgramExpensesSection = ({
     const handleConfirmDelete = useCallback(async () => {
         if (!recordToDelete) return;
 
-        setIsDeletingRecord(true);
+        setRecordsState((prev) => prev.filter((record) => record.id !== recordToDelete.id));
 
-        try {
-            await ProgramExpensesApi.delete(adminClient, recordToDelete.id);
-            onDataChange?.();
-            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
-            setIsDeleteModalOpen(false);
-
-            try {
-                await refetchReadOnlyData(true);
-            } catch {
-                // Refetch error handled by useDataFetch
-            }
-        } catch {
-            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error, 5000);
-        } finally {
-            setIsDeletingRecord(false);
-            setRecordToDelete(null);
+        if (!isTempId(recordToDelete.id)) {
+            setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));
+            setUpdatedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
         }
-    }, [recordToDelete, adminClient, addToast, refetchReadOnlyData, onDataChange]);
+
+        onDataChange?.();
+        addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
+        setIsDeleteModalOpen(false);
+        setRecordToDelete(null);
+    }, [recordToDelete, addToast, onDataChange]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
@@ -283,22 +331,56 @@ export const ProgramExpensesSection = ({
             setIsBulkDeleteModalOpen(false);
             return;
         }
-        setIsBulkDeleting(true);
+
+        setRecordsState((prev) => prev.filter((record) => !selectedRecordIds.includes(record.id)));
+
+        const realIdsToDelete = selectedRecordIds.filter((id) => !isTempId(id));
+
+        if (realIdsToDelete.length > 0) {
+            setDeletedRecordIds((prev) => {
+                const newIds = realIdsToDelete.filter((id) => !prev.includes(id));
+                return [...prev, ...newIds];
+            });
+            setUpdatedRecordIds((prev) => prev.filter((id) => !realIdsToDelete.includes(id)));
+        }
+
+        onDataChange?.();
+        setSelectedRecordIds([]);
+        setIsBulkDeleteModalOpen(false);
+        addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+    }, [selectedRecordIds, addToast, onDataChange]);
+
+    const saveProgramExpenses = useCallback(async (): Promise<boolean> => {
+        const recordsToCreate = recordsState.filter((record) => isTempId(record.id));
+        const recordsToUpdate = recordsState.filter((record) => updatedRecordIds.includes(record.id));
+        const hasRecordChanges =
+            recordsToCreate.length > 0 || recordsToUpdate.length > 0 || deletedRecordIds.length > 0;
+
+        if (!hasRecordChanges) {
+            return true;
+        }
 
         try {
-            await ProgramExpensesApi.bulkDelete(adminClient, selectedRecordIds);
-            onDataChange?.();
-            setSelectedRecordIds([]);
-            setIsBulkDeleteModalOpen(false);
-            refetchReadOnlyData();
-            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+            await ProgramExpensesApi.batchSaveRecords(adminClient, {
+                recordsToCreate,
+                recordsToUpdate,
+                recordIdsToDelete: deletedRecordIds,
+            });
+
+            setUpdatedRecordIds([]);
+            setDeletedRecordIds([]);
+            await refetchReadOnlyData(true);
+
+            return true;
         } catch {
-            setIsBulkDeleteModalOpen(false);
-            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
-        } finally {
-            setIsBulkDeleting(false);
+            addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
+            return false;
         }
-    }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast, onDataChange]);
+    }, [addToast, adminClient, deletedRecordIds, recordsState, refetchReadOnlyData, updatedRecordIds]);
+
+    useEffect(() => {
+        registerSaveCallback?.(saveProgramExpenses);
+    }, [registerSaveCallback, saveProgramExpenses]);
 
     if (isInitialLoading) {
         return (
@@ -316,7 +398,7 @@ export const ProgramExpensesSection = ({
 
             <div className={styles.filters}>
                 <ProgramExpensesToolbar
-                    programs={data.programs}
+                    programs={programsState}
                     selectedProgramIds={selectedProgramIds}
                     exchangeRate={currentExchangeRate}
                     isEditing={isEditing}
@@ -327,8 +409,8 @@ export const ProgramExpensesSection = ({
                 />
                 <ProgramExpensesTable
                     records={filteredRecords}
-                    allRecords={data.records}
-                    programs={data.programs}
+                    allRecords={tableRecords}
+                    programs={programsState}
                     hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
                     isEditing={isEditing}
                     isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || !isEditing || hasExchangeRateError}
@@ -347,8 +429,8 @@ export const ProgramExpensesSection = ({
 
             <AddProgramExpenseRecordModal
                 isOpen={isAddProgramExpenseModalOpen}
-                programs={data.programs}
-                records={data.records}
+                programs={programsState}
+                records={tableRecords}
                 exchangeRate={currentExchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
                 onSubmit={handleSubmitAddProgramExpense}
@@ -359,7 +441,6 @@ export const ProgramExpensesSection = ({
                 title={PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                isButtonsDisabled={isDeletingRecord}
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
                 onClose={handleCancelDelete}
@@ -370,7 +451,6 @@ export const ProgramExpensesSection = ({
                 title={PROGRAM_EXPENSES_TEXT.BULK.DELETE_CONFIRM_TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                isButtonsDisabled={isBulkDeleting}
                 onConfirm={handleConfirmBulkDelete}
                 onCancel={handleBulkDeleteCancel}
                 onClose={handleBulkDeleteCancel}

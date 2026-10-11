@@ -24,6 +24,11 @@ import {
     UpdateReportFundsExpendituresSettingsDto,
     BatchSaveReportFundsExpendituresRecordsPayload,
     BatchSaveReportFundsExpendituresRecordsDto,
+    BatchSaveReportProgramExpendituresRecordsDto,
+    ReportProgramExpendituresRecordState,
+    CreateReportProgramExpendituresRecordDto,
+    UpdateReportProgramExpendituresRecordDto,
+    BatchSaveReportProgramExpendituresRecordsPayload,
 } from '@/types/admin/reports';
 
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
@@ -168,6 +173,34 @@ export const mapBatchSaveReportFundsExpendituresRecordsToDto = (
     recordsToUpdate: payload.recordsToUpdate.map((record) => ({
         id: record.id,
         ...mapReportFundsExpendituresRecordToUpdateDto(record),
+    })),
+    recordIdsToDelete: payload.recordIdsToDelete,
+});
+
+const mapReportProgramExpendituresRecordToRequestDto = (record: ReportProgramExpendituresRecordState) => {
+    return {
+        hippotherapyProgramCategoryId: record.hippotherapyProgramCategoryId,
+        reportingYear: Number.parseInt(record.reportingYear, 10) || new Date().getFullYear(),
+        amountUah: parseAmountValue(record.amountUah),
+        amountUsd: parseAmountValue(record.amountUsd),
+    };
+};
+
+export const mapReportProgramExpendituresRecordToCreateDto = (
+    record: ReportProgramExpendituresRecordState,
+): CreateReportProgramExpendituresRecordDto => mapReportProgramExpendituresRecordToRequestDto(record);
+
+export const mapReportProgramExpendituresRecordToUpdateDto = (
+    record: ReportProgramExpendituresRecordState,
+): UpdateReportProgramExpendituresRecordDto => mapReportProgramExpendituresRecordToRequestDto(record);
+
+export const mapBatchSaveReportProgramExpendituresRecordsToDto = (
+    payload: BatchSaveReportProgramExpendituresRecordsPayload,
+): BatchSaveReportProgramExpendituresRecordsDto => ({
+    recordsToCreate: payload.recordsToCreate.map(mapReportProgramExpendituresRecordToCreateDto),
+    recordsToUpdate: payload.recordsToUpdate.map((record) => ({
+        id: record.id,
+        ...mapReportProgramExpendituresRecordToUpdateDto(record),
     })),
     recordIdsToDelete: payload.recordIdsToDelete,
 });

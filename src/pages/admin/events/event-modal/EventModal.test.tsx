@@ -129,6 +129,7 @@ const eventToEdit: EventItemDto = {
     status: VisibilityStatus.Draft,
     previewImage: null,
     backgroundImage: null,
+    localizations: [],
 };
 
 const eventWithImage: EventItemDto = {

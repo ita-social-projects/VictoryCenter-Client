@@ -10,7 +10,7 @@ import './EventItemComponent.scss';
 export interface EventItemComponentProps {
     item: EventItemDto;
     onEdit: (item: EventItemDto) => void;
-    language?: LocalizationLanguage;
+    language?: LocalizationLanguage | null;
     translationLanguages?: LocalizationLanguage[];
 }
 
@@ -18,9 +18,9 @@ export const EventItemComponent = ({ item, onEdit, language, translationLanguage
     const displayedLocalization = language
         ? item.localizations?.find((localization) => localization.language.code === language.code)
         : undefined;
-    const title = displayedLocalization?.title || item.title;
-    const description = displayedLocalization?.description || item.description;
 
+    const title = displayedLocalization?.title ?? item.title;
+    const description = displayedLocalization?.description ?? item.description;
     return (
         <div className="event-item">
             <div className="event-info">
@@ -29,10 +29,6 @@ export const EventItemComponent = ({ item, onEdit, language, translationLanguage
 
                     <div className="event-info-title">
                         <p>{title}</p>
-                        <LocalizationStatuses<EntityLocalization>
-                            languages={translationLanguages}
-                            localizedEntity={item}
-                        />
                     </div>
                 </div>
 

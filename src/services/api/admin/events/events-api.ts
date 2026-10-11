@@ -3,11 +3,19 @@ import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import {
     EventItemDto,
+    EventItemResponseDto,
+    EventLocalization,
+    EventLocalizationDto,
     EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
+
+const mapEvent = (item: EventItemResponseDto): EventItemDto =>
+    mapEntityWithLocalizations<EventItemResponseDto, EventLocalizationDto, EventLocalization>(item);
+
 
 export const EventsApi = {
     getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
@@ -37,7 +45,7 @@ export const EventsApi = {
         translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus,
     ): Promise<PaginationResult<EventItemDto>> => {
-        const response = await client.get<PaginationResult<EventItemDto>>(API_ROUTES.EVENTS.BASE, {
+        const response = await client.get<PaginationResult<EventItemResponseDto>>(API_ROUTES.EVENTS.BASE, {
             params: {
                 categoryId,
                 offset,
@@ -46,7 +54,7 @@ export const EventsApi = {
                 translationStatusFilter,
             },
         });
-        return response.data;
+        return { ...response.data, items: response.data.items.map(mapEvent) };
     },
     fetchEventSearchItems: async (
         client: AxiosInstance,

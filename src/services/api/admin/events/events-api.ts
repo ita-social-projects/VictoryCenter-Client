@@ -16,7 +16,6 @@ import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/loc
 const mapEvent = (item: EventItemResponseDto): EventItemDto =>
     mapEntityWithLocalizations<EventItemResponseDto, EventLocalizationDto, EventLocalization>(item);
 
-
 export const EventsApi = {
     getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
         const response = await client.get<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.BASE);

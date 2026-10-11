@@ -73,6 +73,7 @@ export const CardContent = ({
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
                     onChange={handleDescriptionChange}
                     value={displayedDescription ?? ''}
                     maxLength={descriptionLimit}

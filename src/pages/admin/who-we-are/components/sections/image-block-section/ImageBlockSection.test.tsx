@@ -35,6 +35,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         disabled,
         normalizeSpaces,
         trimOnBlur,
+        isRequired,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
@@ -48,6 +49,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                 onBlur={onBlur}
                 id={id}
                 disabled={disabled}
+                data-required={isRequired}
             />
         </div>
     ),
@@ -142,6 +144,12 @@ describe('ImageSection', () => {
         expect(screen.getByTestId('mock-rich-input-3')).toHaveAttribute('maxLength', descriptionLimit.toString());
 
         expect(getPublishButton()).toBeDisabled();
+    });
+
+    it('should mark the title and description fields as required', () => {
+        renderComponent();
+        expect(screen.getByTestId('mock-rich-input-2')).toHaveAttribute('data-required', 'true');
+        expect(screen.getByTestId('mock-rich-input-3')).toHaveAttribute('data-required', 'true');
     });
 
     it('should not render if content is undefined or if description content is missing', () => {

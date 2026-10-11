@@ -8,9 +8,10 @@ import './EventItemComponent.scss';
 export interface EventItemComponentProps {
     item: EventItemDto;
     onEdit: (item: EventItemDto) => void;
+    onTranslate: (item: EventItemDto) => void;
 }
 
-export const EventItemComponent = ({ item, onEdit }: EventItemComponentProps) => {
+export const EventItemComponent = ({ item, onEdit, onTranslate }: EventItemComponentProps) => {
     return (
         <div className="event-item">
             <div className="event-info">
@@ -33,6 +34,14 @@ export const EventItemComponent = ({ item, onEdit }: EventItemComponentProps) =>
 
             <div className="event-item-actions">
                 <IconButton
+                    aria-label={EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE}
+                    type="button"
+                    onClick={() => onTranslate(item)}
+                    DefaultIcon={ACTION_ICONS.translate.default}
+                    FilledIcon={ACTION_ICONS.translate.default}
+                />
+
+                <IconButton
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
                     type="button"
                     onClick={() => onEdit(item)}
@@ -44,7 +53,7 @@ export const EventItemComponent = ({ item, onEdit }: EventItemComponentProps) =>
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
                     onClick={() => {
-                        /*TODO: add implementation.*/
+                        /*  TODO: add implementation */
                     }}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}

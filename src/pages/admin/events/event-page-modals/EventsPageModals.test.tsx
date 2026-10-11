@@ -11,6 +11,12 @@ import { ModalMode } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events';
 import { LocalizationLanguage } from '@/types/common/language';
 
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+    }),
+}));
+
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),
 }));

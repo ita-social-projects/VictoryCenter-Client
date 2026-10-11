@@ -99,4 +99,13 @@ describe('OurMission component', () => {
 
         expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
+
+    it('should apply the passed className to the root element', () => {
+        render(
+            <MemoryRouter>
+                <OurMission content={Content} className="custom-class" />
+            </MemoryRouter>,
+        );
+        expect(screen.getByText(aboutUsPageUk.WHAT_WE_DO).parentElement).toHaveClass('custom-class');
+    });
 });

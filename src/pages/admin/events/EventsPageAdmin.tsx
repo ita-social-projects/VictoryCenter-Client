@@ -139,7 +139,7 @@ export const EventsPageAdmin = () => {
         useLocalizationToolkit({
             setErrorState,
         });
-    const { openModalActions } = modalsStateControl;
+    const { openModalActions, closeModalActions } = modalsStateControl;
 
     const getEventSearchItems = useCallback(
         async (
@@ -697,6 +697,16 @@ export const EventsPageAdmin = () => {
     const emptyStateMessage =
         statusFilter !== undefined ? COMMON_TEXT_ADMIN.LIST.NOT_FOUND : EVENT_ITEMS_TEXT.NO_RECORDS;
 
+    const handleTranslateCategory = useCallback(
+        (updatedCategory: EventCategoryDto) => {
+            handleUpdateCategory(updatedCategory);
+
+            closeModalActions.closeTranslateCategoryModal();
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [handleUpdateCategory, closeModalActions, addToast],
+    );
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -828,6 +838,7 @@ export const EventsPageAdmin = () => {
                 onAddCategory={handleAddCategory}
                 onUpdateCategory={handleUpdateCategory}
                 onDeleteCategory={handleDeleteCategory}
+                onTranslateCategory={handleTranslateCategory}
                 translationLanguages={translationLanguages}
             />
             <ConfirmationModal

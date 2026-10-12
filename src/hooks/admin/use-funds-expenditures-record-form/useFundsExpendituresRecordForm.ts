@@ -163,7 +163,7 @@ export const useFundsExpendituresRecordForm = ({
 
         setIsSubmitting(true);
         try {
-            const isCreated = await onSubmit({
+            const isCreated = onSubmit({
                 categoryId: formState.categoryId,
                 reportingYear: formState.reportingYear ?? '',
                 amountUah: normalizedAmountUah,

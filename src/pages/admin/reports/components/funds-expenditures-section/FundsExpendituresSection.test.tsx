@@ -676,6 +676,28 @@ describe('FundsExpenditureSection', () => {
             setupMockDataFetch();
         });
 
+        const renderWithSaveCallback = () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
+
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            const triggerSave = async (expectedSuccess = true) => {
+                expect(saveFn).toBeDefined();
+                const success = await saveFn!();
+                expect(success).toBe(expectedSuccess);
+            };
+
+            return { triggerSave };
+        };
+
+        const setupSuccessMocks = () => {
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+        };
+
         it('should start in read mode', () => {
             render(<FundsExpenditureSection />);
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
@@ -743,86 +765,54 @@ describe('FundsExpenditureSection', () => {
         });
 
         it('should update modified records and save settings when save callback is invoked', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
 
             fireEvent.click(screen.getByTestId('trigger-record-save'));
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-            mockBatchSaveRecords.mockResolvedValueOnce({});
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockUpdateSettings).toHaveBeenCalled();
             expect(mockBatchSaveRecords).toHaveBeenCalled();
         });
 
         it('should send deleted records to api via batchSaveRecords when save callback is invoked after single record deletion', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
 
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockUpdateSettings).toHaveBeenCalled();
             expect(mockBatchSaveRecords).toHaveBeenCalled();
         });
 
         it('should send all selected records to api via batchSaveRecords when save callback is invoked after bulk deletion', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
 
             fireEvent.click(screen.getByLabelText('Select all records'));
             fireEvent.click(screen.getByTestId('delete-selected'));
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockUpdateSettings).toHaveBeenCalled();
             expect(mockBatchSaveRecords).toHaveBeenCalled();
         });
 
         it('should include created records in recordsToCreate and modified in recordsToUpdate when saving', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
 
             fireEvent.click(screen.getByTestId('open-add-income'));
             fireEvent.click(screen.getByTestId('add-record-submit'));
 
             fireEvent.click(screen.getByTestId('trigger-record-save'));
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockBatchSaveRecords).toHaveBeenCalledWith(
                 expect.anything(),
@@ -846,35 +836,25 @@ describe('FundsExpenditureSection', () => {
         });
 
         it('should NOT call batchSaveRecords when only settings are modified and table records are untouched', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+            const { triggerSave } = renderWithSaveCallback();
+            mockUpdateSettings.mockResolvedValueOnce({});
 
             const disclaimerInput = screen.getByTestId('textarea-funds-disclaimer');
             fireEvent.change(disclaimerInput, {
                 target: { value: 'Test disclaimer text' },
             });
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockUpdateSettings).toHaveBeenCalled();
             expect(mockBatchSaveRecords).not.toHaveBeenCalled();
         });
 
         it('should not send temporary records to api if created and deleted before saving', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
+            const { triggerSave } = renderWithSaveCallback();
+            mockUpdateSettings.mockResolvedValueOnce({});
 
             setupMockDataFetch(MOCK_FUNDS_EXPENDITURES_SETTINGS, MOCK_FUNDS_EXPENDITURES_CATEGORIES, []);
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
             fireEvent.click(screen.getByTestId('add-record-submit'));
@@ -882,46 +862,30 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
-            mockUpdateSettings.mockResolvedValueOnce({});
-
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
 
             expect(mockBatchSaveRecords).not.toHaveBeenCalled();
         });
 
         it('should show error toast and return false when batchSaveRecords fails', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
-
-            fireEvent.click(screen.getByTestId('trigger-record-save'));
+            const { triggerSave } = renderWithSaveCallback();
 
             mockUpdateSettings.mockResolvedValueOnce({});
             mockBatchSaveRecords.mockRejectedValueOnce(new Error('Batch save error'));
 
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
+            fireEvent.click(screen.getByTestId('trigger-record-save'));
 
-            expect(success).toBe(false);
+            await triggerSave(false);
+
             expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
         });
 
         it('should show error when registered save function fails', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
-
+            const { triggerSave } = renderWithSaveCallback();
             mockUpdateSettings.mockRejectedValueOnce(new Error('fail'));
 
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(false);
+            await triggerSave(false);
+
             expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
         });
 

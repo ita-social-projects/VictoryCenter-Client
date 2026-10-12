@@ -66,7 +66,7 @@ interface FundsExpendituresTableProps {
             amountUsd: string;
             lastEditedField: FundsExpendituresAmountField;
         },
-    ) => boolean | Promise<boolean>;
+    ) => boolean;
     programAggregateRow?: ProgramAggregateRow | null;
     onProgramYearSave?: (reportingYear: string) => boolean | Promise<boolean>;
     onDeleteRecord?: (record: EnrichedRecord) => void;
@@ -427,12 +427,16 @@ export const FundsExpendituresTable = ({
                 return;
             }
 
-            onRecordSave?.(record.id, {
+            const isSaved = onRecordSave?.(record.id, {
                 categoryId: nextCategoryId,
                 amountUah: preparedAmountUah,
                 amountUsd: preparedAmountUsd,
                 lastEditedField: rowEditState.lastEditedField,
             });
+
+            if (isSaved === false) {
+                return;
+            }
 
             setRowEditMode(null);
         },

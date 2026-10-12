@@ -22,6 +22,8 @@ import { AddProgramExpenseRecordModal } from './components/common/add-program-ex
 import { DeleteRecordModal } from '../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal';
 import { validateFundsExpendituresExchangeRate } from '@/validation/admin/reports-schema/funds-expenditures-exchange-rate-schema/funds-expenditures-exchange-rate-schema';
 import styles from './ProgramExpensesSection.module.scss';
+import { getTempId, isTempId } from '@/utils/functions/reports-records-temp-ids/reports-records-temp-ids';
+import { handleLocalRecordsBulkDelete } from '@/utils/functions/handle-local-records-bulk-delete/handle-local-records-bulk-delete';
 
 const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     exchangeRate: null,
@@ -34,14 +36,6 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 };
 
 const MAX_PROGRAM_EXPENSE_RECORDS = 4;
-
-let tempIdCounter = 0;
-const getTempId = (): number => {
-    tempIdCounter += 1;
-    return -tempIdCounter;
-};
-
-const isTempId = (id: number): boolean => id < 0;
 
 interface ProgramExpensesSectionProps {
     isEditing?: boolean;
@@ -189,7 +183,7 @@ export const ProgramExpensesSection = ({
                 amountUah: string;
                 amountUsd: string;
             },
-        ): boolean => {
+        ) => {
             setRecordsState((prev) =>
                 prev.map((record) =>
                     record.id === recordId
@@ -211,13 +205,13 @@ export const ProgramExpensesSection = ({
                     originalRecord?.amountUah !== recordData.amountUah ||
                     originalRecord?.amountUsd !== recordData.amountUsd;
 
-                setUpdatedRecordIds((prev) =>
-                    hasChanges
-                        ? prev.includes(recordId)
-                            ? prev
-                            : [...prev, recordId]
-                        : prev.filter((id) => id !== recordId),
-                );
+                setUpdatedRecordIds((prev) => {
+                    if (hasChanges) {
+                        return prev.includes(recordId) ? prev : [...prev, recordId];
+                    }
+
+                    return prev.filter((id) => id !== recordId);
+                });
             }
 
             onDataChange?.();
@@ -334,19 +328,15 @@ export const ProgramExpensesSection = ({
 
         setRecordsState((prev) => prev.filter((record) => !selectedRecordIds.includes(record.id)));
 
-        const realIdsToDelete = selectedRecordIds.filter((id) => !isTempId(id));
+        handleLocalRecordsBulkDelete({
+            selectedRecordIds,
+            setSelectedRecordIds,
+            setDeletedRecordIds,
+            setUpdatedRecordIds,
+            setIsBulkDeleteModalOpen,
+            onDataChange,
+        });
 
-        if (realIdsToDelete.length > 0) {
-            setDeletedRecordIds((prev) => {
-                const newIds = realIdsToDelete.filter((id) => !prev.includes(id));
-                return [...prev, ...newIds];
-            });
-            setUpdatedRecordIds((prev) => prev.filter((id) => !realIdsToDelete.includes(id)));
-        }
-
-        onDataChange?.();
-        setSelectedRecordIds([]);
-        setIsBulkDeleteModalOpen(false);
         addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
     }, [selectedRecordIds, addToast, onDataChange]);
 
@@ -369,7 +359,10 @@ export const ProgramExpensesSection = ({
 
             setUpdatedRecordIds([]);
             setDeletedRecordIds([]);
-            await refetchReadOnlyData(true);
+
+            try {
+                await refetchReadOnlyData(true);
+            } catch {}
 
             return true;
         } catch {

@@ -224,8 +224,8 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.categoryId).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
-    it('does not reset values when submit rejects', async () => {
-        const onSubmit = jest.fn().mockRejectedValue(new Error('network'));
+    it('does not reset values when submit fails', async () => {
+        const onSubmit = jest.fn().mockReturnValue(false);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {

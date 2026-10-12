@@ -41,7 +41,7 @@ interface UseFundsExpendituresRecordFormParams {
         amountUsd: string;
         lastEditedField: FundsExpendituresAmountField;
         type: FundsExpendituresTransactionType;
-    }) => Promise<boolean>;
+    }) => boolean;
 }
 
 const INITIAL_STATE: FundsExpendituresRecordFormState = {
@@ -170,7 +170,7 @@ export const useFundsExpendituresRecordForm = ({
                 amountUsd: normalizedAmountUsd,
                 lastEditedField: formState.lastEditedField,
                 type: transactionType,
-            }).catch(() => false);
+            });
 
             if (isCreated) {
                 setFormState(INITIAL_STATE);

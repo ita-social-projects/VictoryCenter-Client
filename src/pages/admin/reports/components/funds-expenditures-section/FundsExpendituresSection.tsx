@@ -56,6 +56,8 @@ import { DeleteFundsExpendituresCategoryModal } from './components/common/delete
 import { EditFundsExpendituresCategoryModal } from './components/common/edit-funds-expenditures-category-modal/EditFundsExpendituresCategoryModal';
 import { TranslateDisclaimerModal } from './components/common/translate-disclaimer-modal/TranslateDisclaimerModal';
 import styles from './FundsExpendituresSection.module.scss';
+import { getTempId, isTempId } from '@/utils/functions/reports-records-temp-ids/reports-records-temp-ids';
+import { handleLocalRecordsBulkDelete } from '@/utils/functions/handle-local-records-bulk-delete/handle-local-records-bulk-delete';
 
 const enrichRecords = (
     records: ReportFundsExpendituresRecord[],
@@ -67,14 +69,6 @@ const enrichRecords = (
         categoryName: categoryMap.get(r.categoryId) ?? String(r.categoryId),
     }));
 };
-
-let tempIdCounter = 0;
-const getTempId = (): number => {
-    tempIdCounter += 1;
-    return -tempIdCounter;
-};
-
-const isTempId = (id: number): boolean => id < 0;
 
 const getCategoryLimitMessage = (
     hasReachedIncomeCategoryLimit: boolean,
@@ -532,13 +526,13 @@ export const FundsExpenditureSection = ({
                     originalRecord?.amountUah !== data.amountUah ||
                     originalRecord?.amountUsd !== data.amountUsd;
 
-                setUpdatedRecordIds((prev) =>
-                    hasChanges
-                        ? prev.includes(recordId)
-                            ? prev
-                            : [...prev, recordId]
-                        : prev.filter((id) => id !== recordId),
-                );
+                setUpdatedRecordIds((prev) => {
+                    if (hasChanges) {
+                        return prev.includes(recordId) ? prev : [...prev, recordId];
+                    }
+
+                    return prev.filter((id) => id !== recordId);
+                });
             }
 
             onDataChange?.();
@@ -550,7 +544,7 @@ export const FundsExpenditureSection = ({
     );
 
     const handleCreateRecord = useCallback(
-        async (data: {
+        (data: {
             categoryId: number;
             reportingYear: string;
             amountUah: string;
@@ -705,19 +699,15 @@ export const FundsExpenditureSection = ({
 
         setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
 
-        const realIdsToDelete = selectedRecordIds.filter((id) => !isTempId(id));
+        handleLocalRecordsBulkDelete({
+            selectedRecordIds,
+            setSelectedRecordIds,
+            setDeletedRecordIds,
+            setUpdatedRecordIds,
+            setIsBulkDeleteModalOpen,
+            onDataChange,
+        });
 
-        if (realIdsToDelete.length > 0) {
-            setDeletedRecordIds((prev) => {
-                const newIds = realIdsToDelete.filter((id) => !prev.includes(id));
-                return [...prev, ...newIds];
-            });
-            setUpdatedRecordIds((prev) => prev.filter((id) => !realIdsToDelete.includes(id)));
-        }
-
-        onDataChange?.();
-        setSelectedRecordIds([]);
-        setIsBulkDeleteModalOpen(false);
         addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
     }, [selectedRecordIds, addToast, onDataChange]);
 

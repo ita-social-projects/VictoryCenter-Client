@@ -1775,6 +1775,7 @@ describe('EventsPageAdmin', () => {
                     backgroundImage: null,
                     priority: 1,
                     resource: '',
+                    localizations: [],
                 },
             ],
             totalItemsCount: 1,

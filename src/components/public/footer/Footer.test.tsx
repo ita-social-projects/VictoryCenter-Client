@@ -34,6 +34,8 @@ function escapeRegExp(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const expectedLogoCount = 2;
+
 describe('Footer', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -45,7 +47,7 @@ describe('Footer', () => {
 
         render(<Footer />, { wrapper: MemoryRouter });
 
-        expect(screen.getAllByTestId('victory-logo')).toHaveLength(2);
+        expect(screen.getAllByTestId('victory-logo')).toHaveLength(expectedLogoCount);
         expect(screen.getByTestId('mail-icon')).toBeInTheDocument();
         expect(screen.getByTestId('phone-icon')).toBeInTheDocument();
     });

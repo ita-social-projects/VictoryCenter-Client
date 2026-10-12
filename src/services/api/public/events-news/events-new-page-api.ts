@@ -1,13 +1,11 @@
-import { eventsNewsPageMock } from '@/utils/mock-data/public/event-news';
 import { EventsNewsPageData } from '@/types/public/events-news';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { axiosInstance } from '../../axios';
+import { mapToEventsNewsPage } from '@/utils/functions/mappers/public/event-news/events-news-page';
 
 export const EventsNewsPageApi = {
     get: async (): Promise<EventsNewsPageData> => {
-        // const response = await axiosInstance.get(`${API_ROUTES. .PUBLIC}`);
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(eventsNewsPageMock);
-            }, 1000);
-        });
+        const response = await axiosInstance.get(`${API_ROUTES.EVENTS_PAGE.PUBLIC}`);
+        return mapToEventsNewsPage(response.data);
     },
 };

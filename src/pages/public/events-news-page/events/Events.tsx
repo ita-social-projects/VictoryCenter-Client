@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
@@ -16,6 +16,7 @@ import styles from './Events.module.scss';
 export const Events = ({ title, tags }: EventsData) => {
     const { t } = useTranslation('eventsNewsPage');
     const pageSize = 8;
+    const safeTags = Array.isArray(tags) ? tags : [];
 
     const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
     const [events, setEvents] = useState<EventsNews[]>([]);
@@ -54,7 +55,7 @@ export const Events = ({ title, tags }: EventsData) => {
         <section className={styles.events}>
             <div className={styles['menu-block']}>
                 <div className={styles['button-block']}>
-                    {tags.map((tag) => (
+                    {safeTags.map((tag) => (
                         <button
                             onClick={() => searchByTag(tag)}
                             key={tag.id}

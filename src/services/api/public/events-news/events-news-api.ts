@@ -1,4 +1,3 @@
-import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 import { EventsNews } from '@/types/public/events-news';
 import { PaginationResult } from '@/types/admin/common';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -10,7 +9,7 @@ export const EventsNewsApi = {
         const response = await axiosInstance.get(API_ROUTES.EVENTS.PUBLISHED, {
             params: { categoryId: tagId || undefined, offset, limit },
         });
-        return { ...response.data, items: response.data.items.map(mapToEventsNews) };
+        return { ...response.data, items: (response.data?.items ?? []).map(mapToEventsNews) };
     },
 };
 

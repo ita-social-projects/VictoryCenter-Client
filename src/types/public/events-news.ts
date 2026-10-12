@@ -68,3 +68,9 @@ export interface PublishedEventNewsDto {
     categories: EventNewsCategoryDto[];
     localizations: PublishedEventNewsLocalizationDto[];
 }
+
+export interface PublicEventsPageDto {
+    eventsBlockTitle?: string | null;
+    pageDescription?: string | null;
+    categories?: EventNewsCategoryDto[] | null;
+}

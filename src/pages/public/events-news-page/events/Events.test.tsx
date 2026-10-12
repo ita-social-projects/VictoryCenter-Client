@@ -1,6 +1,8 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { Events } from './Events';
 import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 
 jest.mock('react-i18next', () => {
     return {
@@ -12,6 +14,10 @@ jest.mock('react-i18next', () => {
 
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
+}));
+
+jest.mock('@/services/api/public/events-news/events-news-api', () => ({
+    EventsNewsApi: { get: jest.fn() },
 }));
 
 const eventsPerPage = 8;
@@ -329,6 +335,82 @@ describe('Events component', () => {
                 // After filter change, should have new data (not concatenated)
                 expect(eventCards.length).toBeLessThanOrEqual(secondFilterData.length);
             });
+        });
+    });
+
+    describe('Fetch handler', () => {
+        const useDataPaginationFetch = require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch')
+            .useDataPaginationFetch as jest.Mock;
+        const mockedApiGet = EventsNewsApi.get as jest.Mock;
+        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
+        const params = { limit: eventsPerPage } as PaginationRequestParams;
+
+        const callLatestFetchHandler = () => {
+            const { calls } = useDataPaginationFetch.mock;
+            return calls[calls.length - 1][0].fetchHandler(params);
+        };
+
+        const clickTag = (name: string) => act(() => screen.getByText(name).click());
+        const clickShowMore = () => act(() => screen.getByText('SHOW_MORE').click());
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
+            mockedApiGet.mockResolvedValue({ items: [], totalItemsCount: 0 });
+        });
+
+        it('requests the first page without a category while "All materials" is selected', async () => {
+            render(<Events {...mockData} />);
+
+            await callLatestFetchHandler();
+
+            expect(mockedApiGet).toHaveBeenCalledWith(undefined, 0, eventsPerPage);
+        });
+
+        it('passes the selected tag id to the API', async () => {
+            render(<Events {...mockData} />);
+            clickTag('Tag 1');
+
+            await callLatestFetchHandler();
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith('1', 0, eventsPerPage);
+        });
+
+        it('stops sending the tag id after "All materials" is selected again', async () => {
+            render(<Events {...mockData} />);
+            clickTag('Tag 1');
+            act(() => screen.getByTestId('all-materials-button').click());
+
+            await callLatestFetchHandler();
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage);
+        });
+
+        it('requests the next page with an increased offset after "Show more"', async () => {
+            render(<Events {...mockData} />);
+            clickShowMore();
+
+            await callLatestFetchHandler();
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, eventsPerPage, eventsPerPage);
+        });
+
+        it('resets the offset to 0 when a tag is selected after loading more', async () => {
+            render(<Events {...mockData} />);
+            clickShowMore();
+            clickTag('Tag 1');
+
+            await callLatestFetchHandler();
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith('1', 0, eventsPerPage);
+        });
+
+        it('returns the API response to the pagination hook', async () => {
+            const page = { items: eventsNewsMock.slice(0, 2), totalItemsCount: 2 };
+            mockedApiGet.mockResolvedValue(page);
+            render(<Events {...mockData} />);
+
+            await expect(callLatestFetchHandler()).resolves.toBe(page);
         });
     });
 });

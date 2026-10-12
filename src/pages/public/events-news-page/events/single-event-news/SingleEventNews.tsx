@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
+import { ReactComponent as SquareArrowIcon } from '@/assets/icons/square-arrow-out-up-right.svg';
 import { EventsNews } from '@/types/public/events-news';
 import styles from './SingleEventNews.module.scss';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
@@ -45,7 +45,7 @@ export const SingleEventNews = memo(
                 <h4 className={styles['event-title']}>{name}</h4>
                 <p className={styles['event-description']}>{description}</p>
                 <div>
-                    <Button onClick={handleClick} icon={ArrowIcon} iconPosition="right" variant="tertiary">
+                    <Button onClick={handleClick} icon={SquareArrowIcon} iconPosition="right" variant="tertiary">
                         {t('LINK_TO_ARTICLE')}
                     </Button>
                 </div>

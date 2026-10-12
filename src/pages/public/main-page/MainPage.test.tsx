@@ -55,6 +55,10 @@ jest.mock('./main-statistics-section/MainStatisticsSection', () => ({
     MainStatisticsSection: () => <div data-testid="main-statistics-section" />,
 }));
 
+jest.mock('./news-events-section/NewsEventsSection', () => ({
+    NewsEventsSection: () => <div data-testid="news-events-section" />,
+}));
+
 jest.mock('./danatation-section/DonationSection', () => ({
     DonationSection: jest.fn(),
 }));
@@ -413,5 +417,34 @@ describe('MainPage', () => {
                 autoFetchDependencies: ['en'],
             }),
         );
+    });
+
+    it('renders NewsEventsSection after the data is loaded', () => {
+        mockUseDataFetchResult(createMainPageData());
+
+        render(<MainPage />);
+
+        expect(screen.getByTestId('news-events-section')).toBeInTheDocument();
+    });
+
+    it('renders NewsEventsSection below DonationSection', () => {
+        mockUseDataFetchResult(createMainPageData());
+
+        render(<MainPage />);
+
+        const donationSection = screen.getByTestId('donation-section');
+        const newsEventsSection = screen.getByTestId('news-events-section');
+
+        expect(
+            donationSection.compareDocumentPosition(newsEventsSection) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+    });
+
+    it('does not render NewsEventsSection while main page data is loading', () => {
+        mockUseDataFetchResult(null, true);
+
+        render(<MainPage />);
+
+        expect(screen.queryByTestId('news-events-section')).not.toBeInTheDocument();
     });
 });

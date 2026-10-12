@@ -44,15 +44,13 @@ export const useTranslateEvent = ({ event, language, onSuccess, mode = ModalMode
 
                 const finalLocalization: EventLocalization = {
                     ...updatedLocalization,
-                    language: updatedLocalization.language || { id: language.id, code: language.code },
+                    language: updatedLocalization.language ?? { id: language.id, code: language.code },
                 };
 
                 const updatedEvent: EventItemDto = {
                     ...event,
-                    localizations: (event.localizations || []).map((loc) =>
-                        (loc.language?.id ?? (loc as unknown as { languageId?: number }).languageId) === language.id
-                            ? finalLocalization
-                            : loc,
+                    localizations: (event.localizations ?? []).map((loc) =>
+                        loc.language?.id === language.id ? finalLocalization : loc,
                     ),
                 };
 
@@ -72,19 +70,18 @@ export const useTranslateEvent = ({ event, language, onSuccess, mode = ModalMode
 
                 const finalLocalization: EventLocalization = {
                     ...createdLocalization,
-                    language: createdLocalization.language || { id: language.id, code: language.code },
+                    language: createdLocalization.language ?? { id: language.id, code: language.code },
                 };
 
                 const updatedEvent: EventItemDto = {
                     ...event,
-                    localizations: [...(event.localizations || []), finalLocalization],
+                    localizations: [...(event.localizations ?? []), finalLocalization],
                 };
 
                 onSuccess(updatedEvent);
             }
         } catch (err) {
             setError(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
-            throw err;
         } finally {
             setIsSubmitting(false);
         }

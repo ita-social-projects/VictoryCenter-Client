@@ -36,16 +36,14 @@ export const TranslateEventModal = ({
 
     useEffect(() => {
         if (isOpen && translatedLanguages?.length > 0) {
-            const targetLanguage = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+            const targetLanguage = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) ?? translatedLanguages[0];
             setLanguage(targetLanguage);
         }
     }, [isOpen, translatedLanguages]);
 
     const existingLocalization = useMemo(() => {
         if (!eventToTranslate?.localizations || !language) return null;
-        return eventToTranslate.localizations.find(
-            (loc) => (loc.language?.id ?? (loc as unknown as { languageId?: number }).languageId) === language.id,
-        );
+        return eventToTranslate.localizations.find((loc) => loc.language?.id === language.id);
     }, [eventToTranslate?.localizations, language]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;

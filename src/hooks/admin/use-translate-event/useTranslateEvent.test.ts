@@ -181,11 +181,7 @@ describe('useTranslateEvent', () => {
         );
 
         await act(async () => {
-            try {
-                await result.current.translateEvent(formValues);
-            } catch {
-                // Expected error
-            }
+            await result.current.translateEvent(formValues);
         });
 
         await waitFor(() => {
@@ -211,11 +207,7 @@ describe('useTranslateEvent', () => {
         );
 
         await act(async () => {
-            try {
-                await result.current.translateEvent(formValues);
-            } catch {
-                // Expected error
-            }
+            await result.current.translateEvent(formValues);
         });
 
         await waitFor(() => {

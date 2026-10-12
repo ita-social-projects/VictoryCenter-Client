@@ -5,13 +5,20 @@ import {
     EventCreateUpdateRequest,
     EventDetailsDto,
     EventItemDto,
+    EventItemResponseDto,
+    EventLocalization,
+    EventLocalizationDto,
     EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { Image, ImageValues } from '@/types/common/image';
+
+const mapEvent = (item: EventItemResponseDto): EventItemDto =>
+    mapEntityWithLocalizations<EventItemResponseDto, EventLocalizationDto, EventLocalization>(item);
 
 interface EventSaveData {
     request: EventCreateUpdateRequest;
@@ -96,6 +103,16 @@ export const EventsApi = {
 
         return response.data;
     },
+    toggleEventsTitleVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
+        const response = await client.post<EventsIntroSectionDto>(
+            API_ROUTES.EVENTS_PAGE.TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY,
+        );
+        return response.data;
+    },
+    toggleEventsDescriptionVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
+        const response = await client.post<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.TOGGLE_DESCRIPTION_VISIBILITY);
+        return response.data;
+    },
     fetchEvents: async (
         client: AxiosInstance,
         categoryId: number,
@@ -104,7 +121,7 @@ export const EventsApi = {
         translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus,
     ): Promise<PaginationResult<EventItemDto>> => {
-        const response = await client.get<PaginationResult<EventItemDto>>(API_ROUTES.EVENTS.BASE, {
+        const response = await client.get<PaginationResult<EventItemResponseDto>>(API_ROUTES.EVENTS.BASE, {
             params: {
                 categoryId,
                 offset,
@@ -113,7 +130,7 @@ export const EventsApi = {
                 translationStatusFilter,
             },
         });
-        return response.data;
+        return { ...response.data, items: response.data.items.map(mapEvent) };
     },
     getEventById: async (client: AxiosInstance, id: number): Promise<EventDetailsDto> => {
         const response = await client.get<EventDetailsDto>(`${API_ROUTES.EVENTS.BASE}/${id}`);

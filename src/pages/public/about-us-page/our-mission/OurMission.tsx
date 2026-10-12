@@ -3,6 +3,7 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
+import cn from 'classnames';
 import styles from './OurMission.module.scss';
 import { Button } from '@/components/public/ui/button';
 import { SafeHtml } from '@/components/common/safe-html';
@@ -14,7 +15,7 @@ export interface OurMissionProps {
     className?: string;
 }
 
-export const OurMission = ({ content, description }: OurMissionProps) => {
+export const OurMission = ({ content, description, className }: OurMissionProps) => {
     const { t } = useTranslation('aboutUsPage');
 
     const descriptionContent = content?.find((x) => x.contentType === ContentType.Description);
@@ -26,7 +27,7 @@ export const OurMission = ({ content, description }: OurMissionProps) => {
     const finalDescription = description ?? descriptionValue;
 
     return (
-        <div className={styles.root}>
+        <div className={cn(styles.root, className)}>
             <h2 className={styles.title}>{t('WHAT_WE_DO')}</h2>
             <div className={styles.block}>
                 <SafeHtml as="p" className={styles.text} html={finalDescription} />

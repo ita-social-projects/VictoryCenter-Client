@@ -1,9 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-
 import { EventItemComponent } from './EventItemComponent';
 import { VisibilityStatus } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events';
+import { TranslationStatus } from '@/types/common/language';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
+import localizationStatusStyles from '@/components/admin/localization-statuses/LocalizationStatuses.module.scss';
 
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: number }) => (
@@ -37,19 +38,67 @@ describe('EventItemComponent', () => {
     } as EventItemDto;
 
     it('renders the event title', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
 
         expect(screen.getByText(item.title)).toBeInTheDocument();
     });
 
     it('renders the event description', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
 
         expect(screen.getByText(item.description)).toBeInTheDocument();
     });
 
+    it('renders the selected language translation and its status badge', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+        const translatedEvent: EventItemDto = {
+            ...item,
+            localizations: [
+                {
+                    language: { id: english.id, code: english.code },
+                    translationStatus: TranslationStatus.Relevant,
+                    title: 'Translated event',
+                    description: 'Translated event description',
+                },
+            ],
+        };
+
+        render(
+            <EventItemComponent
+                item={translatedEvent}
+                onEdit={jest.fn()}
+                language={english}
+                translationLanguages={[english]}
+                onTranslate={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByText('Translated event')).toBeInTheDocument();
+        expect(screen.getByText('Translated event description')).toBeInTheDocument();
+        expect(screen.getByText('EN')).toHaveClass(localizationStatusStyles.relevant);
+    });
+
+    it('falls back to the Ukrainian content and indicates a missing translation', () => {
+        const english = { id: 2, code: 'en', name: 'English' };
+
+        render(
+            <EventItemComponent
+                item={item}
+                onEdit={jest.fn()}
+                onTranslate={jest.fn()}
+                language={english}
+                translationLanguages={[english]}
+            />,
+        );
+
+        expect(screen.getByText(item.title)).toBeInTheDocument();
+        expect(screen.getByText(item.description)).toBeInTheDocument();
+        expect(screen.getByText('EN')).not.toHaveClass(localizationStatusStyles.relevant);
+        expect(screen.getByText('EN')).not.toHaveClass(localizationStatusStyles.outdated);
+    });
+
     it('renders the published date in Ukrainian locale', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
 
         const expectedDate = new Date(item.publishedAt).toLocaleDateString('uk-UA');
 
@@ -57,13 +106,19 @@ describe('EventItemComponent', () => {
     });
 
     it('renders the visibility status', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
 
         expect(screen.getByTestId('visibility-status-label')).toHaveTextContent(String(VisibilityStatus.Published));
     });
 
-    it('renders the edit and delete buttons', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+    it('renders the translate, edit, and delete buttons', () => {
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE,
+            }),
+        ).toBeInTheDocument();
 
         expect(
             screen.getByRole('button', {
@@ -78,8 +133,14 @@ describe('EventItemComponent', () => {
         ).toBeInTheDocument();
     });
 
-    it('renders both buttons with type button', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} />);
+    it('renders all buttons with type button', () => {
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+
+        expect(
+            screen.getByRole('button', {
+                name: EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE,
+            }),
+        ).toHaveAttribute('type', 'button');
 
         expect(
             screen.getByRole('button', {
@@ -96,10 +157,19 @@ describe('EventItemComponent', () => {
 
     it('calls onEdit with the item when the edit icon is clicked', () => {
         const onEdit = jest.fn();
-        render(<EventItemComponent item={item} onEdit={onEdit} />);
+        render(<EventItemComponent item={item} onEdit={onEdit} onTranslate={jest.fn()} />);
 
         fireEvent.click(screen.getByLabelText(EVENT_ITEMS_TEXT.ACTIONS.EDIT));
 
         expect(onEdit).toHaveBeenCalledWith(item);
+    });
+
+    it('calls onTranslate with the item when the translate icon is clicked', () => {
+        const onTranslate = jest.fn();
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={onTranslate} />);
+
+        fireEvent.click(screen.getByLabelText(EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE));
+
+        expect(onTranslate).toHaveBeenCalledWith(item);
     });
 });

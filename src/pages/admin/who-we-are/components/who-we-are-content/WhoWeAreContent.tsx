@@ -194,7 +194,7 @@ export const WhoWeAreContent = () => {
                 const normalizedResult = normalizeSection(result);
                 setSelectedSection(normalizedResult);
                 setUpdatedSection(normalizedResult);
-                addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+                addToast(WHO_WE_ARE_TEXT.PUBLISH_SUCCESS, ToastType.Info);
 
                 refetchCategories();
             } catch (error) {

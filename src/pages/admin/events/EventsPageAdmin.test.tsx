@@ -9,6 +9,7 @@ import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
 import { EventItemDto } from '@/types/admin/events';
+import { TranslationStatusFilter } from '@/types/common/language';
 import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
@@ -19,13 +20,23 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
 }));
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
-    useLocalizationToolkit: () => ({
-        allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
-        translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
-        selectedLanguage: { code: 'en', id: 2 },
-        onLanguageChange: jest.fn(),
-        onTranslationStatusFilterChange: jest.fn(),
-    }),
+    useLocalizationToolkit: () => {
+        const ReactActual = require('react') as {
+            useState: <T>(initialState: T) => [T, (nextState: T) => void];
+        };
+        const [translationStatusFilter, setTranslationStatusFilter] = ReactActual.useState<number | undefined>(
+            undefined,
+        );
+
+        return {
+            allLanguages: [{ id: 1, code: 'uk', name: 'Українська' }],
+            translationLanguages: [{ id: 2, code: 'en', name: 'English' }],
+            selectedLanguage: { code: 'en', id: 2 },
+            translationStatusFilter,
+            onLanguageChange: jest.fn(),
+            onTranslationStatusFilterChange: setTranslationStatusFilter,
+        };
+    },
 }));
 
 jest.mock('@/services/api/admin/events/events-api', () => ({
@@ -34,6 +45,8 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
         updateEventsIntroSection: jest.fn(),
         fetchEventSearchItems: jest.fn(),
         fetchEvents: jest.fn(),
+        toggleEventsTitleVisibility: jest.fn(),
+        toggleEventsDescriptionVisibility: jest.fn(),
         reorder: jest.fn(),
     },
 }));
@@ -52,6 +65,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         onSearchClear,
         onSuggestionSelect,
         onStatusFilterChange,
+        onTranslationStatusFilterChange,
         statusFilter,
         fetchSearchItems,
     }: any) => (
@@ -76,6 +90,14 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 
             <button type="button" data-testid="clear-status-filter" onClick={() => onStatusFilterChange?.(undefined)}>
                 Clear status filter
+            </button>
+
+            <button
+                type="button"
+                data-testid="enable-translation-filter"
+                onClick={() => onTranslationStatusFilterChange?.(2)}
+            >
+                Enable translation filter
             </button>
 
             <button type="button" onClick={() => fetchSearchItems?.('query', { offset: 0, limit: 10 })}>
@@ -107,6 +129,7 @@ const mockOpenAddCategoryModal = jest.fn();
 const mockOpenEditCategoryModal = jest.fn();
 const mockOpenDeleteCategoryModal = jest.fn();
 const mockOpenAddItemModal = jest.fn();
+const mockCloseTranslateCategoryModal = jest.fn();
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => ({
@@ -115,6 +138,9 @@ jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
             openEditCategoryModal: mockOpenEditCategoryModal,
             openDeleteCategoryModal: mockOpenDeleteCategoryModal,
             openAddItemModal: mockOpenAddItemModal,
+        },
+        closeModalActions: {
+            closeTranslateCategoryModal: mockCloseTranslateCategoryModal,
         },
     }),
 }));
@@ -155,6 +181,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 const mockOnAddCategory = jest.fn();
 const mockOnUpdateCategory = jest.fn();
 const mockOnDeleteCategory = jest.fn();
+const mockOnTranslateCategory = jest.fn();
 const mockOnEventSaveSuccess = jest.fn();
 
 jest.mock('./event-page-modals/EventsPageModals', () => ({
@@ -163,6 +190,7 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
         onAddCategory,
         onUpdateCategory,
         onDeleteCategory,
+        onTranslateCategory,
     }: {
         onEventSaveSuccess?: (data: {
             event: EventItemDto;
@@ -173,11 +201,13 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
         onAddCategory: (category: EventCategoryDto) => void;
         onUpdateCategory: (category: EventCategoryDto) => void;
         onDeleteCategory: (categoryId: number) => void;
+        onTranslateCategory: (category: EventCategoryDto) => void;
     }) => {
         mockOnEventSaveSuccess.mockImplementation(onEventSaveSuccess);
         mockOnAddCategory.mockImplementation(onAddCategory);
         mockOnUpdateCategory.mockImplementation(onUpdateCategory);
         mockOnDeleteCategory.mockImplementation(onDeleteCategory);
+        mockOnTranslateCategory.mockImplementation(onTranslateCategory);
 
         return <div data-testid="events-page-modals" />;
     },
@@ -185,6 +215,7 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
 
 jest.mock('./editable-header-section/EditableHeaderSection', () => {
     const mockReact = require('react');
+    const { EVENTS_TEXT } = require('@/const/admin/events');
 
     return {
         EditableHeaderSection: ({
@@ -197,6 +228,9 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
+            isHidden: _isHidden,
+            onToggleVisibility,
+            isToggleVisibilityDisabled,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -207,6 +241,9 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml: string;
             isPublishDisabled?: boolean;
             disabled?: boolean;
+            isHidden?: boolean;
+            onToggleVisibility?: () => void;
+            isToggleVisibilityDisabled?: boolean;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
@@ -222,6 +259,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={disabled}
                     >
                         Edit section
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onToggleVisibility}
+                        aria-label={`${_isHidden ? EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION : EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID ? EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE : EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`}
+                        disabled={disabled || isToggleVisibilityDisabled}
+                    >
+                        Toggle visibility
                     </button>
 
                     {mode === 'edit' && (
@@ -403,7 +449,7 @@ describe('EventsPageAdmin', () => {
             localizations: [
                 {
                     entityId: 1,
-                    language: { id: 2, code: 'en' },
+                    language: { id: 2, code: 'en' } as any,
                     name: 'Localized Cat 1',
                     translationStatus: 1,
                 },
@@ -449,11 +495,15 @@ describe('EventsPageAdmin', () => {
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         });
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         });
 
         mockAddToast.mockClear();
@@ -461,10 +511,12 @@ describe('EventsPageAdmin', () => {
         mockOpenEditCategoryModal.mockClear();
         mockOpenDeleteCategoryModal.mockClear();
         mockOpenAddItemModal.mockClear();
+        mockCloseTranslateCategoryModal.mockClear();
 
         mockOnAddCategory.mockClear();
         mockOnUpdateCategory.mockClear();
         mockOnDeleteCategory.mockClear();
+        mockOnTranslateCategory.mockClear();
         mockOnEventSaveSuccess.mockClear();
     });
 
@@ -639,6 +691,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         let resolveIntroSection!: (section: IntroSection) => void;
@@ -647,7 +701,7 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection = resolve;
         });
 
-        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise);
+        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise as any);
 
         render(<EventsPageAdmin />);
 
@@ -663,6 +717,8 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 
@@ -693,12 +749,22 @@ describe('EventsPageAdmin', () => {
         [
             EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
             'pageDescription',
-            { pageDescription: '<p>Updated content</p>', eventsBlockTitle: '<p>Loaded title</p>' },
+            {
+                pageDescription: '<p>Updated content</p>',
+                eventsBlockTitle: '<p>Loaded title</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
+            },
         ],
         [
             EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
             'eventsBlockTitle',
-            { pageDescription: '<p>Loaded description</p>', eventsBlockTitle: '<p>Updated content</p>' },
+            {
+                pageDescription: '<p>Loaded description</p>',
+                eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
+            },
         ],
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
         const user = userEvent.setup();
@@ -741,10 +807,14 @@ describe('EventsPageAdmin', () => {
             .mockResolvedValueOnce({
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             })
             .mockResolvedValueOnce({
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
 
         await renderEventsPage();
@@ -758,6 +828,8 @@ describe('EventsPageAdmin', () => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, 'pageDescription', {
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Чернетка заголовка</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 
@@ -771,6 +843,8 @@ describe('EventsPageAdmin', () => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith({}, 'eventsBlockTitle', {
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
     });
@@ -811,6 +885,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         const user = userEvent.setup();
@@ -821,7 +897,7 @@ describe('EventsPageAdmin', () => {
             resolvePublish = resolve;
         });
 
-        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise);
+        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise as any);
 
         render(<EventsPageAdmin />);
 
@@ -860,6 +936,8 @@ describe('EventsPageAdmin', () => {
             resolvePublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
         });
 
@@ -882,6 +960,8 @@ describe('EventsPageAdmin', () => {
         type IntroSection = {
             eventsBlockTitle: string;
             pageDescription: string;
+            isEventsBlockTitleHidden: boolean;
+            isPageDescriptionHidden: boolean;
         };
 
         const user = userEvent.setup();
@@ -899,8 +979,8 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.updateEventsIntroSection
-            .mockReturnValueOnce(descriptionPublishPromise)
-            .mockReturnValueOnce(titlePublishPromise);
+            .mockReturnValueOnce(descriptionPublishPromise as any)
+            .mockReturnValueOnce(titlePublishPromise as any);
 
         await renderEventsPage();
         await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
@@ -917,6 +997,8 @@ describe('EventsPageAdmin', () => {
             resolveTitlePublish({
                 eventsBlockTitle: '<p>Updated title</p>',
                 pageDescription: '<p>Loaded description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
             await titlePublishPromise;
         });
@@ -924,6 +1006,8 @@ describe('EventsPageAdmin', () => {
             resolveDescriptionPublish({
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated description</p>',
+                isEventsBlockTitleHidden: false,
+                isPageDescriptionHidden: false,
             });
             await descriptionPublishPromise;
         });
@@ -950,6 +1034,128 @@ describe('EventsPageAdmin', () => {
             10,
             undefined,
         );
+    });
+
+    it('calls toggleEventsDescriptionVisibility when toggling visibility for page description', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
+
+        mockedEventsApi.toggleEventsDescriptionVisibility.mockResolvedValueOnce(mockResponse);
+
+        await renderEventsPage();
+
+        await user.click(
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+            }),
+        );
+
+        await waitFor(() => {
+            expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledWith({});
+        });
+    });
+
+    it('calls toggleEventsTitleVisibility when toggling visibility for events block title', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
+
+        mockedEventsApi.toggleEventsTitleVisibility.mockResolvedValueOnce(mockResponse);
+
+        await renderEventsPage();
+
+        await user.click(
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
+            }),
+        );
+
+        await waitFor(() => {
+            expect(mockedEventsApi.toggleEventsTitleVisibility).toHaveBeenCalledWith({});
+        });
+    });
+
+    it('disables visibility toggle buttons and prevents concurrent toggle requests while a toggle is in progress', async () => {
+        const user = userEvent.setup();
+        const baseIntroSection = {
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        };
+        const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
+
+        let resolveToggle: (val: any) => void = () => {};
+        const togglePromise = new Promise((resolve) => {
+            resolveToggle = resolve;
+        });
+        mockedEventsApi.toggleEventsDescriptionVisibility.mockImplementationOnce(() => togglePromise as any);
+
+        await renderEventsPage();
+
+        const descToggleButton = screen.getByRole('button', {
+            name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+        });
+        const titleToggleButton = screen.getByRole('button', {
+            name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
+        });
+
+        expect(descToggleButton).toBeEnabled();
+        expect(titleToggleButton).toBeEnabled();
+
+        await user.click(descToggleButton);
+
+        expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledTimes(1);
+        expect(descToggleButton).toBeDisabled();
+        expect(titleToggleButton).toBeDisabled();
+
+        await user.click(descToggleButton);
+        expect(mockedEventsApi.toggleEventsDescriptionVisibility).toHaveBeenCalledTimes(1);
+
+        await user.click(titleToggleButton);
+        expect(mockedEventsApi.toggleEventsTitleVisibility).not.toHaveBeenCalled();
+
+        act(() => {
+            resolveToggle(mockResponse);
+        });
+
+        await waitFor(() => {
+            expect(descToggleButton).toBeEnabled();
+            expect(titleToggleButton).toBeEnabled();
+        });
+    });
+
+    it('renders with eye-closed icons when sections are initially hidden', async () => {
+        mockedEventsApi.getEventsIntroSection.mockResolvedValueOnce({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Loaded description</p>',
+            isEventsBlockTitleHidden: true,
+            isPageDescriptionHidden: true,
+        });
+
+        await renderEventsPage();
+
+        expect(
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE}`,
+            }),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', {
+                name: `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.SHOW_SECTION}: ${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE}`,
+            }),
+        ).toBeInTheDocument();
     });
 
     it.each([
@@ -1191,6 +1397,33 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
 
+    it('updates a category translation and displays a success toast', async () => {
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+
+        const translatedCategory: EventCategoryDto = {
+            id: 1,
+            name: 'Translated Category Name',
+            relatedEventNewsCount: 0,
+            localizations: [],
+        };
+
+        act(() => {
+            mockOnTranslateCategory(translatedCategory);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Translated Category Name')).toBeInTheDocument();
+        });
+
+        expect(mockCloseTranslateCategoryModal).toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(
+            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+            ToastType.Success,
+        );
+    });
+
     it('fetches and renders event items for the selected category', async () => {
         mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
 
@@ -1249,6 +1482,44 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, 1);
+        });
+    });
+
+    it('applies the translation filter to the active category and keeps it when switching categories', async () => {
+        const user = userEvent.setup();
+
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
+        });
+
+        await renderEventsPage();
+        await user.click(screen.getByTestId('enable-translation-filter'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[0].id,
+                0,
+                5,
+                TranslationStatusFilter.Missing,
+                undefined,
+            );
+        });
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('category-2'));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[1].id,
+                0,
+                5,
+                TranslationStatusFilter.Missing,
+                undefined,
+            );
         });
     });
 

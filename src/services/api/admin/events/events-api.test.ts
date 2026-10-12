@@ -37,6 +37,8 @@ describe('EventsApi', () => {
         const introSection = {
             eventsBlockTitle: '<p>Title</p>',
             pageDescription: '<p>Description</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         } satisfies EventsIntroSectionDto;
 
         it('updates only the page description through its dedicated endpoint', async () => {
@@ -68,6 +70,8 @@ describe('EventsApi', () => {
                 data: {
                     eventsBlockTitle: '<p>Title</p>',
                     pageDescription: '<p>Description</p>',
+                    isEventsBlockTitleHidden: false,
+                    isPageDescriptionHidden: false,
                 } satisfies EventsIntroSectionDto,
             };
             mockGet.mockResolvedValueOnce(mockResponse);
@@ -110,7 +114,7 @@ describe('EventsApi', () => {
                 },
             });
 
-            expect(result).toBe(responseData);
+            expect(result).toStrictEqual(responseData);
         });
 
         it('calls the Events endpoint without optional parameters', async () => {
@@ -135,7 +139,7 @@ describe('EventsApi', () => {
                 },
             });
 
-            expect(result).toBe(responseData);
+            expect(result).toStrictEqual(responseData);
         });
 
         it('passes null translationStatusFilter to the API', async () => {

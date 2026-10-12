@@ -117,7 +117,9 @@ jest.mock('./plugins', () => {
         return null;
     };
     const MockEnterKeyPlugin = () => null;
+    const MockSpaceNormalizationPlugin = () => <div data-testid="space-normalization-plugin" />;
     return {
+        SpaceNormalizationPlugin: MockSpaceNormalizationPlugin,
         MaxLengthPlugin: MockMaxLengthPlugin,
         OnChangePlugin: MockOnChangePlugin,
         FocusPlugin: MockFocusPlugin,
@@ -309,6 +311,18 @@ describe('RichTextInput', () => {
 
             rerender(<RichTextInput {...defaultProps} disabled />);
             expect(mockEditablePluginProps.disabled).toBe(true);
+        });
+
+        it('does not normalize spaces by default', () => {
+            renderRichTextInput();
+            expect(screen.queryByTestId('space-normalization-plugin')).not.toBeInTheDocument();
+            expect(mockMaxLengthPluginProps.ignoreTrailingWhitespace).toBe(false);
+        });
+
+        it('normalizes spaces and ignores trailing whitespace in the counter when normalizeSpaces is set', () => {
+            renderRichTextInput({ normalizeSpaces: true });
+            expect(screen.getByTestId('space-normalization-plugin')).toBeInTheDocument();
+            expect(mockMaxLengthPluginProps.ignoreTrailingWhitespace).toBe(true);
         });
     });
 

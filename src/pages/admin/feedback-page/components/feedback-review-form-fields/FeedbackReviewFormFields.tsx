@@ -12,9 +12,10 @@ export interface FeedbackReviewFormFieldsProps {
     control: Control<FeedbackReviewFormValues>;
     errors: FieldErrors<FeedbackReviewFormValues>;
     idPrefix: string;
+    disabled?: boolean;
 }
 
-export const FeedbackReviewFormFields = ({ control, errors, idPrefix }: FeedbackReviewFormFieldsProps) => (
+export const FeedbackReviewFormFields = ({ control, errors, idPrefix, disabled }: FeedbackReviewFormFieldsProps) => (
     <>
         <Controller
             name="authorName"
@@ -23,6 +24,7 @@ export const FeedbackReviewFormFields = ({ control, errors, idPrefix }: Feedback
                 <InputWithCharacterLimitGroup
                     name={field.name}
                     value={field.value}
+                    disabled={disabled}
                     onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
                     onBlur={() => {
                         if (field.value) {
@@ -47,6 +49,7 @@ export const FeedbackReviewFormFields = ({ control, errors, idPrefix }: Feedback
                 <TextAreaWithCharacterLimitGroup
                     name={field.name}
                     value={field.value}
+                    disabled={disabled}
                     onChange={(e) => field.onChange(getNormalizedInputTextWhileTyping(e.target.value))}
                     onBlur={() => {
                         if (field.value) {

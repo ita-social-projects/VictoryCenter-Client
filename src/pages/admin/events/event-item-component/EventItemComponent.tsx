@@ -2,9 +2,10 @@ import { VisibilityStatusLabel } from '@/components/admin/visibility-status-labe
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { EventItemDto } from '@/types/admin/events';
-import { LocalizationLanguage } from '@/types/common/language';
+import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
 import { EVENT_ITEMS_TEXT } from '@/const/admin/events';
 import './EventItemComponent.scss';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 export interface EventItemComponentProps {
     item: EventItemDto;
@@ -14,7 +15,13 @@ export interface EventItemComponentProps {
     translationLanguages?: LocalizationLanguage[];
 }
 
-export const EventItemComponent = ({ item, onEdit, onTranslate, language }: EventItemComponentProps) => {
+export const EventItemComponent = ({
+    item,
+    onEdit,
+    onTranslate,
+    language,
+    translationLanguages = [],
+}: EventItemComponentProps) => {
     const displayedLocalization = language
         ? item.localizations?.find((localization) => localization.language.code === language.code)
         : undefined;
@@ -29,6 +36,10 @@ export const EventItemComponent = ({ item, onEdit, onTranslate, language }: Even
 
                     <div className="event-info-title">
                         <p>{title}</p>
+                        <LocalizationStatuses<EntityLocalization>
+                            languages={translationLanguages}
+                            localizedEntity={item}
+                        />
                     </div>
                 </div>
 

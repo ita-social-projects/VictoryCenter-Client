@@ -56,9 +56,16 @@ export const Tooltip = ({
             const tooltipWidth = tooltipElement.offsetWidth;
             const tooltipHeight = tooltipElement.offsetHeight;
 
+            const availableSpaceAbove = positionerRect.top - offsetInPixels;
+            const availableSpaceBelow = window.innerHeight - positionerRect.bottom - offsetInPixels;
             const shouldFlipToTop =
-                position === 'bottom' && positionerRect.bottom + offsetInPixels + tooltipHeight > window.innerHeight;
-            const shouldFlipToBottom = position === 'top' && positionerRect.top - offsetInPixels - tooltipHeight < 0;
+                position === 'bottom' &&
+                tooltipHeight > availableSpaceBelow &&
+                (tooltipHeight <= availableSpaceAbove || availableSpaceAbove > availableSpaceBelow);
+            const shouldFlipToBottom =
+                position === 'top' &&
+                tooltipHeight > availableSpaceAbove &&
+                (tooltipHeight <= availableSpaceBelow || availableSpaceBelow > availableSpaceAbove);
             const resolvedPosition = shouldFlipToTop ? 'top' : shouldFlipToBottom ? 'bottom' : position;
 
             let top = 0;

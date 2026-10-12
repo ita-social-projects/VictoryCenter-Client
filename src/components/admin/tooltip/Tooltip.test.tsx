@@ -228,6 +228,58 @@ describe('Tooltip - Portal Rendering', () => {
         widthSpy.mockRestore();
     });
 
+    it('keeps a bottom tooltip below when neither side fits and there is more space below', () => {
+        mockPortalPositioner.getBoundingClientRect = jest.fn(() => ({
+            width: 120,
+            height: 40,
+            top: 100,
+            left: 100,
+            bottom: 140,
+            right: 220,
+            x: 100,
+            y: 100,
+            toJSON: jest.fn(),
+        }));
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 350, writable: true });
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(300);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip();
+
+        expectPortalTooltipToHaveStyle('top', '148px');
+        expectPortalTooltipToHaveClass('tooltip-popup--bottom');
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
+    it('keeps a top tooltip above when neither side fits and there is more space above', () => {
+        mockPortalPositioner.getBoundingClientRect = jest.fn(() => ({
+            width: 120,
+            height: 40,
+            top: 200,
+            left: 100,
+            bottom: 240,
+            right: 220,
+            x: 100,
+            y: 200,
+            toJSON: jest.fn(),
+        }));
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 350, writable: true });
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(300);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip({ position: 'top' });
+
+        expectPortalTooltipToHaveStyle('top', '-108px');
+        expectPortalTooltipToHaveClass('tooltip-popup--top');
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
     it('renders tooltip in portal', () => {
         renderPortalTooltip();
         expect(getPortalTooltip()).toBeInTheDocument();

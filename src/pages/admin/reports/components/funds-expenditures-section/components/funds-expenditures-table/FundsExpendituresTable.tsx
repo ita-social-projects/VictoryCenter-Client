@@ -540,7 +540,16 @@ export const FundsExpendituresTable = ({
                 data-record-count={records.length}
                 onScroll={handleTableScroll}
             >
-                <table className={styles.table}>
+                <table className={cn(styles.table, { [styles['table-editing']]: isEditing })}>
+                    <colgroup>
+                        {isEditing && <col className={styles['column-checkbox']} />}
+                        <col className={styles['column-year']} />
+                        <col className={styles['column-type']} />
+                        <col className={styles['column-category']} />
+                        <col className={styles['column-amount']} />
+                        <col className={styles['column-amount']} />
+                        {isEditing && <col className={styles['column-actions']} />}
+                    </colgroup>
                     <thead>
                         <tr>
                             {isEditing && (

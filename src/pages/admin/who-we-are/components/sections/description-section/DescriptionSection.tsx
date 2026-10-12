@@ -82,6 +82,7 @@ export const DescriptionSection = ({
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
                     id={descriptionContent.id.toString()}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     value={displayedDescription ?? ''}

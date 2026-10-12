@@ -172,6 +172,7 @@ export const ImageSection = ({
                             <RichTextInputGroup
                                 key={`title-${language.code}`}
                                 label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                                isRequired
                                 value={displayedTitle ?? ''}
                                 onChange={handleTitleChange}
                                 name={COMMON_TEXT_ADMIN.TYPE.TITLE}
@@ -192,6 +193,7 @@ export const ImageSection = ({
                             <RichTextInputGroup
                                 key={`description-${language.code}`}
                                 label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                                isRequired
                                 onChange={handleDescriptionChange}
                                 value={displayedDescription ?? ''}
                                 maxLength={descriptionLimit}

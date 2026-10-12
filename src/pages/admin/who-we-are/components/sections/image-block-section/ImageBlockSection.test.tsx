@@ -33,11 +33,15 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         onBlur,
         id,
         disabled,
+        normalizeSpaces,
+        trimOnBlur,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
+                data-normalize-spaces={normalizeSpaces}
+                data-trim-on-blur={trimOnBlur}
                 onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
@@ -392,6 +396,16 @@ describe('ImageSection', () => {
         fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'any' } });
 
         expect(getPublishButton()).toBeDisabled();
+    });
+
+    it('should normalize spaces and trim on blur in the title and description fields', () => {
+        renderComponent();
+
+        ['mock-rich-input-2', 'mock-rich-input-3'].forEach((testId) => {
+            const input = screen.getByTestId(testId);
+            expect(input).toHaveAttribute('data-normalize-spaces', 'true');
+            expect(input).toHaveAttribute('data-trim-on-blur', 'true');
+        });
     });
 
     it('should disable publish button when description validation returns error on change', () => {

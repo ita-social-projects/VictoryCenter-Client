@@ -160,6 +160,8 @@ export const ImageSection = ({
                                 error={isBaseLanguage ? (titleError ?? undefined) : undefined}
                                 disabled={!isBaseLanguage}
                                 hideToolbar={!isBaseLanguage}
+                                normalizeSpaces
+                                trimOnBlur
                             />
                         </div>
                     )}
@@ -178,6 +180,8 @@ export const ImageSection = ({
                                 error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                                 disabled={!isBaseLanguage}
                                 hideToolbar={!isBaseLanguage}
+                                normalizeSpaces
+                                trimOnBlur
                             />
                         </div>
                     )}

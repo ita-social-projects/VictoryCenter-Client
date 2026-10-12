@@ -1,4 +1,27 @@
-import { isExternalLink } from './url';
+import { isExternalLink, isHttpOrHttpsUrl } from './url';
+
+describe('isHttpOrHttpsUrl', () => {
+    test.each(['https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'http://example.com/video'])(
+        'should accept %s',
+        (value) => {
+            expect(isHttpOrHttpsUrl(value)).toBe(true);
+        },
+    );
+
+    test.each([
+        // eslint-disable-next-line no-script-url -- verifies script URLs are rejected
+        'javascript:alert(1)',
+        'data:text/html,<script>alert(1)</script>',
+        'ftp://example.com/file',
+        'not a url',
+        '/relative/path',
+        '',
+        null,
+        undefined,
+    ])('should reject %p', (value) => {
+        expect(isHttpOrHttpsUrl(value)).toBe(false);
+    });
+});
 
 describe('isExternalLink', () => {
     test('should identify https URLs as external', () => {

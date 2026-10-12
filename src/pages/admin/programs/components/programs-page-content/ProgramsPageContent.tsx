@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HippotherapyProgram, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
-import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoryContextMenu } from '@/hooks/admin/use-category-context-menu/useCategoryContextMenu';
 import { useCategoriesCounter } from '@/hooks/admin/use-categories-counter/useCategoriesCounter';
 import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -491,30 +492,8 @@ export const ProgramsPageContent = () => {
     );
 
     // Context menu handlers
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-            { id: 'addTranslation', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
-        ],
-        [],
-    );
-
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            } else if (id === 'addTranslation') {
-                openModalActions.openTranslateCategoryModal();
-            }
-        },
-        [openModalActions],
-    );
+    const { categoryContextMenuOptions: categoryBarContextMenuOptions, onContextMenuOptionSelected } =
+        useCategoryContextMenu(openModalActions);
 
     // Render helpers
     const renderProgramItem = useCallback(

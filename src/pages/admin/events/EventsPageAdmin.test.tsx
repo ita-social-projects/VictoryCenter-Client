@@ -1365,6 +1365,34 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
     });
 
+    it('refetches the current category without the status filter when the search is cleared after selecting a same-category suggestion', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, _categoryId, _offset, _limit, _sort, status) =>
+            status === undefined
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        await enableStatusFilter(user);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
         const user = userEvent.setup();
 

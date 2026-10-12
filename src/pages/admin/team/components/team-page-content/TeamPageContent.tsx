@@ -8,7 +8,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
-import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
@@ -18,6 +18,7 @@ import { MemberComponent } from '../member-component/MemberComponent';
 import { TeamCategory } from '@/types/admin/team-category';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoryContextMenu } from '@/hooks/admin/use-category-context-menu/useCategoryContextMenu';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
@@ -79,30 +80,8 @@ export const TeamPageContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            } else if (id === 'addTranslation') {
-                openModalActions.openTranslateCategoryModal();
-            }
-        },
-        [openModalActions],
-    );
-
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-            { id: 'addTranslation', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
-        ],
-        [],
-    );
+    const { categoryContextMenuOptions: categoryBarContextMenuOptions, onContextMenuOptionSelected } =
+        useCategoryContextMenu(openModalActions);
 
     const {
         allLanguages,

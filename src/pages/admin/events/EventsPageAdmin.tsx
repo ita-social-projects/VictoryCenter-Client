@@ -188,7 +188,8 @@ export const EventsPageAdmin = () => {
 
     const handleEventSearchClear = useCallback(() => {
         setSelectedSearchItem(null);
-    }, []);
+        resetEventItemsState();
+    }, [resetEventItemsState]);
 
     // Category handlers
     const { categoryContextMenuOptions, onContextMenuOptionSelected } = useCategoryContextMenu(openModalActions);

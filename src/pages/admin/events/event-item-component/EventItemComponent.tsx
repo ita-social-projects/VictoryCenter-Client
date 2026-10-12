@@ -9,11 +9,12 @@ import './EventItemComponent.scss';
 export interface EventItemComponentProps {
     item: EventItemDto;
     onEdit: (item: EventItemDto) => void;
+    onTranslate: (item: EventItemDto) => void;
     language?: LocalizationLanguage | null;
     translationLanguages?: LocalizationLanguage[];
 }
 
-export const EventItemComponent = ({ item, onEdit, language }: EventItemComponentProps) => {
+export const EventItemComponent = ({ item, onEdit, onTranslate, language }: EventItemComponentProps) => {
     const displayedLocalization = language
         ? item.localizations?.find((localization) => localization.language.code === language.code)
         : undefined;
@@ -42,6 +43,14 @@ export const EventItemComponent = ({ item, onEdit, language }: EventItemComponen
 
             <div className="event-item-actions">
                 <IconButton
+                    aria-label={EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE}
+                    type="button"
+                    onClick={() => onTranslate(item)}
+                    DefaultIcon={ACTION_ICONS.translate.default}
+                    FilledIcon={ACTION_ICONS.translate.default}
+                />
+
+                <IconButton
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.EDIT}
                     type="button"
                     onClick={() => onEdit(item)}
@@ -53,7 +62,7 @@ export const EventItemComponent = ({ item, onEdit, language }: EventItemComponen
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
                     onClick={() => {
-                        /*TODO: add implementation.*/
+                        /*  TODO: add implementation */
                     }}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}

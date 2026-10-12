@@ -380,15 +380,14 @@ describe('TranslateProgramModal', () => {
 
         expect(screen.getByText('Hook error text')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION })).toBeDisabled();
     });
 
-    it('handles generate button click without submitting form', () => {
+    it('does not render generate translation button', () => {
         renderModal();
 
-        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION }));
-
-        expect(mockTranslateProgram).not.toHaveBeenCalled();
+        expect(
+            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION }),
+        ).not.toBeInTheDocument();
     });
 
     it('maps localized section contents into initialData for selected language', () => {

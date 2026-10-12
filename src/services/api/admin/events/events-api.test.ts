@@ -183,7 +183,7 @@ describe('EventsApi', () => {
             status: VisibilityStatus.Published,
             previewImageId: null,
             backgroundImageId: null,
-            categoryIds: [1],
+            categoryId: 1,
             localizations: [
                 {
                     languageId: DEFAULT_UKRAINIAN_LANGUAGE_ID,

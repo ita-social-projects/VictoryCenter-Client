@@ -34,7 +34,7 @@ describe('event request mapper', () => {
             status: VisibilityStatus.Draft,
             previewImageId: null,
             backgroundImageId: null,
-            categoryIds: [7],
+            categoryId: 7,
             localizations: [
                 {
                     languageId: 1,
@@ -46,7 +46,7 @@ describe('event request mapper', () => {
         });
     });
 
-    it('preserves event categories and non-Ukrainian localizations when editing', () => {
+    it('preserves the event category and non-Ukrainian localizations when editing', () => {
         const currentEvent = {
             id: 1,
             resource: '',
@@ -59,7 +59,7 @@ describe('event request mapper', () => {
             previewImage: { id: 14, url: 'https://example.com/preview.png', mimeType: 'image/png' },
             backgroundImage: { id: 15, url: 'https://example.com/background.png', mimeType: 'image/png' },
             priority: 1,
-            categories: [{ id: 7 }, { id: 8 }],
+            category: { id: 7 },
             localizations: [
                 {
                     language: { id: 1 },
@@ -84,7 +84,7 @@ describe('event request mapper', () => {
             fallbackBackgroundImage: null,
         });
 
-        expect(request.categoryIds).toEqual([7, 8]);
+        expect(request.categoryId).toBe(7);
         expect(request.backgroundImageId).toBe(15);
         expect(request.localizations).toEqual([
             {

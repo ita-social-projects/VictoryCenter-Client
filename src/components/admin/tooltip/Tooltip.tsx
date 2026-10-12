@@ -27,6 +27,12 @@ export interface TooltipWithPortal extends TooltipBaseProps {
 
 export type TooltipProps = TooltipWithoutPortal | TooltipWithPortal;
 
+interface TooltipCoordinates {
+    top: number;
+    left: number;
+    position: TooltipPosition;
+}
+
 export const Tooltip = ({
     id,
     children,
@@ -39,7 +45,7 @@ export const Tooltip = ({
     portalPositioner,
 }: TooltipProps) => {
     const tooltipRef = useRef<HTMLDivElement>(null);
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+    const [tooltipPosition, setTooltipPosition] = useState<TooltipCoordinates>({ top: 0, left: 0, position });
 
     const calculatePosition = useCallback(() => {
         const tooltipElement = tooltipRef.current;
@@ -50,12 +56,17 @@ export const Tooltip = ({
             const tooltipWidth = tooltipElement.offsetWidth;
             const tooltipHeight = tooltipElement.offsetHeight;
 
+            const shouldFlipToTop =
+                position === 'bottom' && positionerRect.bottom + offsetInPixels + tooltipHeight > window.innerHeight;
+            const shouldFlipToBottom = position === 'top' && positionerRect.top - offsetInPixels - tooltipHeight < 0;
+            const resolvedPosition = shouldFlipToTop ? 'top' : shouldFlipToBottom ? 'bottom' : position;
+
             let top = 0;
             let left = isCentered
                 ? positionerRect.left + (positionerRect.width - tooltipWidth) / 2
                 : positionerRect.left;
 
-            switch (position) {
+            switch (resolvedPosition) {
                 case 'top':
                     top = positionerRect.top - tooltipHeight - offsetInPixels;
                     break;
@@ -64,7 +75,13 @@ export const Tooltip = ({
                     break;
             }
 
-            setTooltipPosition({ top, left });
+            setTooltipPosition((previousPosition) =>
+                previousPosition.top === top &&
+                previousPosition.left === left &&
+                previousPosition.position === resolvedPosition
+                    ? previousPosition
+                    : { top, left, position: resolvedPosition },
+            );
         } else {
             const parentElement = tooltipElement.parentElement as HTMLElement;
             if (!parentElement) return;
@@ -86,7 +103,11 @@ export const Tooltip = ({
                     break;
             }
 
-            setTooltipPosition({ top, left });
+            setTooltipPosition((previousPosition) =>
+                previousPosition.top === top && previousPosition.left === left && previousPosition.position === position
+                    ? previousPosition
+                    : { top, left, position },
+            );
         }
     }, [position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);
 
@@ -110,7 +131,7 @@ export const Tooltip = ({
             ref={tooltipRef}
             role="tooltip"
             onMouseDown={(e) => e.stopPropagation()}
-            className={classNames('tooltip-popup', `tooltip-popup--${position}`)}
+            className={classNames('tooltip-popup', `tooltip-popup--${tooltipPosition.position}`)}
             style={{
                 top: `${tooltipPosition.top}px`,
                 left: `${tooltipPosition.left}px`,

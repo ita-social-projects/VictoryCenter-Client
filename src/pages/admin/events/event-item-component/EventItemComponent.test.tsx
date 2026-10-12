@@ -82,7 +82,13 @@ describe('EventItemComponent', () => {
         const english = { id: 2, code: 'en', name: 'English' };
 
         render(
-            <EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} language={english} translationLanguages={[english]} />,
+            <EventItemComponent
+                item={item}
+                onEdit={jest.fn()}
+                onTranslate={jest.fn()}
+                language={english}
+                translationLanguages={[english]}
+            />,
         );
 
         expect(screen.getByText(item.title)).toBeInTheDocument();

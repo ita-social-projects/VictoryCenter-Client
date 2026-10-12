@@ -1,7 +1,19 @@
 import { Image, ImageValues } from '../common/image';
 import { VisibilityStatus } from './common';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 
-export interface EventItemDto {
+export interface EventLocalization extends EntityLocalization {
+    title: string;
+    description: string;
+    additionalDescription?: string | null;
+}
+
+export interface EventItemDto extends EntityWithLocalizations<EventLocalization> {
     id: number;
     resource: string;
     resourceEn?: string | null;
@@ -15,6 +27,15 @@ export interface EventItemDto {
     priority: number;
 }
 
+export interface EventLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+    additionalDescription?: string | null;
+}
+
+export type EventItemResponseDto = Omit<EventItemDto, 'localizations'> &
+    EntityWithDtoLocalizations<EventLocalizationDto>;
 export interface EventCategoryReference {
     id: number;
 }
@@ -28,7 +49,7 @@ export interface EventLocalizationDetails {
     additionalDescription?: string | null;
 }
 
-export interface EventDetailsDto extends EventItemDto {
+export interface EventDetailsDto extends Omit<EventItemDto, 'localizations'> {
     categories: EventCategoryReference[];
     localizations: EventLocalizationDetails[];
 }

@@ -114,7 +114,7 @@ describe('EventsApi', () => {
                 },
             });
 
-            expect(result).toBe(responseData);
+            expect(result).toStrictEqual(responseData);
         });
 
         it('calls the Events endpoint without optional parameters', async () => {
@@ -139,7 +139,7 @@ describe('EventsApi', () => {
                 },
             });
 
-            expect(result).toBe(responseData);
+            expect(result).toStrictEqual(responseData);
         });
 
         it('passes null translationStatusFilter to the API', async () => {

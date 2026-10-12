@@ -162,6 +162,8 @@ export const TranslateWhoWeAreMultipleDescriptionsForm = forwardRef<
                                         disabled={isSubmitting || formDisabled}
                                         maxLength={limits.descriptionLimit}
                                         error={errors.rows?.[rowIndex]?.description}
+                                        normalizeSpaces
+                                        trimOnBlur
                                     />
                                 </div>
                             </div>

@@ -4,11 +4,7 @@ import { EVENT_CATEGORY_TEXT, EVENT_CATEGORY_VALIDATION } from '@/const/admin/ev
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
-import {
-    validateTranslateCategoryName,
-    validateTranslateCategorySelection,
-    validateTranslateEventCategoryForm,
-} from '@/validation/admin/event-schema/event-schema';
+import { EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS } from '@/validation/admin/event-category-translation-schema/event-category-translation-schema';
 import { forwardRef, useCallback, useEffect } from 'react';
 import styles from './TranslateEventCategoryForm.module.scss';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -63,7 +59,10 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
                 formState: TranslateEventCategoryFormValues,
                 _isPublishing: boolean,
             ): TranslateEventCategoryFormErrorState => {
-                return validateTranslateEventCategoryForm(formState.name, selectedCategory);
+                return EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateForm(
+                    formState.name,
+                    selectedCategory ?? undefined,
+                ) as TranslateEventCategoryFormErrorState;
             },
             [selectedCategory],
         );
@@ -88,23 +87,36 @@ export const TranslateEventCategoryForm = forwardRef<TranslateEventCategoryFormR
         }, [formState, initialData, selectedCategory, onDirtyChange]);
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setFormState((prev) => ({ ...prev, name: e.target.value }));
+            const newValue = e.target.value;
+            setFormState((prev) => ({ ...prev, name: newValue }));
+
+            if (errors.name) {
+                const normalized = getNormalizedInputText(newValue);
+                setErrors((prev) => ({
+                    ...prev,
+                    name: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateName(normalized),
+                }));
+            }
         };
 
         const handleCategoryChange = (category: EventCategoryDto | null) => {
             onCategoryChange?.(category);
-            setErrors((prev) => ({ ...prev, category: validateTranslateCategorySelection(category) }));
+            setErrors((prev) => ({
+                ...prev,
+                category: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateCategory(category),
+            }));
         };
 
         const handleNameBlur = () => {
             const normalized = getNormalizedInputText(formState.name);
+
             if (normalized !== formState.name) {
                 setFormState((prev) => ({ ...prev, name: normalized }));
             }
+
             setErrors((prev) => ({
                 ...prev,
-                name: validateTranslateCategoryName(normalized),
-                category: validateTranslateCategorySelection(selectedCategory),
+                name: EVENT_CATEGORY_TRANSLATION_VALIDATION_FUNCTIONS.validateName(normalized),
             }));
         };
 

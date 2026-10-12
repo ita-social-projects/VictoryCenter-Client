@@ -18,6 +18,7 @@ import {
     InitialValuePlugin,
     EnterKeyPlugin,
     EditablePlugin,
+    SpaceNormalizationPlugin,
 } from './plugins';
 
 export interface RichTextInputProps {
@@ -38,6 +39,11 @@ export interface RichTextInputProps {
      * text content when the input loses focus.
      */
     trimOnBlur?: boolean;
+    /**
+     * If true, collapses consecutive spaces while typing, drops spaces at the start of the field
+     * and excludes trailing spaces from the counter.
+     */
+    normalizeSpaces?: boolean;
     /** If true, prevents the editor value from exceeding maxLength. */
     enforceMaxLength?: boolean;
     showCounter?: boolean;
@@ -69,6 +75,7 @@ export const RichTextInput = ({
     className,
     hasError = false,
     trimOnBlur = false,
+    normalizeSpaces = false,
     enforceMaxLength = true,
     showCounter = true,
     onLengthChange,
@@ -143,7 +150,9 @@ export const RichTextInput = ({
                     maxLength={maxLength}
                     onLengthChange={handleLengthChange}
                     enforceMaxLength={enforceMaxLength}
+                    ignoreTrailingWhitespace={normalizeSpaces}
                 />
+                {normalizeSpaces && <SpaceNormalizationPlugin />}
                 <FocusPlugin
                     onFocus={onFocus}
                     onBlur={onBlur}

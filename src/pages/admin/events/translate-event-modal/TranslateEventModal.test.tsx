@@ -4,6 +4,12 @@ import { EventItemDto } from '@/types/admin/events';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useTranslateEvent } from '@/hooks/admin/use-translate-event/useTranslateEvent';
 
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+    }),
+}));
+
 jest.mock('@/const/common/locales', () => ({
     DEFAULT_LOCALE: 'uk',
 }));

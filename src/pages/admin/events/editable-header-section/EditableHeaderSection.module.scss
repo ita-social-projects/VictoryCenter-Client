@@ -14,6 +14,10 @@
     background-color: colors.$grey-50;
     box-shadow: 0 4px 4px rgba(colors.$black, 0.25);
 
+    &--hidden {
+        background-color: colors.$grey-600;
+    }
+
     &-heading-row,
     &-actions,
     &-form-actions {

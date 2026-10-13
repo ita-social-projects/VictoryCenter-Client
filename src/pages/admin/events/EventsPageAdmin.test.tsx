@@ -1393,6 +1393,31 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 
+    it('clears a selected search result when the status filter changes, so the filter actually takes effect', async () => {
+        const user = userEvent.setup();
+
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, _categoryId, _offset, _limit, _sort, status) =>
+            status === undefined
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-102')).not.toBeInTheDocument();
+
+        await enableStatusFilter(user);
+
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+    });
+
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
         const user = userEvent.setup();
 

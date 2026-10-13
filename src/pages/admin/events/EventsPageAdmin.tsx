@@ -164,6 +164,7 @@ export const EventsPageAdmin = () => {
     const onStatusFilterChange = useCallback(
         (status: VisibilityStatus | undefined) => {
             setStatusFilter(status);
+            setSelectedSearchItem(null);
 
             resetEventItemsState();
         },

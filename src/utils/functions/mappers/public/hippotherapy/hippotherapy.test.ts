@@ -9,6 +9,8 @@ const withImage = (name: string) => ({
 const noImage = { image: null, imageId: null };
 
 const buildDto = (): HippotherapyPageContentDto => ({
+    localizations: [],
+    translationStatuses: [],
     introSection: { title: '<h3>Intro title</h3>', description: '<p>Intro description</p>', ...withImage('intro') },
     descriptionSection: { title: 'Description title', description: '<p>Description text</p>' },
     quoteSection: { quoteText: 'Quote text', authorName: '<p>Author</p>', ...withImage('quote') },

@@ -135,6 +135,8 @@ jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', 
 const mockedIsContentValid = isHippotherapyPageContentValid as jest.Mock;
 
 const buildContent = (): HippotherapyPageContentModel => ({
+    localizations: [],
+    translationStatuses: [],
     introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
     descriptionSection: { title: 'Description title', description: 'Description text' },
     quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },

@@ -24,6 +24,8 @@ import { EthicsSection } from '../sections/ethics-section/EthicsSection';
 import './HippotherapyPageContent.scss';
 
 const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPageContentModel => ({
+    localizations: [],
+    translationStatuses: [],
     introSection: {
         ...content.introSection,
         title: normalizeHtml(content.introSection.title),
@@ -87,6 +89,8 @@ const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPa
 });
 
 const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => ({
+    localizations: [],
+    translationStatuses: [],
     introSection: { title: '', description: '', image: null, imageId: null },
     descriptionSection: { title: '', description: '' },
     quoteSection: { quoteText: '', authorName: '', image: null, imageId: null },

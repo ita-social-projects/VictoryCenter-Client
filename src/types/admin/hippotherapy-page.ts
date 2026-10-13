@@ -181,10 +181,15 @@ export interface HippotherapyPageContentModel extends EntityWithLocalizations<Hi
 }
 
 export interface HippotherapyPageContentDto extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations'>,
-    EntityWithDtoLocalizations<HippotherapyPageLocalizationDto>{
+    EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto>{
     scientificReferencesSection: {
         title: string;
         description: string;
         scientificReferences: HippotherapyScientificReferenceDto[];
     };
 }
+
+export type UpdateHippotherapyPageContentDto = Omit<
+    HippotherapyPageContentDto,
+    'localizations' | 'translationStatuses'
+>;

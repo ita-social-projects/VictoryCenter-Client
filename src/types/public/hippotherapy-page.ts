@@ -74,5 +74,5 @@ export interface HippotherapyAbout {
     anotherQuoteSection: Quote;
     participantsSection: HippotherapyParticipantsSection;
     ethicsSection: HippotherapyEthicsSection;
-    localizations: PublicHippotherapyLocalizationDto[];
+    localizations?: PublicHippotherapyLocalizationDto[];
 }

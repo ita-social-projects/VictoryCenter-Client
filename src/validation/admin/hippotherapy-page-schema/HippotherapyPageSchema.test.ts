@@ -2,6 +2,8 @@ import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS, isHippotherapyPageContentValid 
 import { HippotherapyPageContentModel } from '@/types/admin/hippotherapy-page';
 
 const buildValidContent = (): HippotherapyPageContentModel => ({
+    localizations: [],
+    translationStatuses: [],
     introSection: { title: 'Valid title text', description: 'Valid description text', image: null, imageId: 1 },
     descriptionSection: { title: 'Valid title text', description: 'Valid description text' },
     quoteSection: { quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 2 },

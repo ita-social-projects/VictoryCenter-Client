@@ -118,20 +118,20 @@ describe('isHippotherapyPageContentValid', () => {
         expect(isHippotherapyPageContentValid(content)).toBe(false);
     });
 
-    it('returns false when a section image is missing (no image and no imageId)', () => {
+    it('returns true when a section has no image (the public page shows a default one)', () => {
         const content = buildValidContent();
         content.introSection.image = null;
         content.introSection.imageId = null;
 
-        expect(isHippotherapyPageContentValid(content)).toBe(false);
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
     });
 
-    it('returns false when a gallery card image is missing', () => {
+    it('returns true when a gallery card has no image', () => {
         const content = buildValidContent();
         content.advantagesSection.cards[0].image = null;
         content.advantagesSection.cards[0].imageId = null;
 
-        expect(isHippotherapyPageContentValid(content)).toBe(false);
+        expect(isHippotherapyPageContentValid(content)).toBe(true);
     });
 
     it('treats a newly uploaded (not yet saved) image as present even without an imageId', () => {

@@ -33,6 +33,48 @@ interface TooltipCoordinates {
     position: TooltipPosition;
 }
 
+const resolveVerticalPosition = (
+    position: TooltipPosition,
+    tooltipHeight: number,
+    availableSpaceAbove: number,
+    availableSpaceBelow: number,
+): TooltipPosition => {
+    const fits = (availableSpace: number) => tooltipHeight <= availableSpace;
+
+    if (
+        position === 'bottom' &&
+        !fits(availableSpaceBelow) &&
+        (fits(availableSpaceAbove) || availableSpaceAbove > availableSpaceBelow)
+    ) {
+        return 'top';
+    }
+
+    if (
+        position === 'top' &&
+        !fits(availableSpaceAbove) &&
+        (fits(availableSpaceBelow) || availableSpaceBelow > availableSpaceAbove)
+    ) {
+        return 'bottom';
+    }
+
+    return position;
+};
+
+const getUpdatedTooltipCoordinates = (
+    previousCoordinates: TooltipCoordinates,
+    nextCoordinates: TooltipCoordinates,
+): TooltipCoordinates => {
+    if (
+        previousCoordinates.top === nextCoordinates.top &&
+        previousCoordinates.left === nextCoordinates.left &&
+        previousCoordinates.position === nextCoordinates.position
+    ) {
+        return previousCoordinates;
+    }
+
+    return nextCoordinates;
+};
+
 export const Tooltip = ({
     id,
     children,
@@ -58,15 +100,12 @@ export const Tooltip = ({
 
             const availableSpaceAbove = positionerRect.top - offsetInPixels;
             const availableSpaceBelow = window.innerHeight - positionerRect.bottom - offsetInPixels;
-            const shouldFlipToTop =
-                position === 'bottom' &&
-                tooltipHeight > availableSpaceBelow &&
-                (tooltipHeight <= availableSpaceAbove || availableSpaceAbove > availableSpaceBelow);
-            const shouldFlipToBottom =
-                position === 'top' &&
-                tooltipHeight > availableSpaceAbove &&
-                (tooltipHeight <= availableSpaceBelow || availableSpaceBelow > availableSpaceAbove);
-            const resolvedPosition = shouldFlipToTop ? 'top' : shouldFlipToBottom ? 'bottom' : position;
+            const resolvedPosition = resolveVerticalPosition(
+                position,
+                tooltipHeight,
+                availableSpaceAbove,
+                availableSpaceBelow,
+            );
 
             let top = 0;
             let left = isCentered
@@ -83,11 +122,7 @@ export const Tooltip = ({
             }
 
             setTooltipPosition((previousPosition) =>
-                previousPosition.top === top &&
-                previousPosition.left === left &&
-                previousPosition.position === resolvedPosition
-                    ? previousPosition
-                    : { top, left, position: resolvedPosition },
+                getUpdatedTooltipCoordinates(previousPosition, { top, left, position: resolvedPosition }),
             );
         } else {
             const parentElement = tooltipElement.parentElement as HTMLElement;
@@ -111,9 +146,7 @@ export const Tooltip = ({
             }
 
             setTooltipPosition((previousPosition) =>
-                previousPosition.top === top && previousPosition.left === left && previousPosition.position === position
-                    ? previousPosition
-                    : { top, left, position },
+                getUpdatedTooltipCoordinates(previousPosition, { top, left, position }),
             );
         }
     }, [position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);

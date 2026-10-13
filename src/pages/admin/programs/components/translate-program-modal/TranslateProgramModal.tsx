@@ -136,10 +136,6 @@ export const TranslateProgramModal = ({
         formRef.current.submit(VisibilityStatus.Draft);
     };
 
-    const handleGenerateClick = () => {
-        // TODO: connect real auto-translation action when backend endpoint is ready
-    };
-
     const checkIsDirty = () => {
         return formRef.current?.isDirty() ?? false;
     };
@@ -205,14 +201,6 @@ export const TranslateProgramModal = ({
                                 className="translate-program-modal__action-button"
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION}
-                            </Button>
-                            <Button
-                                buttonStyle="primary"
-                                disabled={isSubmitting || !language}
-                                onClick={handleGenerateClick}
-                                className="translate-program-modal__action-button"
-                            >
-                                {COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION}
                             </Button>
                         </div>
                     </div>

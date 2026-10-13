@@ -1,3 +1,5 @@
+import { endsWithSpace, normalizeSpaces } from '@/utils/functions/normalize-spaces/normalize-spaces';
+
 const trimTrailingWhitespace = (container: Node): void => {
     let child = container.lastChild;
 
@@ -69,7 +71,57 @@ export const normalizeHtml = (html: string): string => {
     return tempDiv.innerHTML;
 };
 
-export const normalizeRichTextHtmlForComparison = (html: string): string => {
+const isTextRunBoundary = (node: Node) => node.nodeName === 'P' || node.nodeName === 'BR';
+
+const removeEmptyBranch = (node: Node, container: Node): void => {
+    let current: Node | null = node;
+
+    while (current && current !== container) {
+        const parent: Node | null = current.parentNode;
+        current.parentNode?.removeChild(current);
+        current = parent && parent.childNodes.length === 0 ? parent : null;
+    }
+};
+
+// Must produce the same text as SpaceNormalizationPlugin does in the editor.
+const applyEditorSpaceRules = (container: HTMLElement): void => {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+    const nodes: Node[] = [];
+
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        nodes.push(node);
+    }
+
+    let hasText = false;
+    let previousEndsWithSpace = false;
+
+    nodes.forEach((node) => {
+        if (node.nodeType !== Node.TEXT_NODE) {
+            if (isTextRunBoundary(node)) previousEndsWithSpace = false;
+            return;
+        }
+
+        const text = normalizeSpaces(node.textContent ?? '', !hasText || previousEndsWithSpace);
+
+        if (!text) {
+            removeEmptyBranch(node, container);
+            return;
+        }
+
+        node.textContent = text;
+        hasText = true;
+        previousEndsWithSpace = endsWithSpace(text);
+    });
+};
+
+export interface RichTextComparisonOptions {
+    collapseSpaces?: boolean;
+}
+
+export const normalizeRichTextHtmlForComparison = (
+    html: string,
+    { collapseSpaces = false }: RichTextComparisonOptions = {},
+): string => {
     const normalizedHtml = normalizeHtml(html);
 
     if (!normalizedHtml) return '';
@@ -83,6 +135,10 @@ export const normalizeRichTextHtmlForComparison = (html: string): string => {
         paragraph.textContent = normalizedHtml;
         tempDiv.textContent = '';
         tempDiv.appendChild(paragraph);
+    }
+
+    if (collapseSpaces) {
+        applyEditorSpaceRules(tempDiv);
     }
 
     return tempDiv.innerHTML.replace(/>\s+</g, '><').trim();

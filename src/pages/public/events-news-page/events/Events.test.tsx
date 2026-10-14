@@ -2,13 +2,23 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import { Events } from './Events';
 import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 
-jest.mock('react-i18next', () => {
-    return {
-        useTranslation: () => ({
-            t: (key: string) => key,
-        }),
-    };
-});
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+            resolvedLanguage: 'uk',
+        },
+    }),
+}));
+
+jest.mock('react-router-dom', () => ({
+    useNavigate: () => jest.fn(),
+    useLocation: () => ({
+        pathname: '/',
+        search: '',
+    }),
+}));
 
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
@@ -267,7 +277,6 @@ describe('Events component', () => {
             const firstPageData = eventsNewsMock.slice(0, 3);
             const secondPageData = eventsNewsMock.slice(3, 6);
 
-            // Initial render with first page
             useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 data: firstPageData,
@@ -281,7 +290,6 @@ describe('Events component', () => {
                 expect(eventCards).toHaveLength(firstPageData.length);
             });
 
-            // Simulate loading more data
             useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 data: secondPageData,
@@ -292,7 +300,6 @@ describe('Events component', () => {
 
             await waitFor(() => {
                 const eventCards = screen.getAllByTestId('single-event-news');
-                // Should have both first and second page data
                 expect(eventCards.length).toBeGreaterThanOrEqual(firstPageData.length);
             });
         });
@@ -314,7 +321,6 @@ describe('Events component', () => {
                 expect(eventCards).toHaveLength(firstFilterData.length);
             });
 
-            // Simulate tag change which resets offset to 0
             useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 data: secondFilterData,
@@ -326,7 +332,6 @@ describe('Events component', () => {
 
             await waitFor(() => {
                 const eventCards = screen.getAllByTestId('single-event-news');
-                // After filter change, should have new data (not concatenated)
                 expect(eventCards.length).toBeLessThanOrEqual(secondFilterData.length);
             });
         });

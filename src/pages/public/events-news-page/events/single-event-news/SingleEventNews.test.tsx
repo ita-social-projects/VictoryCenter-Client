@@ -6,12 +6,20 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+            resolvedLanguage: 'uk',
+        },
     }),
 }));
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
+    useLocation: () => ({
+        pathname: '/',
+        search: '',
+    }),
 }));
 
 const mockEventData: EventsNews = {
@@ -25,6 +33,7 @@ const mockEventData: EventsNews = {
     resource: 'Test Source',
     slug: 'test-event',
     sections: [],
+    localizations: [],
 };
 
 describe('SingleEventNews', () => {

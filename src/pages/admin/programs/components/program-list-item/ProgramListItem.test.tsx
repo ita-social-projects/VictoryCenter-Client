@@ -14,9 +14,9 @@ jest.mock('@/assets/icons/blank-image.svg', () => ({
 }));
 
 jest.mock('@/components/admin/button-tooltip/ButtonTooltip', () => ({
-    ButtonTooltip: ({ children, position }: ButtonTooltipProps) => {
+    ButtonTooltip: ({ children, position, isRenderInPortal }: ButtonTooltipProps) => {
         return (
-            <div data-testid="tooltip-button" data-position={position}>
+            <div data-testid="tooltip-button" data-position={position} data-is-render-in-portal={isRenderInPortal}>
                 {children}
             </div>
         );
@@ -167,6 +167,7 @@ describe('ProgramListItem', () => {
 
         const tooltipButton = getTooltipButton();
         expect(tooltipButton).toHaveAttribute('data-position', 'bottom');
+        expect(tooltipButton).toHaveAttribute('data-is-render-in-portal', 'true');
 
         expect(getProgramItem()).toBeInTheDocument();
         expect(getProgramInfo()).toBeInTheDocument();

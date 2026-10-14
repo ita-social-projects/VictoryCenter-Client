@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import { CONTACT_FORM_LIMITS } from '@/const/public/contact-form';
 import { TFunction } from 'i18next';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+\.[^\s@.]{2,}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9_%+-]+(?:\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
 
 export const createContactFormSchema = (t: TFunction<'contactUsPage', undefined>) =>
     yup.object({

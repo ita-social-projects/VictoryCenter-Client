@@ -17,6 +17,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         id,
         error,
         disabled,
+        isRequired,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
@@ -28,6 +29,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                 onBlur={onBlur}
                 id={id}
                 disabled={disabled}
+                data-required={isRequired}
             />
             {error && <span>{error}</span>}
         </div>
@@ -105,6 +107,11 @@ describe('CardContent', () => {
 
         expect(screen.queryByText('This is a description error message.')).not.toBeInTheDocument();
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
+    });
+
+    it('should mark the description field as required', () => {
+        renderComponent();
+        expect(screen.getByTestId('mock-rich-input-1')).toHaveAttribute('data-required', 'true');
     });
 
     it('should call onChange and onDescriptionValidate on change, and onDescriptionValidate on blur', () => {

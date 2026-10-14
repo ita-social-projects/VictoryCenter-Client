@@ -95,7 +95,7 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.amountUsd).toBe('');
     });
 
-    it('does not recalculate UAH when USD is changed manually and surfaces a mismatch message on blur', () => {
+    it('does not recalculate UAH when USD is changed manually, surfaces a mismatch message on blur, but keeps submit enabled (#4219)', () => {
         const { result } = renderUseFundsForm();
 
         act(() => {
@@ -118,10 +118,10 @@ describe('useFundsExpendituresRecordForm', () => {
 
         expect(result.current.formState.amountUah).toBe('100');
         expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-        expect(result.current.isSubmitDisabled).toBe(true);
+        expect(result.current.isSubmitDisabled).toBe(false);
     });
 
-    it('blocks submit when USD is changed manually without a preceding blur and does not match UAH', async () => {
+    it('submits the manually edited USD value even when it does not match UAH, without a preceding blur (#4219)', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
@@ -133,13 +133,20 @@ describe('useFundsExpendituresRecordForm', () => {
         });
 
         expect(result.current.formState.amountUah).toBe('100');
+        expect(result.current.isSubmitDisabled).toBe(false);
 
         await act(async () => {
             await result.current.handleConfirmAdd();
         });
 
-        expect(onSubmit).not.toHaveBeenCalled();
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(onSubmit).toHaveBeenCalledWith({
+            categoryId: 3,
+            reportingYear: '2026',
+            amountUah: '100',
+            amountUsd: '15',
+            lastEditedField: 'amountUsd',
+            type: 'income',
+        });
     });
 
     it('blocks submit and surfaces required error when reporting year is missing', async () => {
@@ -162,7 +169,7 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
-    it('allows save once a manually edited USD amount is corrected to match UAH at a custom exchange rate', async () => {
+    it('allows save with a manually edited USD amount that does not match UAH at a custom exchange rate (#4219)', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ exchangeRate: '45', onSubmit });
 
@@ -181,14 +188,6 @@ describe('useFundsExpendituresRecordForm', () => {
 
         expect(result.current.formState.amountUah).toBe('450');
         expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-        expect(result.current.isSubmitDisabled).toBe(true);
-
-        act(() => {
-            result.current.handleAmountFieldChange('amountUsd')('10');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
         expect(result.current.isSubmitDisabled).toBe(false);
 
         await act(async () => {
@@ -199,7 +198,7 @@ describe('useFundsExpendituresRecordForm', () => {
             categoryId: 3,
             reportingYear: '2026',
             amountUah: '450',
-            amountUsd: '10',
+            amountUsd: '15',
             lastEditedField: 'amountUsd',
             type: 'income',
         });

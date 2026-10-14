@@ -24,3 +24,11 @@ export interface EventCategoryLocalizationDto {
     name: string;
     translationStatus: number;
 }
+
+export interface CreateEventCategoryLocalizationDto {
+    entityId: number;
+    languageId: number;
+    name: string;
+}
+
+export interface UpdateEventCategoryLocalizationDto extends CreateEventCategoryLocalizationDto {}

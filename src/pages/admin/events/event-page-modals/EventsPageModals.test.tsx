@@ -11,6 +11,14 @@ import { ModalMode } from '@/types/admin/common';
 import { EventItemDto } from '@/types/admin/events';
 import { LocalizationLanguage } from '@/types/common/language';
 
+import { TranslateEventModal } from '../translate-event-modal/TranslateEventModal';
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+    }),
+}));
+
 jest.mock('../event-category-modal/EventCategoryModal', () => ({
     EventCategoryModal: jest.fn(() => <div data-testid="event-category-modal" />),
 }));
@@ -27,10 +35,15 @@ jest.mock('../translate-event-category-modal/TranslateEventCategoryModal', () =>
     TranslateEventCategoryModal: jest.fn(() => <div data-testid="translate-event-category-modal" />),
 }));
 
+jest.mock('../translate-event-modal/TranslateEventModal', () => ({
+    TranslateEventModal: jest.fn(() => <div data-testid="translate-event-modal" />),
+}));
+
 const mockedEventCategoryModal = EventCategoryModal as jest.Mock;
 const mockedDeleteEventCategoryModal = DeleteEventCategoryModal as jest.Mock;
 const mockedEventModal = EventModal as jest.Mock;
 const mockedTranslateEventCategoryModal = TranslateEventCategoryModal as jest.Mock;
+const mockedTranslateEventModal = TranslateEventModal as jest.Mock;
 
 describe('EventsPageModals', () => {
     const categories: EventCategoryDto[] = [
@@ -52,7 +65,7 @@ describe('EventsPageModals', () => {
         relatedEventNewsCount: 0,
     };
 
-    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'Англійська' }];
+    const translationLanguages: LocalizationLanguage[] = [{ id: 1, code: 'en', name: 'English' }];
 
     const closeAddCategoryModal = jest.fn();
     const closeEditCategoryModal = jest.fn();
@@ -60,9 +73,12 @@ describe('EventsPageModals', () => {
     const closeDeleteCategoryModal = jest.fn();
     const closeEditItemModal = jest.fn();
     const closeTranslateCategoryModal = jest.fn();
+    const closeTranslateItemModal = jest.fn();
     const onAddCategory = jest.fn();
     const onUpdateCategory = jest.fn();
     const onDeleteCategory = jest.fn();
+    const onTranslateCategory = jest.fn();
+    const onTranslateEvent = jest.fn();
 
     const createModalsStateControl = (
         isAddCategoryModalOpen = false,
@@ -71,6 +87,7 @@ describe('EventsPageModals', () => {
         isDeleteCategoryModalOpen = false,
         isCategoryToTranslate = false,
         itemToEdit: EventItemDto | null = null,
+        itemToTranslate: EventItemDto | null = null,
     ): UseModalsStateResult<EventItemDto> =>
         ({
             modalState: {
@@ -79,6 +96,7 @@ describe('EventsPageModals', () => {
                 isAddModalOpen,
                 isDeleteCategoryModalOpen,
                 itemToEdit,
+                itemToTranslate,
                 isCategoryToTranslate,
             },
             closeModalActions: {
@@ -88,6 +106,7 @@ describe('EventsPageModals', () => {
                 closeDeleteCategoryModal,
                 closeEditItemModal,
                 closeTranslateCategoryModal,
+                closeTranslateItemModal,
             },
         }) as unknown as UseModalsStateResult<EventItemDto>;
 
@@ -107,6 +126,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -133,6 +153,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -159,6 +180,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -183,6 +205,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -193,37 +216,11 @@ describe('EventsPageModals', () => {
         const eventModalProps = mockedEventModal.mock.calls[0][0];
         const translateModalProps = mockedTranslateEventCategoryModal.mock.calls[0][0];
 
-        expect(addModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Add,
-                isOpen: false,
-            }),
-        );
-
-        expect(editModalProps).toEqual(
-            expect.objectContaining({
-                mode: ModalMode.Edit,
-                isOpen: false,
-            }),
-        );
-
-        expect(deleteModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(eventModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
-
-        expect(translateModalProps).toEqual(
-            expect.objectContaining({
-                isOpen: false,
-            }),
-        );
+        expect(addModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Add, isOpen: false }));
+        expect(editModalProps).toEqual(expect.objectContaining({ mode: ModalMode.Edit, isOpen: false }));
+        expect(deleteModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(eventModalProps).toEqual(expect.objectContaining({ isOpen: false }));
+        expect(translateModalProps).toEqual(expect.objectContaining({ isOpen: false }));
     });
 
     it('renders add event modal', () => {
@@ -235,6 +232,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -262,6 +260,7 @@ describe('EventsPageModals', () => {
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
                 translationLanguages={translationLanguages}
+                onTranslateCategory={onTranslateCategory}
             />,
         );
 
@@ -288,6 +287,7 @@ describe('EventsPageModals', () => {
                 onAddCategory={onAddCategory}
                 onUpdateCategory={onUpdateCategory}
                 onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
                 translationLanguages={translationLanguages}
             />,
         );
@@ -300,6 +300,37 @@ describe('EventsPageModals', () => {
                 categories,
                 onClose: closeTranslateCategoryModal,
                 translationLanguages,
+                onTranslateCategory,
+            }),
+        );
+    });
+
+    it('renders translate event modal when an event is selected to translate', () => {
+        const itemToTranslate = { id: 7, title: 'Event to translate' } as EventItemDto;
+
+        render(
+            <EventsPageModals
+                modalsStateControl={createModalsStateControl(false, false, false, false, false, null, itemToTranslate)}
+                categories={categories}
+                currentCategory={currentCategory}
+                onAddCategory={onAddCategory}
+                onUpdateCategory={onUpdateCategory}
+                onDeleteCategory={onDeleteCategory}
+                onTranslateCategory={onTranslateCategory}
+                translationLanguages={translationLanguages}
+                onTranslateEvent={onTranslateEvent}
+            />,
+        );
+
+        const translateEventModalProps = mockedTranslateEventModal.mock.calls[0][0];
+
+        expect(translateEventModalProps).toEqual(
+            expect.objectContaining({
+                isOpen: true,
+                eventToTranslate: itemToTranslate,
+                onClose: closeTranslateItemModal,
+                translatedLanguages: translationLanguages,
+                onTranslateEvent,
             }),
         );
     });

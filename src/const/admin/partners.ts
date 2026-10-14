@@ -75,6 +75,7 @@ export const PARTNER_BANNER_VALIDATION = {
     image: {
         width: 1440,
         height: 860,
+        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
     },
 };
 

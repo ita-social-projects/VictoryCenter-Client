@@ -65,7 +65,7 @@ export const FaqComponent = ({
                 </div>
             </div>
             <div className="faq-actions">
-                <ButtonTooltip position="bottom">
+                <ButtonTooltip position="bottom" isRenderInPortal>
                     <div className="faq-actions-tooltip">
                         <b>
                             {faq.status === VisibilityStatus.Published

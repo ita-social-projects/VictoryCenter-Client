@@ -5,6 +5,7 @@ import { ContactFormCard } from '@/pages/public/contact-us/components/contact-fo
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import styles from './ContactFormPopUp.module.scss';
 import { CONTACT_US_PAGE_DATA } from '@/utils/mock-data/public/contact-us-page';
+import { SUCCESS_CLOSE_DELAY_MS } from '@/const/public/contact-form';
 
 interface ContactFormPopUpProps {
     isOpen: boolean;
@@ -13,6 +14,35 @@ interface ContactFormPopUpProps {
 
 export const ContactFormPopUp: React.FC<ContactFormPopUpProps> = ({ isOpen, onClose }) => {
     const isMouseDownOnOverlay = useRef(false);
+    const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const clearCloseTimeout = () => {
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+    };
+
+    useEffect(() => {
+        if (!isOpen) {
+            clearCloseTimeout();
+        }
+        return clearCloseTimeout;
+    }, [isOpen]);
+
+    const handleSubmitSuccess = () => {
+        clearCloseTimeout();
+
+        if (SUCCESS_CLOSE_DELAY_MS <= 0) {
+            onClose();
+            return;
+        }
+
+        closeTimeoutRef.current = setTimeout(() => {
+            closeTimeoutRef.current = null;
+            onClose();
+        }, SUCCESS_CLOSE_DELAY_MS);
+    };
 
     useEffect(() => {
         const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -81,6 +111,7 @@ export const ContactFormPopUp: React.FC<ContactFormPopUpProps> = ({ isOpen, onCl
                             subjectPlaceholder={CONTACT_US_PAGE_DATA.subjectPlaceholder}
                             messagePlaceholder={CONTACT_US_PAGE_DATA.messagePlaceholder}
                             submitLabel={CONTACT_US_PAGE_DATA.submitButton}
+                            onSubmitSuccess={handleSubmitSuccess}
                         />
                     </div>
                 </aside>

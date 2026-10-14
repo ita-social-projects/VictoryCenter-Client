@@ -16,12 +16,13 @@
     }
 
     @media (min-width: 768px) {
-        max-width: 550px;
+        max-width: 432px;
         margin-inline: auto;
-        padding: 56px 48px 48px;
+        padding: 48px 32px 32px;
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1440px) {
+        max-width: 544px;
         padding: 64px 48px 48px;
         margin-inline: 0;
     }

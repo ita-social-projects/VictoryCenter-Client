@@ -19,8 +19,8 @@ export const EventsNewsPage = () => {
         <LoadableContent isLoading={isLoading} error={error || !data}>
             {data && (
                 <div>
-                    <EventsNewsIntro description={data.description} />
-                    <Events {...data.eventsData} />
+                    <EventsNewsIntro description={data.description} isHidden={data.isPageDescriptionHidden} />
+                    <Events {...data.eventsData} isTitleHidden={data.isEventsBlockTitleHidden} />
                     <ChooseProgram {...data.chooseProgram} />
                 </div>
             )}

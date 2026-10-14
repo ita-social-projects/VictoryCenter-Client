@@ -50,6 +50,10 @@
             -webkit-line-clamp: 2;
             overflow: hidden;
         }
+
+        span {
+            margin: 8px 0 0 32px;
+        }
     }
 
     &-info-description {

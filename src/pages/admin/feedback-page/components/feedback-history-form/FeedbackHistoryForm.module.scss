@@ -1,0 +1,20 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as typography;
+
+.feedback-history-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .error {
+        @include typography.small-text-regular;
+        color: colors.$error;
+        margin-top: 4px;
+    }
+}

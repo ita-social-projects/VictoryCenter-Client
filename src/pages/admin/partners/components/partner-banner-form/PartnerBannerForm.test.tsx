@@ -6,8 +6,9 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
-import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
 import { ToastType } from '@/types/admin/toast';
 import { ButtonProps } from '@/components/admin/button/Button';
@@ -15,6 +16,8 @@ import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import { InputWithCharacterLimitGroupProps } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import localizationStatusesStyles from '@/components/admin/localization-statuses/LocalizationStatuses.module.scss';
+
+const mockSharedFormatError = IMAGE_VALIDATION.getFormatError();
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
@@ -44,6 +47,9 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
             </button>
             <button type="button" onClick={() => setError?.('Image invalid')} disabled={disabled}>
                 Trigger image error
+            </button>
+            <button type="button" onClick={() => setError?.(mockSharedFormatError)} disabled={disabled}>
+                Trigger format error
             </button>
             <button type="button" onClick={() => setError?.(null)} disabled={disabled}>
                 Clear image error
@@ -492,6 +498,16 @@ describe('PartnerBanner', () => {
             expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
             expect(publishButton).toBeEnabled();
         });
+    });
+
+    it('maps the shared format error to the partner banner format error', async () => {
+        renderBanner();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Trigger format error' }));
+
+        expect(await screen.findByTestId('input-error')).toHaveTextContent(
+            PARTNER_BANNER_VALIDATION.image.getFormatError(),
+        );
     });
 
     it('renders title input as enabled', () => {

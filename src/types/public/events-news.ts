@@ -18,8 +18,10 @@ export interface EventsData {
 
 export interface EventsNewsPageData {
     description: string;
+    isPageDescriptionHidden?: boolean;
     chooseProgram: chooseProgramData;
     eventsData: EventsData;
+    isEventsBlockTitleHidden?: boolean;
 }
 
 export interface EventsNews {

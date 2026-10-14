@@ -97,6 +97,7 @@ const tags = [
 export const eventsNewsPageMock: EventsNewsPageData = {
     description:
         'Цей розділ — про ті моменти, коли те, у що ми віримо, стає реальністю. Тут ти знайдеш все: від маленьких зустрічей до великих відкриттів, від перших кроків дітей у стайні до глибоких переживань ветеранів у сідлі.',
+    isPageDescriptionHidden: false,
     chooseProgram: {
         title: 'Вір у силу події',
         description:
@@ -107,6 +108,7 @@ export const eventsNewsPageMock: EventsNewsPageData = {
         title: 'Що відбувалось',
         tags,
     },
+    isEventsBlockTitleHidden: false,
 };
 
 export const eventsNewsMock: EventsNews[] = [

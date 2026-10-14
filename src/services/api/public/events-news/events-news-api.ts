@@ -1,4 +1,3 @@
-import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 import { EventsNews } from '@/types/public/events-news';
 import { PaginationResult } from '@/types/admin/common';
 import { axiosInstance } from '@/services/api/axios';

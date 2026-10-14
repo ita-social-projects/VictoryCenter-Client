@@ -151,6 +151,7 @@ describe('Tooltip - Portal Rendering', () => {
         // Mock window event listeners
         window.addEventListener = jest.fn();
         window.removeEventListener = jest.fn();
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 768, writable: true });
     });
 
     // Render helpers
@@ -182,6 +183,98 @@ describe('Tooltip - Portal Rendering', () => {
 
         const expectedTop = positionerTop - tooltipHeight - offset;
         expectPortalTooltipToHaveStyle('top', `${expectedTop}px`);
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
+    it('flips a bottom tooltip to the top when there is not enough space below', () => {
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 250, writable: true });
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(50);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip();
+
+        expectPortalTooltipToHaveStyle('top', '142px');
+        expectPortalTooltipToHaveClass('tooltip-popup--top');
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
+    it('flips a top tooltip to the bottom when there is not enough space above', () => {
+        mockPortalPositioner.getBoundingClientRect = jest.fn(() => ({
+            width: 120,
+            height: 40,
+            top: 10,
+            left: 100,
+            bottom: 50,
+            right: 220,
+            x: 100,
+            y: 10,
+            toJSON: jest.fn(),
+        }));
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(50);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip({ position: 'top' });
+
+        expectPortalTooltipToHaveStyle('top', '58px');
+        expectPortalTooltipToHaveClass('tooltip-popup--bottom');
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
+    it('keeps a bottom tooltip below when neither side fits and there is more space below', () => {
+        mockPortalPositioner.getBoundingClientRect = jest.fn(() => ({
+            width: 120,
+            height: 40,
+            top: 100,
+            left: 100,
+            bottom: 140,
+            right: 220,
+            x: 100,
+            y: 100,
+            toJSON: jest.fn(),
+        }));
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 350, writable: true });
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(300);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip();
+
+        expectPortalTooltipToHaveStyle('top', '148px');
+        expectPortalTooltipToHaveClass('tooltip-popup--bottom');
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
+
+    it('keeps a top tooltip above when neither side fits and there is more space above', () => {
+        mockPortalPositioner.getBoundingClientRect = jest.fn(() => ({
+            width: 120,
+            height: 40,
+            top: 200,
+            left: 100,
+            bottom: 240,
+            right: 220,
+            x: 100,
+            y: 200,
+            toJSON: jest.fn(),
+        }));
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 350, writable: true });
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(300);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltip({ position: 'top' });
+
+        expectPortalTooltipToHaveStyle('top', '-108px');
+        expectPortalTooltipToHaveClass('tooltip-popup--top');
 
         heightSpy.mockRestore();
         widthSpy.mockRestore();

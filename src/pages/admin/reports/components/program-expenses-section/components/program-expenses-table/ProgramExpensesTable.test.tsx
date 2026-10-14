@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
 
 jest.mock(
@@ -362,7 +363,11 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, 100, '2025', '8000', '4 200.5');
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                programId: 100,
+                amountUah: '8000',
+                amountUsd: '4 200.5',
+            });
         });
 
         await waitFor(() => {
@@ -372,8 +377,8 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
     });
 
-    it('should keep row in edit mode when onRecordSave resolves false', async () => {
-        const onRecordSave = jest.fn().mockResolvedValue(false);
+    it('should keep row in edit mode when onRecordSave returns false', async () => {
+        const onRecordSave = jest.fn().mockReturnValue(false);
 
         renderTable({ onRecordSave });
 

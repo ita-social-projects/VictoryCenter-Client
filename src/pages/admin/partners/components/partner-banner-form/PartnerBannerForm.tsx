@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { ImageValues, Image } from '@/types/common/image';
 import styles from './PartnerBannerForm.module.scss';
 import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -203,7 +204,10 @@ export const PartnerBanner = ({ language, translationLanguages }: PartnerBannerP
 
             setErrors((prev) => ({
                 ...prev,
-                image: error ? error : undefined,
+                image:
+                    error === IMAGE_VALIDATION.getFormatError()
+                        ? PARTNER_BANNER_VALIDATION.image.getFormatError()
+                        : (error ?? undefined),
             }));
         },
         [isBaseLanguage],

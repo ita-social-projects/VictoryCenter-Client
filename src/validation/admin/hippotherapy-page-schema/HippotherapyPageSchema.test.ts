@@ -134,10 +134,20 @@ describe('isHippotherapyPageContentValid', () => {
         expect(isHippotherapyPageContentValid(content)).toBe(true);
     });
 
-    it('treats a newly uploaded (not yet saved) image as present even without an imageId', () => {
+    it('returns true when no section or card has an image', () => {
         const content = buildValidContent();
-        content.introSection.image = { base64: 'data:image/png;base64,abc', width: 1440, height: 800 } as any;
-        content.introSection.imageId = null;
+        [
+            content.introSection,
+            content.quoteSection,
+            content.hippoventionCenterSection,
+            content.anotherQuoteSection,
+            content.ethicsSection,
+            ...content.advantagesSection.cards,
+            ...content.participantsSection.cards,
+        ].forEach((imageValue) => {
+            imageValue.image = null;
+            imageValue.imageId = null;
+        });
 
         expect(isHippotherapyPageContentValid(content)).toBe(true);
     });

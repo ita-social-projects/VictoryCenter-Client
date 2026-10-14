@@ -16,6 +16,7 @@ const createItem = (overrides: Partial<EventItemDto>): EventItemDto => ({
     backgroundImage: null,
     priority: 1,
     categories: [],
+    localizations: [],
     ...overrides,
 });
 

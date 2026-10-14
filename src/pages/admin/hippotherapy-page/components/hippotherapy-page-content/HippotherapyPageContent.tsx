@@ -4,7 +4,11 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { HippotherapyPageApi } from '@/services/api/admin/hippotherapy-page/hippotherapy-page-api';
-import { HippotherapyPageContentModel } from '@/types/admin/hippotherapy-page';
+import {
+    HippotherapyGallerySectionContent,
+    HippotherapyImageValue,
+    HippotherapyPageContentModel,
+} from '@/types/admin/hippotherapy-page';
 import { isHippotherapyPageContentValid } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -85,6 +89,17 @@ const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPa
         principles: content.ethicsSection.principles.map((principle) => normalizeHtml(principle)),
     },
 });
+
+const hasDraftImage = (content: HippotherapyPageContentModel, errorKey: string): boolean => {
+    const [sectionKey, cardIndex] = errorKey.split('-');
+    const section = content[sectionKey as keyof HippotherapyPageContentModel];
+    const imageValue =
+        cardIndex === undefined
+            ? (section as HippotherapyImageValue)
+            : (section as HippotherapyGallerySectionContent).cards[Number(cardIndex)];
+
+    return Boolean(imageValue?.image);
+};
 
 const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => ({
     introSection: { title: '', description: '', image: null, imageId: null },
@@ -212,7 +227,12 @@ export const HippotherapyPageContent = () => {
     );
 
     const [imageErrors, setImageErrors] = useState<Record<string, string | null>>({});
-    const hasImageErrors = useMemo(() => Object.values(imageErrors).some(Boolean), [imageErrors]);
+    const hasImageErrors = useMemo(
+        () =>
+            !!draftContent &&
+            Object.entries(imageErrors).some(([errorKey, error]) => error && hasDraftImage(draftContent, errorKey)),
+        [imageErrors, draftContent],
+    );
 
     const handleImageErrorChange = useCallback((key: string, error: string | null) => {
         setImageErrors((prev) => (prev[key] === error ? prev : { ...prev, [key]: error }));

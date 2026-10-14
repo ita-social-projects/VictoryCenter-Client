@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
 
 jest.mock(
@@ -283,6 +284,47 @@ describe('ProgramExpensesTable', () => {
 
         await waitFor(() => {
             expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
+        });
+    });
+
+    describe('when stored amounts do not match the current exchange rate', () => {
+        beforeEach(() => {
+            (isUsdAmountMismatch as jest.Mock).mockReturnValue(true);
+        });
+
+        afterEach(() => {
+            (isUsdAmountMismatch as jest.Mock).mockReturnValue(false);
+        });
+
+        it('should enable accept button when only the program is changed', async () => {
+            const onRecordSave = jest.fn().mockResolvedValue(true);
+
+            renderTable({ onRecordSave, exchangeRate: '41.5' });
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+            const acceptButton = screen.getByLabelText('Accept record 1');
+
+            expect(acceptButton).toBeDisabled();
+
+            fireEvent.click(screen.getByTestId('select-option-Program C-102'));
+
+            expect(acceptButton).not.toBeDisabled();
+
+            fireEvent.click(acceptButton);
+
+            await waitFor(() => {
+                expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
+            });
+        });
+
+        it('should keep accept button disabled when amounts are changed to mismatching values', () => {
+            renderTable({ exchangeRate: '41.5' });
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+
+            expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
         });
     });
 

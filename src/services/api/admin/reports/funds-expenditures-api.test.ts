@@ -1,5 +1,6 @@
 import { FundsExpendituresApi } from './funds-expenditures-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { BatchSaveReportFundsExpendituresRecordsPayload } from '@/types/admin/reports';
 import { RequestOptions } from '@/types/common/api';
 
 const mockClient = {
@@ -292,6 +293,89 @@ describe('FundsExpendituresApi', () => {
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS, {
                 signal: undefined,
             });
+        });
+    });
+
+    describe('batchSaveRecords', () => {
+        it('should map payload to dto, send post request to batch-save endpoint, and return data', async () => {
+            const payload: BatchSaveReportFundsExpendituresRecordsPayload = {
+                recordsToCreate: [
+                    {
+                        id: -1,
+                        categoryId: 1,
+                        type: 'income',
+                        reportingYear: '2026',
+                        amountUah: '1500',
+                        amountUsd: '35',
+                        lastEditedField: 'amountUah',
+                    },
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 10,
+                        categoryId: 2,
+                        type: 'expense',
+                        reportingYear: '2026',
+                        amountUah: '800',
+                        amountUsd: '20',
+                        lastEditedField: 'amountUsd',
+                    },
+                ],
+                recordIdsToDelete: [5, 6],
+            };
+
+            mockClient.post.mockResolvedValueOnce({ data: undefined });
+
+            const result = await FundsExpendituresApi.batchSaveRecords(mockClient, payload);
+
+            expect(mockClient.post).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/batch-save`,
+                {
+                    recordsToCreate: [
+                        {
+                            categoryId: 1,
+                            type: 1,
+                            reportingYear: 2026,
+                            amount: 1500,
+                            currency: 1,
+                        },
+                    ],
+                    recordsToUpdate: [
+                        {
+                            id: 10,
+                            categoryId: 2,
+                            type: 2,
+                            reportingYear: 2026,
+                            amount: 20,
+                            currency: 2,
+                        },
+                    ],
+                    recordIdsToDelete: [5, 6],
+                },
+            );
+            expect(result).toBeUndefined();
+        });
+
+        it('should successfully send payload with empty arrays', async () => {
+            const payload: BatchSaveReportFundsExpendituresRecordsPayload = {
+                recordsToCreate: [],
+                recordsToUpdate: [],
+                recordIdsToDelete: [12],
+            };
+
+            mockClient.post.mockResolvedValueOnce({ data: undefined });
+
+            const result = await FundsExpendituresApi.batchSaveRecords(mockClient, payload);
+
+            expect(mockClient.post).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/batch-save`,
+                {
+                    recordsToCreate: [],
+                    recordsToUpdate: [],
+                    recordIdsToDelete: [12],
+                },
+            );
+            expect(result).toBeUndefined();
         });
     });
 });

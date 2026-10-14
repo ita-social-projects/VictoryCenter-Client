@@ -282,7 +282,11 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(acceptButton);
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                programId: 102,
+                amountUah: '7 265',
+                amountUsd: '4 200.5',
+            });
         });
     });
 
@@ -384,7 +388,11 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, 100, '2025', '8000', '4 200.5');
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                programId: 100,
+                amountUah: '8000',
+                amountUsd: '4 200.5',
+            });
         });
 
         await waitFor(() => {
@@ -394,8 +402,8 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
     });
 
-    it('should keep row in edit mode when onRecordSave resolves false', async () => {
-        const onRecordSave = jest.fn().mockResolvedValue(false);
+    it('should keep row in edit mode when onRecordSave returns false', async () => {
+        const onRecordSave = jest.fn().mockReturnValue(false);
 
         renderTable({ onRecordSave });
 

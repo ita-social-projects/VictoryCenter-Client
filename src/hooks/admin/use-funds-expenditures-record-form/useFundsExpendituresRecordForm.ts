@@ -41,7 +41,7 @@ interface UseFundsExpendituresRecordFormParams {
         amountUsd: string;
         lastEditedField: FundsExpendituresAmountField;
         type: FundsExpendituresTransactionType;
-    }) => Promise<boolean>;
+    }) => boolean;
 }
 
 const INITIAL_STATE: FundsExpendituresRecordFormState = {
@@ -163,14 +163,14 @@ export const useFundsExpendituresRecordForm = ({
 
         setIsSubmitting(true);
         try {
-            const isCreated = await onSubmit({
+            const isCreated = onSubmit({
                 categoryId: formState.categoryId,
                 reportingYear: formState.reportingYear ?? '',
                 amountUah: normalizedAmountUah,
                 amountUsd: normalizedAmountUsd,
                 lastEditedField: formState.lastEditedField,
                 type: transactionType,
-            }).catch(() => false);
+            });
 
             if (isCreated) {
                 setFormState(INITIAL_STATE);

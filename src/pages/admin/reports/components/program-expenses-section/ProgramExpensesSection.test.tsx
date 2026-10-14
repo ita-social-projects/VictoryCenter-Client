@@ -58,9 +58,23 @@ const EMPTY_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     records: [],
 };
 
+const createSaveCallbackRegistration = () => {
+    let saveCallback: (() => Promise<boolean>) | undefined;
+
+    const registerSaveCallback = (callback: () => Promise<boolean>) => {
+        saveCallback = callback;
+    };
+
+    return {
+        registerSaveCallback,
+        getSaveCallback: () => saveCallback,
+    };
+};
+
 const mockGetReadOnlyData = jest.fn();
 const mockPost = jest.fn();
 const mockUpdate = jest.fn();
+const mockBatchSaveRecords = jest.fn();
 jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
@@ -68,6 +82,7 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
         bulkDelete: jest.fn(),
         post: (...args: unknown[]) => mockPost(...args),
         update: (...args: unknown[]) => mockUpdate(...args),
+        batchSaveRecords: (...args: unknown[]) => mockBatchSaveRecords(...args),
     },
 }));
 
@@ -308,6 +323,7 @@ describe('ProgramExpensesSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         dispatchEventSpy.mockClear();
+        mockBatchSaveRecords.mockResolvedValue(undefined);
         mockRefetch.mockResolvedValue(undefined);
         mockUseDataFetchResult = {
             data: MOCK_PROGRAM_EXPENSES_DATA,
@@ -315,6 +331,14 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
         mockUseDataFetch.mockImplementation(() => mockUseDataFetchResult);
+    });
+
+    it('should register save callback for program expense records', () => {
+        const registerSaveCallback = jest.fn();
+
+        render(<ProgramExpensesSection exchangeRate="41.25" registerSaveCallback={registerSaveCallback} />);
+
+        expect(registerSaveCallback).toHaveBeenCalledWith(expect.any(Function));
     });
 
     it('should render loader during initial loading', () => {
@@ -547,9 +571,7 @@ describe('ProgramExpensesSection', () => {
         expect(ProgramExpensesApi.delete).not.toHaveBeenCalled();
     });
 
-    it('should delete record after confirmation and show success toast', async () => {
-        (ProgramExpensesApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
-
+    it('should delete record locally after confirmation without calling API and show success toast', async () => {
         render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
@@ -558,55 +580,14 @@ describe('ProgramExpensesSection', () => {
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
         await waitFor(() => {
-            expect(ProgramExpensesApi.delete).toHaveBeenCalledWith('mock-client', 1);
+            expect(ProgramExpensesApi.delete).not.toHaveBeenCalled();
             expect(mockAddToast).toHaveBeenCalledWith(
                 PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
                 'success',
             );
-            expect(mockRefetch).toHaveBeenCalled();
+            expect(mockRefetch).not.toHaveBeenCalled();
             expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
         });
-    });
-
-    it('should show error toast and keep modal open when delete fails', async () => {
-        (ProgramExpensesApi.delete as jest.Mock).mockRejectedValueOnce(new Error('delete failed'));
-
-        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
-
-        fireEvent.click(screen.getByLabelText('Delete record 1'));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-        await waitFor(() => {
-            expect(ProgramExpensesApi.delete).toHaveBeenCalledWith('mock-client', 1);
-            expect(mockAddToast).toHaveBeenCalledWith(
-                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
-                'error',
-                5000,
-            );
-            expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
-        });
-    });
-
-    it('should disable modal buttons while delete request is in flight', async () => {
-        let resolveDelete!: () => void;
-        (ProgramExpensesApi.delete as jest.Mock).mockImplementationOnce(
-            () =>
-                new Promise<void>((resolve) => {
-                    resolveDelete = resolve;
-                }),
-        );
-
-        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
-
-        fireEvent.click(screen.getByLabelText('Delete record 1'));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-        await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeDisabled();
-            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO)).toBeDisabled();
-        });
-
-        resolveDelete();
     });
 
     it('should open bulk delete modal when delete selected button is clicked', () => {
@@ -630,9 +611,7 @@ describe('ProgramExpensesSection', () => {
         expect(ProgramExpensesApi.bulkDelete).not.toHaveBeenCalled();
     });
 
-    it('should bulk delete selected records and show success toast', async () => {
-        (ProgramExpensesApi.bulkDelete as jest.Mock).mockResolvedValueOnce(undefined);
-
+    it('should bulk delete selected records locally without calling API and show success toast', async () => {
         render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
@@ -640,24 +619,9 @@ describe('ProgramExpensesSection', () => {
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
         await waitFor(() => {
-            expect(ProgramExpensesApi.bulkDelete).toHaveBeenCalledWith('mock-client', [1]);
+            expect(ProgramExpensesApi.bulkDelete).not.toHaveBeenCalled();
             expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, 'success');
-            expect(mockRefetch).toHaveBeenCalled();
-            expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
-        });
-    });
-
-    it('should show error toast when bulk delete fails', async () => {
-        (ProgramExpensesApi.bulkDelete as jest.Mock).mockRejectedValueOnce(new Error('failed'));
-
-        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
-
-        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
-        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-        await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, 'error', 5000);
+            expect(mockRefetch).not.toHaveBeenCalled();
             expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
         });
     });
@@ -669,9 +633,7 @@ describe('ProgramExpensesSection', () => {
             mockAddProgramCategory.mockReset();
         });
 
-        it('should open modal in add mode, submit, call API.post and refetch', async () => {
-            mockPost.mockResolvedValueOnce(undefined);
-
+        it('should open modal in add mode, add a new record locally without calling API.post', async () => {
             render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
@@ -682,25 +644,19 @@ describe('ProgramExpensesSection', () => {
             fireEvent.click(screen.getByTestId('mock-submit-btn'));
 
             await waitFor(() => {
-                expect(mockPost).toHaveBeenCalledWith('mock-client', {
-                    reportingYear: 2026,
-                    hippotherapyProgramCategoryId: 2,
-                    amountUah: 1000,
-                    amountUsd: 25,
-                });
+                expect(mockPost).not.toHaveBeenCalled();
                 expect(mockAddProgramCategory).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
                     'success',
                 );
-                expect(mockRefetch).toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
                 expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
             });
         });
 
-        it('should create a new program category first when programId is undefined, then post the record', async () => {
+        it('should create a new program category first when programId is undefined, then add the record locally', async () => {
             mockAddProgramCategory.mockResolvedValueOnce({ id: 99, name: 'New Category', programsCount: 0 });
-            mockPost.mockResolvedValueOnce(undefined);
 
             render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
@@ -709,21 +665,16 @@ describe('ProgramExpensesSection', () => {
 
             await waitFor(() => {
                 expect(mockAddProgramCategory).toHaveBeenCalledWith({ id: null, name: 'New Category' }, 'mock-client');
-                expect(mockPost).toHaveBeenCalledWith('mock-client', {
-                    reportingYear: 2026,
-                    hippotherapyProgramCategoryId: 99,
-                    amountUah: 1000,
-                    amountUsd: 25,
-                });
+                expect(mockPost).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
                     'success',
                 );
-                expect(mockRefetch).toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
             });
         });
 
-        it('should show error toast and not call API.post when creating the new category fails', async () => {
+        it('should show error toast and not add a local record when category creation fails', async () => {
             mockAddProgramCategory.mockRejectedValueOnce(new Error('failed to create category'));
 
             render(<ProgramExpensesSection exchangeRate={'41.25'} />);
@@ -740,9 +691,7 @@ describe('ProgramExpensesSection', () => {
             });
         });
 
-        it('should start inline row edit mode, select program category, click accept, call API.update and refetch', async () => {
-            mockUpdate.mockResolvedValueOnce(undefined);
-
+        it('should update record locally without calling API.update or refetch', async () => {
             render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 
             // Click the edit button on the first record (id: 1)
@@ -761,14 +710,9 @@ describe('ProgramExpensesSection', () => {
             fireEvent.click(acceptButton);
 
             await waitFor(() => {
-                expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
-                    reportingYear: 2025,
-                    hippotherapyProgramCategoryId: 3,
-                    amountUah: 49500,
-                    amountUsd: 1200,
-                });
+                expect(mockUpdate).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
-                expect(mockRefetch).toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
 
                 expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
                 expect(dispatchEventSpy).toHaveBeenCalledWith(
@@ -805,42 +749,149 @@ describe('ProgramExpensesSection', () => {
         });
     });
 
-    it('should show error toast if inline record update fails (catch branch)', async () => {
-        jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
+    describe('batch save integration', () => {
+        it('should save locally updated records through batch API', async () => {
+            const { registerSaveCallback, getSaveCallback } = createSaveCallbackRegistration();
 
-        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
+            render(<ProgramExpensesSection exchangeRate="41.25" registerSaveCallback={registerSaveCallback} />);
 
-        fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+            fireEvent.click(screen.getByLabelText('Accept record 1'));
 
-        fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+            await waitFor(() => {
+                expect(mockUpdate).not.toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
+            });
 
-        const uahInput = screen.getByLabelText('Amount UAH record 1');
-        fireEvent.change(uahInput, { target: { value: '99999' } });
+            const saveRecords = getSaveCallback();
 
-        fireEvent.click(screen.getByLabelText('Accept record 1'));
+            expect(saveRecords).toBeDefined();
 
-        await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(
-                REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY,
-                expect.anything(),
-            );
+            const result = await saveRecords!();
+
+            expect(result).toBe(true);
+
+            expect(mockBatchSaveRecords).toHaveBeenCalledWith('mock-client', {
+                recordsToCreate: [],
+                recordsToUpdate: [
+                    {
+                        id: 1,
+                        hippotherapyProgramCategoryId: 3,
+                        reportingYear: '2025',
+                        amountUah: '49500',
+                        amountUsd: '1200',
+                    },
+                ],
+                recordIdsToDelete: [],
+            });
+
+            expect(mockRefetch).toHaveBeenCalledWith(true);
         });
-    });
 
-    it('should show error toast if adding a new program expense fails (catch branch)', async () => {
-        jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
+        it('should save locally created records through batch API', async () => {
+            const { registerSaveCallback, getSaveCallback } = createSaveCallbackRegistration();
 
-        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
+            render(<ProgramExpensesSection exchangeRate="41.25" registerSaveCallback={registerSaveCallback} />);
 
-        fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
-
-        fireEvent.click(screen.getByTestId('mock-submit-btn'));
-
-        await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(
-                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
-                expect.anything(),
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE,
+                }),
             );
+
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(mockPost).not.toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
+            });
+
+            const saveRecords = getSaveCallback();
+
+            expect(saveRecords).toBeDefined();
+
+            const result = await saveRecords!();
+
+            expect(result).toBe(true);
+
+            expect(mockBatchSaveRecords).toHaveBeenCalledWith('mock-client', {
+                recordsToCreate: [
+                    expect.objectContaining({
+                        id: expect.any(Number),
+                        hippotherapyProgramCategoryId: 2,
+                        reportingYear: '2026',
+                        amountUah: '1 000',
+                        amountUsd: '25',
+                    }),
+                ],
+                recordsToUpdate: [],
+                recordIdsToDelete: [],
+            });
+
+            expect(mockRefetch).toHaveBeenCalledWith(true);
+        });
+
+        it('should save locally deleted records through batch API', async () => {
+            const { registerSaveCallback, getSaveCallback } = createSaveCallbackRegistration();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" registerSaveCallback={registerSaveCallback} />);
+
+            fireEvent.click(screen.getByLabelText('Delete record 1'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(ProgramExpensesApi.delete).not.toHaveBeenCalled();
+                expect(mockRefetch).not.toHaveBeenCalled();
+            });
+
+            const saveRecords = getSaveCallback();
+
+            expect(saveRecords).toBeDefined();
+
+            const result = await saveRecords!();
+
+            expect(result).toBe(true);
+
+            expect(mockBatchSaveRecords).toHaveBeenCalledWith('mock-client', {
+                recordsToCreate: [],
+                recordsToUpdate: [],
+                recordIdsToDelete: [1],
+            });
+
+            expect(mockRefetch).toHaveBeenCalledWith(true);
+        });
+
+        it('should return false and show error toast when batch save fails', async () => {
+            mockBatchSaveRecords.mockRejectedValueOnce(new Error('batch save failed'));
+
+            const { registerSaveCallback, getSaveCallback } = createSaveCallbackRegistration();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" registerSaveCallback={registerSaveCallback} />);
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE,
+                }),
+            );
+
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(screen.getByText('2026')).toBeInTheDocument();
+            });
+
+            const saveRecords = getSaveCallback();
+
+            expect(saveRecords).toBeDefined();
+
+            const result = await saveRecords!();
+
+            expect(result).toBe(false);
+
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+
+            expect(mockRefetch).not.toHaveBeenCalled();
         });
     });
 

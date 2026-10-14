@@ -25,6 +25,7 @@ import {
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
     ReportFundsExpendituresSettingsLocalization,
+    ReportFundsExpendituresRecordState,
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage } from '@/types/common/language';
@@ -55,6 +56,8 @@ import { DeleteFundsExpendituresCategoryModal } from './components/common/delete
 import { EditFundsExpendituresCategoryModal } from './components/common/edit-funds-expenditures-category-modal/EditFundsExpendituresCategoryModal';
 import { TranslateDisclaimerModal } from './components/common/translate-disclaimer-modal/TranslateDisclaimerModal';
 import styles from './FundsExpendituresSection.module.scss';
+import { getTempId, isTempId } from '@/utils/functions/reports-records-temp-ids/reports-records-temp-ids';
+import { handleLocalRecordsBulkDelete } from '@/utils/functions/handle-local-records-bulk-delete/handle-local-records-bulk-delete';
 
 const enrichRecords = (
     records: ReportFundsExpendituresRecord[],
@@ -144,7 +147,10 @@ export const FundsExpenditureSection = ({
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
-    const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
+    const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecordState[]>([]);
+
+    const [updatedRecordIds, setUpdatedRecordIds] = useState<number[]>([]);
+    const [deletedRecordIds, setDeletedRecordIds] = useState<number[]>([]);
 
     const [localIsRowEditMode, setLocalIsRowEditMode] = useState(false);
     const isRowEditMode = propIsRowEditMode ?? localIsRowEditMode;
@@ -165,10 +171,8 @@ export const FundsExpenditureSection = ({
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
-    const [isDeletingRecord, setIsDeletingRecord] = useState(false);
     const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
     const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
-    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
     const hasSeededEditingValuesRef = useRef(false);
 
     const handleDisclaimerChange = useCallback(
@@ -266,7 +270,11 @@ export const FundsExpenditureSection = ({
         fetchHandler: fetchCategories,
     });
 
-    const { data: allRecords, isLoading: isRecordsLoading } = useDataFetch<ReportFundsExpendituresRecord[]>({
+    const {
+        data: allRecords,
+        isLoading: isRecordsLoading,
+        refetch: refetchRecords,
+    } = useDataFetch<ReportFundsExpendituresRecord[]>({
         initialData: [],
         fetchHandler: fetchRecords,
     });
@@ -342,7 +350,12 @@ export const FundsExpenditureSection = ({
     }, [refetchProgramSummary]);
 
     useEffect(() => {
-        setRecordsState(allRecords);
+        setRecordsState(
+            allRecords.map((record) => ({
+                ...record,
+                lastEditedField: 'amountUah' as FundsExpendituresAmountField,
+            })),
+        );
     }, [allRecords]);
 
     useEffect(() => {
@@ -482,7 +495,7 @@ export const FundsExpenditureSection = ({
     );
 
     const handleRecordSave = useCallback(
-        async (
+        (
             recordId: number,
             data: {
                 categoryId: number;
@@ -490,79 +503,74 @@ export const FundsExpenditureSection = ({
                 amountUsd: string;
                 lastEditedField: FundsExpendituresAmountField;
             },
-        ): Promise<boolean> => {
-            const existingRecord = recordsState.find((record) => record.id === recordId);
-            if (!existingRecord) {
-                return false;
-            }
+        ) => {
+            setRecordsState((prev) =>
+                prev.map((record) =>
+                    record.id === recordId
+                        ? {
+                              ...record,
+                              categoryId: data.categoryId,
+                              amountUah: data.amountUah,
+                              amountUsd: data.amountUsd,
+                              lastEditedField: data.lastEditedField,
+                          }
+                        : record,
+                ),
+            );
 
-            try {
-                const updatedRecord = await FundsExpendituresApi.updateRecord(adminClient, recordId, {
-                    categoryId: data.categoryId,
-                    type: existingRecord.type,
-                    reportingYear: existingRecord.reportingYear,
-                    amountUah: data.amountUah,
-                    amountUsd: data.amountUsd,
-                    lastEditedField: data.lastEditedField,
+            if (!isTempId(recordId)) {
+                const originalRecord = allRecords.find((record) => record.id === recordId);
+
+                const hasChanges =
+                    originalRecord?.categoryId !== data.categoryId ||
+                    originalRecord?.amountUah !== data.amountUah ||
+                    originalRecord?.amountUsd !== data.amountUsd;
+
+                setUpdatedRecordIds((prev) => {
+                    if (hasChanges) {
+                        return prev.includes(recordId) ? prev : [...prev, recordId];
+                    }
+
+                    return prev.filter((id) => id !== recordId);
                 });
-
-                setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
-                onDataChange?.();
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
-
-                try {
-                    await refetchSummary(true);
-                } catch {
-                    // Refetch error is already handled by useDataFetch (setError),
-                    // but we can optionally show a refresh failure toast here.
-                }
-
-                return true;
-            } catch {
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
-                return false;
             }
+
+            onDataChange?.();
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+
+            return true;
         },
-        [addToast, adminClient, recordsState, refetchSummary, onDataChange],
+        [addToast, allRecords, onDataChange],
     );
 
     const handleCreateRecord = useCallback(
-        async (data: {
+        (data: {
             categoryId: number;
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
             lastEditedField: FundsExpendituresAmountField;
             type: FundsExpendituresTransactionType;
-        }): Promise<boolean> => {
-            try {
-                const createdRecord = await FundsExpendituresApi.createRecord(adminClient, {
-                    categoryId: data.categoryId,
-                    reportingYear: data.reportingYear,
-                    amountUah: data.amountUah,
-                    amountUsd: data.amountUsd,
-                    lastEditedField: data.lastEditedField,
-                    type: data.type,
-                });
+        }) => {
+            const newRecord: ReportFundsExpendituresRecordState = {
+                id: getTempId(),
+                categoryId: data.categoryId,
+                reportingYear: data.reportingYear,
+                amountUah: data.amountUah,
+                amountUsd: data.amountUsd,
+                type: data.type,
+                lastEditedField: data.lastEditedField,
+            };
 
-                setRecordsState((prev) => [...prev, createdRecord]);
-                onDataChange?.();
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
-                setActiveRecordModalType(null);
+            setRecordsState((prev) => [...prev, newRecord]);
 
-                try {
-                    await refetchSummary(true);
-                } catch {
-                    // Refetch error handled by useDataFetch
-                }
+            onDataChange?.();
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+            setActiveRecordModalType(null);
 
-                return true;
-            } catch {
-                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
-                return false;
-            }
+            return true;
         },
-        [addToast, adminClient, refetchSummary, onDataChange],
+        [addToast, onDataChange],
     );
 
     const handleCreateCategory = useCallback(
@@ -683,46 +691,41 @@ export const FundsExpenditureSection = ({
         setSelectedRecordIds([]);
     }, []);
 
-    const handleConfirmBulkDelete = useCallback(async () => {
+    const handleConfirmBulkDelete = useCallback(() => {
         if (selectedRecordIds.length === 0) {
             setIsBulkDeleteModalOpen(false);
             return;
         }
 
-        setIsBulkDeleting(true);
-        try {
-            await FundsExpendituresApi.bulkDeleteRecords(adminClient, selectedRecordIds);
-            setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
-            onDataChange?.();
-            setSelectedRecordIds([]);
-            setIsBulkDeleteModalOpen(false);
-            await refetchSummary();
-            addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
-        } catch {
-            setIsBulkDeleteModalOpen(false);
-            addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
-        } finally {
-            setIsBulkDeleting(false);
-        }
-    }, [adminClient, selectedRecordIds, refetchSummary, addToast, onDataChange]);
+        setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
 
-    const handleConfirmDelete = useCallback(async () => {
+        handleLocalRecordsBulkDelete({
+            selectedRecordIds,
+            setSelectedRecordIds,
+            setDeletedRecordIds,
+            setUpdatedRecordIds,
+            setIsBulkDeleteModalOpen,
+            onDataChange,
+        });
+
+        addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+    }, [selectedRecordIds, addToast, onDataChange]);
+
+    const handleConfirmDelete = useCallback(() => {
         if (!recordToDelete) return;
 
-        setIsDeletingRecord(true);
-        try {
-            await FundsExpendituresApi.deleteRecord(adminClient, recordToDelete.id);
-            setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
-            onDataChange?.();
-            await refetchSummary();
-            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
-            setIsDeleteModalOpen(false);
-        } catch {
-            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
-        } finally {
-            setIsDeletingRecord(false);
+        setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
+
+        if (!isTempId(recordToDelete.id)) {
+            setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));
+            setUpdatedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
         }
-    }, [recordToDelete, adminClient, addToast, refetchSummary, onDataChange]);
+
+        onDataChange?.();
+        addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
+        setIsDeleteModalOpen(false);
+        setRecordToDelete(null);
+    }, [recordToDelete, addToast, onDataChange]);
 
     const handleTranslateDisclaimerSuccess = useCallback(
         (localization: ReportFundsExpendituresSettingsLocalization) => {
@@ -739,13 +742,30 @@ export const FundsExpenditureSection = ({
         [addToast, onDataChange],
     );
 
-    const saveSettings = useCallback(async (): Promise<boolean> => {
+    const saveFundsExpenditures = useCallback(async (): Promise<boolean> => {
         try {
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
                 disclaimerTitle: disclaimerValue,
                 exchangeRate: exchangeRateValue,
                 programExpendituresReportingYear: programYearValue,
             });
+
+            const recordsToCreate = recordsState.filter((record) => isTempId(record.id));
+            const recordsToUpdate = recordsState.filter((record) => updatedRecordIds.includes(record.id));
+
+            const hasRecordChanges =
+                recordsToCreate.length > 0 || recordsToUpdate.length > 0 || deletedRecordIds.length > 0;
+
+            if (hasRecordChanges) {
+                await FundsExpendituresApi.batchSaveRecords(adminClient, {
+                    recordsToCreate: recordsToCreate,
+                    recordsToUpdate: recordsToUpdate,
+                    recordIdsToDelete: deletedRecordIds,
+                });
+            }
+
+            setUpdatedRecordIds([]);
+            setDeletedRecordIds([]);
 
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
             setExchangeRateValue(updatedSettings.exchangeRate ?? '');
@@ -755,6 +775,9 @@ export const FundsExpenditureSection = ({
 
             try {
                 await refetchSettings(true);
+                if (hasRecordChanges) {
+                    await refetchRecords(true);
+                }
             } catch {}
 
             return true;
@@ -770,14 +793,18 @@ export const FundsExpenditureSection = ({
         fetchDisclaimerLocalizations,
         onExchangeRateValueChange,
         refetchSettings,
+        refetchRecords,
         programYearValue,
+        updatedRecordIds,
+        recordsState,
+        deletedRecordIds,
     ]);
 
     useEffect(() => {
         if (registerSaveCallback) {
-            registerSaveCallback(saveSettings);
+            registerSaveCallback(saveFundsExpenditures);
         }
-    }, [registerSaveCallback, saveSettings]);
+    }, [registerSaveCallback, saveFundsExpenditures]);
 
     if (isInitialLoading) {
         return (
@@ -950,7 +977,6 @@ export const FundsExpenditureSection = ({
                 title={FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                isButtonsDisabled={isDeletingRecord}
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setIsDeleteModalOpen(false)}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -961,7 +987,6 @@ export const FundsExpenditureSection = ({
                 title={FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                isButtonsDisabled={isBulkDeleting}
                 onConfirm={handleConfirmBulkDelete}
                 onCancel={handleBulkDeleteCancel}
                 onClose={handleBulkDeleteCancel}

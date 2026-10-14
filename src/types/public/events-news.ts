@@ -1,5 +1,7 @@
 import { Image } from '../common/image';
 import { HippotherapyProgramSectionDto } from '../common/program-sections';
+import { EntityLocalization } from '@/types/common/language';
+
 export interface chooseProgramData {
     title: string;
     description: string;
@@ -9,6 +11,7 @@ export interface chooseProgramData {
 export interface Tag {
     id: string;
     name: string;
+    localizations?: EntityLocalization[];
 }
 
 export interface EventsData {
@@ -31,8 +34,9 @@ export interface EventsNews {
     description: string;
     date: string;
     tags: Tag[];
-    previewImage: Image | string | null; // string для моків, Image для реальних даних
-    backgroundImage: Image | string | null; // string для моків, Image для реальних даних
+    previewImage: Image | string | { url?: string } | null;
+    backgroundImage: Image | string | null;
     slug: string;
     sections: HippotherapyProgramSectionDto[];
+    localizations?: EntityLocalization[];
 }

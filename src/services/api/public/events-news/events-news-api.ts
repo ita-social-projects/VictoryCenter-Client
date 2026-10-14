@@ -1,6 +1,8 @@
 import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 import { EventsNews } from '@/types/public/events-news';
 import { PaginationResult } from '@/types/admin/common';
+import { axiosInstance } from '@/services/api/axios';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 const delay = (milliseconds: number): Promise<void> =>
     new Promise((resolve) => {
@@ -20,26 +22,20 @@ const getPaginatedEvents = (tagId: string, offset: number, limit: number): Pagin
 
 export const EventsNewsApi = {
     get: async (tagId: string, offset: number = 0, limit: number = 5): Promise<PaginationResult<EventsNews>> => {
-        // const response = await axiosInstance.get(`${API_ROUTES. .PUBLIC}`);
-        await delay(500);
-
-        return getPaginatedEvents(tagId, offset, limit);
+        const response = await axiosInstance.get(`${API_ROUTES.EVENTS.PUBLISHED}`, {
+            params: {
+                categoryId: tagId || undefined,
+                offset: offset,
+                limit: limit,
+            },
+        });
+        return response.data;
     },
 };
 
 export const EventNewsApi = {
     get: async (slug: string): Promise<EventsNews> => {
-        // const response = await axiosInstance.get(`${API_ROUTES.EVENTS.BY_SLUG}/${slug}`);
-        // return response.data;
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const event = eventsNewsMock.find((event) => event.slug === slug);
-                if (event) {
-                    resolve(event);
-                } else {
-                    reject(new Error('Event not found'));
-                }
-            }, 200);
-        });
+        const response = await axiosInstance.get(`${API_ROUTES.EVENTS.PUBLISHED}/${slug}`);
+        return response.data;
     },
 };

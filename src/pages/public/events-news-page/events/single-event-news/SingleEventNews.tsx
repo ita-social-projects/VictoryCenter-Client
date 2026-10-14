@@ -6,6 +6,7 @@ import { EventsNews } from '@/types/public/events-news';
 import styles from './SingleEventNews.module.scss';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { Button } from '@/components/public/ui/button/Button';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 export const SingleEventNews = memo(
     ({
@@ -16,9 +17,18 @@ export const SingleEventNews = memo(
         resource = '',
         previewImage = '',
         slug = '',
+        localizations = [],
     }: EventsNews) => {
         const { t } = useTranslation('eventsNewsPage');
         const navigate = useNavigate();
+
+        const localized = useGetLocalization(localizations, {
+            name: name,
+            title: name,
+            description: description,
+        });
+
+        const finalName = localized.title || localized.name;
 
         const handleClick = () => {
             if (slug) {
@@ -42,8 +52,9 @@ export const SingleEventNews = memo(
                     </span>
                 </div>
 
-                <h4 className={styles['event-title']}>{name}</h4>
-                <p className={styles['event-description']}>{description}</p>
+                <h4 className={styles['event-title']}>{finalName}</h4>
+                <p className={styles['event-description']}>{localized.description}</p>
+
                 <div>
                     <Button onClick={handleClick} icon={ArrowIcon} iconPosition="right" variant="tertiary">
                         {t('LINK_TO_ARTICLE')}

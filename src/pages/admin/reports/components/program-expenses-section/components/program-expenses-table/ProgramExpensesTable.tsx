@@ -69,20 +69,19 @@ const isAcceptButtonDisabled = (
     const normalizedOriginalUah = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true);
     const normalizedOriginalUsd = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true);
 
+    const isAmountsUnchanged = normalizedUah === normalizedOriginalUah && normalizedUsd === normalizedOriginalUsd;
+
     const hasErrors =
         Boolean(rowEditState.errors.amountUah) ||
         Boolean(rowEditState.errors.amountUsd) ||
         Boolean(rowEditState.errors.programId) ||
-        Boolean(rowEditState.usdMismatchMessage) ||
-        isUsdAmountMismatch(normalizedUah, normalizedUsd, exchangeRate);
+        (!isAmountsUnchanged && Boolean(rowEditState.usdMismatchMessage)) ||
+        (!isAmountsUnchanged && isUsdAmountMismatch(normalizedUah, normalizedUsd, exchangeRate));
 
     const programIdUndefined = rowEditState.programId === undefined;
     const amountsEmpty = normalizedUah === '' || normalizedUsd === '';
 
-    const noChanges =
-        normalizedUah === normalizedOriginalUah &&
-        normalizedUsd === normalizedOriginalUsd &&
-        rowEditState.programId === rowEditState.originalProgramId;
+    const noChanges = isAmountsUnchanged && rowEditState.programId === rowEditState.originalProgramId;
 
     return hasErrors || programIdUndefined || amountsEmpty || noChanges;
 };

@@ -172,6 +172,19 @@ describe('EventsApi', () => {
         });
     });
 
+    describe('reorder', () => {
+        it('calls the reorder endpoint with categoryId and ids', async () => {
+            mockPut.mockResolvedValueOnce({});
+
+            await EventsApi.reorder(client, 3, [1, 2]);
+
+            expect(mockPut).toHaveBeenCalledWith(API_ROUTES.EVENTS.REORDER, {
+                categoryId: 3,
+                ids: [1, 2],
+            });
+        });
+    });
+
     describe('event image flow', () => {
         const request = {
             title: 'Event title',

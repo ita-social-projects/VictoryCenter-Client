@@ -2,6 +2,10 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import {
+    getNormalizedInputText,
+    getNormalizedInputTextWhileTyping,
+} from '@/utils/functions/formatters/text-formatters';
 
 export interface TranslateEventFormValues {
     title: string;
@@ -31,10 +35,10 @@ const DEFAULT_FORM_STATE: TranslateEventFormValues = {
 
 export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEventFormProps>(
     ({ initialData = null, onSubmit, formDisabled = false, onValidationChange, onDirtyChange }, ref) => {
-        const [formState, setFormState] = useState<TranslateEventFormValues>(initialData || DEFAULT_FORM_STATE);
+        const [formState, setFormState] = useState<TranslateEventFormValues>(initialData ?? DEFAULT_FORM_STATE);
 
         const isFormValid = formState.title.trim().length > 0 && formState.description.trim().length > 0;
-        const isFormDirty = JSON.stringify(formState) !== JSON.stringify(initialData || DEFAULT_FORM_STATE);
+        const isFormDirty = JSON.stringify(formState) !== JSON.stringify(initialData ?? DEFAULT_FORM_STATE);
 
         useEffect(() => {
             onValidationChange?.(isFormValid);
@@ -46,7 +50,13 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
 
         useImperativeHandle(ref, () => ({
             submit: () => {
-                if (isFormValid) onSubmit(formState);
+                if (isFormValid) {
+                    onSubmit({
+                        title: getNormalizedInputText(formState.title),
+                        description: getNormalizedInputText(formState.description),
+                        additionalDescription: getNormalizedInputText(formState.additionalDescription),
+                    });
+                }
             },
             isValid: () => isFormValid,
             isDirty: () => isFormDirty,
@@ -55,8 +65,16 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
         const handleChange =
             (field: keyof TranslateEventFormValues) =>
             (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, [field]: e.target.value }));
+                const normalized = getNormalizedInputTextWhileTyping(e.target.value);
+                setFormState((prev) => ({ ...prev, [field]: normalized }));
             };
+
+        const handleBlur = (field: keyof TranslateEventFormValues) => () => {
+            setFormState((prev) => ({
+                ...prev,
+                [field]: getNormalizedInputText(prev[field]),
+            }));
+        };
 
         return (
             <form
@@ -70,6 +88,8 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     isRequired
                     value={formState.title}
                     onChange={handleChange('title')}
+                    onBlur={handleBlur('title')}
+                    normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     maxLength={EVENT_VALIDATION.title.max}
                     name="title"
@@ -82,6 +102,8 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     isRequired
                     value={formState.description}
                     onChange={handleChange('description')}
+                    onBlur={handleBlur('description')}
+                    normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     rows={5}
                     maxLength={EVENT_VALIDATION.description.max}
@@ -93,6 +115,8 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     label={EVENTS_TEXT.FORM.LABEL.ADDITIONAL_DESCRIPTION}
                     value={formState.additionalDescription}
                     onChange={handleChange('additionalDescription')}
+                    onBlur={handleBlur('additionalDescription')}
+                    normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     maxLength={EVENT_VALIDATION.additionalDescription.max}
                     name="additionalDescription"

@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import React, { useRef } from 'react';
+import React from 'react';
 import { TranslateEventForm, TranslateEventFormRef, TranslateEventFormProps } from './TranslateEventForm';
 import { EVENTS_TEXT } from '@/const/admin/events';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ label, value, onChange, name, id, disabled }: any) => (
+    InputWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled }: any) => (
         <div data-testid={`input-group-${name}`}>
             <label htmlFor={id}>{label}</label>
             <input
@@ -12,6 +12,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
                 name={name}
                 value={value}
                 onChange={onChange}
+                onBlur={onBlur}
                 disabled={disabled}
                 data-testid={`input-${name}`}
             />
@@ -22,7 +23,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, name, id, disabled }: any) => (
+        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled }: any) => (
             <div data-testid={`textarea-group-${name}`}>
                 <label htmlFor={id}>{label}</label>
                 <textarea
@@ -30,6 +31,7 @@ jest.mock(
                     name={name}
                     value={value}
                     onChange={onChange}
+                    onBlur={onBlur}
                     disabled={disabled}
                     data-testid={`textarea-${name}`}
                 />
@@ -142,5 +144,49 @@ describe('TranslateEventForm', () => {
 
         expect(onSubmit).toHaveBeenCalledWith(initialData);
         expect(ref.current?.isValid()).toBe(true);
+    });
+
+    it('normalizes spaces while typing and removes leading spaces', () => {
+        render(<FormWrapper />);
+
+        const titleInput = screen.getByTestId('input-title');
+        fireEvent.change(titleInput, { target: { value: '   New   Title   ' } });
+
+        expect(titleInput).toHaveValue('New Title ');
+    });
+
+    it('normalizes and trims spaces on blur', () => {
+        render(<FormWrapper />);
+
+        const titleInput = screen.getByTestId('input-title');
+        fireEvent.change(titleInput, { target: { value: 'New Title ' } });
+        fireEvent.blur(titleInput);
+
+        expect(titleInput).toHaveValue('New Title');
+
+        const descInput = screen.getByTestId('textarea-description');
+        fireEvent.change(descInput, { target: { value: 'Description ' } });
+        fireEvent.blur(descInput);
+
+        expect(descInput).toHaveValue('Description');
+    });
+
+    it('normalizes values on submit even if fields were not blurred', () => {
+        const onSubmit = jest.fn();
+        const ref = React.createRef<TranslateEventFormRef>();
+
+        render(<TranslateEventForm {...defaultProps} onSubmit={onSubmit} ref={ref} />);
+
+        fireEvent.change(screen.getByTestId('input-title'), { target: { value: '  Title  ' } });
+        fireEvent.change(screen.getByTestId('textarea-description'), { target: { value: '  Description  ' } });
+        fireEvent.change(screen.getByTestId('input-additionalDescription'), { target: { value: '  Extra  ' } });
+
+        ref.current?.submit();
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            title: 'Title',
+            description: 'Description',
+            additionalDescription: 'Extra',
+        });
     });
 });

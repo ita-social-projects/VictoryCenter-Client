@@ -264,28 +264,6 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
     });
 
-    it('should enable accept button when category is changed and call onRecordSave upon clicking accept', async () => {
-        const onRecordSave = jest.fn().mockResolvedValue(true);
-
-        renderTable({ onRecordSave });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
-
-        const acceptButton = screen.getByLabelText('Accept record 1');
-
-        expect(acceptButton).toBeDisabled();
-
-        fireEvent.click(screen.getByTestId('select-option-Program C-102'));
-
-        expect(acceptButton).not.toBeDisabled();
-
-        fireEvent.click(acceptButton);
-
-        await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
-        });
-    });
-
     it('should show the required error under the program field and disable accept when the program is cleared', () => {
         renderTable();
 

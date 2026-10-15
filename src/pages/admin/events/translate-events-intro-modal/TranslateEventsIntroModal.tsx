@@ -33,6 +33,10 @@ export const TranslateEventsIntroModal = ({
         }
     }, [availableLanguages, isOpen]);
 
+    useEffect(() => {
+        setValue('');
+    }, [field, isOpen]);
+
     const handleClose = () => {
         setValue('');
         onClose();

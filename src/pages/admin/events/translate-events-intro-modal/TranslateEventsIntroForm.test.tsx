@@ -29,14 +29,14 @@ describe('TranslateEventsIntroForm', () => {
         expect(screen.getByText('23/1000')).toBeInTheDocument();
     });
 
-    it('renders a controlled input with a counter below for the events block title', () => {
+    it('renders a controlled textarea with a counter below for the events block title', () => {
         render(<TranslateEventsIntroFormHarness field="eventsBlockTitle" />);
 
         const field = screen.getByRole('textbox', {
             name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
         });
 
-        expect(field).toBeInstanceOf(HTMLInputElement);
+        expect(field).toBeInstanceOf(HTMLTextAreaElement);
         fireEvent.change(field, { target: { value: 'Title translation' } });
         expect(screen.getByTestId('controlled-value')).toHaveTextContent('Title translation');
         expect(screen.getByText('17/100')).toBeInTheDocument();

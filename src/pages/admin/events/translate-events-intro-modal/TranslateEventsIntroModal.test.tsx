@@ -51,12 +51,12 @@ describe('TranslateEventsIntroModal', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
     });
 
-    it('renders the events block title translation modal with an empty input', () => {
+    it('renders the events block title translation modal with an empty textarea', () => {
         render(<TranslationModalHarness field="eventsBlockTitle" />);
 
         const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE);
 
-        expect(field).toBeInstanceOf(HTMLInputElement);
+        expect(field).toBeInstanceOf(HTMLTextAreaElement);
         expect(field).toHaveValue('');
         expect(
             screen
@@ -124,6 +124,54 @@ describe('TranslateEventsIntroModal', () => {
         await user.click(screen.getByRole('button', { name: 'Відкрити модалку' }));
 
         expect(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE)).toHaveValue('');
+    });
+
+    it('clears a draft when the parent closes the modal or switches the translated field', async () => {
+        const user = userEvent.setup();
+        const onClose = jest.fn();
+        const { rerender } = render(
+            <TranslateEventsIntroModal
+                isOpen
+                field="pageDescription"
+                translationLanguages={translationLanguages}
+                onClose={onClose}
+            />,
+        );
+
+        await user.type(
+            getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE),
+            'Translation draft',
+        );
+
+        rerender(
+            <TranslateEventsIntroModal
+                isOpen
+                field="eventsBlockTitle"
+                translationLanguages={translationLanguages}
+                onClose={onClose}
+            />,
+        );
+        expect(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE)).toHaveValue('');
+
+        await user.type(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE), 'Draft');
+        rerender(
+            <TranslateEventsIntroModal
+                isOpen={false}
+                field="eventsBlockTitle"
+                translationLanguages={translationLanguages}
+                onClose={onClose}
+            />,
+        );
+        rerender(
+            <TranslateEventsIntroModal
+                isOpen
+                field="eventsBlockTitle"
+                translationLanguages={translationLanguages}
+                onClose={onClose}
+            />,
+        );
+
+        expect(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE)).toHaveValue('');
     });
 
     it('opens the confirmation modal when closing a changed form with Escape', async () => {

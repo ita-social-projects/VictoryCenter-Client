@@ -192,6 +192,23 @@ describe('TranslateEventForm', () => {
         });
     });
 
+    it('validates on the fly while typing, but does not show required error', () => {
+        render(<TranslateEventForm {...defaultProps} />);
+
+        const title = screen.getByTestId('input-title');
+        fireEvent.change(title, { target: { value: 'a' } });
+        expect(screen.getByTestId('error-title')).toBeInTheDocument();
+
+        fireEvent.change(title, { target: { value: 'Valid title here' } });
+        expect(screen.queryByTestId('error-title')).not.toBeInTheDocument();
+
+        fireEvent.change(title, { target: { value: '' } });
+        expect(screen.queryByTestId('error-title')).not.toBeInTheDocument();
+
+        fireEvent.blur(title);
+        expect(screen.getByTestId('error-title')).toBeInTheDocument();
+    });
+
     it('shows validation errors on blur for invalid values', () => {
         render(<TranslateEventForm {...defaultProps} />);
 

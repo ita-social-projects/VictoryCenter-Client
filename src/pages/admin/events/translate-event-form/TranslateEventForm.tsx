@@ -83,6 +83,12 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
             (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 const normalized = getNormalizedInputTextWhileTyping(e.target.value);
                 setFormState((prev) => ({ ...prev, [field]: normalized }));
+
+                if (normalized.trim().length === 0) {
+                    setErrors((prev) => ({ ...prev, [field]: undefined }));
+                } else {
+                    validateField(field, normalized);
+                }
             };
 
         const handleBlur = (field: keyof TranslateEventFormValues) => () => {

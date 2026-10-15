@@ -55,7 +55,7 @@ jest.mock('./main-statistics-section/MainStatisticsSection', () => ({
     MainStatisticsSection: () => <div data-testid="main-statistics-section" />,
 }));
 
-jest.mock('./news-events-section/NewsEventsSection', () => ({
+jest.mock('./event-news/NewsEventsSection', () => ({
     NewsEventsSection: () => <div data-testid="news-events-section" />,
 }));
 

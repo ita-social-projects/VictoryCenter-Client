@@ -9,7 +9,7 @@ jest.mock('../../axios', () => ({
 }));
 
 jest.mock('@/utils/functions/mappers/public/event-news/event-news', () => ({
-    mapToEventsNews: jest.fn((dto: { id: number }) => ({ id: String(dto.id) })),
+    mapToEventsNews: jest.fn(),
 }));
 
 const mockedAxiosGet = axiosInstance.get as jest.Mock;
@@ -20,6 +20,7 @@ const mockResponse = (data: unknown) => mockedAxiosGet.mockResolvedValue({ data 
 describe('events-news-api', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockedMapper.mockImplementation((dto: { id: number }) => ({ id: String(dto.id) }));
     });
 
     describe('EventsNewsApi.get', () => {
@@ -36,7 +37,10 @@ describe('events-news-api', () => {
                 await EventsNewsApi.get(...args);
 
                 expect(mockedAxiosGet).toHaveBeenCalledTimes(1);
-                expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS.PUBLISHED, { params: expectedParams });
+                expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS.PUBLISHED, {
+                    params: expectedParams,
+                    signal: undefined,
+                });
             },
         );
 
@@ -70,8 +74,22 @@ describe('events-news-api', () => {
 
             const result = await EventNewsApi.get('my-slug');
 
-            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/my-slug`);
-            expect(result).toEqual({ id: '5' });
+            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/my-slug`, {
+                signal: undefined,
+            });
+            expect(result).toEqual({ id: '5', sections: [] });
+        });
+
+        it('passes the cancellation signal to axios', async () => {
+            mockResponse({ items: [], totalItemsCount: 0 });
+            const { signal } = new AbortController();
+
+            await EventsNewsApi.get(undefined, 0, 5, 'uk', { cancellationSignal: signal });
+
+            expect(mockedAxiosGet).toHaveBeenCalledWith(
+                API_ROUTES.EVENTS.PUBLISHED,
+                expect.objectContaining({ signal }),
+            );
         });
 
         it('encodes special characters in the slug', async () => {
@@ -79,7 +97,9 @@ describe('events-news-api', () => {
 
             await EventNewsApi.get('a b/c?d');
 
-            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/a%20b%2Fc%3Fd`);
+            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/a%20b%2Fc%3Fd`, {
+                signal: undefined,
+            });
         });
 
         it('rejects when the news is not found', async () => {

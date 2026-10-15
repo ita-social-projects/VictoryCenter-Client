@@ -8,15 +8,7 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { Button } from '@/components/public/ui/button/Button';
 
 export const SingleEventNews = memo(
-    ({
-        name = '',
-        date = '',
-        tags = [],
-        description = '',
-        resource = '',
-        previewImage = '',
-        slug = '',
-    }: EventsNews) => {
+    ({ name = '', date = '', tag, description = '', resource = '', previewImage = '', slug = '' }: EventsNews) => {
         const { t } = useTranslation('eventsNewsPage');
         const navigate = useNavigate();
 
@@ -28,16 +20,11 @@ export const SingleEventNews = memo(
 
         return (
             <div className={styles['event-card']}>
-                <img src={previewImage as string} alt="Event" className={styles['event-image']} />
+                <img src={previewImage as string} alt={name || 'Event'} className={styles['event-image']} />
                 <div className={styles['event-header']}>
-                    {tags &&
-                        tags.map((tag) => (
-                            <span key={tag.id} className={styles['event-tag']}>
-                                {tag.name}
-                            </span>
-                        ))}
+                    {tag && <span className={styles['event-tag']}>{tag.name}</span>}
                     <span className={styles['event-date']}>
-                        {resource && resource + ' | '}
+                        {resource ? `${resource} | ` : ''}
                         {date}
                     </span>
                 </div>

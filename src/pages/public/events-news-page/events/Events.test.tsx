@@ -1,16 +1,15 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { Events } from './Events';
 import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
+import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 
-jest.mock('react-i18next', () => {
-    return {
-        useTranslation: () => ({
-            t: (key: string) => key,
-        }),
-    };
-});
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+}));
 
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
@@ -19,6 +18,20 @@ jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch'
 jest.mock('@/services/api/public/events-news/events-news-api', () => ({
     EventsNewsApi: { get: jest.fn() },
 }));
+
+let mockCurrentLanguage: string = DEFAULT_LOCALE;
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
+}));
+
+jest.mock('./single-event-news/SingleEventNews', () => ({
+    SingleEventNews: ({ name }: { name: string }) => <div data-testid="single-event-news">{name}</div>,
+}));
+
+const useDataPaginationFetch = require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch')
+    .useDataPaginationFetch as jest.Mock;
+const mockedApiGet = EventsNewsApi.get as jest.Mock;
 
 const eventsPerPage = 8;
 
@@ -31,340 +44,233 @@ const mockHookImplementation = {
     resetList: jest.fn(),
 };
 
-jest.mock('./single-event-news/SingleEventNews', () => ({
-    SingleEventNews: ({ title }: { title: string }) => <div data-testid="single-event-news">{title}</div>,
-}));
+const mockData = {
+    title: 'Test Events',
+    tags: [
+        { id: '1', name: 'Tag 1' },
+        { id: '2', name: 'Tag 2' },
+    ],
+};
+
+const clickTag = (name: string) => act(() => screen.getByText(name).click());
+const clickAllMaterials = () => act(() => screen.getByTestId('all-materials-button').click());
+const clickShowMore = () => act(() => screen.getByText('SHOW_MORE').click());
+
+const getLatestHookOptions = () => {
+    const { calls } = useDataPaginationFetch.mock;
+    return calls[calls.length - 1][0];
+};
 
 describe('Events component', () => {
-    describe('More events than page size', () => {
-        const useDataPaginationFetch =
-            require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-        const mockData = {
-            title: 'Test Events',
-            tags: [
-                { id: '1', name: 'Tag 1' },
-                { id: '2', name: 'Tag 2' },
-            ],
-        };
-
-        beforeEach(() => {
-            jest.clearAllMocks();
-            useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
-        });
-
-        it('should display the title and tags', async () => {
-            render(<Events {...mockData} />);
-            await waitFor(() => {
-                expect(screen.getByText('Test Events')).toBeInTheDocument();
-                expect(screen.getByText('Tag 1')).toBeInTheDocument();
-                expect(screen.getByText('Tag 2')).toBeInTheDocument();
-                const allTag = screen.getByTestId('all-materials-button');
-                expect(allTag).toBeInTheDocument();
-                expect(allTag).toHaveTextContent('ALL_MATERIALS');
-                expect(allTag).toHaveClass('black-button');
-            });
-        });
-
-        it('should update selected tag and reset offset when a tag is clicked', async () => {
-            render(<Events {...mockData} />);
-            const allTag = screen.getByTestId('all-materials-button');
-            expect(allTag).toHaveClass('black-button');
-            const tagButton = screen.getByText('Tag 1');
-            expect(tagButton).not.toHaveClass('black-button');
-            act(() => tagButton.click());
-
-            await waitFor(() => {
-                expect(tagButton).toHaveClass('black-button');
-                expect(allTag).toHaveClass('white-button');
-            });
-        });
-
-        it('should render the "Show More" button', async () => {
-            render(<Events {...mockData} />);
-            let events = screen.getAllByTestId('single-event-news');
-            expect(events).toHaveLength(eventsPerPage);
-            const showMoreButton = screen.getByText('SHOW_MORE');
-            expect(showMoreButton).toBeInTheDocument();
-        });
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockCurrentLanguage = DEFAULT_LOCALE;
+        useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
+        mockedApiGet.mockResolvedValue({ items: [], totalItemsCount: 0 });
     });
 
-    describe('Fewer events than page size', () => {
-        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            const mockImplementationWithFewerData = {
+    describe('Rendering', () => {
+        it('should display the title and tags', () => {
+            render(<Events {...mockData} />);
+
+            expect(screen.getByText('Test Events')).toBeInTheDocument();
+            expect(screen.getByText('Tag 1')).toBeInTheDocument();
+            expect(screen.getByText('Tag 2')).toBeInTheDocument();
+
+            const allTag = screen.getByTestId('all-materials-button');
+            expect(allTag).toHaveTextContent('ALL_MATERIALS');
+            expect(allTag).toHaveClass('black-button');
+        });
+
+        it('should render the "Show More" button and a card for every event from the hook', () => {
+            render(<Events {...mockData} />);
+
+            expect(screen.getAllByTestId('single-event-news')).toHaveLength(eventsPerPage);
+            expect(screen.getByText('SHOW_MORE')).toBeInTheDocument();
+        });
+
+        it('should render exactly the data returned by the hook and replace it when the data changes', () => {
+            const firstPage = eventsNewsMock.slice(0, 3);
+            const secondPage = eventsNewsMock.slice(3, 5);
+
+            useDataPaginationFetch.mockImplementation(() => ({ ...mockHookImplementation, data: firstPage }));
+            const { rerender } = render(<Events {...mockData} />);
+            expect(screen.getAllByTestId('single-event-news')).toHaveLength(firstPage.length);
+
+            useDataPaginationFetch.mockImplementation(() => ({ ...mockHookImplementation, data: secondPage }));
+            rerender(<Events {...mockData} />);
+
+            // Компонент не накопичує дані сам: накопичення відбувається в хуку
+            expect(screen.getAllByTestId('single-event-news')).toHaveLength(secondPage.length);
+        });
+
+        it('should not show "Show More" button when there are no more events to load', () => {
+            useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 hasMore: false,
                 data: eventsNewsMock.slice(0, 3),
-            };
-            useDataPaginationFetch.mockImplementation(() => mockImplementationWithFewerData);
+            }));
+
+            render(<Events {...mockData} />);
+
+            expect(screen.queryByText('SHOW_MORE')).not.toBeInTheDocument();
         });
 
-        it('should not show "Show More" button when there are no more events to load', async () => {
+        it('should display title and buttons but no event cards when events list is empty', () => {
+            useDataPaginationFetch.mockImplementation(() => ({
+                ...mockHookImplementation,
+                data: [],
+                hasMore: false,
+            }));
+
             render(<Events {...mockData} />);
-            const showMoreButton = screen.queryByText('SHOW_MORE');
-            expect(showMoreButton).not.toBeInTheDocument();
+
+            expect(screen.getByText('Test Events')).toBeInTheDocument();
+            expect(screen.getByTestId('all-materials-button')).toBeInTheDocument();
+            expect(screen.queryAllByTestId('single-event-news')).toHaveLength(0);
+            expect(screen.queryByText('SHOW_MORE')).not.toBeInTheDocument();
         });
     });
 
     describe('Error state', () => {
-        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            const mockImplementationWithError = {
+        it('should display error message when data fetch fails', () => {
+            useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 error: 'Failed to load events',
                 data: [],
-            };
-            useDataPaginationFetch.mockImplementation(() => mockImplementationWithError);
-        });
+            }));
 
-        it('should display error message when data fetch fails', async () => {
             render(<Events {...mockData} />);
+
             const errorMessage = screen.getByRole('alert');
-            expect(errorMessage).toBeInTheDocument();
             expect(errorMessage).toHaveTextContent('FAILED_TO_LOAD_THE_EVENTS_NEWS');
         });
     });
 
     describe('Loading state', () => {
-        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            const mockImplementationWithLoading = {
+        it('should display loading progress when isLoading is true', () => {
+            useDataPaginationFetch.mockImplementation(() => ({
                 ...mockHookImplementation,
                 isLoading: true,
                 data: eventsNewsMock.slice(0, 3),
-            };
-            useDataPaginationFetch.mockImplementation(() => mockImplementationWithLoading);
+            }));
+
+            render(<Events {...mockData} />);
+
+            expect(screen.getByRole('progressbar')).toBeInTheDocument();
         });
 
-        it('should display loading progress when isLoading is true', async () => {
+        it('should not display loading progress when isLoading is false', () => {
             render(<Events {...mockData} />);
-            const progressBar = screen.getByRole('progressbar');
-            expect(progressBar).toBeInTheDocument();
+
+            expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
         });
     });
 
-    describe('Clear tag filter', () => {
-        const mockData = {
-            title: 'Test Events',
-            tags: [
-                { id: '1', name: 'Tag 1' },
-                { id: '2', name: 'Tag 2' },
-            ],
-        };
-
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
-        });
-
-        it('should clear selected tag when "All Materials" button is clicked', async () => {
+    describe('Tag selection', () => {
+        it('should highlight the selected tag and deselect "All materials"', () => {
             render(<Events {...mockData} />);
             const allTag = screen.getByTestId('all-materials-button');
             const tagButton = screen.getByText('Tag 1');
 
-            act(() => tagButton.click());
-            await waitFor(() => {
-                expect(tagButton).toHaveClass('black-button');
-                expect(allTag).toHaveClass('white-button');
-            });
+            expect(allTag).toHaveClass('black-button');
+            expect(tagButton).not.toHaveClass('black-button');
 
-            act(() => allTag.click());
-            await waitFor(() => {
-                expect(allTag).toHaveClass('black-button');
-                expect(tagButton).toHaveClass('white-button');
-            });
+            clickTag('Tag 1');
+
+            expect(tagButton).toHaveClass('black-button');
+            expect(allTag).toHaveClass('white-button');
+        });
+
+        it('should switch the highlight between tags', () => {
+            render(<Events {...mockData} />);
+
+            clickTag('Tag 1');
+            clickTag('Tag 2');
+
+            expect(screen.getByText('Tag 1')).toHaveClass('white-button');
+            expect(screen.getByText('Tag 2')).toHaveClass('black-button');
+        });
+
+        it('should clear the selected tag when "All materials" is clicked', () => {
+            render(<Events {...mockData} />);
+            const allTag = screen.getByTestId('all-materials-button');
+            const tagButton = screen.getByText('Tag 1');
+
+            clickTag('Tag 1');
+            expect(tagButton).toHaveClass('black-button');
+            expect(allTag).toHaveClass('white-button');
+
+            clickAllMaterials();
+            expect(allTag).toHaveClass('black-button');
+            expect(tagButton).toHaveClass('white-button');
         });
     });
 
-    describe('Show More button click', () => {
-        const mockData = {
-            title: 'Test Events',
-            tags: [{ id: '1', name: 'Tag 1' }],
-        };
-
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
-        });
-
-        it('should call loadMore when Show More button is clicked', async () => {
-            render(<Events {...mockData} />);
-            const showMoreButton = screen.getByText('SHOW_MORE');
-            expect(showMoreButton).toBeInTheDocument();
-
-            act(() => showMoreButton.click());
-
-            await waitFor(() => {
-                expect(showMoreButton).toBeInTheDocument();
-            });
-        });
-    });
-
-    describe('Empty events list', () => {
-        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
-        beforeEach(() => {
-            jest.clearAllMocks();
-            const useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-            const mockImplementationWithNoEvents = {
-                ...mockHookImplementation,
-                data: [],
-                hasMore: false,
-            };
-            useDataPaginationFetch.mockImplementation(() => mockImplementationWithNoEvents);
-        });
-
-        it('should display title and buttons but no event cards when events list is empty', async () => {
-            render(<Events {...mockData} />);
-            expect(screen.getByText('Test Events')).toBeInTheDocument();
-            expect(screen.getByTestId('all-materials-button')).toBeInTheDocument();
-
-            const eventCards = screen.queryAllByTestId('single-event-news');
-            expect(eventCards).toHaveLength(0);
-
-            const showMoreButton = screen.queryByText('SHOW_MORE');
-            expect(showMoreButton).not.toBeInTheDocument();
-        });
-    });
-
-    describe('Data update logic', () => {
-        const mockData = {
-            title: 'Test Events',
-            tags: [{ id: '1', name: 'Tag 1' }],
-        };
-        let useDataPaginationFetch: jest.Mock;
-
-        beforeEach(() => {
-            jest.clearAllMocks();
-            useDataPaginationFetch =
-                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-        });
-
-        it('should replace events when offset is 0 (initial load)', async () => {
-            const initialData = eventsNewsMock.slice(0, 3);
-            useDataPaginationFetch.mockImplementation(() => ({
-                ...mockHookImplementation,
-                data: initialData,
-                hasMore: true,
-            }));
-
+    describe('Pagination hook configuration', () => {
+        it('should configure the hook with the page size and empty initial data', () => {
             render(<Events {...mockData} />);
 
-            await waitFor(() => {
-                const eventCards = screen.getAllByTestId('single-event-news');
-                expect(eventCards).toHaveLength(initialData.length);
-            });
+            expect(getLatestHookOptions()).toEqual(
+                expect.objectContaining({ initialData: [], pageSize: eventsPerPage }),
+            );
         });
 
-        it('should append events when offset is incremented (load more)', async () => {
-            const firstPageData = eventsNewsMock.slice(0, 3);
-            const secondPageData = eventsNewsMock.slice(3, 6);
+        it('should call fetchMore when "Show More" is clicked', () => {
+            render(<Events {...mockData} />);
 
-            // Initial render with first page
-            useDataPaginationFetch.mockImplementation(() => ({
-                ...mockHookImplementation,
-                data: firstPageData,
-                hasMore: true,
-            }));
+            clickShowMore();
 
+            expect(mockHookImplementation.fetchMore).toHaveBeenCalledTimes(1);
+        });
+
+        it('should include the selected tag id in autoFetchDependencies', () => {
+            render(<Events {...mockData} />);
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([DEFAULT_LOCALE, undefined]);
+
+            clickTag('Tag 1');
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([DEFAULT_LOCALE, '1']);
+
+            clickAllMaterials();
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([DEFAULT_LOCALE, undefined]);
+        });
+
+        it.each(LOCALES)('should include "%s" and the tag id in autoFetchDependencies', (language) => {
+            mockCurrentLanguage = language;
+            render(<Events {...mockData} />);
+
+            clickTag('Tag 1');
+
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([language, '1']);
+        });
+
+        it.each(LOCALES)('should refetch when the language changes from "%s"', (from) => {
+            const to = LOCALES.find((locale) => locale !== from);
+            if (!to) return; // підтримується лише одна мова, перемикати нема на що
+
+            mockCurrentLanguage = from;
             const { rerender } = render(<Events {...mockData} />);
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([from, undefined]);
 
-            await waitFor(() => {
-                const eventCards = screen.getAllByTestId('single-event-news');
-                expect(eventCards).toHaveLength(firstPageData.length);
-            });
-
-            // Simulate loading more data
-            useDataPaginationFetch.mockImplementation(() => ({
-                ...mockHookImplementation,
-                data: secondPageData,
-                hasMore: true,
-            }));
-
+            mockCurrentLanguage = to;
             rerender(<Events {...mockData} />);
 
-            await waitFor(() => {
-                const eventCards = screen.getAllByTestId('single-event-news');
-                // Should have both first and second page data
-                expect(eventCards.length).toBeGreaterThanOrEqual(firstPageData.length);
-            });
-        });
-
-        it('should reset events when tag filter changes (offset back to 0)', async () => {
-            const firstFilterData = eventsNewsMock.slice(0, 3);
-            const secondFilterData = eventsNewsMock.slice(0, 2);
-
-            useDataPaginationFetch.mockImplementation(() => ({
-                ...mockHookImplementation,
-                data: firstFilterData,
-                hasMore: true,
-            }));
-
-            render(<Events {...mockData} />);
-
-            await waitFor(() => {
-                let eventCards = screen.getAllByTestId('single-event-news');
-                expect(eventCards).toHaveLength(firstFilterData.length);
-            });
-
-            // Simulate tag change which resets offset to 0
-            useDataPaginationFetch.mockImplementation(() => ({
-                ...mockHookImplementation,
-                data: secondFilterData,
-                hasMore: true,
-            }));
-
-            const tagButton = screen.getByText('Tag 1');
-            act(() => tagButton.click());
-
-            await waitFor(() => {
-                const eventCards = screen.getAllByTestId('single-event-news');
-                // After filter change, should have new data (not concatenated)
-                expect(eventCards.length).toBeLessThanOrEqual(secondFilterData.length);
-            });
+            expect(getLatestHookOptions().autoFetchDependencies).toEqual([to, undefined]);
         });
     });
 
     describe('Fetch handler', () => {
-        const useDataPaginationFetch = require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch')
-            .useDataPaginationFetch as jest.Mock;
-        const mockedApiGet = EventsNewsApi.get as jest.Mock;
-        const mockData = { title: 'Test Events', tags: [{ id: '1', name: 'Tag 1' }] };
-        const params = { limit: eventsPerPage } as PaginationRequestParams;
+        const params = { offset: 0, limit: eventsPerPage } as PaginationRequestParams;
 
-        const callLatestFetchHandler = () => {
-            const { calls } = useDataPaginationFetch.mock;
-            return calls[calls.length - 1][0].fetchHandler(params);
-        };
-
-        const clickTag = (name: string) => act(() => screen.getByText(name).click());
-        const clickShowMore = () => act(() => screen.getByText('SHOW_MORE').click());
-
-        beforeEach(() => {
-            jest.clearAllMocks();
-            useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
-            mockedApiGet.mockResolvedValue({ items: [], totalItemsCount: 0 });
-        });
+        const callLatestFetchHandler = (overrides: Partial<PaginationRequestParams> = {}) =>
+            getLatestHookOptions().fetchHandler({ ...params, ...overrides });
 
         it('requests the first page without a category while "All materials" is selected', async () => {
             render(<Events {...mockData} />);
 
             await callLatestFetchHandler();
 
-            expect(mockedApiGet).toHaveBeenCalledWith(undefined, 0, eventsPerPage);
+            expect(mockedApiGet).toHaveBeenCalledWith(undefined, 0, eventsPerPage, DEFAULT_LOCALE, undefined);
         });
 
         it('passes the selected tag id to the API', async () => {
@@ -373,36 +279,57 @@ describe('Events component', () => {
 
             await callLatestFetchHandler();
 
-            expect(mockedApiGet).toHaveBeenLastCalledWith('1', 0, eventsPerPage);
+            expect(mockedApiGet).toHaveBeenLastCalledWith('1', 0, eventsPerPage, DEFAULT_LOCALE, undefined);
         });
 
         it('stops sending the tag id after "All materials" is selected again', async () => {
             render(<Events {...mockData} />);
             clickTag('Tag 1');
-            act(() => screen.getByTestId('all-materials-button').click());
+            clickAllMaterials();
 
             await callLatestFetchHandler();
 
-            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage);
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage, DEFAULT_LOCALE, undefined);
         });
 
-        it('requests the next page with an increased offset after "Show more"', async () => {
+        it.each(LOCALES)('passes the "%s" language to the API', async (language) => {
+            mockCurrentLanguage = language;
             render(<Events {...mockData} />);
-            clickShowMore();
 
             await callLatestFetchHandler();
 
-            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, eventsPerPage, eventsPerPage);
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage, language, undefined);
         });
 
-        it('resets the offset to 0 when a tag is selected after loading more', async () => {
+        it('passes the offset provided by the pagination hook to the API', async () => {
             render(<Events {...mockData} />);
-            clickShowMore();
-            clickTag('Tag 1');
 
-            await callLatestFetchHandler();
+            await callLatestFetchHandler({ offset: eventsPerPage });
 
-            expect(mockedApiGet).toHaveBeenLastCalledWith('1', 0, eventsPerPage);
+            expect(mockedApiGet).toHaveBeenLastCalledWith(
+                undefined,
+                eventsPerPage,
+                eventsPerPage,
+                DEFAULT_LOCALE,
+                undefined,
+            );
+        });
+
+        it('falls back to the default page size when the hook does not provide a limit', async () => {
+            render(<Events {...mockData} />);
+
+            await callLatestFetchHandler({ limit: undefined });
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage, DEFAULT_LOCALE, undefined);
+        });
+
+        it('passes requestOptions (cancellation signal) to the API', async () => {
+            const requestOptions = { cancellationSignal: new AbortController().signal };
+            render(<Events {...mockData} />);
+
+            await callLatestFetchHandler({ requestOptions });
+
+            expect(mockedApiGet).toHaveBeenLastCalledWith(undefined, 0, eventsPerPage, DEFAULT_LOCALE, requestOptions);
         });
 
         it('returns the API response to the pagination hook', async () => {

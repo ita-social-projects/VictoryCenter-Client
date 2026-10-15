@@ -6,10 +6,7 @@ describe('mapToEventsNews', () => {
         const background = { id: 2, url: '/background.webp', mimeType: 'image/webp' };
         const dto = createPublishedEventNewsDto({
             id: 42,
-            categories: [
-                { id: 10, name: 'Media', localizations: [] },
-                { id: 11, name: 'News', localizations: [] },
-            ],
+            category: { id: 10, name: 'Media', localizations: [] },
             backgroundImage: background,
         });
 
@@ -18,10 +15,7 @@ describe('mapToEventsNews', () => {
             name: 'Event title',
             description: 'Event description',
             date: '15/02/2025',
-            tags: [
-                { id: '10', name: 'Media' },
-                { id: '11', name: 'News' },
-            ],
+            tag: { id: '10', name: 'Media' },
             resource: 'NV',
             previewImage: '/preview.webp',
             backgroundImage: background,
@@ -34,7 +28,7 @@ describe('mapToEventsNews', () => {
         const result = mapToEventsNews(createPublishedEventNewsDto({ id: 7 }));
 
         expect(result.id).toBe('7');
-        expect(result.tags[0].id).toBe('10');
+        expect(result.tag?.id).toBe('10');
     });
 
     it.each([
@@ -56,7 +50,7 @@ describe('mapToEventsNews', () => {
     });
 
     it('returns no tags when the news has no categories', () => {
-        expect(mapToEventsNews(createPublishedEventNewsDto({ categories: [] })).tags).toEqual([]);
+        expect(mapToEventsNews(createPublishedEventNewsDto({ category: undefined })).tag).toEqual(undefined);
     });
 
     it('always returns an empty sections list', () => {

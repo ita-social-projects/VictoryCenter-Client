@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
@@ -7,49 +7,48 @@ import { ReactComponent as ArrowDownIcon } from '@/assets/icons/arrow-down.svg';
 import { EventsData, EventsNews, Tag } from '@/types/public/events-news';
 import { SingleEventNews } from './single-event-news/SingleEventNews';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import {
     useDataPaginationFetch,
     PaginationRequestParams,
 } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import styles from './Events.module.scss';
 
+const PAGE_SIZE = 8;
+const getEventId = (item: EventsNews) => item.id;
 export const Events = ({ title, tags }: EventsData) => {
     const { t } = useTranslation('eventsNewsPage');
-    const pageSize = 8;
+    const { currentLanguage } = useLocale();
     const safeTags = Array.isArray(tags) ? tags : [];
 
     const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-    const [events, setEvents] = useState<EventsNews[]>([]);
-    const [offset, setOffset] = useState<number>(0);
-
-    const searchByTag = (tag: Tag) => {
-        setSelectedTag(tag);
-        setOffset(0); // Reset offset when changing tag
-    };
-
-    const loadMore = () => setOffset((prevOffset) => prevOffset + pageSize);
+    const selectedTagId = selectedTag?.id;
 
     const getEvents = useCallback(
-        async (params: PaginationRequestParams) => {
-            return EventsNewsApi.get(selectedTag?.id, offset, params.limit as number);
-        },
-        [selectedTag, offset],
+        (params: PaginationRequestParams) =>
+            EventsNewsApi.get(
+                selectedTagId,
+                params.offset,
+                params.limit ?? PAGE_SIZE,
+                currentLanguage,
+                params.requestOptions,
+            ),
+        [selectedTagId, currentLanguage],
     );
 
-    const { data, isLoading, error, hasMore } = useDataPaginationFetch<EventsNews>({
+    const {
+        data: events,
+        isLoading,
+        error,
+        hasMore,
+        fetchMore,
+    } = useDataPaginationFetch<EventsNews>({
         initialData: [],
         fetchHandler: getEvents,
-        autoFetchDependencies: [t, selectedTag, offset],
-        pageSize: pageSize,
+        autoFetchDependencies: [currentLanguage, selectedTagId],
+        getUniqueId: getEventId,
+        pageSize: PAGE_SIZE,
     });
-
-    useEffect(() => {
-        if (offset === 0) {
-            setEvents(data);
-        } else {
-            setEvents((prevEvents) => [...prevEvents, ...data]);
-        }
-    }, [data, offset]);
 
     return (
         <section className={styles.events}>
@@ -57,11 +56,11 @@ export const Events = ({ title, tags }: EventsData) => {
                 <div className={styles['button-block']}>
                     {safeTags.map((tag) => (
                         <button
-                            onClick={() => searchByTag(tag)}
+                            onClick={() => setSelectedTag(tag)}
                             key={tag.id}
                             className={classNames({
-                                [styles['white-button']]: selectedTag?.id !== tag.id,
-                                [styles['black-button']]: selectedTag?.id === tag.id,
+                                [styles['white-button']]: selectedTagId !== tag.id,
+                                [styles['black-button']]: selectedTagId === tag.id,
                             })}
                         >
                             {tag.name}
@@ -96,7 +95,7 @@ export const Events = ({ title, tags }: EventsData) => {
             </div>
             {hasMore && (
                 <Button
-                    onClick={loadMore}
+                    onClick={fetchMore}
                     variant="secondary-dark"
                     iconPosition="right"
                     icon={ArrowDownIcon}

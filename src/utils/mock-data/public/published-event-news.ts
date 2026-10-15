@@ -15,7 +15,7 @@ export const createPublishedEventNewsDto = (overrides: Partial<PublishedEventNew
     publishedAt: '2025-02-15T00:00:00+02:00',
     previewImage: { id: 1, url: '/preview.webp', mimeType: 'image/webp' },
     backgroundImage: null,
-    categories: [{ id: 10, name: 'Media', localizations: [] }],
+    category: { id: 10, name: 'Media', localizations: [] },
     localizations: [],
     ...overrides,
 });

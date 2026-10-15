@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import React, { useCallback } from 'react';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { EventsNewsIntro } from './event-news-intro/EventsNewsIntro';
@@ -6,13 +6,20 @@ import { Events } from './events/Events';
 import { ChooseProgram } from './choose-program/ChooseProgram';
 import { EventsNewsPageApi } from '@/services/api/public/events-news/events-new-page-api';
 import { EventsNewsPageData } from '@/types/public/events-news';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { RequestOptions } from '@/types/common/api';
 
 export const EventsNewsPage = () => {
-    const { t } = useTranslation('eventsNewsPage');
+    const { currentLanguage } = useLocale();
+    const fetchPageData = useCallback(
+        (options?: RequestOptions) => EventsNewsPageApi.get(currentLanguage, options),
+        [currentLanguage],
+    );
+
     const { data, isLoading, error } = useDataFetch<EventsNewsPageData | null>({
         initialData: null,
-        fetchHandler: EventsNewsPageApi.get,
-        autoFetchDependencies: [t],
+        fetchHandler: fetchPageData,
+        autoFetchDependencies: [currentLanguage],
     });
 
     return (

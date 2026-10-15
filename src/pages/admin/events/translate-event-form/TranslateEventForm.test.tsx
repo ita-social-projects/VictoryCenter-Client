@@ -180,8 +180,12 @@ describe('TranslateEventForm', () => {
         render(<TranslateEventForm {...defaultProps} onSubmit={onSubmit} ref={ref} />);
 
         fireEvent.change(screen.getByTestId('input-title'), { target: { value: '  Title long enough  ' } });
-        fireEvent.change(screen.getByTestId('textarea-description'), { target: { value: '  Description long enough  ' } });
-        fireEvent.change(screen.getByTestId('input-additionalDescription'), { target: { value: '  Extra long enough  ' } });
+        fireEvent.change(screen.getByTestId('textarea-description'), {
+            target: { value: '  Description long enough  ' },
+        });
+        fireEvent.change(screen.getByTestId('input-additionalDescription'), {
+            target: { value: '  Extra long enough  ' },
+        });
 
         ref.current?.submit();
 

@@ -15,6 +15,8 @@ import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -48,6 +50,7 @@ export const ImageSection = ({
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const hasImageDimensionsTooSmallError = imageError === IMAGE_VALIDATION.ImageDimensionsTooSmallError;
 
     const displayedTitle = useMemo(() => {
         if (!titleContent) return null;
@@ -147,6 +150,7 @@ export const ImageSection = ({
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     disabled={!isBaseLanguage}
                     {...imageInputProps}
+                    className={hasImageDimensionsTooSmallError ? whoWeAreVariantStyles['container-focused'] : undefined}
                 />
                 {imageError && (
                     <p data-testid="image-error" className="error">

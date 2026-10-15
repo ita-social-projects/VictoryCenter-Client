@@ -48,7 +48,7 @@ export const PartnersPage: React.FC = () => {
                 description={CTA_DATA.description}
                 mediaUrl={outroVideo}
                 buttons={[
-                    { label: t('actions.becomePartner'), href: PUBLIC_ROUTES.DONATE.FULL },
+                    { label: t('actions.becomePartner'), href: PUBLIC_ROUTES.SUPPORT_US.FULL },
                     { label: t('actions.supportUs'), href: PUBLIC_ROUTES.DONATE.FULL },
                 ]}
             />

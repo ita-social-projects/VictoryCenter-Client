@@ -1697,6 +1697,22 @@ describe('FundsExpenditureSection add buttons disabled state based on selection'
             expectAddButtonsDisabled(false);
         });
     });
+
+    it('should re-enable both add buttons and hide selection summary after deleting the selected record via row delete', async () => {
+        renderSection({ isEditing: true });
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+        expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'false');
+
+        fireEvent.click(screen.getByTestId('trigger-record-delete'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+            expectAddButtonsDisabled(false);
+        });
+    });
 });
 
 describe('FundsExpenditureSection onSelectionChange callback', () => {
@@ -1736,6 +1752,21 @@ describe('FundsExpenditureSection onSelectionChange callback', () => {
 
         fireEvent.click(screen.getByTestId('delete-selected'));
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+        });
+    });
+
+    it('should call onSelectionChange with false after the selected record is deleted via row delete', async () => {
+        const mockOnSelectionChange = jest.fn();
+        render(<FundsExpenditureSection isEditing onSelectionChange={mockOnSelectionChange} />);
+
+        fireEvent.click(screen.getByTestId('select-row-1'));
+        expect(mockOnSelectionChange).toHaveBeenLastCalledWith(true);
+
+        fireEvent.click(screen.getByTestId('trigger-record-delete'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
         await waitFor(() => {
             expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);

@@ -149,7 +149,7 @@ describe('AdminPanelToolbar', () => {
         const { StatusFilterDropdown } = require('../status-filter-dropdown/StatusFilterDropdown');
         const onStatusFilterChange = StatusFilterDropdown.mock.calls[0][0].onStatusFilterChange;
 
-        onStatusFilterChange(VisibilityStatus.Published);
+        onStatusFilterChange?.(VisibilityStatus.Published);
 
         expect(mockOnStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
     });

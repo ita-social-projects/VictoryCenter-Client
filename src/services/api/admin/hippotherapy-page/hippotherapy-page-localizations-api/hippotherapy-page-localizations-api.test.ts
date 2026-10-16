@@ -40,11 +40,8 @@ describe('HippotherapyPageLocalizationsApi', () => {
             get: jest.fn().mockResolvedValueOnce({ data: responseData }),
         };
 
-        const result = await HippotherapyPageLocalizationsApi.getByLanguageId(
-            mockClient as any,
-            entityId,
-            languageId,
-        );
+        const promise = HippotherapyPageLocalizationsApi.getByLanguageId(mockClient as any, entityId, languageId);
+        const result = await promise;
 
         expect(mockClient.get).toHaveBeenCalledWith(`${BASE}/${entityId}/${languageId}`);
         expect(result).toEqual(responseData);
@@ -99,12 +96,7 @@ describe('HippotherapyPageLocalizationsApi', () => {
             put: jest.fn().mockResolvedValueOnce({ data: responseData }),
         };
 
-        const result = await HippotherapyPageLocalizationsApi.update(
-            mockClient as any,
-            entityId,
-            languageId,
-            payload,
-        );
+        const result = await HippotherapyPageLocalizationsApi.update(mockClient as any, entityId, languageId, payload);
 
         expect(mockClient.put).toHaveBeenCalledWith(`${BASE}/${entityId}/${languageId}`, payload);
         expect(result).toEqual(responseData);

@@ -33,17 +33,23 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         onBlur,
         id,
         disabled,
+        normalizeSpaces,
+        trimOnBlur,
+        isRequired,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
+                data-normalize-spaces={normalizeSpaces}
+                data-trim-on-blur={trimOnBlur}
                 onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 id={id}
                 disabled={disabled}
+                data-required={isRequired}
             />
         </div>
     ),
@@ -138,6 +144,12 @@ describe('ImageSection', () => {
         expect(screen.getByTestId('mock-rich-input-3')).toHaveAttribute('maxLength', descriptionLimit.toString());
 
         expect(getPublishButton()).toBeDisabled();
+    });
+
+    it('should mark the title and description fields as required', () => {
+        renderComponent();
+        expect(screen.getByTestId('mock-rich-input-2')).toHaveAttribute('data-required', 'true');
+        expect(screen.getByTestId('mock-rich-input-3')).toHaveAttribute('data-required', 'true');
     });
 
     it('should not render if content is undefined or if description content is missing', () => {
@@ -385,22 +397,38 @@ describe('ImageSection', () => {
         expect(validateDescriptionMock()).toHaveBeenCalledWith('');
     });
 
-    it('should disable publish button when title validation returns error on change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateTitleMock().mockReturnValueOnce('ERR');
+    it('should not validate title on change', () => {
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'any' } });
+        const validateTitle = validateTitleMock();
 
-        expect(getPublishButton()).toBeDisabled();
+        fireEvent.change(screen.getByTestId('mock-rich-input-2'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateTitle).not.toHaveBeenCalledWith('any');
     });
 
-    it('should disable publish button when description validation returns error on change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateDescriptionMock().mockReturnValueOnce('ERR');
+    it('should normalize spaces and trim on blur in the title and description fields', () => {
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'any' } });
+        ['mock-rich-input-2', 'mock-rich-input-3'].forEach((testId) => {
+            const input = screen.getByTestId(testId);
+            expect(input).toHaveAttribute('data-normalize-spaces', 'true');
+            expect(input).toHaveAttribute('data-trim-on-blur', 'true');
+        });
+    });
 
-        expect(getPublishButton()).toBeDisabled();
+    it('should not validate description on change', () => {
+        renderComponent();
+
+        const validateDescription = validateDescriptionMock();
+
+        fireEvent.change(screen.getByTestId('mock-rich-input-3'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateDescription).not.toHaveBeenCalledWith('any');
     });
 
     it('should disable publish button when title validation returns error on blur', () => {
@@ -419,28 +447,6 @@ describe('ImageSection', () => {
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
         expect(getPublishButton()).toBeDisabled();
-    });
-
-    it('should enable publish button after title error is cleared on next change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateTitleMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'a' } });
-        expect(getPublishButton()).toBeDisabled();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'b' } });
-        expect(getPublishButton()).toBeEnabled();
-    });
-
-    it('should enable publish button after description error is cleared on next change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateDescriptionMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'a' } });
-        expect(getPublishButton()).toBeDisabled();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'b' } });
-        expect(getPublishButton()).toBeEnabled();
     });
 
     it('should prevent edits and hide publish button for non-base language', () => {
@@ -500,5 +506,14 @@ describe('ImageSection', () => {
 
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle).not.toHaveBeenCalled();
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription).not.toHaveBeenCalled();
+    });
+
+    it('should validate title and description before publishing', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(getPublishButton());
+
+        expect(validateTitleMock()).toHaveBeenCalledWith('Initial Title');
+        expect(validateDescriptionMock()).toHaveBeenCalledWith('Initial Description');
     });
 });

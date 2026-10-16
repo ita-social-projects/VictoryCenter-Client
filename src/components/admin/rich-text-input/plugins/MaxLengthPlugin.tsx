@@ -7,19 +7,26 @@ export interface MaxLengthPluginProps {
     maxLength: number;
     onLengthChange?: (length: number) => void;
     enforceMaxLength?: boolean;
+    /** If true, trailing whitespace is not counted in the reported length. */
+    ignoreTrailingWhitespace?: boolean;
 }
 
-export const MaxLengthPlugin = ({ maxLength, onLengthChange, enforceMaxLength = true }: MaxLengthPluginProps) => {
+export const MaxLengthPlugin = ({
+    maxLength,
+    onLengthChange,
+    enforceMaxLength = true,
+    ignoreTrailingWhitespace = false,
+}: MaxLengthPluginProps) => {
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
         return editor.registerUpdateListener(({ editorState }) => {
             editorState.read(() => {
-                const textLength = $getRoot().getTextContent().length;
-                onLengthChange?.(textLength);
+                const text = $getRoot().getTextContent();
+                onLengthChange?.((ignoreTrailingWhitespace ? text.trimEnd() : text).length);
             });
         });
-    }, [editor, onLengthChange]);
+    }, [editor, onLengthChange, ignoreTrailingWhitespace]);
 
     useEffect(() => {
         return editor.registerNodeTransform(RootNode, (rootNode: RootNode) => {

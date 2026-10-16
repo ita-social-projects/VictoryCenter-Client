@@ -76,8 +76,11 @@ export const API_ROUTES = {
     },
     EVENTS_PAGE: {
         BASE: 'EventsPage',
+        PUBLIC: 'EventsPage/public',
         DESCRIPTION: 'EventsPage/description',
         EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
+        TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY: 'EventsPage/events-block-title/toggle-visibility',
+        TOGGLE_DESCRIPTION_VISIBILITY: 'EventsPage/description/toggle-visibility',
     },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
@@ -190,8 +193,7 @@ export const API_ROUTES = {
     EVENT_CATEGORIES: {
         BASE: 'EventNewsCategories',
     },
-
-    HIPPOTHERAPY_PAGE_LOCALIZATIONS: {
-        BASE: 'HippotherapyPageLocalizations',
+    EVENT_CATEGORIES_LOCALIZATIONS: {
+        BASE: 'EventNewsCategoryLocalizations',
     },
 };

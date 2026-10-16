@@ -24,7 +24,9 @@ export const HippotherapyPageLocalizationsApi = {
         entityId: number,
         languageId: number,
     ): Promise<HippotherapyPageTranslationStatusDto[]> => {
-        const response = await client.get<HippotherapyPageTranslationStatusDto[]>(`${BASE}/${entityId}/${languageId}/statuses`);
+        const response = await client.get<HippotherapyPageTranslationStatusDto[]>(
+            `${BASE}/${entityId}/${languageId}/statuses`,
+        );
         return response.data;
     },
 

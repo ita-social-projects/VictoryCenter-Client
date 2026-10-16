@@ -73,6 +73,7 @@ export const CardContent = ({
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
                     onChange={handleDescriptionChange}
                     value={displayedDescription ?? ''}
                     maxLength={descriptionLimit}
@@ -82,6 +83,8 @@ export const CardContent = ({
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
+                    normalizeSpaces
+                    trimOnBlur
                 />
             </div>
         </div>

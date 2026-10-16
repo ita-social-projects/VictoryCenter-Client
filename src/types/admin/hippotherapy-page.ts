@@ -165,7 +165,9 @@ export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue
     principles: string[];
 }
 
-export interface HippotherapyPageContentModel extends EntityWithLocalizations<HippotherapyPageLocalization>, EntityWithTranslationStatuses{
+export interface HippotherapyPageContentModel
+    extends EntityWithLocalizations<HippotherapyPageLocalization>,
+        EntityWithTranslationStatuses {
     id?: number;
     introSection: HippotherapyIntroSectionContent;
     descriptionSection: HippotherapyTextCardContent;
@@ -180,8 +182,9 @@ export interface HippotherapyPageContentModel extends EntityWithLocalizations<Hi
     ethicsSection: HippotherapyEthicsSectionContent;
 }
 
-export interface HippotherapyPageContentDto extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations'>,
-    EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto>{
+export interface HippotherapyPageContentDto
+    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations'>,
+        EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
     scientificReferencesSection: {
         title: string;
         description: string;

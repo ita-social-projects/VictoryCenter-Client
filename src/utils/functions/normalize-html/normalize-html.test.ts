@@ -128,6 +128,7 @@ describe('normalizeHtml', () => {
         ['formatting that only wraps a space', '<p>A <strong>&nbsp;</strong>B</p>'],
         ['leading nbsp in a later paragraph', '<p>A</p><p>&nbsp;B</p>'],
         ['leading nbsp after a line break', '<p>A<br>&nbsp;B</p>'],
+        ['leading nbsp after an initial line break', '<p><br>&nbsp;B</p>'],
     ])('matches what the editor makes of %s when collapsing spaces', (_, stored) => {
         expect(normalizeRichTextHtmlForComparison(stored, { collapseSpaces: true })).toBe(
             normalizeRichTextHtmlForComparison(getEditorHtml(stored), { collapseSpaces: true }),
@@ -137,6 +138,12 @@ describe('normalizeHtml', () => {
     it('keeps a leading space in a later paragraph, as the editor does', () => {
         expect(normalizeRichTextHtmlForComparison('<p>A</p><p>&nbsp;B</p>', { collapseSpaces: true })).not.toBe(
             normalizeRichTextHtmlForComparison('<p>A</p><p>B</p>', { collapseSpaces: true }),
+        );
+    });
+
+    it('keeps a leading space after an initial line break, as the editor does', () => {
+        expect(normalizeRichTextHtmlForComparison('<p><br>&nbsp;B</p>', { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison('<p><br>B</p>', { collapseSpaces: true }),
         );
     });
 

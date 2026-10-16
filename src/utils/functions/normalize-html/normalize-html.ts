@@ -92,16 +92,20 @@ const applyEditorSpaceRules = (container: HTMLElement): void => {
         nodes.push(node);
     }
 
-    let hasText = false;
+    // The editor strips leading spaces only from the field's first descendant.
+    let atFieldStart = true;
+    let paragraphSeen = false;
     let previousEndsWithSpace = false;
 
     nodes.forEach((node) => {
         if (node.nodeType !== Node.TEXT_NODE) {
             if (isTextRunBoundary(node)) previousEndsWithSpace = false;
+            if (node.nodeName === 'BR' || (node.nodeName === 'P' && paragraphSeen)) atFieldStart = false;
+            if (node.nodeName === 'P') paragraphSeen = true;
             return;
         }
 
-        const text = normalizeSpaces(node.textContent ?? '', !hasText || previousEndsWithSpace);
+        const text = normalizeSpaces(node.textContent ?? '', atFieldStart || previousEndsWithSpace);
 
         if (!text) {
             removeEmptyBranch(node, container);
@@ -109,7 +113,7 @@ const applyEditorSpaceRules = (container: HTMLElement): void => {
         }
 
         node.textContent = text;
-        hasText = true;
+        atFieldStart = false;
         previousEndsWithSpace = endsWithSpace(text);
     });
 };

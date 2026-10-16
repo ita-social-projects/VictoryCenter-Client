@@ -767,6 +767,8 @@ export const EventsPageAdmin = () => {
 
             setEventToDeleteId(null);
 
+            eventItemsContextIdRef.current += 1;
+
             await fetchEventItems(selectedCategory.id, true);
             await fetchCategories();
         } catch {

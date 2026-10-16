@@ -14,6 +14,8 @@ describe('HippotherapyPageApi', () => {
     } as unknown as jest.Mocked<AxiosInstance>;
 
     const buildDto = (): HippotherapyPageContentDto => ({
+        localizations: [],
+        translationStatuses: [],
         introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
         descriptionSection: { title: 'Description title', description: 'Description text' },
         quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
@@ -51,6 +53,7 @@ describe('HippotherapyPageApi', () => {
 
     const buildContent = (): HippotherapyPageContentModel => ({
         ...buildDto(),
+        localizations: [],
         scientificReferencesSection: {
             ...buildDto().scientificReferencesSection,
             scientificReferences: [
@@ -96,6 +99,16 @@ describe('HippotherapyPageApi', () => {
 
             expect(result.introSection.imageId).toBe(42);
             expect(result.advantagesSection.cards[0].imageId).toBe(43);
+        });
+
+        it('does not send localizations or translationStatuses in the PUT body', async () => {
+            mockClient.put.mockResolvedValue({ data: buildDto() });
+
+            await HippotherapyPageApi.update(mockClient, buildContent());
+
+            const sentPayload = mockClient.put.mock.calls[0][1] as Record<string, unknown>;
+            expect(sentPayload).not.toHaveProperty('localizations');
+            expect(sentPayload).not.toHaveProperty('translationStatuses');
         });
     });
 
@@ -295,6 +308,16 @@ describe('HippotherapyPageApi', () => {
             await expect(HippotherapyPageApi.update(mockClient, content)).rejects.toThrow('Publish failed');
 
             expect(ImageApi.delete).not.toHaveBeenCalled();
+        });
+
+        it('does not send localizations or translationStatuses in the PUT body', async () => {
+            mockClient.put.mockResolvedValue({ data: buildDto() });
+
+            await HippotherapyPageApi.update(mockClient, buildContent());
+
+            const sentPayload = mockClient.put.mock.calls[0][1] as Record<string, unknown>;
+            expect(sentPayload).not.toHaveProperty('localizations');
+            expect(sentPayload).not.toHaveProperty('translationStatuses');
         });
     });
 });

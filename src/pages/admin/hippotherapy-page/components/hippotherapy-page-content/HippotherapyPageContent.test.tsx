@@ -137,7 +137,9 @@ const mockedIsContentValid = isHippotherapyPageContentValid as jest.Mock;
 const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'image/webp' };
 
 const buildContent = (): HippotherapyPageContentModel => ({
-    introSection: { title: 'Intro title', description: 'Intro description', image: savedImage, imageId: savedImage.id },
+    localizations: [],
+    translationStatuses: [],
+    introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
     descriptionSection: { title: 'Description title', description: 'Description text' },
     quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
     hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },

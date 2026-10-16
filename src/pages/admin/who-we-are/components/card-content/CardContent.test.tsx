@@ -7,6 +7,8 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: ({
@@ -38,8 +40,8 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 }));
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
+    ImageInput: ({ onChange, label, setError, disabled, className }: any) => (
+        <div data-testid="mock-image-input" data-class-name={className}>
             <label>{label}</label>
             <input
                 data-testid="mock-image-input-file"
@@ -181,6 +183,38 @@ describe('CardContent', () => {
         renderComponent({ imageError });
 
         expect(screen.getByText(imageError)).toBeInTheDocument();
+    });
+
+    it('should highlight the image input only for a dimensions-too-small error', () => {
+        const { rerender } = renderComponent({ imageError: IMAGE_VALIDATION.ImageDimensionsTooSmallError });
+
+        expect(screen.getByTestId('mock-image-input')).toHaveAttribute(
+            'data-class-name',
+            whoWeAreVariantStyles['container-focused'],
+        );
+        expect(screen.getByText(IMAGE_VALIDATION.ImageDimensionsTooSmallError)).toBeInTheDocument();
+
+        rerender(
+            <CardContent
+                content={baseContent}
+                onChange={mockOnChange}
+                descriptionLimit={descriptionLimit}
+                imageInputProps={{ style: { width: '200px' }, subText: '200x200' }}
+                onDescriptionValidate={mockOnDescriptionValidate}
+                descriptionError={null}
+                imageError={null}
+                setImageError={mockSetImageError}
+                language={{ id: 1, code: 'uk', name: 'Ukrainian' }}
+            />,
+        );
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
+    });
+
+    it('should not highlight the image input for other image errors', () => {
+        renderComponent({ imageError: 'image size error' });
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
     });
 
     it('should handle a null image prop gracefully', () => {

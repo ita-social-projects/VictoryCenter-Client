@@ -159,6 +159,18 @@ const mockImageLoadWithDimensions = (
     fireEvent.load(element);
 };
 
+const renderLoadedCropper = async (props: Partial<DefaultProps> = {}) => {
+    const utils = render(<CropModal {...defaultProps} {...props} />);
+    const imgElement = screen.getByAltText('Crop target') as HTMLImageElement;
+    mockImageLoad(imgElement);
+    await waitFor(() => {
+        expect(screen.getByTestId('react-crop-mock').dataset.crop).toBeDefined();
+    });
+    return { ...utils, imgElement };
+};
+
+const getCropData = () => JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+
 describe('CropModal', () => {
     let mockGetContext: jest.SpyInstance;
     let consoleErrorSpy: jest.SpyInstance;
@@ -512,5 +524,30 @@ describe('CropModal', () => {
 
         expect(defaultProps.onChange).not.toHaveBeenCalled();
         expect(screen.queryByTestId('react-crop-mock')).not.toBeInTheDocument();
+    });
+
+    describe('image drag prevention', () => {
+        it('Makes the image non-draggable', () => {
+            render(<CropModal {...defaultProps} />);
+
+            expect(screen.getByAltText('Crop target')).toHaveAttribute('draggable', 'false');
+        });
+
+        it('Prevents the native dragstart of the image', () => {
+            render(<CropModal {...defaultProps} />);
+            const imgElement = screen.getByAltText('Crop target');
+            const notPrevented = fireEvent.dragStart(imgElement);
+
+            expect(notPrevented).toBe(false);
+        });
+
+        it('Does not change the crop when the user starts dragging the image', async () => {
+            const { imgElement } = await renderLoadedCropper();
+            const before = getCropData();
+
+            fireEvent.dragStart(imgElement);
+
+            expect(getCropData()).toEqual(before);
+        });
     });
 });

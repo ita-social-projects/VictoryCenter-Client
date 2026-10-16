@@ -134,21 +134,23 @@ jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', 
 }));
 const mockedIsContentValid = isHippotherapyPageContentValid as jest.Mock;
 
+const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'image/webp' };
+
 const buildContent = (): HippotherapyPageContentModel => ({
-    introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+    introSection: { title: 'Intro title', description: 'Intro description', image: savedImage, imageId: savedImage.id },
     descriptionSection: { title: 'Description title', description: 'Description text' },
-    quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
+    quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
     hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
     hippoventionCenterSection: {
         title: 'Hippovention center title',
         description: 'Hippovention center text',
         pros: 'Pro one and pro two',
-        image: null,
-        imageId: null,
+        image: savedImage,
+        imageId: savedImage.id,
     },
     advantagesSection: {
         title: 'Advantages title',
-        cards: [{ description: 'Card description', image: null, imageId: null }],
+        cards: [{ description: 'Card description', image: savedImage, imageId: savedImage.id }],
     },
     analysisSection: { title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
@@ -156,17 +158,22 @@ const buildContent = (): HippotherapyPageContentModel => ({
         description: 'Research text',
         scientificReferences: [{ localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' }],
     },
-    anotherQuoteSection: { quoteText: 'Another quote', authorName: 'Another author', image: null, imageId: null },
+    anotherQuoteSection: {
+        quoteText: 'Another quote',
+        authorName: 'Another author',
+        image: savedImage,
+        imageId: savedImage.id,
+    },
     participantsSection: {
         title: 'Participants title',
-        cards: [{ description: 'Participant description', image: null, imageId: null }],
+        cards: [{ description: 'Participant description', image: savedImage, imageId: savedImage.id }],
     },
     ethicsSection: {
         title: 'Ethics title',
         description: 'Ethics text',
         principles: ['Principle one'],
-        image: null,
-        imageId: null,
+        image: savedImage,
+        imageId: savedImage.id,
     },
 });
 
@@ -293,6 +300,20 @@ describe('HippotherapyPageContent', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
 
         fireEvent.click(screen.getByRole('button', { name: 'Clear intro image error' }));
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+    });
+
+    it('keeps the publish button enabled when an image error comes from an empty slot', async () => {
+        const content = buildContent();
+        content.introSection = { ...content.introSection, image: null, imageId: null };
+        mockedHippotherapyPageApi.get.mockResolvedValue(content);
+
+        render(<HippotherapyPageContent />);
+
+        await screen.findByTestId('section-intro');
+        fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Set intro image error' }));
+
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 

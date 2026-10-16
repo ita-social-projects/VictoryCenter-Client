@@ -38,13 +38,13 @@ describe('EventItemComponent', () => {
     } as EventItemDto;
 
     it('renders the event title', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         expect(screen.getByText(item.title)).toBeInTheDocument();
     });
 
     it('renders the event description', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         expect(screen.getByText(item.description)).toBeInTheDocument();
     });
@@ -70,6 +70,7 @@ describe('EventItemComponent', () => {
                 language={english}
                 translationLanguages={[english]}
                 onTranslate={jest.fn()}
+                onDelete={jest.fn()}
             />,
         );
 
@@ -86,6 +87,7 @@ describe('EventItemComponent', () => {
                 item={item}
                 onEdit={jest.fn()}
                 onTranslate={jest.fn()}
+                onDelete={jest.fn()}
                 language={english}
                 translationLanguages={[english]}
             />,
@@ -98,7 +100,7 @@ describe('EventItemComponent', () => {
     });
 
     it('renders the published date in Ukrainian locale', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         const expectedDate = new Date(item.publishedAt).toLocaleDateString('uk-UA');
 
@@ -106,13 +108,13 @@ describe('EventItemComponent', () => {
     });
 
     it('renders the visibility status', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         expect(screen.getByTestId('visibility-status-label')).toHaveTextContent(String(VisibilityStatus.Published));
     });
 
     it('renders the translate, edit, and delete buttons', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         expect(
             screen.getByRole('button', {
@@ -134,7 +136,7 @@ describe('EventItemComponent', () => {
     });
 
     it('renders all buttons with type button', () => {
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         expect(
             screen.getByRole('button', {
@@ -157,7 +159,7 @@ describe('EventItemComponent', () => {
 
     it('calls onEdit with the item when the edit icon is clicked', () => {
         const onEdit = jest.fn();
-        render(<EventItemComponent item={item} onEdit={onEdit} onTranslate={jest.fn()} />);
+        render(<EventItemComponent item={item} onEdit={onEdit} onTranslate={jest.fn()} onDelete={jest.fn()} />);
 
         fireEvent.click(screen.getByLabelText(EVENT_ITEMS_TEXT.ACTIONS.EDIT));
 
@@ -166,10 +168,20 @@ describe('EventItemComponent', () => {
 
     it('calls onTranslate with the item when the translate icon is clicked', () => {
         const onTranslate = jest.fn();
-        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={onTranslate} />);
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onTranslate={onTranslate} onDelete={jest.fn()} />);
 
         fireEvent.click(screen.getByLabelText(EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE));
 
         expect(onTranslate).toHaveBeenCalledWith(item);
+    });
+
+    it('calls onDelete with the event id', () => {
+        const onDelete = jest.fn();
+
+        render(<EventItemComponent item={item} onEdit={jest.fn()} onDelete={onDelete} onTranslate={jest.fn()} />);
+
+        fireEvent.click(screen.getByRole('button', { name: EVENT_ITEMS_TEXT.ACTIONS.DELETE }));
+
+        expect(onDelete).toHaveBeenCalledWith(item.id);
     });
 });

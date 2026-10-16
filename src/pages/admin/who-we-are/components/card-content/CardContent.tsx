@@ -10,7 +10,6 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
-import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 

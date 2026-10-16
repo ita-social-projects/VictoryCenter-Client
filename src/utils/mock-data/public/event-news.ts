@@ -2,7 +2,6 @@ import { EventsNewsPageData, EventsNews } from '@/types/public/events-news';
 import { HippotherapyProgramSectionContentDto, HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import chooseProgrammImg from '@/assets/images/horse-and-girl.webp';
 import girlAndWhiteHorse from '@/assets/images/girl-and-white-horse.webp';
 import oldManHorse from '@/assets/images/old-man-horse.webp';
 import supportChildren from '@/assets/images/support-children.webp';
@@ -97,12 +96,6 @@ const tags = [
 export const eventsNewsPageMock: EventsNewsPageData = {
     description:
         'Цей розділ — про ті моменти, коли те, у що ми віримо, стає реальністю. Тут ти знайдеш все: від маленьких зустрічей до великих відкриттів, від перших кроків дітей у стайні до глибоких переживань ветеранів у сідлі.',
-    chooseProgram: {
-        title: 'Вір у силу події',
-        description:
-            'Кожна з них — не просто дата в календарі. Це — ще один доказ: відновлення можливе. Слідкуй за анонсами, читай історії, або стань частиною наступної події.',
-        imgURL: chooseProgrammImg,
-    },
     eventsData: {
         title: 'Що відбувалось',
         tags,

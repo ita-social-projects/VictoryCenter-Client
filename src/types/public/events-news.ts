@@ -18,7 +18,6 @@ export interface EventsData {
 
 export interface EventsNewsPageData {
     description: string;
-    chooseProgram: chooseProgramData;
     eventsData: EventsData;
 }
 

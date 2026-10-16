@@ -43,11 +43,6 @@ const mockedPageApiGet = EventsNewsPageApi.get as jest.Mock;
 
 const mockEventsNewsPageData: EventsNewsPageData = {
     description: 'Events and News description',
-    chooseProgram: {
-        title: 'Choose Program',
-        description: 'Select a program that suits you',
-        imgURL: 'https://example.com/image.jpg',
-    },
     eventsData: {
         title: 'Events',
         tags: [
@@ -85,7 +80,8 @@ describe('EventsNewsPage component', () => {
         );
         expect(ChooseProgram).toHaveBeenCalledWith(
             expect.objectContaining({
-                ...mockEventsNewsPageData.chooseProgram,
+                title: 'CHOOSE_PROGRAM_TITLE',
+                description: 'CHOOSE_PROGRAM_DESCRIPTION',
             }),
             undefined,
         );

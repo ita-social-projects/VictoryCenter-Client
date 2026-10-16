@@ -8,9 +8,11 @@ import { EventsNewsPageApi } from '@/services/api/public/events-news/events-new-
 import { EventsNewsPageData } from '@/types/public/events-news';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { RequestOptions } from '@/types/common/api';
-
+import { useTranslation } from 'react-i18next';
+import CHOOSE_PROGRAM_IMAGE from '@/assets/images/horse-and-girl.webp';
 export const EventsNewsPage = () => {
     const { currentLanguage } = useLocale();
+    const { t } = useTranslation('eventsNewsPage');
     const fetchPageData = useCallback(
         (options?: RequestOptions) => EventsNewsPageApi.get(currentLanguage, options),
         [currentLanguage],
@@ -28,7 +30,11 @@ export const EventsNewsPage = () => {
                 <div>
                     <EventsNewsIntro description={data.description} />
                     <Events {...data.eventsData} />
-                    <ChooseProgram {...data.chooseProgram} />
+                    <ChooseProgram
+                        title={t('CHOOSE_PROGRAM_TITLE')}
+                        description={t('CHOOSE_PROGRAM_DESCRIPTION')}
+                        imgURL={CHOOSE_PROGRAM_IMAGE}
+                    />
                 </div>
             )}
         </LoadableContent>

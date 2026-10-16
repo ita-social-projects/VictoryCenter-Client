@@ -201,7 +201,6 @@ describe('CardContent', () => {
                 descriptionLimit={descriptionLimit}
                 imageInputProps={{ style: { width: '200px' }, subText: '200x200' }}
                 onDescriptionValidate={mockOnDescriptionValidate}
-                descriptionError={null}
                 imageError={null}
                 setImageError={mockSetImageError}
                 language={{ id: 1, code: 'uk', name: 'Ukrainian' }}

@@ -71,7 +71,9 @@ export const normalizeHtml = (html: string): string => {
     return tempDiv.innerHTML;
 };
 
-const isTextRunBoundary = (node: Node) => node.nodeName === 'P' || node.nodeName === 'BR';
+const INLINE_FORMATS = new Set(['STRONG', 'EM', 'B', 'I']);
+
+const isTextRunBoundary = (node: Node) => !INLINE_FORMATS.has(node.nodeName);
 
 const removeEmptyBranch = (node: Node, container: Node): void => {
     let current: Node | null = node;
@@ -94,18 +96,20 @@ const applyEditorSpaceRules = (container: HTMLElement): void => {
 
     // The editor strips leading spaces only from the field's first descendant.
     let atFieldStart = true;
-    let paragraphSeen = false;
+    const leadingBoundaries: Node[] = [];
     let previousEndsWithSpace = false;
 
     nodes.forEach((node) => {
         if (node.nodeType !== Node.TEXT_NODE) {
-            if (isTextRunBoundary(node)) previousEndsWithSpace = false;
-            if (node.nodeName === 'BR' || (node.nodeName === 'P' && paragraphSeen)) atFieldStart = false;
-            if (node.nodeName === 'P') paragraphSeen = true;
+            if (isTextRunBoundary(node)) {
+                previousEndsWithSpace = false;
+                if (atFieldStart) leadingBoundaries.push(node);
+            }
             return;
         }
 
-        const text = normalizeSpaces(node.textContent ?? '', atFieldStart || previousEndsWithSpace);
+        const isFirstDescendant = atFieldStart && leadingBoundaries.every((boundary) => boundary.contains(node));
+        const text = normalizeSpaces(node.textContent ?? '', isFirstDescendant || previousEndsWithSpace);
 
         if (!text) {
             removeEmptyBranch(node, container);

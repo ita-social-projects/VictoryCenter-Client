@@ -147,6 +147,22 @@ describe('normalizeHtml', () => {
         );
     });
 
+    it.each([
+        ['div', '<div>A</div><div>&nbsp;B</div>', '<div>A</div><div>B</div>'],
+        ['list item', '<ul><li>A</li><li>&nbsp;B</li></ul>', '<ul><li>A</li><li>B</li></ul>'],
+        ['heading', '<h2>A </h2><h2>&nbsp;B</h2>', '<h2>A </h2><h2>B</h2>'],
+    ])('keeps a leading space after a %s boundary, as the editor does', (_, withSpace, withoutSpace) => {
+        expect(normalizeRichTextHtmlForComparison(withSpace, { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison(withoutSpace, { collapseSpaces: true }),
+        );
+    });
+
+    it('strips a leading space from the first text inside nested blocks', () => {
+        expect(normalizeRichTextHtmlForComparison('<ul><li>&nbsp;B</li></ul>', { collapseSpaces: true })).toBe(
+            '<ul><li>B</li></ul>',
+        );
+    });
+
     it('preserves word boundaries when normalizing spaces', () => {
         expect(normalizeRichTextHtmlForComparison('<p>A b</p>', { collapseSpaces: true })).not.toBe(
             normalizeRichTextHtmlForComparison('<p>Ab</p>', { collapseSpaces: true }),

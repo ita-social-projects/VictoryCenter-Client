@@ -75,6 +75,72 @@ const INLINE_FORMATS = new Set(['STRONG', 'EM', 'B', 'I']);
 
 const isTextRunBoundary = (node: Node) => !INLINE_FORMATS.has(node.nodeName);
 
+const isBlank = (node: Node) => !(node.textContent ?? '').trim();
+
+// Mirrors removeEmptyTags in the editor's sanitizer.
+const removeBlankElements = (container: HTMLElement): void => {
+    container.querySelectorAll('strong, em, b, i').forEach((el) => {
+        if (isBlank(el)) el.replaceWith(document.createTextNode(el.textContent ?? ''));
+    });
+
+    container.querySelectorAll('p').forEach((p) => {
+        if (isBlank(p)) p.remove();
+    });
+};
+
+const isBlockElement = (node: Node | null) =>
+    node?.nodeType === Node.ELEMENT_NODE && isTextRunBoundary(node) && node.nodeName !== 'BR';
+
+const HAS_SOURCE_WHITESPACE = /[\t\r\n]/;
+const SOURCE_WHITESPACE = /[ \t\r\n]*[\t\r\n][ \t\r\n]*/g;
+const LEADING_SOURCE_WHITESPACE = /^[ \t\r\n]*[\t\r\n][ \t\r\n]*/;
+const TRAILING_SOURCE_WHITESPACE = /[ \t\r\n]*[\t\r\n][ \t\r\n]*$/;
+
+const isLineEdge = (sibling: Node | null, parent: Node | null) =>
+    sibling ? isBlockElement(sibling) || sibling.nodeName === 'BR' : isBlockElement(parent);
+
+// The editor never outputs newlines or tabs, so these come from formatted HTML source.
+const collapseSourceWhitespace = (container: HTMLElement): void => {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const textNodes: Node[] = [];
+
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (HAS_SOURCE_WHITESPACE.test(node.textContent ?? '')) textNodes.push(node);
+    }
+
+    textNodes.forEach((node) => {
+        let text = node.textContent ?? '';
+        if (isLineEdge(node.previousSibling, node.parentNode)) text = text.replace(LEADING_SOURCE_WHITESPACE, '');
+        if (isLineEdge(node.nextSibling, node.parentNode)) text = text.replace(TRAILING_SOURCE_WHITESPACE, '');
+        text = text.replace(SOURCE_WHITESPACE, ' ');
+
+        if (text) {
+            node.textContent = text;
+        } else {
+            node.parentNode?.removeChild(node);
+        }
+    });
+};
+
+const removeWhitespaceBetweenBlocks = (container: HTMLElement): void => {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const whitespaceNodes: Node[] = [];
+
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const { previousSibling, nextSibling, parentNode } = node;
+        if (
+            isBlank(node) &&
+            !INLINE_FORMATS.has(parentNode?.nodeName ?? '') &&
+            (!previousSibling || isBlockElement(previousSibling)) &&
+            (!nextSibling || isBlockElement(nextSibling))
+        ) {
+            whitespaceNodes.push(node);
+        }
+    }
+
+    whitespaceNodes.forEach((node) => node.parentNode?.removeChild(node));
+};
+
 const removeEmptyBranch = (node: Node, container: Node): void => {
     let current: Node | null = node;
 
@@ -145,9 +211,13 @@ export const normalizeRichTextHtmlForComparison = (
         tempDiv.appendChild(paragraph);
     }
 
+    removeBlankElements(tempDiv);
+    collapseSourceWhitespace(tempDiv);
+    removeWhitespaceBetweenBlocks(tempDiv);
+
     if (collapseSpaces) {
         applyEditorSpaceRules(tempDiv);
     }
 
-    return tempDiv.innerHTML.replace(/>\s+</g, '><').trim();
+    return tempDiv.innerHTML.trim();
 };

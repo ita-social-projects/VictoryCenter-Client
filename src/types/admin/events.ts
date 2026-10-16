@@ -38,6 +38,7 @@ export interface EventItemDto extends EntityWithLocalizations<EventLocalization>
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
+    categories?: EventSearchItemCategory[];
 }
 
 export type EventItemResponseDto = Omit<EventItemDto, 'localizations'> &
@@ -95,11 +96,9 @@ export interface ErrorState {
     type: EventsErrorType | null;
 }
 
-// this is a test interface and most probably will need adjustments in the future
-export interface EventSearchItemData {
+export interface EventSearchItemCategory {
     id: number;
     name: string;
-    categories: string[];
 }
 
 // this is a test interface and most probably will need adjustments in the future

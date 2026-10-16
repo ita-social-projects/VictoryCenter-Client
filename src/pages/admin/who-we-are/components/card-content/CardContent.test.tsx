@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CardContent } from './CardContent';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { ContentType } from '@/types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
@@ -51,6 +52,12 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ),
 }));
 
+jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
+    WHO_WE_ARE_VALIDATION_FUNCTIONS: {
+        validateText: jest.fn(),
+    },
+}));
+
 describe('CardContent', () => {
     let mockOnChange: jest.Mock;
     let mockOnDescriptionValidate: jest.Mock;
@@ -81,7 +88,6 @@ describe('CardContent', () => {
                 subText: '200x200',
             },
             onDescriptionValidate: mockOnDescriptionValidate,
-            descriptionError: null,
             imageError: null,
             setImageError: mockSetImageError,
             language: { id: 1, code: 'uk', name: 'Ukrainian' },
@@ -93,6 +99,8 @@ describe('CardContent', () => {
         mockOnChange = jest.fn();
         mockSetImageError = jest.fn();
         mockOnDescriptionValidate = jest.fn();
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 
     it('should render the component with initial values and no errors', () => {
@@ -114,20 +122,25 @@ describe('CardContent', () => {
         expect(screen.getByTestId('mock-rich-input-1')).toHaveAttribute('data-required', 'true');
     });
 
-    it('should call onChange and onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
+    it('should call onChange and reset validation on change, and validate on blur', () => {
         renderComponent();
+
         const descriptionInput = screen.getByTestId('mock-rich-input-1');
         const newDescription = 'New description text';
 
         fireEvent.change(descriptionInput, { target: { value: newDescription } });
+
         expect(mockOnChange).toHaveBeenCalledWith({
             ...baseContent,
             description: newDescription,
         });
-        expect(mockOnDescriptionValidate).toHaveBeenCalledWith(newDescription);
+
+        expect(mockOnDescriptionValidate).toHaveBeenCalledWith(null);
 
         fireEvent.blur(descriptionInput);
-        expect(mockOnDescriptionValidate).toHaveBeenCalled();
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalledWith('Initial description');
+        expect(mockOnDescriptionValidate).toHaveBeenLastCalledWith(null);
     });
 
     it('should call onChange on image change and setImageError on error', () => {
@@ -148,11 +161,19 @@ describe('CardContent', () => {
         });
     });
 
-    it('should display description error message when prop is provided', () => {
-        const descriptionError = 'This is a description error message.';
-        renderComponent({ descriptionError });
+    it('should display description validation error on blur', () => {
+        const errorMessage = 'This is a description error message.';
 
-        expect(screen.getByText(descriptionError)).toBeInTheDocument();
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+
+        renderComponent();
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+
+        fireEvent.blur(descriptionInput);
+
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        expect(mockOnDescriptionValidate).toHaveBeenCalledWith(errorMessage);
     });
 
     it('should display image error message when prop is provided', () => {
@@ -206,5 +227,26 @@ describe('CardContent', () => {
         fireEvent.change(imageInput, { target: { files: [file] } });
 
         expect(mockOnChange).not.toHaveBeenCalledWith(expect.objectContaining({ image: file }));
+    });
+
+    it('should clear description validation error on change', () => {
+        const errorMessage = 'This is a description error message.';
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+
+        renderComponent();
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+
+        fireEvent.blur(descriptionInput);
+
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+
+        fireEvent.change(descriptionInput, {
+            target: { value: 'Updated description' },
+        });
+
+        expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
+        expect(mockOnDescriptionValidate).toHaveBeenLastCalledWith(null);
     });
 });

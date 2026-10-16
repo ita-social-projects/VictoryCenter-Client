@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { CardsSection, CardsSectionProps } from './CardsSection';
 import '@testing-library/jest-dom';
 import { ContentType } from '@/types/common/about-us';
@@ -12,12 +12,12 @@ jest.mock('../../card-content/CardContent', () => ({
         content,
         onChange,
         onDescriptionValidate,
-        descriptionError,
         imageError,
         setImageError,
         language,
-    }: CardContentProps & { language?: any }) => {
-        const disabled = language && language.code !== 'uk';
+    }: CardContentProps) => {
+        const disabled = language.code !== 'uk';
+
         return (
             <div data-testid={`mock-card-content-${content.id}`}>
                 <textarea
@@ -25,14 +25,22 @@ jest.mock('../../card-content/CardContent', () => ({
                     onChange={(e) => {
                         if (!disabled) {
                             onChange({ ...content, description: e.target.value });
-                            onDescriptionValidate(e.target.value);
+                            onDescriptionValidate(null);
                         }
                     }}
-                    onBlur={(e) => !disabled && onDescriptionValidate(e.currentTarget.value)}
-                    value={content.description ?? undefined}
+                    onBlur={(e) => {
+                        if (!disabled) {
+                            const {
+                                WHO_WE_ARE_VALIDATION_FUNCTIONS,
+                            } = require('@/validation/admin/who-we-are-schema/WhoWeAreSchema');
+
+                            const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.currentTarget.value);
+                            onDescriptionValidate(error || null);
+                        }
+                    }}
+                    value={content.description ?? ''}
                     disabled={disabled}
                 />
-                {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}
                 <input
                     data-testid={`mock-image-input-${content.id}`}
                     onChange={(e) => {
@@ -174,33 +182,37 @@ describe('CardsSection', () => {
         );
     });
 
-    it('should display a description validation error and disable the publish button', async () => {
-        const errorMessage = 'Description cannot be empty.';
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+    it('should disable the publish button when description validation fails on blur', () => {
+        renderComponent({ isPublishButtonActive: true });
 
-        renderComponent();
         const textarea = screen.getByTestId('mock-textarea-1');
-
-        fireEvent.blur(textarea, { target: { value: '' } });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('desc-error-1')).toHaveTextContent(errorMessage);
-            const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
-            expect(publishButton).toBeDisabled();
+        const publishButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
         });
+
+        expect(publishButton).toBeEnabled();
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue('Description cannot be empty.');
+
+        fireEvent.blur(textarea);
+
+        expect(publishButton).toBeDisabled();
     });
 
-    it('should display an image error and disable the publish button', async () => {
-        renderComponent();
+    it('should display an image error and disable the publish button', () => {
+        renderComponent({ isPublishButtonActive: true });
+
         const imageInput = screen.getByTestId('mock-image-input-1');
+        const publishButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        });
+
+        expect(publishButton).toBeEnabled();
 
         fireEvent.blur(imageInput);
 
-        await waitFor(() => {
-            expect(screen.getByTestId('image-error-1')).toHaveTextContent('test image error');
-            const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
-            expect(publishButton).toBeDisabled();
-        });
+        expect(screen.getByTestId('image-error-1')).toHaveTextContent('test image error');
+        expect(publishButton).toBeDisabled();
     });
 
     it('should enable publish button, disable translate button and call onPublish when clicked', () => {
@@ -229,21 +241,19 @@ describe('CardsSection', () => {
         expect(mockOnChange).not.toHaveBeenCalled();
     });
 
-    it('should keep the publish button disabled if there are any validation errors', async () => {
+    it('should keep the publish button disabled if there are any validation errors', () => {
         const errorMessage = 'Description cannot be empty.';
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
 
         renderComponent({ isPublishButtonActive: true });
 
-        const textarea = screen.getByTestId('mock-textarea-1');
-        fireEvent.blur(textarea, { target: { value: '' } });
-
-        const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('desc-error-1')).toHaveTextContent(errorMessage);
-            expect(publishButton).toBeDisabled();
+        const publishButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
         });
+
+        expect(publishButton).toBeDisabled();
+
+        fireEvent.click(publishButton);
 
         expect(mockOnPublish).not.toHaveBeenCalled();
     });

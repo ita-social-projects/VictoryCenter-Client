@@ -1,4 +1,29 @@
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot, $insertNodes, createEditor } from 'lexical';
+import { registerSpaceNormalization } from '@/components/admin/rich-text-input/plugins/SpaceNormalizationPlugin';
+import { sanitizeHtml } from '@/components/admin/rich-text-input/plugins/htmlSanitizer';
 import { normalizeHtml, normalizeRichTextHtmlForComparison } from './normalize-html';
+
+// Loads stored HTML the way RichTextInput does and returns what OnChangePlugin would emit.
+const getEditorHtml = (html: string): string => {
+    const editor = createEditor({
+        onError: (error) => {
+            throw error;
+        },
+    });
+    editor.update(
+        () => {
+            const dom = new DOMParser().parseFromString(html, 'text/html');
+            $getRoot().clear();
+            $insertNodes($generateNodesFromDOM(editor, dom));
+        },
+        { discrete: true },
+    );
+    registerSpaceNormalization(editor);
+    editor.update(() => {}, { discrete: true });
+
+    return editor.getEditorState().read(() => sanitizeHtml($generateHtmlFromNodes(editor)));
+};
 
 describe('normalizeHtml', () => {
     it('returns the same string for plain text', () => {
@@ -85,6 +110,92 @@ describe('normalizeHtml', () => {
     it('removes editor-only wrappers for rich text comparison', () => {
         const input = '<p><span>Text <b><strong>Bold</strong></b> and <i><em>italic</em></i></span></p>';
         expect(normalizeRichTextHtmlForComparison(input)).toBe('<p>Text <strong>Bold</strong> and <em>italic</em></p>');
+    });
+
+    it('keeps nbsp and leading spaces for rich text comparison by default', () => {
+        expect(normalizeRichTextHtmlForComparison('<p>A,&nbsp;b</p>')).not.toBe(
+            normalizeRichTextHtmlForComparison('<p>A, b</p>'),
+        );
+    });
+
+    it.each([
+        ['nbsp between words', '<p>Учасники/ці,&nbsp;які вірять</p>'],
+        ['leading nbsp', '<p>&nbsp;Партнери</p>'],
+        ['leading space and nbsp', '<p> &nbsp;Благодійники/ці</p>'],
+        ['repeated spaces', '<p>A &nbsp; &nbsp;b</p>'],
+        ['space repeated across formatting', '<p>A <strong>&nbsp;B</strong></p>'],
+        ['field-leading space split across formatting', '<p>&nbsp;<strong>&nbsp;Партнери</strong></p>'],
+        ['formatting that only wraps a space', '<p>A <strong>&nbsp;</strong>B</p>'],
+        ['leading nbsp in a later paragraph', '<p>A</p><p>&nbsp;B</p>'],
+        ['leading nbsp after a line break', '<p>A<br>&nbsp;B</p>'],
+        ['leading nbsp after an initial line break', '<p><br>&nbsp;B</p>'],
+        ['formatting that only wraps a space between words', '<p>A<strong>&nbsp;</strong>B</p>'],
+        ['a whitespace-only paragraph', '<p>A</p><p>&nbsp;&nbsp;</p><p>B</p>'],
+        ['a paragraph with only a line break', '<p>A</p><p><br></p><p>B</p>'],
+        ['a leading empty paragraph', '<p></p><p>&nbsp;B</p>'],
+        ['indented HTML source', '<p>\n  <strong>A</strong>\n</p>\n<p>\n  B <em>C</em>\n</p>'],
+        ['a source newline between formatted words', '<p><strong>A</strong>\n<em>B</em></p>'],
+    ])('matches what the editor makes of %s when collapsing spaces', (_, stored) => {
+        expect(normalizeRichTextHtmlForComparison(stored, { collapseSpaces: true })).toBe(
+            normalizeRichTextHtmlForComparison(getEditorHtml(stored), { collapseSpaces: true }),
+        );
+    });
+
+    it('keeps a leading space in a later paragraph, as the editor does', () => {
+        expect(normalizeRichTextHtmlForComparison('<p>A</p><p>&nbsp;B</p>', { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison('<p>A</p><p>B</p>', { collapseSpaces: true }),
+        );
+    });
+
+    it('keeps a leading space after an initial line break, as the editor does', () => {
+        expect(normalizeRichTextHtmlForComparison('<p><br>&nbsp;B</p>', { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison('<p><br>B</p>', { collapseSpaces: true }),
+        );
+    });
+
+    it.each([
+        ['div', '<div>A</div><div>&nbsp;B</div>', '<div>A</div><div>B</div>'],
+        ['list item', '<ul><li>A</li><li>&nbsp;B</li></ul>', '<ul><li>A</li><li>B</li></ul>'],
+        ['heading', '<h2>A </h2><h2>&nbsp;B</h2>', '<h2>A </h2><h2>B</h2>'],
+    ])('keeps a leading space after a %s boundary, as the editor does', (_, withSpace, withoutSpace) => {
+        expect(normalizeRichTextHtmlForComparison(withSpace, { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison(withoutSpace, { collapseSpaces: true }),
+        );
+    });
+
+    it('strips a leading space from the first text inside nested blocks', () => {
+        expect(normalizeRichTextHtmlForComparison('<ul><li>&nbsp;B</li></ul>', { collapseSpaces: true })).toBe(
+            '<ul><li>B</li></ul>',
+        );
+    });
+
+    it('preserves word boundaries when normalizing spaces', () => {
+        expect(normalizeRichTextHtmlForComparison('<p>A b</p>', { collapseSpaces: true })).not.toBe(
+            normalizeRichTextHtmlForComparison('<p>Ab</p>', { collapseSpaces: true }),
+        );
+    });
+
+    it.each([false, true])('keeps the space between formatted words (collapseSpaces: %s)', (collapseSpaces) => {
+        expect(normalizeRichTextHtmlForComparison('<p><strong>A</strong> <em>B</em></p>', { collapseSpaces })).not.toBe(
+            normalizeRichTextHtmlForComparison('<p><strong>A</strong><em>B</em></p>', { collapseSpaces }),
+        );
+    });
+
+    it('ignores whitespace between paragraphs for rich text comparison', () => {
+        expect(normalizeRichTextHtmlForComparison('<p>A</p>\n  <p>B</p>')).toBe('<p>A</p><p>B</p>');
+    });
+
+    it('collapses whitespace from formatted HTML source for rich text comparison', () => {
+        expect(normalizeRichTextHtmlForComparison('<p>\n  <strong>A</strong>\n</p>\n<p>\n  B <em>C</em>\n</p>')).toBe(
+            '<p><strong>A</strong></p><p>B <em>C</em></p>',
+        );
+        expect(normalizeRichTextHtmlForComparison('<p><strong>A</strong>\n<em>B</em></p>')).toBe(
+            '<p><strong>A</strong> <em>B</em></p>',
+        );
+    });
+
+    it('treats a field of blank paragraphs as empty for rich text comparison', () => {
+        expect(normalizeRichTextHtmlForComparison('<p><br></p><p>&nbsp;</p>')).toBe('');
     });
 
     it('preserves formatting differences for rich text comparison', () => {

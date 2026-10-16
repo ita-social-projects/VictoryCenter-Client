@@ -1,10 +1,10 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { mapToEventsNews } from '@/utils/functions/mappers/public/event-news/event-news';
 import { createPublishedEventNewsDto } from '@/utils/mock-data/public/published-event-news';
-import { axiosInstance } from '../../axios';
+import { axiosInstance } from '@/services/api/axios';
 import { EventNewsApi, EventsNewsApi } from './events-news-api';
 
-jest.mock('../../axios', () => ({
+jest.mock('@/services/api/axios', () => ({
     axiosInstance: { get: jest.fn() },
 }));
 

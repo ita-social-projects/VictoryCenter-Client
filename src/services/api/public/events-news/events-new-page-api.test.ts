@@ -1,7 +1,7 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { mapToEventsNewsPage } from '@/utils/functions/mappers/public/event-news/events-news-page';
-import { axiosInstance } from '../../axios';
+import { axiosInstance } from '@/services/api/axios';
 import { EventsNewsPageApi } from './events-new-page-api';
 
 jest.mock('@/services/api/axios', () => ({

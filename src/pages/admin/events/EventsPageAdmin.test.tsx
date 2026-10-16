@@ -1902,6 +1902,10 @@ describe('EventsPageAdmin', () => {
             );
         });
 
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalledTimes(2);
+        });
+
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
         expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
     });

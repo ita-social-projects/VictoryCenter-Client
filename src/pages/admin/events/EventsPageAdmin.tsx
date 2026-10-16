@@ -225,7 +225,12 @@ export const EventsPageAdmin = () => {
             setCategories(fetchedCategories);
 
             if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+                setSelectedCategory((prevSelected) =>
+                    prevSelected
+                        ? (fetchedCategories.find((category) => category.id === prevSelected.id) ??
+                          fetchedCategories[0])
+                        : fetchedCategories[0],
+                );
             }
         } catch {
             setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
@@ -763,6 +768,7 @@ export const EventsPageAdmin = () => {
             setEventToDeleteId(null);
 
             await fetchEventItems(selectedCategory.id, true);
+            await fetchCategories();
         } catch {
             addToast(
                 EVENTS_TEXT.MESSAGE.FAIL_TO_DELETE_EVENT,
@@ -772,7 +778,7 @@ export const EventsPageAdmin = () => {
         } finally {
             setIsEventDeleting(false);
         }
-    }, [client, fetchEventItems, selectedCategory, eventToDeleteId, isEventDeleting, addToast]);
+    }, [client, fetchCategories, fetchEventItems, selectedCategory, eventToDeleteId, isEventDeleting, addToast]);
 
     const handleDeleteCancel = useCallback(() => {
         if (isEventDeleting) {

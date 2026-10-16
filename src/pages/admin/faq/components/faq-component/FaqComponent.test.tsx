@@ -5,9 +5,14 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { FAQ_TEXT } from '@/const/admin/faq';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { LocalizationLanguage } from '@/types/common/language';
+import { ButtonTooltipProps } from '@/components/admin/button-tooltip/ButtonTooltip';
 
 jest.mock('@/components/admin/button-tooltip/ButtonTooltip', () => ({
-    ButtonTooltip: ({ children }: any) => <div data-testid="button-tooltip">{children}</div>,
+    ButtonTooltip: ({ children, isRenderInPortal }: ButtonTooltipProps) => (
+        <div data-testid="button-tooltip" data-is-render-in-portal={isRenderInPortal}>
+            {children}
+        </div>
+    ),
 }));
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: any) => <span data-testid="status-label">{status}</span>,
@@ -81,6 +86,7 @@ describe('FaqComponent', () => {
         expect(screen.getByTestId('button-tooltip')).toHaveTextContent(FAQ_TEXT.TOOLTIP.PUBLISHED_IN);
         expect(screen.getByText('Page 1')).toBeInTheDocument();
         expect(screen.getByText('Page 2')).toBeInTheDocument();
+        expect(screen.getByTestId('button-tooltip')).toHaveAttribute('data-is-render-in-portal', 'true');
     });
 
     it('shows correct tooltip for drafted status', () => {

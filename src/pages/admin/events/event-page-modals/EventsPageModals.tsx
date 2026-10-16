@@ -19,6 +19,7 @@ export interface EventsPageModalsProps {
     onDeleteCategory(categoryId: number): void;
     onTranslateCategory(category: EventCategoryDto): void;
     translationLanguages: LocalizationLanguage[];
+    onTranslateEvent?: (event: EventItemDto) => void;
 }
 
 export const EventsPageModals = ({
@@ -31,6 +32,7 @@ export const EventsPageModals = ({
     onDeleteCategory,
     onTranslateCategory,
     translationLanguages,
+    onTranslateEvent,
 }: EventsPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
 
@@ -91,6 +93,7 @@ export const EventsPageModals = ({
                 eventToTranslate={modalState.itemToTranslate || null}
                 onClose={closeModalActions.closeTranslateItemModal}
                 translatedLanguages={translationLanguages}
+                onTranslateEvent={onTranslateEvent}
             />
         </>
     );

@@ -7,10 +7,12 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
+    ImageInput: ({ onChange, label, setError, disabled, className }: any) => (
+        <div data-testid="mock-image-input" data-class-name={className}>
             <label htmlFor="mock-image-input-id">{label}</label>
             <input
                 data-testid="mock-image-input-file"
@@ -20,6 +22,15 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 onChange={(e) => !disabled && onChange(e.target.files?.[0])}
             />
             <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
+            <button
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    if (!disabled) setError(IMAGE_VALIDATION.ImageDimensionsTooSmallError);
+                }}
+            >
+                Set Dimensions Too Small Error
+            </button>
+            <button onClick={() => !disabled && setError(null)}>Clear Error</button>
         </div>
     ),
 }));
@@ -229,6 +240,30 @@ describe('ImageSection', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
 
         expect(await screen.findByText('image size error')).toBeInTheDocument();
+    });
+
+    it('should highlight the image input only for a dimensions-too-small error', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Dimensions Too Small Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).toHaveAttribute(
+            'data-class-name',
+            whoWeAreVariantStyles['container-focused'],
+        );
+        expect(screen.getByTestId('image-error')).toHaveTextContent(IMAGE_VALIDATION.ImageDimensionsTooSmallError);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
+    });
+
+    it('should not highlight the image input for other image errors', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
     });
 
     it('should render correctly without title content', () => {

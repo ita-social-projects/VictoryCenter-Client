@@ -9,9 +9,11 @@ import {
     ReportFundsExpendituresRecordFormValues,
     ReportFundsExpendituresSettingsDto,
     ReportFundsExpendituresSummaryDto,
+    BatchSaveReportFundsExpendituresRecordsPayload,
 } from '@/types/admin/reports';
 import { RequestOptions } from '@/types/common/api';
 import {
+    mapBatchSaveReportFundsExpendituresRecordsToDto,
     mapReportFundsExpendituresCategoryDtoToCategory,
     mapReportFundsExpendituresCategoryToCreateDto,
     mapReportFundsExpendituresCategoryToUpdateDto,
@@ -165,6 +167,18 @@ export const FundsExpendituresApi = {
         const response = await client.post<number[]>(
             `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/bulk-delete`,
             ids,
+        );
+
+        return response.data;
+    },
+
+    batchSaveRecords: async (
+        client: AxiosInstance,
+        payload: BatchSaveReportFundsExpendituresRecordsPayload,
+    ): Promise<void> => {
+        const response = await client.post<void>(
+            `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/batch-save`,
+            mapBatchSaveReportFundsExpendituresRecordsToDto(payload),
         );
 
         return response.data;

@@ -258,6 +258,14 @@ export const EventsPageAdmin = () => {
         openModalActions.openAddItemModal();
     }, [openModalActions, selectedCategory]);
 
+    const handleTranslateEvent = useCallback(
+        (updatedEvent: EventItemDto) => {
+            setEventItems((prev) => prev.map((item) => (item.id === updatedEvent.id ? updatedEvent : item)));
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [addToast],
+    );
+
     const handleAddCategory = useCallback((newCategory: EventCategoryDto) => {
         setCategories((prev) => [...prev, newCategory]);
     }, []);
@@ -862,6 +870,7 @@ export const EventsPageAdmin = () => {
                 onDeleteCategory={handleDeleteCategory}
                 onTranslateCategory={handleTranslateCategory}
                 translationLanguages={translationLanguages}
+                onTranslateEvent={handleTranslateEvent}
             />
             <ConfirmationModal
                 isOpen={!!publishConfirmation}

@@ -196,4 +196,7 @@ export const API_ROUTES = {
     EVENT_CATEGORIES_LOCALIZATIONS: {
         BASE: 'EventNewsCategoryLocalizations',
     },
+    EVENT_LOCALIZATIONS: {
+        BASE: 'EventNewsLocalizations',
+    },
 };

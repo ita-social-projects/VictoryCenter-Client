@@ -9,6 +9,7 @@ import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
 import { EventItemDto } from '@/types/admin/events';
+import { VisibilityStatus } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -181,6 +182,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 const mockOnAddCategory = jest.fn();
 const mockOnUpdateCategory = jest.fn();
 const mockOnDeleteCategory = jest.fn();
+const mockOnTranslateEvent = jest.fn();
 const mockOnTranslateCategory = jest.fn();
 const mockOnEventSaveSuccess = jest.fn();
 
@@ -191,6 +193,7 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
         onUpdateCategory,
         onDeleteCategory,
         onTranslateCategory,
+        onTranslateEvent,
     }: {
         onEventSaveSuccess?: (data: {
             event: EventItemDto;
@@ -202,12 +205,14 @@ jest.mock('./event-page-modals/EventsPageModals', () => ({
         onUpdateCategory: (category: EventCategoryDto) => void;
         onDeleteCategory: (categoryId: number) => void;
         onTranslateCategory: (category: EventCategoryDto) => void;
+        onTranslateEvent?: (event: EventItemDto) => void;
     }) => {
         mockOnEventSaveSuccess.mockImplementation(onEventSaveSuccess);
         mockOnAddCategory.mockImplementation(onAddCategory);
         mockOnUpdateCategory.mockImplementation(onUpdateCategory);
         mockOnDeleteCategory.mockImplementation(onDeleteCategory);
         mockOnTranslateCategory.mockImplementation(onTranslateCategory);
+        if (onTranslateEvent) mockOnTranslateEvent.mockImplementation(onTranslateEvent);
 
         return <div data-testid="events-page-modals" />;
     },
@@ -1754,6 +1759,49 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('Category 2')).not.toBeInTheDocument();
+        });
+    });
+
+    it('updates event item in the list when onTranslateEvent is called', async () => {
+        const eventsResponse = {
+            items: [
+                {
+                    id: 1,
+                    title: 'Initial Event',
+                    description: 'Initial Description',
+                    publishedAt: '2024-01-01',
+                    status: VisibilityStatus.Published,
+                    previewImage: null,
+                    backgroundImage: null,
+                    priority: 1,
+                    resource: '',
+                    localizations: [],
+                },
+            ],
+            totalItemsCount: 1,
+        };
+
+        mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
+
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+
+        const updatedEvent: EventItemDto = {
+            ...eventsResponse.items[0],
+            title: 'Initial Event',
+            localizations: [
+                {
+                    language: { id: 2, code: 'en' },
+                    title: 'Translated Title',
+                    description: 'Translated Description',
+                    translationStatus: 1 as any,
+                },
+            ],
+        };
+
+        act(() => {
+            mockOnTranslateEvent(updatedEvent);
         });
     });
 });

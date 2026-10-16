@@ -7,11 +7,24 @@ import {
     EntityWithLocalizations,
 } from '../common/language';
 
-export interface EventLocalization extends EntityLocalization {
+export interface EventLocalizableFields {
     title: string;
     description: string;
     additionalDescription?: string | null;
 }
+
+export interface EventLocalization extends EntityLocalization, EventLocalizableFields {}
+
+export interface EventLocalizationDto extends EntityLocalizationDto, EventLocalizableFields {
+    entityId: number;
+}
+
+export interface CreateEventLocalizationDto extends EventLocalizableFields {
+    entityId: number;
+    languageId: number;
+}
+
+export type UpdateEventLocalizationDto = EventLocalizableFields;
 
 export interface EventItemDto extends EntityWithLocalizations<EventLocalization> {
     id: number;
@@ -25,13 +38,6 @@ export interface EventItemDto extends EntityWithLocalizations<EventLocalization>
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
-}
-
-export interface EventLocalizationDto extends EntityLocalizationDto {
-    entityId: number;
-    title: string;
-    description: string;
-    additionalDescription?: string | null;
 }
 
 export type EventItemResponseDto = Omit<EventItemDto, 'localizations'> &

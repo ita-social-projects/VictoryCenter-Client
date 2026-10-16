@@ -354,6 +354,7 @@ const mockUpdateSettings = jest.fn();
 const mockDeleteRecord = jest.fn();
 const mockBulkDelete = jest.fn();
 const mockCreateCategory = jest.fn();
+const mockBatchSaveRecords = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
@@ -366,6 +367,7 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
         deleteRecord: (...args: unknown[]) => mockDeleteRecord(...args),
         bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
         createCategory: (...args: unknown[]) => mockCreateCategory(...args),
+        batchSaveRecords: (...args: unknown[]) => mockBatchSaveRecords(...args),
     },
 }));
 
@@ -500,16 +502,7 @@ describe('FundsExpenditureSection', () => {
         });
     });
 
-    it('should show success toast when record is saved from table', async () => {
-        mockUpdateRecord.mockResolvedValueOnce({
-            id: 1,
-            categoryId: 1,
-            type: 'income',
-            reportingYear: '2025',
-            amountUah: '7300',
-            amountUsd: '173.81',
-        });
-
+    it('should update record locally and not call api immediately', async () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('trigger-record-save'));
@@ -519,17 +512,7 @@ describe('FundsExpenditureSection', () => {
             FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
             'success',
         );
-    });
-
-    it('should show retry error toast when record save fails', async () => {
-        mockUpdateRecord.mockRejectedValueOnce(new Error('save failed'));
-
-        render(<FundsExpenditureSection />);
-
-        fireEvent.click(screen.getByTestId('trigger-record-save'));
-
-        await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        expect(mockUpdateRecord).not.toHaveBeenCalled();
     });
 
     it('should render the disclaimer text', () => {
@@ -693,6 +676,28 @@ describe('FundsExpenditureSection', () => {
             setupMockDataFetch();
         });
 
+        const renderWithSaveCallback = () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
+
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            const triggerSave = async (expectedSuccess = true) => {
+                expect(saveFn).toBeDefined();
+                const success = await saveFn!();
+                expect(success).toBe(expectedSuccess);
+            };
+
+            return { triggerSave };
+        };
+
+        const setupSuccessMocks = () => {
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+        };
+
         it('should start in read mode', () => {
             render(<FundsExpenditureSection />);
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
@@ -732,62 +737,155 @@ describe('FundsExpenditureSection', () => {
             });
         });
 
-        it('should delete record successfully', async () => {
+        it('should delete record locally and not call api immediately', async () => {
             render(<FundsExpenditureSection isEditing />);
+
+            expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                'data-record-count',
+                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
+            );
+
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
             await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalled();
+                expect(mockDeleteRecord).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
                     'success',
                 );
+                expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                    'data-record-count',
+                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
+                );
+                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
             });
         });
 
-        it('should show error when deleting record fails', async () => {
-            mockDeleteRecord.mockRejectedValueOnce(new Error('fail'));
-            render(<FundsExpenditureSection isEditing />);
+        it('should update modified records and save settings when save callback is invoked', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
+
+            fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+            await triggerSave();
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBatchSaveRecords).toHaveBeenCalled();
+        });
+
+        it('should send deleted records to api via batchSaveRecords when save callback is invoked after single record deletion', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
+
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-            await waitFor(() => {
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
-                    'error',
-                );
-            });
+
+            await triggerSave();
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBatchSaveRecords).toHaveBeenCalled();
         });
 
-        it('should save settings when registered save function is called', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+        it('should send all selected records to api via batchSaveRecords when save callback is invoked after bulk deletion', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
 
-            mockUpdateSettings.mockResolvedValueOnce({
-                id: 1,
-                disclaimerTitle: 'saved',
-                exchangeRate: '42.18',
+            fireEvent.click(screen.getByLabelText('Select all records'));
+            fireEvent.click(screen.getByTestId('delete-selected'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await triggerSave();
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBatchSaveRecords).toHaveBeenCalled();
+        });
+
+        it('should include created records in recordsToCreate and modified in recordsToUpdate when saving', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            setupSuccessMocks();
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
+
+            fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+            await triggerSave();
+
+            expect(mockBatchSaveRecords).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({
+                    recordsToCreate: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: expect.any(Number),
+                            amountUah: '1000',
+                            type: 'income',
+                        }),
+                    ]),
+                    recordsToUpdate: expect.arrayContaining([
+                        expect.objectContaining({
+                            id: 1,
+                            amountUah: '7300',
+                        }),
+                    ]),
+                    recordIdsToDelete: [],
+                }),
+            );
+        });
+
+        it('should NOT call batchSaveRecords when only settings are modified and table records are untouched', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            mockUpdateSettings.mockResolvedValueOnce({});
+
+            const disclaimerInput = screen.getByTestId('textarea-funds-disclaimer');
+            fireEvent.change(disclaimerInput, {
+                target: { value: 'Test disclaimer text' },
             });
 
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(true);
+            await triggerSave();
+
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
+        });
+
+        it('should not send temporary records to api if created and deleted before saving', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+            mockUpdateSettings.mockResolvedValueOnce({});
+
+            setupMockDataFetch(MOCK_FUNDS_EXPENDITURES_SETTINGS, MOCK_FUNDS_EXPENDITURES_CATEGORIES, []);
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
+
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await triggerSave();
+
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
+        });
+
+        it('should show error toast and return false when batchSaveRecords fails', async () => {
+            const { triggerSave } = renderWithSaveCallback();
+
+            mockUpdateSettings.mockResolvedValueOnce({});
+            mockBatchSaveRecords.mockRejectedValueOnce(new Error('Batch save error'));
+
+            fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+            await triggerSave(false);
+
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
         });
 
         it('should show error when registered save function fails', async () => {
-            let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => {
-                saveFn = fn;
-            };
-            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
-
+            const { triggerSave } = renderWithSaveCallback();
             mockUpdateSettings.mockRejectedValueOnce(new Error('fail'));
 
-            expect(saveFn).toBeDefined();
-            const success = await saveFn!();
-            expect(success).toBe(false);
+            await triggerSave(false);
+
             expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
         });
 
@@ -999,23 +1097,14 @@ describe('FundsExpenditureSection', () => {
             expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-type', 'expense');
         });
 
-        it('should create income record successfully and show success toast', async () => {
-            mockCreateRecord.mockResolvedValueOnce({
-                id: 999,
-                categoryId: 1,
-                type: 'income',
-                reportingYear: '2026',
-                amountUah: '1000',
-                amountUsd: '25',
-            });
-
-            render(<FundsExpenditureSection />);
+        it('should create income record locally and show success toast without immediate api call', async () => {
+            const onDataChange = jest.fn();
+            render(<FundsExpenditureSection onDataChange={onDataChange} />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
             fireEvent.click(screen.getByTestId('add-record-submit'));
 
-            expect(await screen.findByTestId('funds-table')).toBeInTheDocument();
-            expect(mockCreateRecord).toHaveBeenCalled();
+            expect(mockCreateRecord).not.toHaveBeenCalled();
             expect(mockAddToast).toHaveBeenCalledWith(
                 FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
                 'success',
@@ -1023,74 +1112,12 @@ describe('FundsExpenditureSection', () => {
             await waitFor(() => {
                 expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
             });
-        });
-
-        it('should show error toast when income record creation fails', async () => {
-            mockCreateRecord.mockRejectedValueOnce(new Error('create failed'));
-
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByTestId('open-add-income'));
-            fireEvent.click(screen.getByTestId('add-record-submit'));
-
-            expect(await screen.findByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
-            expect(mockAddToast).toHaveBeenCalledWith(
-                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
-                'error',
-            );
-        });
-
-        it('should delete record after confirmation and show success toast', async () => {
-            mockDeleteRecord.mockResolvedValueOnce(undefined);
-
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             expect(screen.getByTestId('funds-table')).toHaveAttribute(
                 'data-record-count',
-                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
+                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length + 1),
             );
 
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
-
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
-                    'success',
-                );
-                expect(screen.getByTestId('funds-table')).toHaveAttribute(
-                    'data-record-count',
-                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
-                );
-                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
-            });
-        });
-
-        it('should show delete error toast and keep modal open when delete fails', async () => {
-            mockDeleteRecord.mockRejectedValueOnce(new Error('delete failed'));
-
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
-                    'error',
-                );
-                expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
-                expect(screen.getByTestId('funds-table')).toHaveAttribute(
-                    'data-record-count',
-                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
-                );
-            });
+            expect(onDataChange).toHaveBeenCalled();
         });
 
         it('should close delete confirmation modal on cancel', () => {
@@ -1259,9 +1286,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
         });
     });
 
-    it('confirms bulk delete calls API and shows success toast', async () => {
-        mockBulkDelete.mockResolvedValue(undefined);
-
+    it('should delete records locally on bulk delete and not call api immediately', async () => {
         render(<FundsExpenditureSection isEditing={true} />);
 
         fireEvent.click(screen.getByLabelText('Select all records'));
@@ -1274,7 +1299,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
         await waitFor(() => {
-            expect(mockBulkDelete).toHaveBeenCalledWith(expect.anything(), [1, 2]);
+            expect(mockBulkDelete).not.toHaveBeenCalled();
             expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, 'success');
         });
     });

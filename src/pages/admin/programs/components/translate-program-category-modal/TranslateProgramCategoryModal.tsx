@@ -114,8 +114,6 @@ export const TranslateProgramCategoryModal = ({
                     isSubmitting={isSubmitting}
                     languages={englishLanguages}
                     onLanguageChange={setLanguage}
-                    generateDisabled={!selectedCategory}
-                    hideGenerateButton={false}
                 />
             )}
             {error && <div className="translate-program-category-error">{error}</div>}

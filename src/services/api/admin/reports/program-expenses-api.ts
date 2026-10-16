@@ -7,10 +7,12 @@ import {
     ReportProgramExpendituresRecordDto,
     CreateReportProgramExpendituresRecordDto,
     UpdateReportProgramExpendituresRecordDto,
+    BatchSaveReportProgramExpendituresRecordsPayload,
 } from '@/types/admin/reports';
 import { ProgramCategory } from '@/types/admin/programs';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
+import { mapBatchSaveReportProgramExpendituresRecordsToDto } from '@/utils/functions/mappers/admin/reports-mapper/reports-mapper';
 
 const mapDtoToReadOnlyData = (
     records: ReportProgramExpendituresRecordDto[],
@@ -121,5 +123,17 @@ export const ProgramExpensesApi = {
 
     bulkDelete: async (client: AxiosInstance, ids: number[]): Promise<void> => {
         await client.post(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/bulk-delete`, ids);
+    },
+
+    batchSaveRecords: async (
+        client: AxiosInstance,
+        payload: BatchSaveReportProgramExpendituresRecordsPayload,
+    ): Promise<void> => {
+        const response = await client.post<void>(
+            `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/batch-save`,
+            mapBatchSaveReportProgramExpendituresRecordsToDto(payload),
+        );
+
+        return response.data;
     },
 };

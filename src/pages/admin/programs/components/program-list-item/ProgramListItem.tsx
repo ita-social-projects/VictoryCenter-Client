@@ -57,7 +57,7 @@ export const ProgramListItem = ({
                 </div>
             </div>
             <div className="program-actions">
-                <ButtonTooltip position="bottom">
+                <ButtonTooltip position="bottom" isRenderInPortal>
                     <div className="program-actions-tooltip">
                         <b>
                             {program.status === VisibilityStatus.Published

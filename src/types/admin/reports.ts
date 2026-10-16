@@ -151,6 +151,22 @@ export interface UpdateReportFundsExpendituresRecordDto {
     currency: ReportFundsExpendituresCurrencyDto;
 }
 
+export interface BatchUpdateReportFundsExpendituresRecordDto extends UpdateReportFundsExpendituresRecordDto {
+    id: number;
+}
+
+export interface BatchSaveReportFundsExpendituresRecordsDto {
+    recordsToCreate: CreateReportFundsExpendituresRecordDto[];
+    recordsToUpdate: BatchUpdateReportFundsExpendituresRecordDto[];
+    recordIdsToDelete: number[];
+}
+
+export interface BatchSaveReportFundsExpendituresRecordsPayload {
+    recordsToCreate: ReportFundsExpendituresRecordState[];
+    recordsToUpdate: ReportFundsExpendituresRecordState[];
+    recordIdsToDelete: number[];
+}
+
 export interface ReportFundsExpendituresSummaryDto {
     incomeUahTotal: number;
     incomeUsdTotal: number;
@@ -232,6 +248,10 @@ export interface ReportFundsExpendituresRecord {
     amountUsd: string;
 }
 
+export type ReportFundsExpendituresRecordState = ReportFundsExpendituresRecordFormValues & {
+    id: number;
+};
+
 export type FundsExpendituresAmountField = 'amountUah' | 'amountUsd';
 
 export type ReportFundsExpendituresRecordFormValues = Pick<
@@ -294,4 +314,28 @@ export interface UpdateReportProgramExpendituresRecordDto {
     hippotherapyProgramCategoryId: number;
     amountUah: number;
     amountUsd: number;
+}
+
+export interface BatchUpdateReportProgramExpendituresRecordDto extends UpdateReportProgramExpendituresRecordDto {
+    id: number;
+}
+
+export interface BatchSaveReportProgramExpendituresRecordsDto {
+    recordsToCreate: CreateReportProgramExpendituresRecordDto[];
+    recordsToUpdate: BatchUpdateReportProgramExpendituresRecordDto[];
+    recordIdsToDelete: number[];
+}
+
+export interface BatchSaveReportProgramExpendituresRecordsPayload {
+    recordsToCreate: ReportProgramExpendituresRecordState[];
+    recordsToUpdate: ReportProgramExpendituresRecordState[];
+    recordIdsToDelete: number[];
+}
+
+export interface ReportProgramExpendituresRecordState {
+    id: number;
+    hippotherapyProgramCategoryId: number;
+    reportingYear: string;
+    amountUah: string;
+    amountUsd: string;
 }

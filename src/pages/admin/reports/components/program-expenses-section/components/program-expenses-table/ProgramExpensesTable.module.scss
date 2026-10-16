@@ -57,7 +57,7 @@
     color: rgba(c.$graphite-black, 0.88);
     white-space: nowrap;
     position: sticky;
-    top: 0;
+    top: -1px;
     z-index: z-index.admin(sticky-table-header);
     background-color: c.$light-blue-25;
 }

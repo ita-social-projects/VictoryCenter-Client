@@ -49,7 +49,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('does not submit invalid form and closes confirmation state', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
@@ -67,7 +67,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('submits valid form and resets values on success', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
@@ -122,7 +122,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('submits the manually edited USD value even when it does not match UAH, without a preceding blur (#4219)', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
@@ -150,7 +150,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('blocks submit and surfaces required error when reporting year is missing', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
@@ -170,7 +170,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('allows save with a manually edited USD amount that does not match UAH at a custom exchange rate (#4219)', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
         const { result } = renderUseFundsForm({ exchangeRate: '45', onSubmit });
 
         act(() => {
@@ -224,8 +224,8 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.categoryId).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
-    it('does not reset values when submit rejects', async () => {
-        const onSubmit = jest.fn().mockRejectedValue(new Error('network'));
+    it('does not reset values when submit fails', async () => {
+        const onSubmit = jest.fn().mockReturnValue(false);
         const { result } = renderUseFundsForm({ onSubmit });
 
         act(() => {
@@ -249,7 +249,7 @@ describe('useFundsExpendituresRecordForm', () => {
         const validateCategorySpy = jest
             .spyOn(fundsExpendituresSchema, 'validateFundsExpendituresCategory')
             .mockReturnValue(undefined);
-        const onSubmit = jest.fn().mockResolvedValue(true);
+        const onSubmit = jest.fn().mockReturnValue(true);
 
         const { result } = renderUseFundsForm({ onSubmit });
 
@@ -269,7 +269,7 @@ describe('useFundsExpendituresRecordForm', () => {
     });
 
     it('keeps values after failed submit and resets when modal closes', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(false);
+        const onSubmit = jest.fn().mockReturnValue(false);
         const { result, rerender } = renderHook(
             ({ isOpen }) =>
                 useFundsExpendituresRecordForm({

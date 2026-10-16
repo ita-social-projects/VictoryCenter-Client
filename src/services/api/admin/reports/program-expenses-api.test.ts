@@ -1,5 +1,6 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ProgramExpensesApi } from './program-expenses-api';
+import { BatchSaveReportProgramExpendituresRecordsPayload } from '@/types/admin/reports';
 
 const mockClient = {
     get: jest.fn(),
@@ -260,6 +261,83 @@ describe('ProgramExpensesApi', () => {
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/summary`, {
                 signal,
             });
+        });
+    });
+
+    describe('batchSaveRecords', () => {
+        it('should map payload to dto, send post request to batch-save endpoint, and return data', async () => {
+            const payload: BatchSaveReportProgramExpendituresRecordsPayload = {
+                recordsToCreate: [
+                    {
+                        id: -1,
+                        hippotherapyProgramCategoryId: 5,
+                        reportingYear: '2026',
+                        amountUah: '1000',
+                        amountUsd: '25',
+                    },
+                ],
+                recordsToUpdate: [
+                    {
+                        id: 10,
+                        hippotherapyProgramCategoryId: 7,
+                        reportingYear: '2025',
+                        amountUah: '2000',
+                        amountUsd: '50',
+                    },
+                ],
+                recordIdsToDelete: [11, 12],
+            };
+
+            mockClient.post.mockResolvedValue({ data: undefined });
+
+            const result = await ProgramExpensesApi.batchSaveRecords(mockClient, payload);
+
+            expect(mockClient.post).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/batch-save`,
+                {
+                    recordsToCreate: [
+                        {
+                            hippotherapyProgramCategoryId: 5,
+                            reportingYear: 2026,
+                            amountUah: 1000,
+                            amountUsd: 25,
+                        },
+                    ],
+                    recordsToUpdate: [
+                        {
+                            id: 10,
+                            hippotherapyProgramCategoryId: 7,
+                            reportingYear: 2025,
+                            amountUah: 2000,
+                            amountUsd: 50,
+                        },
+                    ],
+                    recordIdsToDelete: [11, 12],
+                },
+            );
+
+            expect(result).toBeUndefined();
+        });
+
+        it('posts an empty batch payload', async () => {
+            const payload: BatchSaveReportProgramExpendituresRecordsPayload = {
+                recordsToCreate: [],
+                recordsToUpdate: [],
+                recordIdsToDelete: [],
+            };
+
+            mockClient.post.mockResolvedValue({ data: undefined });
+
+            await ProgramExpensesApi.batchSaveRecords(mockClient, payload);
+
+            expect(mockClient.post).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/batch-save`,
+                {
+                    recordsToCreate: [],
+                    recordsToUpdate: [],
+                    recordIdsToDelete: [],
+                },
+            );
         });
     });
 });

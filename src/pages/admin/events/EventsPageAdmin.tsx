@@ -90,6 +90,8 @@ export const EventsPageAdmin = () => {
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const [eventToDeleteId, setEventToDeleteId] = useState<number | null>(null);
+    const [isEventDeleting, setIsEventDeleting] = useState(false);
 
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
@@ -223,7 +225,12 @@ export const EventsPageAdmin = () => {
             setCategories(fetchedCategories);
 
             if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+                setSelectedCategory((prevSelected) =>
+                    prevSelected
+                        ? (fetchedCategories.find((category) => category.id === prevSelected.id) ??
+                          fetchedCategories[0])
+                        : fetchedCategories[0],
+                );
             }
         } catch {
             setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
@@ -337,6 +344,10 @@ export const EventsPageAdmin = () => {
         };
     }, [updatePageSize]);
 
+    const handleDeleteClick = useCallback((eventId: number) => {
+        setEventToDeleteId(eventId);
+    }, []);
+
     const renderEntityComponent = useCallback(
         (item: EventItemDto) => (
             <EventItemComponent
@@ -344,10 +355,17 @@ export const EventsPageAdmin = () => {
                 language={selectedLanguage}
                 translationLanguages={translationLanguages}
                 onEdit={openModalActions.openEditItemModal}
+                onDelete={handleDeleteClick}
                 onTranslate={openModalActions.openTranslateItemModal}
             />
         ),
-        [openModalActions, selectedLanguage, translationLanguages],
+        [
+            handleDeleteClick,
+            openModalActions.openEditItemModal,
+            openModalActions.openTranslateItemModal,
+            selectedLanguage,
+            translationLanguages,
+        ],
     );
 
     const handleEntitiesReordered = useCallback(
@@ -737,6 +755,43 @@ export const EventsPageAdmin = () => {
         [handleUpdateCategory, closeModalActions, addToast],
     );
 
+    const handleDeleteConfirm = useCallback(async () => {
+        if (eventToDeleteId === null || isEventDeleting || !selectedCategory) {
+            return;
+        }
+
+        setIsEventDeleting(true);
+
+        try {
+            await EventsApi.deleteEvent(client, eventToDeleteId);
+
+            setEventItems((prev) => prev.filter((item) => item.id !== eventToDeleteId));
+
+            setEventToDeleteId(null);
+
+            eventItemsContextIdRef.current += 1;
+
+            await fetchEventItems(selectedCategory.id, true);
+            await fetchCategories();
+        } catch {
+            addToast(
+                EVENTS_TEXT.MESSAGE.FAIL_TO_DELETE_EVENT,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        } finally {
+            setIsEventDeleting(false);
+        }
+    }, [client, fetchCategories, fetchEventItems, selectedCategory, eventToDeleteId, isEventDeleting, addToast]);
+
+    const handleDeleteCancel = useCallback(() => {
+        if (isEventDeleting) {
+            return;
+        }
+
+        setEventToDeleteId(null);
+    }, [isEventDeleting]);
+
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
@@ -881,6 +936,17 @@ export const EventsPageAdmin = () => {
                 onConfirm={handlePublishConfirmation}
                 onCancel={closePublishConfirmation}
                 isButtonsDisabled={!!publishConfirmation && publishingSections[publishConfirmation.sectionId]}
+            />
+
+            <ConfirmationModal
+                isOpen={eventToDeleteId !== null}
+                onClose={handleDeleteCancel}
+                title={EVENTS_TEXT.QUESTION.DELETE_MATERIAL}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+                isButtonsDisabled={isEventDeleting}
             />
             <ToastContainer />
         </div>

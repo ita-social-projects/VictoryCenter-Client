@@ -765,6 +765,8 @@ export const EventsPageAdmin = () => {
         try {
             await EventsApi.deleteEvent(client, eventToDeleteId);
 
+            setEventItems((prev) => prev.filter((item) => item.id !== eventToDeleteId));
+
             setEventToDeleteId(null);
 
             eventItemsContextIdRef.current += 1;

@@ -784,13 +784,11 @@ export const FundsExpenditureSection = ({
 
             fetchDisclaimerLocalizations(updatedSettings.id);
 
-            try {
-                await refetchSettings(true);
-                if (hasRecordChanges) {
-                    await refetchRecords(true);
-                    await refetchSummary(true);
-                }
-            } catch {}
+            await refetchSettings();
+            if (hasRecordChanges) {
+                await refetchRecords();
+                await refetchSummary();
+            }
 
             return true;
         } catch {

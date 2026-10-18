@@ -1747,8 +1747,6 @@ describe('FundsExpenditureSection onSelectionChange callback', () => {
 });
 
 describe('FundsExpenditureSection category limit', () => {
-    const SUMMARY_SLOT = 3;
-
     beforeEach(() => {
         jest.clearAllMocks();
         // Records: 3 income + 3 regular expense + 1 reserved 'Програмні' expense.
@@ -1886,30 +1884,52 @@ describe('FundsExpenditureSection category limit', () => {
         );
     });
 
-    it('refetches the summary after publishing record changes', async () => {
-        let saveFn: (() => Promise<boolean>) | undefined;
-        mockUpdateSettings.mockResolvedValueOnce({ id: 1, disclaimerTitle: 'Updated', exchangeRate: '42.18' });
-        mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+    describe('refetches after publishing', () => {
+        const SLOT = { settings: 0, records: 2, summary: 3 };
 
-        render(
-            <FundsExpenditureSection
-                isEditing
-                registerSaveCallback={(fn) => {
-                    saveFn = fn;
-                }}
-            />,
-        );
+        const getRefetchCallCount = (slot: number) =>
+            mockUseDataFetch.mock.results
+                .filter((_, index) => index % 5 === slot)
+                .reduce((count, result) => count + (result.value.refetch as jest.Mock).mock.calls.length, 0);
 
-        addRecord('income');
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+        const setupPublish = () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            mockUpdateSettings.mockResolvedValueOnce({ id: 1, disclaimerTitle: 'Updated', exchangeRate: '42.18' });
+            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+
+            render(
+                <FundsExpenditureSection
+                    isEditing
+                    registerSaveCallback={(fn) => {
+                        saveFn = fn;
+                    }}
+                />,
+            );
+
+            return () => saveFn!();
+        };
+
+        it('refetches settings, records and summary when records changed', async () => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBeGreaterThan(0);
         });
 
-        await saveFn!();
+        it('refetches only settings when records did not change', async () => {
+            const save = setupPublish();
 
-        const summaryRefetchCalls = mockUseDataFetch.mock.results
-            .filter((_, index) => index % 5 === SUMMARY_SLOT)
-            .flatMap((result) => (result.value.refetch as jest.Mock).mock.calls);
-        expect(summaryRefetchCalls).toContainEqual([true]);
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBe(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBe(0);
+        });
     });
 });

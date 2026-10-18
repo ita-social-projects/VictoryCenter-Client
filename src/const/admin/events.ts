@@ -7,11 +7,13 @@ export const EVENTS_TEXT = {
         SAVE_NEW_MATERIAL: 'Зберегти новий матеріал?',
         PUBLISH_NEW_MATERIAL: 'Опублікувати новий матеріал?',
         PUBLISH_MATERIAL: 'Опублікувати матеріал?',
+        DELETE_MATERIAL: 'Видалити матеріал?',
     },
     MESSAGE: {
         DONT_FORGET_TO_ORDER: 'Не забудьте налаштувати порядок відображення матеріалів на сайті',
         FAIL_TO_CREATE_EVENT: 'Виникла помилка під час додавання матеріалу',
         FAIL_TO_UPDATE_EVENT: 'Виникла помилка під час оновлення матеріалу',
+        FAIL_TO_DELETE_EVENT: 'Виникла помилка під час видалення матеріалу',
     },
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',

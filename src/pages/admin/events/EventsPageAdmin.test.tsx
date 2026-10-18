@@ -49,6 +49,7 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
         toggleEventsTitleVisibility: jest.fn(),
         toggleEventsDescriptionVisibility: jest.fn(),
         reorder: jest.fn(),
+        deleteEvent: jest.fn(),
     },
 }));
 
@@ -371,12 +372,48 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('./event-item-component/EventItemComponent', () => ({
-    EventItemComponent: ({ item }: { item: EventItemDto }) => (
+    EventItemComponent: ({ item, onDelete }: { item: EventItemDto; onDelete: (itemId: number) => void }) => (
         <div data-testid={`rendered-event-${item.id}`}>
             <span>{item.title}</span>
             <span>{item.description}</span>
+            <button type="button" onClick={() => onDelete(item.id)}>
+                Delete event {item.id}
+            </button>
         </div>
     ),
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
+        isOpen,
+        title,
+        onConfirm,
+        onCancel,
+        isButtonsDisabled,
+        confirmText,
+        cancelText,
+    }: {
+        isOpen: boolean;
+        title: string;
+        onConfirm: () => void;
+        onCancel: () => void;
+        isButtonsDisabled?: boolean;
+        confirmText: string;
+        cancelText: string;
+    }) =>
+        isOpen ? (
+            <div role="dialog">
+                <span>{title}</span>
+
+                <button type="button" onClick={onCancel} disabled={isButtonsDisabled}>
+                    {cancelText}
+                </button>
+
+                <button type="button" onClick={onConfirm} disabled={isButtonsDisabled}>
+                    {confirmText}
+                </button>
+            </div>
+        ) : null,
 }));
 
 const mockAddToast = jest.fn();
@@ -510,6 +547,8 @@ describe('EventsPageAdmin', () => {
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
         });
+
+        mockedEventsApi.deleteEvent.mockReset();
 
         mockAddToast.mockClear();
         mockOpenAddCategoryModal.mockClear();
@@ -1803,5 +1842,121 @@ describe('EventsPageAdmin', () => {
         act(() => {
             mockOnTranslateEvent(updatedEvent);
         });
+    });
+
+    it('opens delete confirmation modal for the selected event', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.QUESTION.DELETE_MATERIAL)).toBeInTheDocument();
+        expect(mockedEventsApi.deleteEvent).not.toHaveBeenCalled();
+    });
+
+    it('deletes the event and refreshes the event list', async () => {
+        const remainingEvents = [eventItems[1]];
+
+        mockedEventsApi.fetchEvents
+            .mockResolvedValueOnce({
+                items: eventItems,
+                totalItemsCount: eventItems.length,
+            })
+            .mockResolvedValueOnce({
+                items: remainingEvents,
+                totalItemsCount: remainingEvents.length,
+            });
+
+        mockedEventsApi.deleteEvent.mockResolvedValue(101);
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.deleteEvent).toHaveBeenCalledWith({}, 101);
+        });
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[0].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
+        });
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalledTimes(2);
+        });
+
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
+    });
+
+    it('shows an error and keeps the event when deletion fails', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        mockedEventsApi.deleteEvent.mockRejectedValue(new Error('Delete failed'));
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                EVENTS_TEXT.MESSAGE.FAIL_TO_DELETE_EVENT,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        });
+
+        expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('cancels event deletion without calling the API', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(mockedEventsApi.deleteEvent).not.toHaveBeenCalled();
+        expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
     });
 });

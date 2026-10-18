@@ -159,6 +159,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isEditing,
         isAddIncomeDisabled,
         isAddExpenseDisabled,
+        categoryLimitMessage,
         onTypeChange,
         onCategoryChange,
         onExchangeRateChange,
@@ -172,6 +173,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isEditing: boolean;
         isAddIncomeDisabled: boolean;
         isAddExpenseDisabled: boolean;
+        categoryLimitMessage?: string;
         onTypeChange: (v: unknown) => void;
         onCategoryChange: (v: unknown) => void;
         onExchangeRateChange: (v: string) => void;
@@ -185,6 +187,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
             data-editing={String(isEditing)}
             data-add-income-disabled={String(isAddIncomeDisabled)}
             data-add-expense-disabled={String(isAddExpenseDisabled)}
+            data-category-limit-message={categoryLimitMessage ?? ''}
         >
             <span data-testid="exchange-rate">{exchangeRate}</span>
             <span data-testid="selected-category-id">{selectedCategoryId ?? 'none'}</span>
@@ -1740,5 +1743,209 @@ describe('FundsExpenditureSection onSelectionChange callback', () => {
         await waitFor(() => {
             expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
         });
+    });
+});
+
+describe('FundsExpenditureSection category limit', () => {
+    const SUMMARY_SLOT = 3;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        // Records: 3 income + 3 regular expense + 1 reserved 'Програмні' expense.
+        // Summary reports zero categories so the limit can only come from the records.
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            {
+                ...MOCK_FUNDS_EXPENDITURES_SUMMARY,
+                incomeCategories: 0,
+                expenseCategories: 0,
+            },
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    const getToolbar = () => screen.getByTestId('funds-toolbar');
+
+    const addRecord = (type: 'income' | 'expense') => {
+        fireEvent.click(screen.getByTestId(type === 'income' ? 'open-add-income' : 'open-add-expense'));
+        fireEvent.click(screen.getByTestId('add-record-submit'));
+    };
+
+    it('does not count the reserved program category toward the expense limit', () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
+        expect(getToolbar()).toHaveAttribute('data-category-limit-message', '');
+    });
+
+    it('disables add income after the 4th unpublished income record is added', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('income');
+
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+        });
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
+        expect(getToolbar()).toHaveAttribute(
+            'data-category-limit-message',
+            FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME,
+        );
+    });
+
+    it('disables add expense after the 4th unpublished non-program expense record is added', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('expense');
+
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+        });
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
+        expect(getToolbar()).toHaveAttribute(
+            'data-category-limit-message',
+            FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE,
+        );
+    });
+
+    it('shows the combined message when both limits are reached', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('income');
+        addRecord('expense');
+
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute(
+                'data-category-limit-message',
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH,
+            );
+        });
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+    });
+
+    it('re-enables add income when a record is removed after reaching the limit', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('income');
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-record-delete'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
+        });
+    });
+
+    describe('when the limit is reached by already published records', () => {
+        // 4 income + 4 regular expense records + 1 reserved 'Програмні' record
+        const fullRecords: ReportFundsExpendituresRecord[] = [
+            ...MOCK_FUNDS_EXPENDITURES_RECORDS,
+            { id: 8, categoryId: 4, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+            { id: 9, categoryId: 9, type: 'expense', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+        ];
+        const fullCategories: ReportFundsExpendituresCategory[] = [
+            ...MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            { id: 9, name: 'Оренда', type: 'expense', localizations: [] },
+        ];
+
+        beforeEach(() => {
+            setupMockDataFetch(MOCK_FUNDS_EXPENDITURES_SETTINGS, fullCategories, fullRecords, {
+                ...MOCK_FUNDS_EXPENDITURES_SUMMARY,
+                incomeCategories: 4,
+                expenseCategories: 4,
+            });
+        });
+
+        it('starts with both add buttons disabled', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+            expect(getToolbar()).toHaveAttribute(
+                'data-category-limit-message',
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH,
+            );
+        });
+
+        it('re-enables add income right after deleting a published income record', async () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('filter-income'));
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
+            });
+            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+            expect(getToolbar()).toHaveAttribute(
+                'data-category-limit-message',
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE,
+            );
+        });
+
+        it('re-enables add expense right after deleting a published non-program expense record', async () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('filter-expense'));
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
+            });
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+            expect(getToolbar()).toHaveAttribute(
+                'data-category-limit-message',
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME,
+            );
+        });
+
+        it('re-enables add income right after bulk-deleting a published income record', async () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('select-row-1'));
+            fireEvent.click(screen.getByTestId('delete-selected'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
+            });
+            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+        });
+    });
+
+    it('refetches the summary after publishing record changes', async () => {
+        let saveFn: (() => Promise<boolean>) | undefined;
+        mockUpdateSettings.mockResolvedValueOnce({ id: 1, disclaimerTitle: 'Updated', exchangeRate: '42.18' });
+        mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+
+        render(
+            <FundsExpenditureSection
+                isEditing
+                registerSaveCallback={(fn) => {
+                    saveFn = fn;
+                }}
+            />,
+        );
+
+        addRecord('income');
+        await waitFor(() => {
+            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
+        });
+
+        await saveFn!();
+
+        const summaryRefetchCalls = mockUseDataFetch.mock.results
+            .filter((_, index) => index % 5 === SUMMARY_SLOT)
+            .flatMap((result) => (result.value.refetch as jest.Mock).mock.calls);
+        expect(summaryRefetchCalls).toContainEqual([true]);
     });
 });

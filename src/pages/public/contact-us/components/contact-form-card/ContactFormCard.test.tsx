@@ -154,7 +154,7 @@ describe('ContactFormCard', () => {
     });
 
     describe('Email field', () => {
-        const submitForm = () => fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+        const validateEmail = () => fireEvent.blur(screen.getByPlaceholderText('E-mail'));
 
         it.each([
             ['missing @', 'userexample.com'],
@@ -164,7 +164,7 @@ describe('ContactFormCard', () => {
         ])('shows error for invalid email: %s', async (_, invalidEmail) => {
             renderForm();
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: invalidEmail } });
-            submitForm();
+            validateEmail();
 
             expect(await screen.findByText('contactForm.emailInvalid')).toBeInTheDocument();
         });
@@ -172,7 +172,7 @@ describe('ContactFormCard', () => {
         it('does not show error for valid email', async () => {
             renderForm();
             fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'user@mail.com' } });
-            submitForm();
+            validateEmail();
 
             expect(screen.queryByText('contactForm.emailInvalid')).not.toBeInTheDocument();
         });
@@ -325,11 +325,44 @@ describe('ContactFormCard', () => {
             expect(submitButton).toBeDisabled();
         });
 
-        it('enables submit button if turnstileToken is present', () => {
+        it('keeps submit disabled when fields are valid but CAPTCHA has no token', () => {
+            (useTurnstile as jest.Mock).mockReturnValue({
+                token: null,
+                containerRef: { current: null },
+                reset: jest.fn(),
+            });
+
+            renderForm();
+            fireEvent.change(screen.getByPlaceholderText("Ваше ім'я"), { target: { value: 'Іван' } });
+            fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'ivan@example.com' } });
+            fireEvent.change(screen.getByPlaceholderText('Тема звернення'), { target: { value: 'Важливе питання' } });
+            fireEvent.change(screen.getByPlaceholderText('Напишіть ваше повідомлення'), {
+                target: { value: 'Це тестове повідомлення достатньої довжини.' },
+            });
+
+            expect(screen.getByRole('button', { name: 'Надіслати' })).toBeDisabled();
+        });
+        it('keeps submit disabled with CAPTCHA passed until every required field is valid', async () => {
             renderForm();
             const submitButton = screen.getByRole('button', { name: 'Надіслати' });
 
-            expect(submitButton).not.toBeDisabled();
+            expect(submitButton).toBeDisabled();
+
+            fireEvent.change(screen.getByPlaceholderText("Ваше ім'я"), { target: { value: 'Іван' } });
+            expect(submitButton).toBeDisabled();
+
+            fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'invalid-email' } });
+            fireEvent.change(screen.getByPlaceholderText('Тема звернення'), { target: { value: 'Важливе питання' } });
+            fireEvent.change(screen.getByPlaceholderText('Напишіть ваше повідомлення'), {
+                target: { value: 'Це тестове повідомлення достатньої довжини.' },
+            });
+            expect(submitButton).toBeDisabled();
+
+            fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'ivan@example.com' } });
+            await waitFor(() => expect(submitButton).toBeEnabled());
+
+            fireEvent.change(screen.getByPlaceholderText('Тема звернення'), { target: { value: 'abc' } });
+            expect(submitButton).toBeDisabled();
         });
     });
 

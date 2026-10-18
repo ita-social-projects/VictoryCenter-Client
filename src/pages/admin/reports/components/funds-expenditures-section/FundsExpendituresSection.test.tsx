@@ -1766,50 +1766,45 @@ describe('FundsExpenditureSection category limit', () => {
         mockGetByEntityId.mockResolvedValue([]);
     });
 
+    const { LIMIT_INCOME, LIMIT_EXPENSE, LIMIT_BOTH } = FUNDS_EXPENDITURES_TEXT.MESSAGE;
+
     const getToolbar = () => screen.getByTestId('funds-toolbar');
+
+    const expectLimitState = (incomeDisabled: boolean, expenseDisabled: boolean, message = '') => {
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', String(incomeDisabled));
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', String(expenseDisabled));
+        expect(getToolbar()).toHaveAttribute('data-category-limit-message', message);
+    };
 
     const addRecord = (type: 'income' | 'expense') => {
         fireEvent.click(screen.getByTestId(type === 'income' ? 'open-add-income' : 'open-add-expense'));
         fireEvent.click(screen.getByTestId('add-record-submit'));
     };
 
+    const deleteRecordVia = (testIds: string[]) => {
+        testIds.forEach((testId) => fireEvent.click(screen.getByTestId(testId)));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+    };
+
     it('does not count the reserved program category toward the expense limit', () => {
         render(<FundsExpenditureSection isEditing />);
 
-        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
-        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
-        expect(getToolbar()).toHaveAttribute('data-category-limit-message', '');
+        expectLimitState(false, false);
     });
 
-    it('disables add income after the 4th unpublished income record is added', async () => {
-        render(<FundsExpenditureSection isEditing />);
+    it.each([
+        { type: 'income' as const, incomeDisabled: true, expenseDisabled: false, message: LIMIT_INCOME },
+        { type: 'expense' as const, incomeDisabled: false, expenseDisabled: true, message: LIMIT_EXPENSE },
+    ])(
+        'disables add $type after the 4th unpublished $type record is added',
+        async ({ type, incomeDisabled, expenseDisabled, message }) => {
+            render(<FundsExpenditureSection isEditing />);
 
-        addRecord('income');
+            addRecord(type);
 
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
-        });
-        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
-        expect(getToolbar()).toHaveAttribute(
-            'data-category-limit-message',
-            FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME,
-        );
-    });
-
-    it('disables add expense after the 4th unpublished non-program expense record is added', async () => {
-        render(<FundsExpenditureSection isEditing />);
-
-        addRecord('expense');
-
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
-        });
-        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
-        expect(getToolbar()).toHaveAttribute(
-            'data-category-limit-message',
-            FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE,
-        );
-    });
+            await waitFor(() => expectLimitState(incomeDisabled, expenseDisabled, message));
+        },
+    );
 
     it('shows the combined message when both limits are reached', async () => {
         render(<FundsExpenditureSection isEditing />);
@@ -1817,30 +1812,18 @@ describe('FundsExpenditureSection category limit', () => {
         addRecord('income');
         addRecord('expense');
 
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute(
-                'data-category-limit-message',
-                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH,
-            );
-        });
-        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
-        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
+        await waitFor(() => expectLimitState(true, true, LIMIT_BOTH));
     });
 
     it('re-enables add income when a record is removed after reaching the limit', async () => {
         render(<FundsExpenditureSection isEditing />);
 
         addRecord('income');
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
-        });
+        await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
 
-        fireEvent.click(screen.getByTestId('trigger-record-delete'));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+        deleteRecordVia(['trigger-record-delete']);
 
-        await waitFor(() => {
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
-        });
+        await waitFor(() => expectLimitState(false, false));
     });
 
     describe('when the limit is reached by already published records', () => {
@@ -1866,60 +1849,41 @@ describe('FundsExpenditureSection category limit', () => {
         it('starts with both add buttons disabled', () => {
             render(<FundsExpenditureSection isEditing />);
 
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
-            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
-            expect(getToolbar()).toHaveAttribute(
-                'data-category-limit-message',
-                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_BOTH,
-            );
+            expectLimitState(true, true, LIMIT_BOTH);
         });
 
-        it('re-enables add income right after deleting a published income record', async () => {
-            render(<FundsExpenditureSection isEditing />);
+        it.each([
+            {
+                action: 'deleting a published income record',
+                testIds: ['filter-income', 'trigger-record-delete'],
+                incomeDisabled: false,
+                expenseDisabled: true,
+                message: LIMIT_EXPENSE,
+            },
+            {
+                action: 'deleting a published non-program expense record',
+                testIds: ['filter-expense', 'trigger-record-delete'],
+                incomeDisabled: true,
+                expenseDisabled: false,
+                message: LIMIT_INCOME,
+            },
+            {
+                action: 'bulk-deleting a published income record',
+                testIds: ['select-row-1', 'delete-selected'],
+                incomeDisabled: false,
+                expenseDisabled: true,
+                message: LIMIT_EXPENSE,
+            },
+        ])(
+            're-enables the matching add button right after $action',
+            async ({ testIds, incomeDisabled, expenseDisabled, message }) => {
+                render(<FundsExpenditureSection isEditing />);
 
-            fireEvent.click(screen.getByTestId('filter-income'));
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+                deleteRecordVia(testIds);
 
-            await waitFor(() => {
-                expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
-            });
-            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
-            expect(getToolbar()).toHaveAttribute(
-                'data-category-limit-message',
-                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_EXPENSE,
-            );
-        });
-
-        it('re-enables add expense right after deleting a published non-program expense record', async () => {
-            render(<FundsExpenditureSection isEditing />);
-
-            fireEvent.click(screen.getByTestId('filter-expense'));
-            fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'false');
-            });
-            expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'true');
-            expect(getToolbar()).toHaveAttribute(
-                'data-category-limit-message',
-                FUNDS_EXPENDITURES_TEXT.MESSAGE.LIMIT_INCOME,
-            );
-        });
-
-        it('re-enables add income right after bulk-deleting a published income record', async () => {
-            render(<FundsExpenditureSection isEditing />);
-
-            fireEvent.click(screen.getByTestId('select-row-1'));
-            fireEvent.click(screen.getByTestId('delete-selected'));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-
-            await waitFor(() => {
-                expect(getToolbar()).toHaveAttribute('data-add-income-disabled', 'false');
-            });
-            expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', 'true');
-        });
+                await waitFor(() => expectLimitState(incomeDisabled, expenseDisabled, message));
+            },
+        );
     });
 
     it('refetches the summary after publishing record changes', async () => {

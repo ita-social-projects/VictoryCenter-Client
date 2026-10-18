@@ -60,7 +60,7 @@ export const DescriptionSection = ({
     const handleBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 

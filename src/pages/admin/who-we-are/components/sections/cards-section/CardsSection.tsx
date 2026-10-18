@@ -90,9 +90,10 @@ export const CardsSection = ({
 
         setErrors(updatedErrors);
 
-        const hasErrors = Object.values(updatedErrors).some(
-            (error) => error.description !== null || error.image !== null,
-        );
+        const hasErrors = cardContents.some((card) => {
+            const error = updatedErrors[card.id];
+            return error?.description != null || error?.image != null;
+        });
 
         if (hasErrors || !isPublishButtonActive || !isBaseLanguage) return;
 
@@ -103,7 +104,7 @@ export const CardsSection = ({
         cardContents.some((card) =>
             Boolean(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(card.description ?? ''))),
         ) ||
-        Object.values(errors).some((error) => error.image !== null) ||
+        cardContents.some((card) => errors[card.id]?.image != null) ||
         !isPublishButtonActive ||
         !isBaseLanguage;
 

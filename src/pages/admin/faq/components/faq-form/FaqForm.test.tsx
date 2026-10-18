@@ -1,5 +1,7 @@
+import { createRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { FaqForm } from './FaqForm';
+import { FaqForm, FaqFormRef } from './FaqForm';
+import { FAQ_VALIDATION } from '@/const/admin/faq';
 
 jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
     MultiSelectInputGroup: (props: any) => {
@@ -99,5 +101,77 @@ describe('FaqForm', () => {
         expect(screen.getByTestId('question-error')).toBeInTheDocument();
         expect(screen.getByTestId('answer-error')).toBeInTheDocument();
         expect(screen.getByTestId('pages-error')).toBeInTheDocument();
+    });
+
+    it('allows saving a draft without an answer', () => {
+        const ref = createRef<FaqFormRef>();
+
+        render(
+            <FaqForm
+                ref={ref}
+                onSubmit={jest.fn()}
+                initialData={{
+                    questionText: 'Valid question',
+                    answerText: '',
+                    pages: mockPages,
+                }}
+            />,
+        );
+
+        expect(ref.current?.isValid(false)).toBe(true);
+    });
+
+    it('requires an answer when publishing', () => {
+        const ref = createRef<FaqFormRef>();
+
+        render(
+            <FaqForm
+                ref={ref}
+                onSubmit={jest.fn()}
+                initialData={{
+                    questionText: 'Valid question',
+                    answerText: '',
+                    pages: mockPages,
+                }}
+            />,
+        );
+
+        expect(ref.current?.isValid(true)).toBe(false);
+    });
+
+    it('allows publishing when all fields are valid', () => {
+        const ref = createRef<FaqFormRef>();
+
+        render(
+            <FaqForm
+                ref={ref}
+                onSubmit={jest.fn()}
+                initialData={{
+                    questionText: 'Valid question',
+                    answerText: 'A'.repeat(FAQ_VALIDATION.answer.min),
+                    pages: mockPages,
+                }}
+            />,
+        );
+
+        expect(ref.current?.isValid(true)).toBe(true);
+    });
+
+    it('requires question and pages when saving a draft', () => {
+        const ref = createRef<FaqFormRef>();
+
+        render(
+            <FaqForm
+                ref={ref}
+                onSubmit={jest.fn()}
+                initialData={{
+                    questionText: '',
+                    answerText: '',
+                    pages: [],
+                }}
+            />,
+        );
+
+        expect(ref.current?.isValid(false)).toBe(false);
     });
 });

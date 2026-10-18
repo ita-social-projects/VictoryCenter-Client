@@ -3,6 +3,18 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 export const EVENTS_TEXT = {
+    QUESTION: {
+        SAVE_NEW_MATERIAL: 'Зберегти новий матеріал?',
+        PUBLISH_NEW_MATERIAL: 'Опублікувати новий матеріал?',
+        PUBLISH_MATERIAL: 'Опублікувати матеріал?',
+        DELETE_MATERIAL: 'Видалити матеріал?',
+    },
+    MESSAGE: {
+        DONT_FORGET_TO_ORDER: 'Не забудьте налаштувати порядок відображення матеріалів на сайті',
+        FAIL_TO_CREATE_EVENT: 'Виникла помилка під час додавання матеріалу',
+        FAIL_TO_UPDATE_EVENT: 'Виникла помилка під час оновлення матеріалу',
+        FAIL_TO_DELETE_EVENT: 'Виникла помилка під час видалення матеріалу',
+    },
     BUTTON: {
         ADD_EVENT: 'Додати новину, подію',
         ADD_MATERIAL: 'Додати матеріал',
@@ -28,6 +40,8 @@ export const EVENTS_TEXT = {
         ARIA_LABEL: {
             EDIT_SECTION: 'Редагувати секцію',
             VIEW_SECTION: 'Переглянути секцію',
+            HIDE_SECTION: 'Сховати секцію',
+            SHOW_SECTION: 'Показати секцію',
         },
         CHARACTER_LIMIT: {
             PAGE_DESCRIPTION: 1000,
@@ -36,6 +50,7 @@ export const EVENTS_TEXT = {
     },
     FORM: {
         MODAL_TITLE: 'Додати матеріал',
+        EDIT_MODAL_TITLE: 'Редагувати матеріал',
         LINKS_SECTION_TITLE: 'Додати посилання на матеріал',
         LABEL: {
             TITLE: 'Заголовок',
@@ -91,9 +106,13 @@ export const EVENT_CATEGORY_TEXT = {
         },
         NAME_PLACEHOLDER: 'Введіть назву категорії',
         CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+        MESSAGE: {
+            FAIL_TO_TRANSLATE: 'Не вдалось перекласти категорію',
+        },
     },
     TRANSLATION_MODAL: {
         TITLE: 'Переклад категорії',
+        EDIT_TITLE: 'Редагувати категорію',
         LANGUAGE_EN: 'Англійська',
         SAVE_BUTTON: 'Зберегти переклад',
     },
@@ -168,6 +187,7 @@ export const EVENT_ITEMS_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати матеріал',
         DELETE: 'Видалити матеріал',
+        TRANSLATE: 'Перекласти',
     },
     NO_RECORDS: 'Ще немає матеріалу',
 };

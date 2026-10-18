@@ -36,10 +36,10 @@ export interface FaqFormProps {
     onValidationChange?: (isValid: boolean) => void;
 }
 
-const validateForm = (formState: FaqFormValues): FaqFormErrors => {
+const validateForm = (formState: FaqFormValues, isPublishing: boolean): FaqFormErrors => {
     return {
         questionText: FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.questionText),
-        answerText: FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answerText),
+        answerText: isPublishing ? FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answerText) : undefined,
         pages: FAQ_VALIDATION_FUNCTIONS.validatePages(formState.pages),
     };
 };

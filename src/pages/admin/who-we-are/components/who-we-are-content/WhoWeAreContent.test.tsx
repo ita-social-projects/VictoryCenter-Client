@@ -330,7 +330,7 @@ describe('WhoWeAreContent Component', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+            expect(mockAddToast).toHaveBeenCalledWith(WHO_WE_ARE_TEXT.PUBLISH_SUCCESS, ToastType.Info);
         });
 
         await waitFor(() => {
@@ -340,6 +340,26 @@ describe('WhoWeAreContent Component', () => {
         await waitFor(() => {
             expect(publishButton).toBeDisabled();
         });
+    });
+
+    it('keeps publish disabled when the editor only rewrites nbsp in the published description', async () => {
+        const sectionWithNbsp: WhoWeAreSection = {
+            ...mockSection1,
+            contents: [{ ...mockSection1.contents[0], description: '<p>&nbsp;Учасники/ці,&nbsp;які вірять</p>' }],
+        };
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(sectionWithNbsp);
+
+        render(<WhoWeAreContent />);
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+        const input = screen.getByTestId('input-1');
+        const publishButton = screen.getByRole('button', { name: 'Publish' });
+
+        fireEvent.change(input, { target: { value: '<p>Учасники/ці, які вірять!</p>' } });
+        expect(publishButton).toBeEnabled();
+
+        fireEvent.change(input, { target: { value: '<p>Учасники/ці, які вірять</p>' } });
+        expect(publishButton).toBeDisabled();
     });
 
     it('should display the loader while categories are loading', () => {

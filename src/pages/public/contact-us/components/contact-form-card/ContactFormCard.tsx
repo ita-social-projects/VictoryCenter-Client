@@ -14,6 +14,12 @@ import { TFunction } from 'i18next';
 
 const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
+const collapseSpaces = (v: string): string => v.replace(/^\s+/, '').replace(/[ \t]{2,}/g, ' ');
+
+const normalizeSpaces = (v: string): string => v.trim().replace(/[ \t]{2,}/g, ' ');
+
+const stripSpaces = (v: string): string => v.replace(/\s+/g, '');
+
 interface ContactFormCardProps {
     isPopup?: boolean;
     title: string;
@@ -22,6 +28,7 @@ interface ContactFormCardProps {
     subjectPlaceholder: string;
     messagePlaceholder: string;
     submitLabel: string;
+    onSubmitSuccess?: () => void;
 }
 
 const getCharacterLimitHint = (
@@ -49,6 +56,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     subjectPlaceholder,
     messagePlaceholder,
     submitLabel,
+    onSubmitSuccess,
 }) => {
     const { t, i18n } = useTranslation('contactUsPage');
 
@@ -61,6 +69,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         reset,
         clearErrors,
         trigger,
+        setValue,
         formState: { errors },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
@@ -84,6 +93,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         containerRef: turnstileRef,
         reset: resetTurnstile,
     } = useTurnstile(CF_TURNSTILE_SITE_KEY);
+
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     const [toast, setToast] = useState<Toast | null>(null);
 
@@ -111,22 +129,50 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         t,
     );
 
+    const sanitizeOnChange = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        name: keyof ContactFormData,
+        cleaner: (v: string) => string = collapseSpaces,
+    ) => {
+        const el = event.target;
+        const originalValue = el.value;
+        const cleaned = cleaner(originalValue);
+        if (cleaned === originalValue) return;
+
+        const caret = el.selectionStart ?? originalValue.length;
+        const newCaret = cleaner(originalValue.slice(0, caret)).length;
+
+        setValue(name, cleaned, { shouldDirty: true });
+
+        if (el.type !== 'email') {
+            requestAnimationFrame(() => {
+                if (document.activeElement === el && el.value === cleaned) {
+                    el.setSelectionRange(newCaret, newCaret);
+                }
+            });
+        }
+    };
+
     const onSubmit = async (data: ContactFormData) => {
         if (!turnstileToken) return;
 
         try {
             await submitContactUsForm({
                 captchaResponseToken: turnstileToken,
-                fromName: data.name,
-                fromEmail: data.email,
-                subject: data.subject,
-                message: data.message,
+                fromName: normalizeSpaces(data.name),
+                fromEmail: stripSpaces(data.email),
+                subject: normalizeSpaces(data.subject),
+                message: normalizeSpaces(data.message),
             });
+
+            if (!isMountedRef.current) return;
 
             reset();
             resetTurnstile();
             showToast(t('contactForm.submitSuccess'), ToastType.Success, 5000);
+            onSubmitSuccess?.();
         } catch {
+            if (!isMountedRef.current) return;
             showToast(t('contactForm.submitError'), ToastType.Error, 3000);
         }
     };
@@ -157,8 +203,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                             placeholder={namePlaceholder}
                             className={styles['contact-form-input']}
                             {...register('name', {
-                                onChange: () => {
+                                onChange: (e) => {
+                                    sanitizeOnChange(e, 'name');
                                     if (errors.name) clearErrors('name');
+                                },
+                                onBlur: (e) => {
+                                    setValue('name', normalizeSpaces(e.target.value), {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    });
                                 },
                             })}
                         />
@@ -181,8 +234,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                             placeholder={emailPlaceholder}
                             className={styles['contact-form-input']}
                             {...register('email', {
-                                onChange: () => {
+                                onChange: (e) => {
+                                    sanitizeOnChange(e, 'email', stripSpaces);
                                     if (errors.email) clearErrors('email');
+                                },
+                                onBlur: (e) => {
+                                    setValue('email', stripSpaces(e.target.value), {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    });
                                 },
                             })}
                         />
@@ -206,8 +266,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                             className={styles['contact-form-input']}
                             maxLength={CONTACT_FORM_LIMITS.SUBJECT.MAX}
                             {...register('subject', {
-                                onChange: () => {
+                                onChange: (e) => {
+                                    sanitizeOnChange(e, 'subject');
                                     if (errors.subject) clearErrors('subject');
+                                },
+                                onBlur: (e) => {
+                                    setValue('subject', normalizeSpaces(e.target.value), {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    });
                                 },
                             })}
                         />
@@ -241,8 +308,15 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                             rows={6}
                             maxLength={CONTACT_FORM_LIMITS.MESSAGE.MAX}
                             {...register('message', {
-                                onChange: () => {
+                                onChange: (e) => {
+                                    sanitizeOnChange(e, 'message');
                                     if (errors.message) clearErrors('message');
+                                },
+                                onBlur: (e) => {
+                                    setValue('message', normalizeSpaces(e.target.value), {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                    });
                                 },
                             })}
                         />

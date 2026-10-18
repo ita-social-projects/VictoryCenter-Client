@@ -3,6 +3,7 @@ import { ReactComponent as VictoryCenterLogo } from '@/assets/icons/logo-with-te
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { PLATFORM_LABEL } from '@/const/public/platform-labels';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -11,20 +12,10 @@ import {
 } from '@/services/api/public/company-profile/company-profile-api';
 import './Footer.scss';
 
-const PLATFORM_LABEL: Record<number, string> = {
-    0: 'Instagram',
-    1: 'Facebook',
-    2: 'Telegram',
-    3: 'YouTube',
-    4: 'X',
-    5: 'WhatsApp',
-    6: 'LinkedIn',
-    7: 'Viber',
-};
-
 export const Footer = () => {
     const { t, i18n } = useTranslation('footer');
     const [profile, setProfile] = useState<PublicCompanyProfileDto | null>(null);
+    const [newsletterEmail, setNewsletterEmail] = useState('');
 
     useEffect(() => {
         let mounted = true;
@@ -60,8 +51,33 @@ export const Footer = () => {
         navigator.clipboard.writeText(text);
     };
 
+    const handleNewsletterSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setNewsletterEmail('');
+    };
+
     return (
         <div className="footer-content">
+            <div className="newsletter-block">
+                <div className="logo-container">
+                    <Link to="/">
+                        <VictoryCenterLogo className="logo" />
+                    </Link>
+                </div>
+                <h3 className="newsletter-title">{t('STAY_UP_TO_DATE_WITH_THE_NEWS')}</h3>
+                <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+                    <input
+                        type="email"
+                        placeholder={t('ENTER_YOUR_EMAIL')}
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        required
+                    />
+                    <button type="submit" className="submit-btn" aria-label={t('SIGN_UP')}>
+                        ↗
+                    </button>
+                </form>
+            </div>
             <div className="main-block">
                 <div className="logo-container">
                     <Link to="/">

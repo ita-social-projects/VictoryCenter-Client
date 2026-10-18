@@ -3,7 +3,6 @@ import { FeedbackCategory, FeedbackCategoryItem } from '@/types/admin/feedback';
 export const FEEDBACK_TEXT = {
     BUTTON: {
         ADD_MATERIAL: 'Додати матеріал',
-        ADD_FEEDBACK: 'Додати відгук',
     },
     PLACEHOLDER: {
         SEARCH_HISTORY: 'Введіть історію',
@@ -36,10 +35,9 @@ export const FEEDBACK_TEXT = {
         FAIL_TO_FETCH_ITEMS: 'Не вдалося завантажити матеріали',
         FAIL_TO_REORDER: 'Виникла помилка, не вдалося змінити порядок елемента',
         SUCCESS_DELETE: 'Матеріал успішно видалено',
-        FAIL_TO_CREATE_HISTORY: 'Виникла помилка під час додавання історії',
         SUCCESS_PUBLISH: 'Відгук успішно опубліковано',
         SUCCESS_UPDATE: 'Зміни успішно опубліковано',
-        FAIL_TO_EDIT_HISTORY: 'Виникла помилка під час редагування історії',
+        FAIL_TO_UPDATE: 'Виникла помилка під час збереження змін',
         SUCCESS_TRANSLATE: 'Переклад успішно збережено',
         FAIL_TO_TRANSLATE: 'Виникла помилка під час збереження перекладу',
         FAIL_TO_PUBLISH: 'Виникла помилка під час збереження',
@@ -70,9 +68,11 @@ export const FEEDBACK_TEXT = {
             LINK: 'Посилання на відео відгук',
         },
     },
+    EDIT_VIDEO_REVIEW_MODAL: {
+        TITLE: 'Редагувати відео відгук',
+    },
     ADD_REVIEW_MODAL: {
         TITLE: 'Додати відгук',
-        PUBLISH: 'Опублікувати',
         LABEL: {
             AUTHOR_NAME: "Ім'я",
             TEXT: 'Відгук',

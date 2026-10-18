@@ -6,9 +6,21 @@ const originalImage = globalThis.Image;
 const originalCreateObjectURL = globalThis.URL.createObjectURL;
 const originalRevokeObjectURL = globalThis.URL.revokeObjectURL;
 
-const createTestFile = (size: number, type: string = 'image/jpeg', name: string = 'test.jpg'): File => {
-    const bits = [new Array(size).fill('a').join('')];
-    return new File(bits, name, { type, lastModified: Date.now() });
+const SIGNATURES: Record<string, number[]> = {
+    'image/jpeg': [0xff, 0xd8, 0xff],
+    'image/png': [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+    'image/webp': [0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50],
+};
+
+const createTestFile = (
+    size: number,
+    type: string = 'image/jpeg',
+    name: string = 'test.jpg',
+    contentType: string = type,
+): File => {
+    const signature = SIGNATURES[contentType] ?? [];
+    const padding = new Array(Math.max(size - signature.length, 0)).fill('a').join('');
+    return new File([new Uint8Array(signature), padding], name, { type, lastModified: Date.now() });
 };
 
 describe('ImageValidationSchema', () => {
@@ -109,11 +121,39 @@ describe('ImageValidationSchema', () => {
         );
     });
 
-    it('rejects a file that fails to load as an image', async () => {
+    it('rejects a file with a valid signature that fails to decode with the format error', async () => {
         mockImageDimensions(0, 0, true);
-        const validFile = createTestFile(1000, 'image/jpeg');
+        const corruptedFile = createTestFile(1000, 'image/jpeg');
 
-        await expect(validationSchema.validate(validFile)).rejects.toThrow();
+        await expect(validationSchema.validate(corruptedFile)).rejects.toThrow(IMAGE_VALIDATION.getFormatError());
+    });
+
+    it('rejects a text file renamed to .png with the format error', async () => {
+        mockImageDimensions(0, 0, true);
+        const fakePng = new File(['this is plain text, not an image'], 'fake_text.png', { type: 'image/png' });
+
+        await expect(validationSchema.validate(fakePng)).rejects.toThrow(IMAGE_VALIDATION.getFormatError());
+    });
+
+    it('returns the format error before the size error for an oversized fake image', async () => {
+        mockImageDimensions(1920, 1080);
+        const largeFake = createTestFile(IMAGE_VALIDATION.maxSizeBytes + 1024, 'image/png', 'big.png', 'text/plain');
+
+        await expect(validationSchema.validate(largeFake)).rejects.toThrow(IMAGE_VALIDATION.getFormatError());
+    });
+
+    it.each(['image/png', 'image/webp'])('accepts a valid %s file', async (type) => {
+        mockImageDimensions(1920, 1080);
+        const file = createTestFile(1000, type, 'image');
+
+        await expect(validationSchema.validate(file)).resolves.toEqual(file);
+    });
+
+    it('accepts a real image whose extension does not match its content', async () => {
+        mockImageDimensions(1920, 1080);
+        const jpegNamedPng = createTestFile(1000, 'image/png', 'photo.png', 'image/jpeg');
+
+        await expect(validationSchema.validate(jpegNamedPng)).resolves.toEqual(jpegNamedPng);
     });
 });
 

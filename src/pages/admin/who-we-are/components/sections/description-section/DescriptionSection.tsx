@@ -82,6 +82,7 @@ export const DescriptionSection = ({
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
                     id={descriptionContent.id.toString()}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     value={displayedDescription ?? ''}
@@ -91,6 +92,8 @@ export const DescriptionSection = ({
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
+                    normalizeSpaces
+                    trimOnBlur
                 />
                 {isBaseLanguage && (
                     <Button

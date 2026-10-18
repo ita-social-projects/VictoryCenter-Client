@@ -1,5 +1,6 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/variables/colors' as c;
 
 .container {
     padding: 5% 8%;
@@ -7,13 +8,15 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
+    background-color: c.$white;
 
     .title {
         font-size: t.$h4-size;
+        line-height: t.$h4-height;
         margin-top: 10px;
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
-        letter-spacing: t.$h3-spacing;
+        letter-spacing: t.$ls-tight;
         text-transform: uppercase;
         flex-shrink: 0;
     }
@@ -30,7 +33,7 @@
     .description {
         font-family: t.$font-family-base;
         font-weight: t.$fw-regular;
-        letter-spacing: t.$h3-spacing;
+        letter-spacing: t.$ls-tight;
         text-transform: none;
         white-space: pre-wrap;
         line-height: t.$small-height;

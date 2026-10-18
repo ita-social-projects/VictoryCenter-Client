@@ -31,7 +31,7 @@ interface AddFundsExpendituresRecordModalProps {
         amountUsd: string;
         lastEditedField: FundsExpendituresAmountField;
         type: FundsExpendituresTransactionType;
-    }) => Promise<boolean>;
+    }) => boolean;
 }
 
 export const AddFundsExpendituresRecordModal = ({

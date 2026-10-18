@@ -18,7 +18,9 @@ export interface EventsData {
 
 export interface EventsNewsPageData {
     description: string;
+    isPageDescriptionHidden?: boolean;
     eventsData: EventsData;
+    isEventsBlockTitleHidden?: boolean;
 }
 
 export interface EventsNews {

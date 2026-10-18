@@ -3,86 +3,124 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { StoriesOfVictoryPage } from './StoriesOfVictoryPage';
+import { PublicFeedbackApi } from '@/services/api/public/feedback/feedback-api';
 
-// Mock react-i18next
-jest.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-        i18n: { changeLanguage: jest.fn() },
-    }),
-}));
-
-// Mock LoadableContent to simplify testing
-jest.mock('@/components/common/loadable-content/LoadableContent', () => ({
-    LoadableContent: function MockLoadableContent({ isLoading, error, children }: any) {
-        return (
-            <div data-testid="loadable-content" data-loading={isLoading} data-error={error}>
-                {children}
-            </div>
-        );
+jest.mock('@/services/api/public/feedback/feedback-api', () => ({
+    PublicFeedbackApi: {
+        fetchHistories: jest.fn(),
+        fetchReviews: jest.fn(),
+        fetchVideos: jest.fn(),
     },
 }));
 
+jest.mock('@/components/common/loadable-content/LoadableContent', () => ({
+    LoadableContent: ({ isLoading, error, children }: any) => {
+        if (isLoading) return <div data-testid="loader" />;
+        if (error) return <div data-testid="error-message" />;
+        return <>{children}</>;
+    },
+}));
+
+jest.mock('./components/slogan/SloganSection', () => ({
+    SloganSection: () => <div data-testid="slogan-section" />,
+}));
+
+jest.mock('./components/review-articles/ReviewArticlesSection', () => ({
+    ReviewArticlesSection: ({ content }: any) => (
+        <div data-testid="review-articles-section" data-count={content?.length ?? 0} />
+    ),
+}));
+
+jest.mock('./components/reviews/ReviewsSection', () => ({
+    ReviewsSection: ({ content }: any) => <div data-testid="reviews-section" data-count={content?.length ?? 0} />,
+}));
+
+jest.mock('./components/video-reviews/VideoReviewsSection', () => ({
+    VideoReviewsSection: ({ content }: any) => (
+        <div data-testid="video-reviews-section" data-count={content?.length ?? 0} />
+    ),
+}));
+
+const mockApi = PublicFeedbackApi as jest.Mocked<typeof PublicFeedbackApi>;
+
+const histories = [
+    { id: 1, title: 'T1', story: 'S1', image: 'a.jpg' },
+    { id: 2, title: 'T2', story: 'S2', image: 'b.jpg' },
+];
+const reviews = [{ id: 3, name: 'N', review: 'R' }];
+const videos = [
+    { id: 4, title: 'V1', link: 'l1' },
+    { id: 5, title: 'V2', link: 'l2' },
+    { id: 6, title: 'V3', link: 'l3' },
+];
+
 describe('StoriesOfVictoryPage', () => {
-    it('should render without crashing', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockApi.fetchHistories.mockResolvedValue(histories);
+        mockApi.fetchReviews.mockResolvedValue(reviews);
+        mockApi.fetchVideos.mockResolvedValue(videos);
+    });
+
+    it('shows a single loader while any section is still loading', () => {
+        mockApi.fetchVideos.mockReturnValue(new Promise(() => {}));
+
         render(<StoriesOfVictoryPage />);
-        expect(screen.getByTestId('loadable-content')).toBeInTheDocument();
+
+        expect(screen.getAllByTestId('loader')).toHaveLength(1);
+        expect(screen.queryByTestId('slogan-section')).not.toBeInTheDocument();
     });
 
-    it('should render LoadableContent component', () => {
+    it('renders all four sections with their fetched data', async () => {
         render(<StoriesOfVictoryPage />);
-        const loadableContent = screen.getByTestId('loadable-content');
-        expect(loadableContent).toBeInTheDocument();
+
+        expect(await screen.findByTestId('slogan-section')).toBeInTheDocument();
+        expect(screen.getByTestId('review-articles-section')).toHaveAttribute('data-count', '2');
+        expect(screen.getByTestId('reviews-section')).toHaveAttribute('data-count', '1');
+        expect(screen.getByTestId('video-reviews-section')).toHaveAttribute('data-count', '3');
+        expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
     });
 
-    it('should pass false for isLoading prop to LoadableContent', () => {
+    it('renders the video reviews section before the reviews section', async () => {
         render(<StoriesOfVictoryPage />);
-        const loadableContent = screen.getByTestId('loadable-content');
-        expect(loadableContent).toHaveAttribute('data-loading', 'false');
+
+        const videosSection = await screen.findByTestId('video-reviews-section');
+        const reviewsSection = screen.getByTestId('reviews-section');
+        expect(videosSection.compareDocumentPosition(reviewsSection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
-    it('should pass false for error prop to LoadableContent', () => {
+    it('shows an error in place of only the section whose request failed', async () => {
+        mockApi.fetchVideos.mockRejectedValue(new Error('videos down'));
+
         render(<StoriesOfVictoryPage />);
-        const loadableContent = screen.getByTestId('loadable-content');
-        expect(loadableContent).toHaveAttribute('data-error', 'false');
+
+        expect(await screen.findByTestId('slogan-section')).toBeInTheDocument();
+        expect(screen.getAllByTestId('error-message')).toHaveLength(1);
+        expect(screen.queryByTestId('video-reviews-section')).not.toBeInTheDocument();
+        expect(screen.getByTestId('review-articles-section')).toBeInTheDocument();
+        expect(screen.getByTestId('reviews-section')).toBeInTheDocument();
     });
 
-    it('should render SloganSection component', () => {
-        const { container } = render(<StoriesOfVictoryPage />);
-        // SloganSection renders an h1 with data-testid
-        expect(container.querySelector('[data-testid="slogan-section"]')).toBeInTheDocument();
-    });
+    it('shows a single page-level error when every request fails', async () => {
+        mockApi.fetchHistories.mockRejectedValue(new Error('network'));
+        mockApi.fetchReviews.mockRejectedValue(new Error('network'));
+        mockApi.fetchVideos.mockRejectedValue(new Error('network'));
 
-    it('should render ReviewArticlesSection component', () => {
-        const { container } = render(<StoriesOfVictoryPage />);
-        // ReviewArticlesSection renders a section with className container
-        expect(container.querySelector('section')).toBeInTheDocument();
-    });
-
-    it('should render multiple section elements', () => {
-        const { container } = render(<StoriesOfVictoryPage />);
-        const sections = container.querySelectorAll('section');
-        expect(sections.length).toBeGreaterThan(0);
-    });
-
-    it('should render ReviewsSection component', () => {
-        const { container } = render(<StoriesOfVictoryPage />);
-        const h3Elements = container.querySelectorAll('h3');
-        expect(h3Elements.length).toBeGreaterThan(0);
-    });
-
-    it('should render all section children within LoadableContent', () => {
         render(<StoriesOfVictoryPage />);
-        const loadableContent = screen.getByTestId('loadable-content');
-        // Check that LoadableContent has children (the section components)
-        expect(loadableContent.children.length).toBeGreaterThan(0);
+
+        expect(await screen.findByTestId('error-message')).toBeInTheDocument();
+        expect(screen.getAllByTestId('error-message')).toHaveLength(1);
+        expect(screen.queryByTestId('slogan-section')).not.toBeInTheDocument();
     });
 
-    it('should render component with correct structure', () => {
+    it('passes the cancellation signal from useDataFetch to every request', async () => {
         render(<StoriesOfVictoryPage />);
-        const loadableContent = screen.getByTestId('loadable-content');
-        // Should have 4 main section children
-        const children = Array.from(loadableContent.children);
-        expect(children.length).toBe(3);
+        await screen.findByTestId('slogan-section');
+
+        [mockApi.fetchHistories, mockApi.fetchReviews, mockApi.fetchVideos].forEach((fetchMock) => {
+            expect(fetchMock).toHaveBeenCalledWith(
+                expect.objectContaining({ cancellationSignal: expect.any(AbortSignal) }),
+            );
+        });
     });
 });

@@ -7,10 +7,12 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled }: any) => (
-        <div data-testid="mock-image-input">
+    ImageInput: ({ onChange, label, setError, disabled, className }: any) => (
+        <div data-testid="mock-image-input" data-class-name={className}>
             <label htmlFor="mock-image-input-id">{label}</label>
             <input
                 data-testid="mock-image-input-file"
@@ -20,6 +22,15 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 onChange={(e) => !disabled && onChange(e.target.files?.[0])}
             />
             <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
+            <button
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    if (!disabled) setError(IMAGE_VALIDATION.ImageDimensionsTooSmallError);
+                }}
+            >
+                Set Dimensions Too Small Error
+            </button>
+            <button onClick={() => !disabled && setError(null)}>Clear Error</button>
         </div>
     ),
 }));
@@ -33,17 +44,23 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         onBlur,
         id,
         disabled,
+        normalizeSpaces,
+        trimOnBlur,
+        isRequired,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
+                data-normalize-spaces={normalizeSpaces}
+                data-trim-on-blur={trimOnBlur}
                 onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 id={id}
                 disabled={disabled}
+                data-required={isRequired}
             />
         </div>
     ),
@@ -140,6 +157,12 @@ describe('ImageSection', () => {
         expect(getPublishButton()).toBeDisabled();
     });
 
+    it('should mark the title and description fields as required', () => {
+        renderComponent();
+        expect(screen.getByTestId('mock-rich-input-2')).toHaveAttribute('data-required', 'true');
+        expect(screen.getByTestId('mock-rich-input-3')).toHaveAttribute('data-required', 'true');
+    });
+
     it('should not render if content is undefined or if description content is missing', () => {
         const { container: nullContentContainer } = renderComponent({ content: undefined });
         expect(nullContentContainer).toBeEmptyDOMElement();
@@ -217,6 +240,30 @@ describe('ImageSection', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
 
         expect(await screen.findByText('image size error')).toBeInTheDocument();
+    });
+
+    it('should highlight the image input only for a dimensions-too-small error', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Dimensions Too Small Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).toHaveAttribute(
+            'data-class-name',
+            whoWeAreVariantStyles['container-focused'],
+        );
+        expect(screen.getByTestId('image-error')).toHaveTextContent(IMAGE_VALIDATION.ImageDimensionsTooSmallError);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
+    });
+
+    it('should not highlight the image input for other image errors', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
+
+        expect(screen.getByTestId('mock-image-input')).not.toHaveAttribute('data-class-name');
     });
 
     it('should render correctly without title content', () => {
@@ -385,22 +432,38 @@ describe('ImageSection', () => {
         expect(validateDescriptionMock()).toHaveBeenCalledWith('');
     });
 
-    it('should disable publish button when title validation returns error on change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateTitleMock().mockReturnValueOnce('ERR');
+    it('should not validate title on change', () => {
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'any' } });
+        const validateTitle = validateTitleMock();
 
-        expect(getPublishButton()).toBeDisabled();
+        fireEvent.change(screen.getByTestId('mock-rich-input-2'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateTitle).not.toHaveBeenCalledWith('any');
     });
 
-    it('should disable publish button when description validation returns error on change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateDescriptionMock().mockReturnValueOnce('ERR');
+    it('should normalize spaces and trim on blur in the title and description fields', () => {
+        renderComponent();
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'any' } });
+        ['mock-rich-input-2', 'mock-rich-input-3'].forEach((testId) => {
+            const input = screen.getByTestId(testId);
+            expect(input).toHaveAttribute('data-normalize-spaces', 'true');
+            expect(input).toHaveAttribute('data-trim-on-blur', 'true');
+        });
+    });
 
-        expect(getPublishButton()).toBeDisabled();
+    it('should not validate description on change', () => {
+        renderComponent();
+
+        const validateDescription = validateDescriptionMock();
+
+        fireEvent.change(screen.getByTestId('mock-rich-input-3'), {
+            target: { value: 'any' },
+        });
+
+        expect(validateDescription).not.toHaveBeenCalledWith('any');
     });
 
     it('should disable publish button when title validation returns error on blur', () => {
@@ -419,28 +482,6 @@ describe('ImageSection', () => {
         fireEvent.blur(screen.getByTestId('mock-rich-input-3'));
 
         expect(getPublishButton()).toBeDisabled();
-    });
-
-    it('should enable publish button after title error is cleared on next change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateTitleMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'a' } });
-        expect(getPublishButton()).toBeDisabled();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'b' } });
-        expect(getPublishButton()).toBeEnabled();
-    });
-
-    it('should enable publish button after description error is cleared on next change', () => {
-        renderComponent({ isPublishButtonActive: true });
-        validateDescriptionMock().mockReturnValueOnce('ERR').mockReturnValueOnce(undefined);
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'a' } });
-        expect(getPublishButton()).toBeDisabled();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'b' } });
-        expect(getPublishButton()).toBeEnabled();
     });
 
     it('should prevent edits and hide publish button for non-base language', () => {
@@ -500,5 +541,14 @@ describe('ImageSection', () => {
 
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle).not.toHaveBeenCalled();
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription).not.toHaveBeenCalled();
+    });
+
+    it('should validate title and description before publishing', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(getPublishButton());
+
+        expect(validateTitleMock()).toHaveBeenCalledWith('Initial Title');
+        expect(validateDescriptionMock()).toHaveBeenCalledWith('Initial Description');
     });
 });

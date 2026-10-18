@@ -119,7 +119,8 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
             >
                 <div className={styles['form-group']}>
                     <InputWithCharacterLimitGroup
-                        label="*Заголовок"
+                        label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
+                        isRequired
                         value={formState.title}
                         onChange={handleTitleChange}
                         onBlur={handleTitleBlur}
@@ -127,6 +128,11 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                         name="title"
                         placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         maxLength={HISTORY_TRANSLATION_VALIDATION.title.max}
+                        maxLimitWarning={HISTORY_TRANSLATION_VALIDATION.title.getMaxError()}
+                        rows={1}
+                        autoGrow
+                        maxRows={3}
+                        showCounterBelow
                         disabled={isSubmitting || formDisabled}
                         error={errors.title}
                         className={styles['title-input']}
@@ -134,7 +140,8 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                 </div>
                 <div className={styles['form-group']}>
                     <TextAreaWithCharacterLimitGroup
-                        label="*Опис"
+                        label={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
+                        isRequired
                         id="history-translation-description"
                         name="description"
                         placeholder={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.PLACEHOLDER}
@@ -146,6 +153,7 @@ export const TranslateHistorySectionForm = forwardRef<TranslateHistorySectionFor
                         maxRows={0}
                         disabled={isSubmitting || formDisabled}
                         maxLength={HISTORY_TRANSLATION_VALIDATION.description.max}
+                        maxLimitWarning={HISTORY_TRANSLATION_VALIDATION.description.getMaxError()}
                         error={errors.description}
                     />
                 </div>

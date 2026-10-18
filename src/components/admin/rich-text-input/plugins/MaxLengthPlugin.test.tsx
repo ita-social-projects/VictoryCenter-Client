@@ -70,6 +70,30 @@ describe('MaxLengthPlugin', () => {
         expect(onLengthChange).toHaveBeenCalledWith(12);
     });
 
+    it.each([
+        [false, 7],
+        [true, 5],
+    ])('counts trailing whitespace only when ignoreTrailingWhitespace is %s', (ignoreTrailingWhitespace, expected) => {
+        const onLengthChange = jest.fn();
+
+        render(
+            <MaxLengthPlugin
+                maxLength={100}
+                onLengthChange={onLengthChange}
+                ignoreTrailingWhitespace={ignoreTrailingWhitespace}
+            />,
+        );
+
+        mockGetRoot.mockReturnValue({
+            getTextContent: jest.fn(() => 'Hello  '),
+        });
+
+        const updateListenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
+        updateListenerCallback({ editorState: { read: jest.fn((callback) => callback()) } });
+
+        expect(onLengthChange).toHaveBeenCalledWith(expected);
+    });
+
     it('does not trim text when under maxLength', () => {
         const { trimTextContentFromAnchor } = require('@lexical/selection');
         const { $getSelection, $isRangeSelection } = require('lexical');

@@ -19,6 +19,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
         id,
         error,
         disabled,
+        isRequired,
     }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
@@ -31,6 +32,7 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
                 name={name}
                 id={id}
                 disabled={disabled}
+                data-required={isRequired}
             />
             {error && <span>{error}</span>}
         </div>
@@ -99,6 +101,11 @@ describe('DescriptionSection', () => {
         const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeInTheDocument();
         expect(publishButton).toBeDisabled();
+    });
+
+    it('should mark the description field as required', () => {
+        renderComponent();
+        expect(screen.getByTestId('mock-rich-input-1')).toHaveAttribute('data-required', 'true');
     });
 
     it('should not render anything if content is null', () => {

@@ -94,7 +94,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
             <button data-testid="clear-search" onClick={onSearchClear}>
                 Clear Search
             </button>
-            <button onClick={() => onStatusFilterChange(1)}>Filter Published</button>
+            <button onClick={() => onStatusFilterChange?.(1)}>Filter Published</button>
             <button data-testid="add-item-button" onClick={onAddItem}>
                 {AddItemButtonText}
             </button>

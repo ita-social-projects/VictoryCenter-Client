@@ -15,6 +15,8 @@ import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -48,6 +50,7 @@ export const ImageSection = ({
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const hasImageDimensionsTooSmallError = imageError === IMAGE_VALIDATION.ImageDimensionsTooSmallError;
 
     const displayedTitle = useMemo(() => {
         if (!titleContent) return null;
@@ -78,27 +81,23 @@ export const ImageSection = ({
     };
 
     const handleTitleChange = (value: string) => {
+        setTitleError(null);
+
         if (!titleContent || !isBaseLanguage) return;
         onChange({
             ...titleContent,
             title: value,
         });
-
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
-        setTitleError(error || null);
     };
 
     const handleDescriptionChange = (value: string) => {
+        setDescriptionError(null);
+
         if (!descriptionContent || !isBaseLanguage) return;
         onChange({
             ...descriptionContent,
             description: value,
         });
-
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
-        setDescriptionError(error || null);
     };
 
     const handleTitleBlur = () => {
@@ -115,6 +114,31 @@ export const ImageSection = ({
         setDescriptionError(error || null);
     };
 
+    const handlePublish = () => {
+        const titleError = titleContent
+            ? WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))
+            : null;
+
+        const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(
+            getPlainTextFromHtml(displayedDescription ?? ''),
+        );
+
+        setTitleError(titleError || null);
+        setDescriptionError(descriptionError || null);
+
+        if (titleError || descriptionError || imageError) return;
+
+        onPublish();
+    };
+
+    const isPublishDisabled =
+        !isPublishButtonActive ||
+        !!imageError ||
+        !!titleError ||
+        !!descriptionError ||
+        !!(titleContent && WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))) ||
+        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getPlainTextFromHtml(displayedDescription ?? ''));
+
     return (
         <div className="image-section">
             <div className="image-wrapper">
@@ -126,6 +150,7 @@ export const ImageSection = ({
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     disabled={!isBaseLanguage}
                     {...imageInputProps}
+                    className={hasImageDimensionsTooSmallError ? whoWeAreVariantStyles['container-focused'] : undefined}
                 />
                 {imageError && (
                     <p data-testid="image-error" className="error">
@@ -151,6 +176,7 @@ export const ImageSection = ({
                             <RichTextInputGroup
                                 key={`title-${language.code}`}
                                 label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                                isRequired
                                 value={displayedTitle ?? ''}
                                 onChange={handleTitleChange}
                                 name={COMMON_TEXT_ADMIN.TYPE.TITLE}
@@ -160,6 +186,8 @@ export const ImageSection = ({
                                 error={isBaseLanguage ? (titleError ?? undefined) : undefined}
                                 disabled={!isBaseLanguage}
                                 hideToolbar={!isBaseLanguage}
+                                normalizeSpaces
+                                trimOnBlur
                             />
                         </div>
                     )}
@@ -169,6 +197,7 @@ export const ImageSection = ({
                             <RichTextInputGroup
                                 key={`description-${language.code}`}
                                 label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                                isRequired
                                 onChange={handleDescriptionChange}
                                 value={displayedDescription ?? ''}
                                 maxLength={descriptionLimit}
@@ -178,6 +207,8 @@ export const ImageSection = ({
                                 error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                                 disabled={!isBaseLanguage}
                                 hideToolbar={!isBaseLanguage}
+                                normalizeSpaces
+                                trimOnBlur
                             />
                         </div>
                     )}
@@ -185,9 +216,9 @@ export const ImageSection = ({
                         <Button
                             className="button"
                             buttonStyle="primary"
-                            onClick={onPublish}
+                            onClick={handlePublish}
                             type="submit"
-                            disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
+                            disabled={isPublishDisabled}
                         >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>

@@ -79,6 +79,8 @@ export const API_ROUTES = {
         PUBLIC: 'EventsPage/public',
         DESCRIPTION: 'EventsPage/description',
         EVENTS_BLOCK_TITLE: 'EventsPage/events-block-title',
+        TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY: 'EventsPage/events-block-title/toggle-visibility',
+        TOGGLE_DESCRIPTION_VISIBILITY: 'EventsPage/description/toggle-visibility',
     },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
@@ -93,12 +95,15 @@ export const API_ROUTES = {
     },
     FEEDBACK_HISTORIES: {
         BASE: 'FeedbackHistories',
+        PUBLISHED: 'FeedbackHistories/published',
     },
     FEEDBACK_REVIEWS: {
         BASE: 'FeedbackReviews',
+        PUBLISHED: 'FeedbackReviews/published',
     },
     VIDEO_REVIEWS: {
         BASE: 'VideoReviews',
+        PUBLISHED: 'VideoReviews/published',
     },
     FEEDBACK_HISTORY_LOCALIZATIONS: {
         BASE: 'FeedbackHistoryLocalizations',
@@ -187,5 +192,11 @@ export const API_ROUTES = {
     },
     EVENT_CATEGORIES: {
         BASE: 'EventNewsCategories',
+    },
+    EVENT_CATEGORIES_LOCALIZATIONS: {
+        BASE: 'EventNewsCategoryLocalizations',
+    },
+    EVENT_LOCALIZATIONS: {
+        BASE: 'EventNewsLocalizations',
     },
 };

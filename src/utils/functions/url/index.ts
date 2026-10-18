@@ -1,1 +1,1 @@
-export { isExternalLink } from './url';
+export { isExternalLink, isHttpOrHttpsUrl } from './url';

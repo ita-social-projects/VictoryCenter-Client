@@ -9,6 +9,8 @@ import './CardContent.scss';
 import { LocalizationLanguage } from '@/types/common/language';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
+import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
 export interface CardContentProps {
     content: Content;
@@ -35,6 +37,7 @@ export const CardContent = ({
     language,
 }: CardContentProps) => {
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const hasImageDimensionsTooSmallError = imageError === IMAGE_VALIDATION.ImageDimensionsTooSmallError;
 
     const displayedDescription = useMemo(() => {
         const displayedLocalization = returnDisplayedLocalization(content, language.code);
@@ -67,12 +70,14 @@ export const CardContent = ({
                 setError={setImageError}
                 disabled={!isBaseLanguage}
                 {...imageInputProps}
+                className={hasImageDimensionsTooSmallError ? whoWeAreVariantStyles['container-focused'] : undefined}
             />
             {imageError && <p className="error">{imageError}</p>}
             <div className="card-content-description-wrapper">
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
                     onChange={handleDescriptionChange}
                     value={displayedDescription ?? ''}
                     maxLength={descriptionLimit}
@@ -82,6 +87,8 @@ export const CardContent = ({
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
+                    normalizeSpaces
+                    trimOnBlur
                 />
             </div>
         </div>

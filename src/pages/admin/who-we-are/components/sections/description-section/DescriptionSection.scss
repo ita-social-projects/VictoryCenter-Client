@@ -2,8 +2,7 @@
 
 .description-section {
     display: flex;
-    justify-content: space-between;
-    margin-top: 9.75rem;
+    margin-top: 154px;
     gap: 5rem;
 
     .error {
@@ -33,6 +32,7 @@
     }
 
     &-textarea {
+        position: relative;
         width: 38rem;
         display: flex;
         flex-direction: column;
@@ -53,9 +53,10 @@
         }
 
         &-buttons {
+            position: absolute;
+            top: -24px;
+            right: 14px;
             display: flex;
-            justify-content: flex-end;
-            width: 100%;
 
             .translate-btn {
                 width: 1.5rem;
@@ -65,15 +66,20 @@
         }
     }
 
-    &-show-block {
-        .what-we-do {
-            padding: 0;
-            gap: 6.88rem;
+    & &-show-block {
+        flex-direction: row;
+        flex-shrink: 0;
+        width: 793px;
+        padding: 0;
+        gap: 110px;
 
-            .details-block {
-                padding-top: 0.7rem;
-                width: 25.8125rem;
-            }
+        > h2 {
+            white-space: nowrap;
+        }
+
+        > div {
+            flex-shrink: 0;
+            width: 413px;
         }
     }
 }

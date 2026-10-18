@@ -20,7 +20,7 @@ import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/u
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { WhoWeAreModals } from '../modals/WhoWeAreModals';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
-import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
+import { normalizeHtml, normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 
 interface ErrorState {
     message: string | null;
@@ -30,6 +30,32 @@ interface ErrorState {
 function isExistingImage(image: any): image is Image {
     return image !== null && typeof image === 'object' && 'id' in image && 'url' in image;
 }
+
+// The editors on this page use normalizeSpaces, so compare text the same way.
+const toComparableRichText = (html: string) => normalizeRichTextHtmlForComparison(html, { collapseSpaces: true });
+
+const toComparableContent = (item: Content): Content => ({
+    ...item,
+    description: item.description ? toComparableRichText(item.description) : item.description,
+    title: item.title ? toComparableRichText(item.title) : item.title,
+});
+
+const toComparableSectionString = (section: WhoWeAreSection): string =>
+    JSON.stringify({ ...section, contents: section.contents.map(toComparableContent) });
+
+const normalizeContent = (item: Content): Content => ({
+    ...item,
+    description: item.description ? normalizeHtml(item.description) : item.description,
+    title: item.title ? normalizeHtml(item.title) : item.title,
+});
+
+const normalizeSection = (section: WhoWeAreSection): WhoWeAreSection => ({
+    ...section,
+    contents: section.contents.map(normalizeContent),
+});
+
+const withSyncedImageId = (item: Content): Content =>
+    isExistingImage(item.image) ? { ...item, imageId: item.image.id ?? null } : item;
 
 export const WhoWeAreContent = () => {
     const client = useAdminClient();
@@ -76,17 +102,6 @@ export const WhoWeAreContent = () => {
         autoFetchDependencies: [getSection],
     });
 
-    const normalizeSection = useCallback((section: WhoWeAreSection): WhoWeAreSection => {
-        return {
-            ...section,
-            contents: section.contents.map((item) => ({
-                ...item,
-                description: item.description ? normalizeHtml(item.description) : item.description,
-                title: item.title ? normalizeHtml(item.title) : item.title,
-            })),
-        };
-    }, []);
-
     useEffect(() => {
         if (categories && categories.length > 0 && !selectedCategory) {
             setSelectedCategory(categories[0]);
@@ -99,14 +114,17 @@ export const WhoWeAreContent = () => {
             setSelectedSection(normalizedSection);
             setUpdatedSection(normalizedSection);
         }
-    }, [fetchedSection, normalizeSection]);
+    }, [fetchedSection]);
+
+    const comparableSelectedSection = useMemo(
+        () => (selectedSection ? toComparableSectionString(selectedSection) : null),
+        [selectedSection],
+    );
 
     const isPublishButtonActive = useMemo(() => {
-        if (!selectedSection || !updatedSection) return false;
-        const normalizedSelectedSectionString = JSON.stringify(normalizeSection(selectedSection));
-        const normalizedUpdatedSectionString = JSON.stringify(normalizeSection(updatedSection));
-        return normalizedSelectedSectionString !== normalizedUpdatedSectionString;
-    }, [selectedSection, updatedSection, normalizeSection]);
+        if (!comparableSelectedSection || !updatedSection) return false;
+        return comparableSelectedSection !== toComparableSectionString(updatedSection);
+    }, [comparableSelectedSection, updatedSection]);
 
     const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
         if (type === 'languages') {
@@ -173,19 +191,18 @@ export const WhoWeAreContent = () => {
     const handlePublishChange = useCallback(async () => {
         if (!selectedSection || !updatedSection) return;
 
-        const normalizedUpdatedSection = normalizeSection(updatedSection);
+        const changedContents = updatedSection.contents
+            .map(withSyncedImageId)
+            .filter((updatedItem) => {
+                const originalItem = selectedSection.contents.find((sel) => sel.id === updatedItem.id);
 
-        const changedContents = normalizedUpdatedSection.contents.filter((updatedItem) => {
-            const originalItem = selectedSection.contents.find((sel) => sel.id === updatedItem.id);
-
-            if (!originalItem) return true;
-            else {
-                if (isExistingImage(updatedItem.image)) {
-                    updatedItem.imageId = updatedItem.image?.id ?? null;
-                }
-                return JSON.stringify(updatedItem) !== JSON.stringify(originalItem);
-            }
-        });
+                return (
+                    !originalItem ||
+                    JSON.stringify(toComparableContent(updatedItem)) !==
+                        JSON.stringify(toComparableContent(originalItem))
+                );
+            })
+            .map(normalizeContent);
 
         if (selectedCategory && changedContents.length > 0) {
             try {
@@ -194,14 +211,14 @@ export const WhoWeAreContent = () => {
                 const normalizedResult = normalizeSection(result);
                 setSelectedSection(normalizedResult);
                 setUpdatedSection(normalizedResult);
-                addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+                addToast(WHO_WE_ARE_TEXT.PUBLISH_SUCCESS, ToastType.Info);
 
                 refetchCategories();
             } catch (error) {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories, normalizeSection]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);

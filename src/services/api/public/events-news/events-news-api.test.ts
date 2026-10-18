@@ -1,109 +1,112 @@
-import { EventsNewsApi, EventNewsApi } from './events-news-api';
-import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { mapToEventsNews } from '@/utils/functions/mappers/public/event-news/event-news';
+import { createPublishedEventNewsDto } from '@/utils/mock-data/public/published-event-news';
+import { axiosInstance } from '@/services/api/axios';
+import { EventNewsApi, EventsNewsApi } from './events-news-api';
+
+jest.mock('@/services/api/axios', () => ({
+    axiosInstance: { get: jest.fn() },
+}));
+
+jest.mock('@/utils/functions/mappers/public/event-news/event-news', () => ({
+    mapToEventsNews: jest.fn(),
+}));
+
+const mockedAxiosGet = axiosInstance.get as jest.Mock;
+const mockedMapper = mapToEventsNews as jest.Mock;
+
+const mockResponse = (data: unknown) => mockedAxiosGet.mockResolvedValue({ data });
 
 describe('events-news-api', () => {
     beforeEach(() => {
-        jest.useFakeTimers();
+        jest.clearAllMocks();
+        mockedMapper.mockImplementation((dto: { id: number }) => ({ id: String(dto.id) }));
     });
 
-    afterEach(() => {
-        jest.useRealTimers();
-        jest.restoreAllMocks();
-    });
+    describe('EventsNewsApi.get', () => {
+        it.each([
+            ['default arguments', [], { categoryId: undefined, offset: 0, limit: 5 }],
+            ['a tag id, offset and limit', ['3', 8, 4], { categoryId: '3', offset: 8, limit: 4 }],
+            ['an empty tag id (all materials)', ['', 0, 4], { categoryId: undefined, offset: 0, limit: 4 }],
+            ['an undefined tag id', [undefined, 5, 5], { categoryId: undefined, offset: 5, limit: 5 }],
+        ] as [string, Parameters<typeof EventsNewsApi.get>, object][])(
+            'sends the published endpoint request with %s',
+            async (_description, args, expectedParams) => {
+                mockResponse({ items: [], totalItemsCount: 0 });
 
-    it('returns first page items and totalItemsCount when enough items remain', async () => {
-        const promise = EventsNewsApi.get('', 0, 5);
+                await EventsNewsApi.get(...args);
 
-        jest.advanceTimersByTime(500);
-        await jest.runAllTimers();
+                expect(mockedAxiosGet).toHaveBeenCalledTimes(1);
+                expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS.PUBLISHED, {
+                    params: expectedParams,
+                    signal: undefined,
+                });
+            },
+        );
 
-        await expect(promise).resolves.toEqual({
-            items: eventsNewsMock.slice(0, 5),
-            totalItemsCount: eventsNewsMock.length,
+        it('maps every item through mapToEventsNews and keeps the total count', async () => {
+            const dtos = [createPublishedEventNewsDto({ id: 1 }), createPublishedEventNewsDto({ id: 2 })];
+            mockResponse({ items: dtos, totalItemsCount: 7 });
+
+            const result = await EventsNewsApi.get();
+
+            expect(mockedMapper).toHaveBeenCalledTimes(dtos.length);
+            expect(result).toEqual({ items: [{ id: '1' }, { id: '2' }], totalItemsCount: 7 });
+        });
+
+        it('returns an empty page when the backend has no items', async () => {
+            mockResponse({ items: [], totalItemsCount: 0 });
+
+            await expect(EventsNewsApi.get('999')).resolves.toEqual({ items: [], totalItemsCount: 0 });
+            expect(mockedMapper).not.toHaveBeenCalled();
+        });
+
+        it('rejects when the request fails', async () => {
+            mockedAxiosGet.mockRejectedValue(new Error('Network'));
+
+            await expect(EventsNewsApi.get()).rejects.toThrow('Network');
         });
     });
 
-    it('returns remaining items and totalItemsCount set to 0 when offset+limit >= items.length', async () => {
-        const offset = 10;
-        const limit = 5;
+    describe('EventNewsApi.get', () => {
+        it('requests the published news by slug and maps the response', async () => {
+            mockResponse(createPublishedEventNewsDto({ id: 5, slug: 'my-slug' }));
 
-        const promise = EventsNewsApi.get('', offset, limit);
+            const result = await EventNewsApi.get('my-slug');
 
-        jest.advanceTimersByTime(500);
-        await jest.runAllTimers();
-
-        await expect(promise).resolves.toEqual({
-            items: eventsNewsMock.slice(offset, offset + limit),
-            totalItemsCount: 0,
+            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/my-slug`, {
+                signal: undefined,
+            });
+            expect(result).toEqual({ id: '5', sections: [] });
         });
-    });
 
-    it('filters by tagId and paginates correctly', async () => {
-        const tagId = '2';
-        const allForTag = eventsNewsMock.filter((e) => e.tags.some((t) => t.id === tagId));
-        const offset = 0;
-        const limit = 3;
+        it('passes the cancellation signal to axios', async () => {
+            mockResponse({ items: [], totalItemsCount: 0 });
+            const { signal } = new AbortController();
 
-        const promise = EventsNewsApi.get(tagId, offset, limit);
+            await EventsNewsApi.get(undefined, 0, 5, 'uk', { cancellationSignal: signal });
 
-        jest.advanceTimersByTime(500);
-        await jest.runAllTimers();
-
-        const expectedTotal = offset + limit >= allForTag.length ? 0 : allForTag.length;
-
-        await expect(promise).resolves.toEqual({
-            items: allForTag.slice(offset, offset + limit),
-            totalItemsCount: expectedTotal,
+            expect(mockedAxiosGet).toHaveBeenCalledWith(
+                API_ROUTES.EVENTS.PUBLISHED,
+                expect.objectContaining({ signal }),
+            );
         });
-    });
 
-    it('propagates rejection when implementation is mocked to fail', async () => {
-        jest.spyOn(EventsNewsApi, 'get').mockImplementationOnce(() => Promise.reject(new Error('Network')));
-        await expect(EventsNewsApi.get('', 0, 5)).rejects.toThrow('Network');
-    });
+        it('encodes special characters in the slug', async () => {
+            mockResponse(createPublishedEventNewsDto());
 
-    it('returns empty items and totalItemsCount 0 when tagId has no matches', async () => {
-        const tagId = 'non-existent';
-        const promise = EventsNewsApi.get(tagId, 0, 5);
+            await EventNewsApi.get('a b/c?d');
 
-        jest.advanceTimersByTime(500);
-        await jest.runAllTimers();
-
-        await expect(promise).resolves.toEqual({
-            items: [],
-            totalItemsCount: 0,
+            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/a%20b%2Fc%3Fd`, {
+                signal: undefined,
+            });
         });
-    });
 
-    it('handles limit = 0 by returning empty items and totalItemsCount equal to items.length', async () => {
-        const promise = EventsNewsApi.get('', 0, 0);
+        it('rejects when the news is not found', async () => {
+            mockedAxiosGet.mockRejectedValue(new Error('Request failed with status code 404'));
 
-        jest.advanceTimersByTime(500);
-        await jest.runAllTimers();
-
-        await expect(promise).resolves.toEqual({
-            items: eventsNewsMock.slice(0, 0),
-            totalItemsCount: eventsNewsMock.length,
+            await expect(EventNewsApi.get('unknown')).rejects.toThrow('404');
+            expect(mockedMapper).not.toHaveBeenCalled();
         });
-    });
-
-    it('resolves with the matching mock event when given a slug present in eventsNewsMock', async () => {
-        const targetEvent = eventsNewsMock[0];
-
-        const promise = EventNewsApi.get(targetEvent.slug);
-
-        jest.advanceTimersByTime(200);
-        await jest.runAllTimers();
-
-        await expect(promise).resolves.toEqual(targetEvent);
-    });
-
-    it('rejects with an Error when given a slug not present in eventsNewsMock', async () => {
-        const promise = EventNewsApi.get('non-existent-slug');
-
-        jest.advanceTimersByTime(200);
-        await jest.runAllTimers();
-
-        await expect(promise).rejects.toThrow('Event not found');
     });
 });

@@ -2,7 +2,6 @@ import { EventsNewsPageData, EventsNews } from '@/types/public/events-news';
 import { HippotherapyProgramSectionContentDto, HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import chooseProgrammImg from '@/assets/images/horse-and-girl.webp';
 import girlAndWhiteHorse from '@/assets/images/girl-and-white-horse.webp';
 import oldManHorse from '@/assets/images/old-man-horse.webp';
 import supportChildren from '@/assets/images/support-children.webp';
@@ -89,21 +88,15 @@ const textOnlySections: HippotherapyProgramSectionDto[] = [
 ];
 
 const tags = [
-    { id: '1', name: 'Новини' },
-    { id: '2', name: 'Медіа' },
-    { id: '3', name: 'Програми' },
+    { id: '1', name: 'Новини', localizations: [] },
+    { id: '2', name: 'Медіа', localizations: [] },
+    { id: '3', name: 'Програми', localizations: [] },
 ];
 
 export const eventsNewsPageMock: EventsNewsPageData = {
     description:
         'Цей розділ — про ті моменти, коли те, у що ми віримо, стає реальністю. Тут ти знайдеш все: від маленьких зустрічей до великих відкриттів, від перших кроків дітей у стайні до глибоких переживань ветеранів у сідлі.',
     isPageDescriptionHidden: false,
-    chooseProgram: {
-        title: 'Вір у силу події',
-        description:
-            'Кожна з них — не просто дата в календарі. Це — ще один доказ: відновлення можливе. Слідкуй за анонсами, читай історії, або стань частиною наступної події.',
-        imgURL: chooseProgrammImg,
-    },
     eventsData: {
         title: 'Що відбувалось',
         tags,
@@ -118,7 +111,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'На NV.ua вийшов великий матеріал про нашу роботу з ветеранами й дітьми. Журналісти побували на сесіях і побачили, як відбувається зцілення через довіру, тишу й спільність.',
         date: '16/02/2025',
-        tags: [tags[1]],
+        tag: tags[1],
         resource: 'Канал Дім',
         previewImage: girlAndWhiteHorse,
         backgroundImage: girlAndWhiteHorse,
@@ -131,7 +124,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'NV.ua підготував розгорнену публікацію про наші заняття з ветеранами й дітьми. Кореспонденти відвідали сеанси іпотерапії та стали свідками відновлення через взаєморозуміння, спокій і єдність.',
         date: '16/02/2025',
-        tags: [tags[2]],
+        tag: tags[2],
         resource: 'NV',
         previewImage: supportChildren,
         backgroundImage: supportChildren,
@@ -144,7 +137,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'Журналісти дізналися подробиці про нашу програму з дітьми та вояками. Вони були свідками того, як довіра до коня становить ключовим елементом у процесі зцілення.',
         date: '16/02/2025',
-        tags: [tags[0]],
+        tag: tags[0],
         previewImage: peopleCircle,
         backgroundImage: peopleCircle,
         slug: 'therapeutic-role-of-horses-in-rehabilitation-of-children-and-military',
@@ -156,7 +149,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             "На порталі NV.ua опубліковано масштабний матеріал про наші програми з військовослужбовцями та дітьми. Інтерв'юеровані респонденти розповідали про зцілення через спілкування з конем.",
         date: '16/02/2025',
-        tags: [tags[1]],
+        tag: tags[1],
         resource: 'NV',
         previewImage: oldManHorse,
         backgroundImage: oldManHorse,
@@ -169,7 +162,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'Репортери побували на сесіях іпотерапії та переконалися в унікальності методу. Атмосфера довіри й спокою, які коні створюють навколо себе, стають фундаментом для відновлення.',
         date: '16/02/2025',
-        tags: [tags[1]],
+        tag: tags[1],
         resource: 'NV Live',
         previewImage: team,
         backgroundImage: team,
@@ -182,7 +175,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'Розмова про те, як конярство впливає на психоемоційний стан учасників програми. Настя поділилася своїм досвідом взаємодії з конями на наших заняттях.',
         date: '16/02/2025',
-        tags: [tags[1]],
+        tag: tags[1],
         resource: 'Андрій Шимановський',
         previewImage: hutirka,
         backgroundImage: hutirka,
@@ -195,7 +188,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'Детальна розповідь про структуру та методи наших інноваційних програм. Спеціалісти центру пояснюють, чому іпотерапія виявляється настільки ефективною для всіх вікових груп.',
         date: '15/02/2025',
-        tags: [tags[1]],
+        tag: tags[1],
         resource: 'Канал Дім',
         previewImage: girlAndWhiteHorse,
         backgroundImage: girlAndWhiteHorse,
@@ -208,7 +201,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'Аналіз наукових даних та реальних прикладів того, як взаємодія з конем допомагає подолати психологічні травми. Матеріал охоплює досвід роботи з різними віковими категоріями учасників.',
         date: '15/02/2025',
-        tags: [tags[2]],
+        tag: tags[2],
         resource: 'NV',
         previewImage: supportChildren,
         backgroundImage: supportChildren,
@@ -221,7 +214,7 @@ export const eventsNewsMock: EventsNews[] = [
         description:
             'NV.ua опублікував великий репортаж про нашу роботу з дітьми та ветеранами. Журналісти побували на заходах і відчули, як відбувається відновлення через довіру, тишу і спільне переживання.',
         date: '15/02/2025',
-        tags: [tags[0]],
+        tag: tags[0],
         previewImage: peopleCircle,
         backgroundImage: peopleCircle,
         slug: 'how-horses-support-children-and-veterans',

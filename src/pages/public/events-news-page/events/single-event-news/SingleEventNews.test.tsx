@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { SingleEventNews } from './SingleEventNews';
 import { EventsNews } from '@/types/public/events-news';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -14,6 +15,13 @@ jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
 }));
 
+// Змінна має починатися з "mock", інакше Jest не дозволить використати її у фабриці
+let mockCurrentLanguage: string = DEFAULT_LOCALE;
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
+}));
+
 const mockEventData: EventsNews = {
     id: '1',
     name: 'Test Event',
@@ -21,7 +29,7 @@ const mockEventData: EventsNews = {
     description: 'This is a test event description',
     previewImage: 'https://example.com/image.jpg',
     backgroundImage: 'https://example.com/image.jpg',
-    tags: [{ id: '1', name: 'Media' }],
+    tag: { id: '1', name: 'Media' },
     resource: 'Test Source',
     slug: 'test-event',
     sections: [],
@@ -30,18 +38,25 @@ const mockEventData: EventsNews = {
 describe('SingleEventNews', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockCurrentLanguage = DEFAULT_LOCALE;
     });
 
     it('should render event image, title, date, and description', () => {
         render(<SingleEventNews {...mockEventData} />);
-        const image = screen.getByRole('img', { name: /event/i });
+        const image = screen.getByRole('img', { name: mockEventData.name });
 
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src', mockEventData.previewImage);
-        expect(image).toHaveAttribute('alt', 'Event');
+        expect(image).toHaveAttribute('alt', mockEventData.name);
         expect(screen.getByText(mockEventData.name)).toBeInTheDocument();
         expect(screen.getByText(new RegExp(mockEventData.date))).toBeInTheDocument();
         expect(screen.getByText(mockEventData.description)).toBeInTheDocument();
+    });
+
+    it('should use the fallback alt text when the event has no name', () => {
+        render(<SingleEventNews {...mockEventData} name="" />);
+
+        expect(screen.getByRole('img', { name: 'Event' })).toHaveAttribute('alt', 'Event');
     });
 
     it('should display resource and date with separator', () => {
@@ -49,12 +64,13 @@ describe('SingleEventNews', () => {
         expect(screen.getByText(`${mockEventData.resource} | ${mockEventData.date}`)).toBeInTheDocument();
     });
 
-    it('should render event tags', () => {
+    it('should render event tag', () => {
         render(<SingleEventNews {...mockEventData} />);
         expect(screen.getByText('Media')).toBeInTheDocument();
     });
 
-    it('should render a link button to the events and news page', () => {
+    it.each(LOCALES)('should render a link button to the events and news page for "%s"', (language) => {
+        mockCurrentLanguage = language;
         render(<SingleEventNews {...mockEventData} />);
         const button = screen.getByRole('button', { name: /LINK_TO_ARTICLE/i });
 
@@ -73,29 +89,16 @@ describe('SingleEventNews', () => {
         expect(screen.queryByText(/\|/)).not.toBeInTheDocument();
     });
 
-    it('should render correctly with empty tags array', () => {
+    it('should render correctly with empty tag', () => {
         const eventWithoutTags = {
             ...mockEventData,
-            tags: [],
+            tag: undefined,
         };
-        render(<SingleEventNews {...eventWithoutTags} />);
+        const { container } = render(<SingleEventNews {...eventWithoutTags} />);
         expect(screen.getByText(mockEventData.name)).toBeInTheDocument();
         expect(screen.getByText(mockEventData.description)).toBeInTheDocument();
-    });
-
-    it('should handle multiple tags correctly', () => {
-        const eventWithMultipleTags = {
-            ...mockEventData,
-            tags: [
-                { id: '1', name: 'Media' },
-                { id: '2', name: 'News' },
-                { id: '3', name: 'Event' },
-            ],
-        };
-        render(<SingleEventNews {...eventWithMultipleTags} />);
-        expect(screen.getByText('Media')).toBeInTheDocument();
-        expect(screen.getByText('News')).toBeInTheDocument();
-        expect(screen.getByText('Event')).toBeInTheDocument();
+        expect(screen.queryByText('Media')).not.toBeInTheDocument();
+        expect(container.querySelectorAll('[class*="event-tag"]')).toHaveLength(0);
     });
 
     it('should use default values when optional props are not provided', () => {
@@ -106,7 +109,7 @@ describe('SingleEventNews', () => {
             previewImage: 'https://example.com/minimal.jpg',
             backgroundImage: 'https://example.com/minimal.jpg',
             description: 'Minimal description',
-            tags: [],
+            tag: { id: '1', name: 'Media' },
             slug: 'minimal-event',
             sections: [],
         };
@@ -142,7 +145,8 @@ describe('SingleEventNews', () => {
     it('should fall back to default values when props are undefined', () => {
         const { container } = render(<SingleEventNews {...({} as EventsNews)} />);
 
-        const image = screen.getByRole('img', { name: /event/i });
+        const image = screen.getByRole('img', { name: 'Event' });
+        expect(image).toHaveAttribute('alt', 'Event');
         expect(image.getAttribute('src')).toBeFalsy();
 
         const heading = screen.getByRole('heading', { level: 4 });

@@ -219,4 +219,56 @@ describe('CategoryCombobox', () => {
         expect(input).toHaveAttribute('id', 'add-program-expense-category');
         expect(label).toHaveAttribute('for', 'add-program-expense-category');
     });
+
+    it('shows all options when opened with an already selected option matching an existing program', () => {
+        renderCombobox({ inputValue: 'Program A' });
+        const input = screen.getByPlaceholderText('Оберіть програму');
+
+        fireEvent.focus(input);
+
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+        expect(screen.getByText('Program B')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Program A' })).toHaveClass('select-options-selected');
+    });
+
+    it('filters options after user types even if the initial value was an exact match', () => {
+        const onInputValueChange = jest.fn();
+        const { rerender } = renderCombobox({ inputValue: 'Program A', onInputValueChange });
+        const input = screen.getByPlaceholderText('Оберіть програму');
+
+        fireEvent.change(input, { target: { value: 'Program B' } });
+        rerender(
+            <CategoryCombobox
+                options={OPTIONS}
+                inputValue="Program B"
+                onInputValueChange={onInputValueChange}
+                onOptionSelect={jest.fn()}
+                placeholder="Оберіть програму"
+            />,
+        );
+
+        expect(screen.getByText('Program B')).toBeInTheDocument();
+        expect(screen.queryByText('Program A')).not.toBeInTheDocument();
+    });
+
+    it('closes the dropdown if it becomes disabled while open', () => {
+        const { container, rerender } = renderCombobox();
+        const input = screen.getByPlaceholderText('Оберіть програму');
+
+        fireEvent.focus(input);
+        expect(container.querySelector('.select')).toHaveClass('select-opened');
+
+        rerender(
+            <CategoryCombobox
+                options={OPTIONS}
+                inputValue=""
+                onInputValueChange={jest.fn()}
+                onOptionSelect={jest.fn()}
+                placeholder="Оберіть програму"
+                disabled={true}
+            />,
+        );
+
+        expect(container.querySelector('.select')).toHaveClass('select-closed');
+    });
 });

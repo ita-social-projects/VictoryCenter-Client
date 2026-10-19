@@ -197,7 +197,7 @@ describe('TranslateEventsIntroModal', () => {
         ['pageDescription', EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
         ['eventsBlockTitle', EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE],
     ] as const)(
-        'validates the %s translation after blur and enables saving after correction',
+        'validates the %s translation after blur and keeps saving disabled after correction',
         async (fieldName, label) => {
             const user = userEvent.setup();
             render(<TranslationModalHarness field={fieldName} />);
@@ -213,7 +213,7 @@ describe('TranslateEventsIntroModal', () => {
 
             await user.type(field, '0');
             expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
-            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeEnabled();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
         },
     );
 
@@ -232,11 +232,11 @@ describe('TranslateEventsIntroModal', () => {
     it.each([
         ['pageDescription', EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE, 1000],
         ['eventsBlockTitle', EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE, 100],
-    ] as const)('enables saving at the %s maximum-length boundary', (fieldName, label, max) => {
+    ] as const)('keeps saving disabled at the %s maximum-length boundary', (fieldName, label, max) => {
         render(<TranslationModalHarness field={fieldName} />);
         const field = getTranslationField(label);
 
         fireEvent.change(field, { target: { value: 'a'.repeat(max) } });
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeEnabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
     });
 });

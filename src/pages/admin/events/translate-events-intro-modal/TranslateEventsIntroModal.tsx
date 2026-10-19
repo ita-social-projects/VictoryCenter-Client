@@ -70,8 +70,6 @@ export const TranslateEventsIntroModal = ({
     const handleSave = () => {
         // Translation persistence is handled in a separate task.
     };
-    const isFormValid = !getEventsPageTextValidationError(value, validationRule);
-
     return (
         <LocalizationModal
             isOpen={isOpen}
@@ -79,7 +77,7 @@ export const TranslateEventsIntroModal = ({
             title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
             onSave={handleSave}
             isSubmitting={false}
-            isFormValid={isFormValid}
+            isFormValid={false}
             isDirty={Boolean(value)}
             checkIsDirty={() => Boolean(value)}
             maxWidth="594px"

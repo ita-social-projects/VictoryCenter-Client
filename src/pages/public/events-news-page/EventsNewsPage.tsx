@@ -13,10 +13,7 @@ import CHOOSE_PROGRAM_IMAGE from '@/assets/images/horse-and-girl.webp';
 export const EventsNewsPage = () => {
     const { currentLanguage } = useLocale();
     const { t } = useTranslation('eventsNewsPage');
-    const fetchPageData = useCallback(
-        (options?: RequestOptions) => EventsNewsPageApi.get(currentLanguage, options),
-        [currentLanguage],
-    );
+    const fetchPageData = useCallback((options?: RequestOptions) => EventsNewsPageApi.get(options), [currentLanguage]);
 
     const { data, isLoading, error } = useDataFetch<EventsNewsPageData | null>({
         initialData: null,

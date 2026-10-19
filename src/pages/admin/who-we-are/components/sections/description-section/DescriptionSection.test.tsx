@@ -159,7 +159,7 @@ describe('DescriptionSection', () => {
 
         expect(publishButton).toBeEnabled();
 
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue(errorMessage);
 
         fireEvent.blur(descriptionInput);
 
@@ -195,7 +195,7 @@ describe('DescriptionSection', () => {
 
     it('should hide validation error when switching to non-base language', async () => {
         const errorMessage = 'Description is too short.';
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue(errorMessage);
 
         const { rerender } = renderComponent();
         const descriptionInput = screen.getByTestId('mock-rich-input-1');

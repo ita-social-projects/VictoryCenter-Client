@@ -1,14 +1,15 @@
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
-import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
-import './CardContent.scss';
 import { LocalizationLanguage } from '@/types/common/language';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
-import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
 
@@ -18,8 +19,7 @@ export interface CardContentProps {
     descriptionLimit: number;
     rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
-    onDescriptionValidate: (value: string) => void;
-    descriptionError: string | null;
+    onDescriptionValidate: (error: string | null) => void;
     imageError: string | null;
     setImageError: (value: string | null) => void;
     language: LocalizationLanguage;
@@ -31,11 +31,11 @@ export const CardContent = ({
     descriptionLimit,
     imageInputProps,
     onDescriptionValidate,
-    descriptionError,
     imageError,
     setImageError,
     language,
 }: CardContentProps) => {
+    const [descriptionError, setDescriptionError] = useState<string | null>(null);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
     const hasImageDimensionsTooSmallError = imageError === IMAGE_VALIDATION.ImageDimensionsTooSmallError;
 
@@ -52,12 +52,22 @@ export const CardContent = ({
     };
 
     const handleDescriptionChange = (value: string) => {
+        setDescriptionError(null);
+        onDescriptionValidate(null);
+
         if (!isBaseLanguage) return;
         onChange({
             ...content,
             description: value,
         });
-        onDescriptionValidate(value);
+    };
+
+    const handleDescriptionValidate = (value: string) => {
+        const plainText = getPlainTextFromHtml(value);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText) || null;
+
+        setDescriptionError(error);
+        onDescriptionValidate(error);
     };
 
     return (
@@ -83,7 +93,7 @@ export const CardContent = ({
                     maxLength={descriptionLimit}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
-                    onBlur={() => isBaseLanguage && onDescriptionValidate(displayedDescription ?? '')}
+                    onBlur={() => isBaseLanguage && handleDescriptionValidate(displayedDescription ?? '')}
                     error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}

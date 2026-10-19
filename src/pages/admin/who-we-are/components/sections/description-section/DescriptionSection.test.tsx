@@ -50,6 +50,7 @@ jest.mock('@/pages/public/about-us-page/our-mission/OurMission', () => ({
 jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn(),
+        validateDescription: jest.fn(),
     },
 }));
 
@@ -88,7 +89,9 @@ describe('DescriptionSection', () => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
         mockOnTranslate = jest.fn();
+
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue(null);
     });
 
     it('should render the description section with initial content', () => {
@@ -144,20 +147,24 @@ describe('DescriptionSection', () => {
         );
     });
 
-    it('should show an error message and disable the publish button when validation fails', async () => {
+    it('should show an error message and disable the publish button when validation fails', () => {
         const errorMessage = 'Description is too short.';
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
 
-        renderComponent();
+        renderComponent({ isPublishButtonActive: true });
+
         const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        const publishButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        });
+
+        expect(publishButton).toBeEnabled();
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue(errorMessage);
 
         fireEvent.blur(descriptionInput);
 
-        await waitFor(() => {
-            expect(screen.getByText(errorMessage)).toBeInTheDocument();
-            const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
-            expect(publishButton).toBeDisabled();
-        });
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        expect(publishButton).toBeDisabled();
     });
 
     it('should disable translate button and call onPublish when publish button is clicked with no errors', () => {
@@ -188,7 +195,7 @@ describe('DescriptionSection', () => {
 
     it('should hide validation error when switching to non-base language', async () => {
         const errorMessage = 'Description is too short.';
-        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue(errorMessage);
 
         const { rerender } = renderComponent();
         const descriptionInput = screen.getByTestId('mock-rich-input-1');
@@ -202,5 +209,18 @@ describe('DescriptionSection', () => {
         rerender(<DescriptionSection {...buildProps({ language: { id: 2, code: 'en', name: 'English' } })} />);
 
         expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
+    });
+
+    it('should disable publish button when description is invalid without blur', () => {
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue('Description is too short.');
+
+        renderComponent({ isPublishButtonActive: true });
+
+        const publishButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        });
+
+        expect(publishButton).toBeDisabled();
+        expect(mockOnPublish).not.toHaveBeenCalled();
     });
 });

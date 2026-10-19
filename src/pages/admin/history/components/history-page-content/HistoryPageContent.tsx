@@ -176,6 +176,33 @@ export const HistoryPageContent = () => {
         setCanPublish(true);
     }, []);
 
+    const handleSectionChanged = useCallback(
+        (updatedSections: HistorySectionDto[]) => {
+            setLocalSectionsCount(updatedSections.length);
+
+            const getSectionsSnapshot = (items: HistorySectionDto[]) =>
+                JSON.stringify(
+                    items.map((section) => ({
+                        id: section.id ?? null,
+                        template: section.template,
+                        order: section.order,
+                        contents: section.contents.map((content) => ({
+                            id: content.id ?? null,
+                            contentType: content.contentType,
+                            order: content.order,
+                            title: content.title,
+                            description: content.description,
+                            imageId: content.imageId ?? null,
+                            image: content.image,
+                        })),
+                    })),
+                );
+
+            setCanPublish(getSectionsSnapshot(updatedSections) !== getSectionsSnapshot(normalizedSections));
+        },
+        [normalizedSections],
+    );
+
     const handleSectionDeleted = useCallback(
         async (remainingSections: HistorySectionDto[]) => {
             try {
@@ -194,6 +221,7 @@ export const HistoryPageContent = () => {
                     })),
                 }));
                 await HistoryApi.syncSections(client, payload);
+                setCanPublish(false);
                 void refetchSections();
             } catch {
                 addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
@@ -355,10 +383,7 @@ export const HistoryPageContent = () => {
                         sections={filteredSections}
                         onReplaceSection={handleReplaceSection}
                         onValidationChange={setIsFormValid}
-                        onSectionsChange={(s) => {
-                            setLocalSectionsCount(s.length);
-                            setCanPublish(true);
-                        }}
+                        onSectionsChange={handleSectionChanged}
                         onHasEditingSectionChange={setHasActiveSectionForm}
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}

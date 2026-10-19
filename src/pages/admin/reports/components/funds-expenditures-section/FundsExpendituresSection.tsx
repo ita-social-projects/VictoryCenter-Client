@@ -784,10 +784,19 @@ export const FundsExpenditureSection = ({
 
             fetchDisclaimerLocalizations(updatedSettings.id);
 
-            await refetchSettings();
+            let hasRefetchFailed = false;
+            const markRefetchFailed = () => {
+                hasRefetchFailed = true;
+            };
+
+            await refetchSettings(true).catch(markRefetchFailed);
             if (hasRecordChanges) {
-                await refetchRecords();
-                await refetchSummary();
+                await refetchRecords(true).catch(markRefetchFailed);
+                await refetchSummary(true).catch(markRefetchFailed);
+            }
+
+            if (hasRefetchFailed) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, ToastType.Warning);
             }
 
             return true;

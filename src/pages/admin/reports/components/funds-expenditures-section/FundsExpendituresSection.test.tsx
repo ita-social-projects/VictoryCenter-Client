@@ -17,6 +17,7 @@ import {
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { ToastType } from '@/types/admin/toast';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -1930,6 +1931,45 @@ describe('FundsExpenditureSection category limit', () => {
             expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
             expect(getRefetchCallCount(SLOT.records)).toBe(0);
             expect(getRefetchCallCount(SLOT.summary)).toBe(0);
+        });
+
+        const failRefetch = (slot: number) =>
+            mockUseDataFetch.mock.results
+                .filter((_, index) => index % 5 === slot)
+                .forEach((result) => (result.value.refetch as jest.Mock).mockRejectedValue(new Error('Network Error')));
+
+        it('does not warn when every refetch succeeds', async () => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(mockAddToast).not.toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA,
+                ToastType.Warning,
+            );
+        });
+
+        it.each([
+            { failed: 'settings', slot: SLOT.settings },
+            { failed: 'records', slot: SLOT.records },
+            { failed: 'summary', slot: SLOT.summary },
+        ])('still publishes, runs the other refetches and warns when the $failed refetch fails', async ({ slot }) => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+            failRefetch(slot);
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBeGreaterThan(0);
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, ToastType.Warning);
+            expect(mockAddToast).not.toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         });
     });
 });

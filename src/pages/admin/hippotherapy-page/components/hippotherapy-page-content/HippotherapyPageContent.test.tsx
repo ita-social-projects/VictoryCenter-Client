@@ -298,10 +298,10 @@ describe('HippotherapyPageContent', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Set intro image error' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Set hippotherapy-quote image error' }));
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Clear intro image error' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Clear hippotherapy-quote image error' }));
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 

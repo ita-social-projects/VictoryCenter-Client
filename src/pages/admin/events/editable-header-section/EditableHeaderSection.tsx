@@ -3,11 +3,12 @@ import DOMPurify from 'dompurify';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { ReactComponent as EyeClosedIcon } from '@/assets/icons/eye-closed.svg';
+import { ReactComponent as TranslateIcon } from '@/assets/icons/translate.svg';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_TEXT } from '@/const/admin/events';
+import { EVENT_ITEMS_TEXT, EVENTS_TEXT } from '@/const/admin/events';
 import {
     EventsPageTextValidationRule,
     getEventsPageTextValidationError,
@@ -36,6 +37,8 @@ export interface EditableHeaderSectionProps {
     isPublishDisabled?: boolean;
     disabled?: boolean;
     placeholder: string;
+    onTranslate?: () => void;
+    isTranslateDisabled?: boolean;
     isHidden?: boolean;
     onToggleVisibility?: () => void;
     isToggleVisibilityDisabled?: boolean;
@@ -88,6 +91,8 @@ export const EditableHeaderSection = ({
     isPublishDisabled: isPublishForcedDisabled = false,
     disabled = false,
     placeholder,
+    onTranslate,
+    isTranslateDisabled = false,
     isHidden,
     onToggleVisibility,
     isToggleVisibilityDisabled = false,
@@ -169,6 +174,17 @@ export const EditableHeaderSection = ({
                             {heading}
                         </h2>
                         <div className={styles['editable-header-section-actions']}>
+                            {onTranslate && (
+                                <button
+                                    type="button"
+                                    className={styles['editable-header-section-icon-button']}
+                                    aria-label={`${EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE}: ${heading}`}
+                                    onClick={onTranslate}
+                                    disabled={disabled || isTranslateDisabled}
+                                >
+                                    <TranslateIcon />
+                                </button>
+                            )}
                             <button
                                 type="button"
                                 className={styles['editable-header-section-icon-button']}

@@ -41,6 +41,8 @@ import {
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
+import { TranslateEventsIntroModal } from './translate-events-intro-modal/TranslateEventsIntroModal';
+import { EventsIntroTranslationField } from './translate-events-intro-modal/TranslateEventsIntroForm';
 import {
     EventsPageTextValidationRule,
     getEventsPageTextValidationError,
@@ -94,6 +96,9 @@ export const EventsPageAdmin = () => {
     const [selectedSearchItem, setSelectedSearchItem] = useState<EventItemDto | null>(null);
     const [eventToDeleteId, setEventToDeleteId] = useState<number | null>(null);
     const [isEventDeleting, setIsEventDeleting] = useState(false);
+    const [activeIntroTranslationField, setActiveIntroTranslationField] = useState<EventsIntroTranslationField | null>(
+        null,
+    );
 
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
@@ -608,6 +613,10 @@ export const EventsPageAdmin = () => {
         setEventsIntroDraft((currentDraft) => (currentDraft ? { ...currentDraft, [field]: value } : currentDraft));
     }, []);
 
+    const closeIntroTranslationModal = useCallback(() => {
+        setActiveIntroTranslationField(null);
+    }, []);
+
     const openPublishConfirmation = useCallback(
         (sectionId: EditableHeaderSectionId, value: string) => {
             if (!eventsIntroDraft || publishingSectionsRef.current[sectionId]) return;
@@ -862,6 +871,7 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
+                    onTranslate={() => setActiveIntroTranslationField('pageDescription')}
                     isHidden={eventsIntroSection?.isPageDescriptionHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)
@@ -897,12 +907,21 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
+                    onTranslate={() => setActiveIntroTranslationField('eventsBlockTitle')}
                     isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)
                     }
                 />
             </div>
+            {activeIntroTranslationField && (
+                <TranslateEventsIntroModal
+                    isOpen
+                    field={activeIntroTranslationField}
+                    translationLanguages={translationLanguages}
+                    onClose={closeIntroTranslationModal}
+                />
+            )}
             <div className="events-page-list-container" ref={listContainerRef}>
                 <CategoryBar<EventCategoryDto>
                     categories={categories}

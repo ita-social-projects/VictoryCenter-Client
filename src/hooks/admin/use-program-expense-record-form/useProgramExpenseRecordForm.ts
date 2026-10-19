@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
-import { getUsdMismatchMessage, useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
+import { useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
 import {
     validateProgramExpenseAmount,
     validateProgramExpenseProgram,
@@ -262,26 +262,11 @@ export const useProgramExpenseRecordForm = ({
 
     const isDirty = recordToEdit ? isEditModeDirty() : isCreateModeDirty();
 
-    const areAmountsUnchangedFromRecord = Boolean(
-        recordToEdit &&
-            formState.amountUah === recordToEdit.amountUah &&
-            formState.amountUsd === recordToEdit.amountUsd,
-    );
-    const currentUsdMismatchMessage = areAmountsUnchangedFromRecord
-        ? undefined
-        : getUsdMismatchMessage(
-              formState.amountUah,
-              formState.amountUsd,
-              exchangeRate,
-              PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-          );
-
     const isSubmitEnabled =
         !validateProgramExpenseReportingYear(formState.reportingYear, 'save') &&
         !getProgramError(formState.programId, formState.programInputValue, 'blur') &&
         !validateProgramExpenseAmount(formState.amountUah, 'save') &&
         !validateProgramExpenseAmount(formState.amountUsd, 'save') &&
-        !currentUsdMismatchMessage &&
         !isSubmitting &&
         isDirty;
 
@@ -301,11 +286,6 @@ export const useProgramExpenseRecordForm = ({
 
         if (!hasProgram || !formState.reportingYear || isSubmitting) return false;
 
-        if (currentUsdMismatchMessage) {
-            setUsdMismatchMessage(currentUsdMismatchMessage);
-            return false;
-        }
-
         setIsSubmitting(true);
         try {
             const success = await onSubmit({
@@ -319,7 +299,7 @@ export const useProgramExpenseRecordForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [formState, isSubmitting, onSubmit, currentUsdMismatchMessage, setUsdMismatchMessage]);
+    }, [formState, isSubmitting, onSubmit]);
 
     const handleConfirmAdd = useCallback(async () => {
         const success = await submitRecord();

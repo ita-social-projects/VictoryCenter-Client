@@ -81,7 +81,7 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.isSubmitDisabled).toBe(false);
     });
 
-    it('blocks submit when USD is changed manually without a preceding blur and does not match UAH', async () => {
+    it('allows submit when USD is changed manually and does not match UAH', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseProgramExpenseForm({ onSubmit });
 
@@ -93,13 +93,15 @@ describe('useProgramExpenseRecordForm', () => {
         });
 
         expect(result.current.formState.amountUah).toBe('400');
+        expect(result.current.isSubmitDisabled).toBe(false);
 
         await act(async () => {
             await result.current.handleSave();
         });
 
-        expect(onSubmit).not.toHaveBeenCalled();
-        expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(onSubmit).toHaveBeenCalledWith(
+            expect.objectContaining({ reportingYear: '2026', amountUah: '400', amountUsd: '999' }),
+        );
     });
 
     it('validates amountUah max digits on change', () => {
@@ -362,7 +364,7 @@ describe('useProgramExpenseRecordForm', () => {
             });
         });
 
-        it('does not recalculate UAH when a legacy record USD amount is actively edited, and surfaces a mismatch until corrected', async () => {
+        it('does not recalculate UAH when a legacy record USD amount is actively edited, and surfaces a non-blocking mismatch until corrected', async () => {
             const onSubmit = jest.fn().mockResolvedValue(true);
             const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40', onSubmit });
 
@@ -376,7 +378,7 @@ describe('useProgramExpenseRecordForm', () => {
 
             expect(result.current.formState.amountUah).toBe('400');
             expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-            expect(result.current.isSubmitDisabled).toBe(true);
+            expect(result.current.isSubmitDisabled).toBe(false);
 
             act(() => {
                 result.current.handleAmountFieldChange('amountUsd')('10');

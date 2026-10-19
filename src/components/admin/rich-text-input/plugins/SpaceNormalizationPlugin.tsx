@@ -1,20 +1,9 @@
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $getSelection, $isRangeSelection, $isTextNode, LexicalEditor, TextNode } from 'lexical';
-
-const SPACE_RUN = /[ \u00A0]+/g;
-const LEADING_SPACES = /^[ \u00A0]+/;
+import { endsWithSpace, normalizeSpaces, startsWithSpace } from '@/utils/functions/normalize-spaces/normalize-spaces';
 
 const isFirstTextNodeInField = (node: TextNode) => node.is($getRoot().getFirstDescendant());
-
-const endsWithSpace = (text: string) => /[ \u00A0]$/.test(text);
-
-const startsWithSpace = (text: string) => LEADING_SPACES.test(text);
-
-const normalizeSpaces = (text: string, stripLeading: boolean) => {
-    const collapsed = text.replace(SPACE_RUN, ' ');
-    return stripLeading ? collapsed.replace(LEADING_SPACES, '') : collapsed;
-};
 
 const $normalizeTextNode = (node: TextNode) => {
     const text = node.getTextContent();

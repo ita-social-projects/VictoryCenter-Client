@@ -173,6 +173,8 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                                     src={displaySrc}
                                     crossOrigin="anonymous"
                                     alt="Crop target"
+                                    draggable={false}
+                                    onDragStart={(e) => e.preventDefault()}
                                     onLoad={(e) => onImageLoaded(e.currentTarget)}
                                     style={{ maxWidth: '100%', maxHeight: '70vh' }}
                                 />

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
@@ -9,6 +9,7 @@ import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 import { SingleEventNews } from './single-event-news/SingleEventNews';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 import { EventCategoryButton } from './event-category-button/EventCategoryButton';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import {
     useDataPaginationFetch,
     PaginationRequestParams,
@@ -19,53 +20,53 @@ export interface EventsProps extends EventsData {
     isTitleHidden?: boolean;
 }
 
+const PAGE_SIZE = 8;
+const getEventId = (item: EventsNews) => item.id;
+
 export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
     const { t } = useTranslation('eventsNewsPage');
-    const pageSize = 8;
+    const { currentLanguage } = useLocale();
+    const safeTags = Array.isArray(tags) ? tags : [];
 
     const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
-    const [events, setEvents] = useState<EventsNews[]>([]);
-    const [offset, setOffset] = useState<number>(0);
-
-    const searchByTag = (tag: Tag) => {
-        setSelectedTag(tag);
-        setOffset(0); // Reset offset when changing tag
-    };
-
-    const loadMore = () => setOffset((prevOffset) => prevOffset + pageSize);
+    const selectedTagId = selectedTag?.id;
 
     const getEvents = useCallback(
-        async (params: PaginationRequestParams) => {
-            return EventsNewsApi.get(selectedTag?.id || '', offset, params.limit as number);
-        },
-        [selectedTag, offset],
+        (params: PaginationRequestParams) =>
+            EventsNewsApi.get(
+                selectedTagId,
+                params.offset,
+                params.limit ?? PAGE_SIZE,
+                currentLanguage,
+                params.requestOptions,
+            ),
+        [selectedTagId, currentLanguage],
     );
 
-    const { data, isLoading, error, hasMore } = useDataPaginationFetch<EventsNews>({
+    const {
+        data: events,
+        isLoading,
+        error,
+        hasMore,
+        fetchMore,
+    } = useDataPaginationFetch<EventsNews>({
         initialData: [],
         fetchHandler: getEvents,
-        autoFetchDependencies: [t, selectedTag, offset],
-        pageSize: pageSize,
+        autoFetchDependencies: [currentLanguage, selectedTagId],
+        getUniqueId: getEventId,
+        pageSize: PAGE_SIZE,
     });
-
-    useEffect(() => {
-        if (offset === 0) {
-            setEvents(data);
-        } else {
-            setEvents((prevEvents) => [...prevEvents, ...data]);
-        }
-    }, [data, offset]);
 
     return (
         <section className={styles.events}>
             <div className={styles['menu-block']}>
                 <div className={styles['button-block']}>
-                    {tags.map((tag) => (
+                    {safeTags.map((tag) => (
                         <EventCategoryButton
                             key={tag.id}
                             tag={tag}
                             isActive={selectedTag?.id === tag.id}
-                            onClick={() => searchByTag(tag)}
+                            onClick={() => setSelectedTag(tag)}
                         />
                     ))}
 
@@ -112,7 +113,7 @@ export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
             </div>
             {hasMore && (
                 <Button
-                    onClick={loadMore}
+                    onClick={fetchMore}
                     variant="secondary-dark"
                     iconPosition="right"
                     icon={ArrowDownIcon}

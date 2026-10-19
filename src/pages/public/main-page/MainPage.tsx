@@ -13,6 +13,7 @@ import { MainStatisticsSection } from './main-statistics-section/MainStatisticsS
 import { DonationSection } from './danatation-section/DonationSection';
 import styles from './MainPage.module.scss';
 import { AboutUsSection } from './about-us/AboutUsSection';
+import { NewsEventsSection } from './event-news/NewsEventsSection';
 
 const getFilledText = (...values: Array<string | null | undefined>): string => {
     return values.find((value) => value?.trim())?.trim() ?? '';
@@ -70,6 +71,7 @@ export const MainPage = () => {
             <MainProgramsSection />
             <MainStatisticsSection impactStatistics={mainPageData?.impactStatistics} />
             <DonationSection donationData={mainPageData?.mainDonations} />
+            <NewsEventsSection />
         </div>
     );
 };

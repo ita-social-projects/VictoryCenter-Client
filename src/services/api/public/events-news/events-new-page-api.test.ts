@@ -1,17 +1,63 @@
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { mapToEventsNewsPage } from '@/utils/functions/mappers/public/event-news/events-news-page';
+import { axiosInstance } from '@/services/api/axios';
 import { EventsNewsPageApi } from './events-new-page-api';
 import { eventsNewsPageMock } from '@/utils/mock-data/public/event-news';
-import { axiosInstance } from '@/services/api/axios';
-import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 jest.mock('@/services/api/axios', () => ({
-    axiosInstance: {
-        get: jest.fn(),
-    },
+    axiosInstance: { get: jest.fn() },
 }));
 
+jest.mock('@/utils/functions/mappers/public/event-news/events-news-page', () => ({
+    mapToEventsNewsPage: jest.fn(),
+}));
+
+const mockedAxiosGet = axiosInstance.get as jest.Mock;
+const mockedMapper = mapToEventsNewsPage as jest.Mock;
+
 describe('EventsNewsPageApi', () => {
+    const dto = { eventsBlockTitle: 'Title', pageDescription: 'Description', categories: [] };
+    const mapped = { description: 'mapped', chooseProgram: {}, eventsData: { tags: [] } };
+
     beforeEach(() => {
         jest.clearAllMocks();
+        mockedMapper.mockReturnValue(mapped);
+        mockedAxiosGet.mockResolvedValue({ data: dto });
+    });
+
+    it('requests the public events page endpoint', async () => {
+        await EventsNewsPageApi.get();
+
+        expect(mockedAxiosGet).toHaveBeenCalledTimes(1);
+        expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal: undefined });
+    });
+
+    it('maps the response with the default locale', async () => {
+        const result = await EventsNewsPageApi.get();
+
+        expect(mockedMapper).toHaveBeenCalledWith(dto, DEFAULT_LOCALE);
+        expect(result).toBe(mapped);
+    });
+
+    it('maps the response with the provided language code', async () => {
+        await EventsNewsPageApi.get('en');
+
+        expect(mockedMapper).toHaveBeenCalledWith(dto, 'en');
+    });
+
+    it('passes the cancellation signal to axios', async () => {
+        const { signal } = new AbortController();
+
+        await EventsNewsPageApi.get('uk', { cancellationSignal: signal });
+
+        expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal });
+    });
+
+    it('is a promise-returning function', () => {
+        const result = EventsNewsPageApi.get();
+
+        expect(result).toBeInstanceOf(Promise);
     });
 
     it('resolves with the mapped data directly from the API response', async () => {
@@ -26,12 +72,7 @@ describe('EventsNewsPageApi', () => {
             },
         };
 
-        (axiosInstance.get as jest.Mock).mockResolvedValue(mockApiResponse);
-
-        const result = await EventsNewsPageApi.get();
-
-        expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC);
-        expect(result).toEqual({
+        const expectedMappedResult = {
             description: 'Test Description',
             isPageDescriptionHidden: false,
             chooseProgram: eventsNewsPageMock.chooseProgram,
@@ -43,7 +84,16 @@ describe('EventsNewsPageApi', () => {
                 ],
             },
             isEventsBlockTitleHidden: false,
-        });
+        };
+
+        mockedAxiosGet.mockResolvedValue(mockApiResponse);
+        mockedMapper.mockReturnValue(expectedMappedResult);
+
+        const result = await EventsNewsPageApi.get();
+
+        expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal: undefined });
+        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data, DEFAULT_LOCALE);
+        expect(result).toEqual(expectedMappedResult);
     });
 
     it('handles empty or missing data fields correctly', async () => {
@@ -51,11 +101,7 @@ describe('EventsNewsPageApi', () => {
             data: {},
         };
 
-        (axiosInstance.get as jest.Mock).mockResolvedValue(mockApiResponse);
-
-        const result = await EventsNewsPageApi.get();
-
-        expect(result).toEqual({
+        const expectedMappedResult = {
             description: '',
             isPageDescriptionHidden: true,
             chooseProgram: eventsNewsPageMock.chooseProgram,
@@ -64,20 +110,21 @@ describe('EventsNewsPageApi', () => {
                 tags: [],
             },
             isEventsBlockTitleHidden: true,
-        });
-    });
+        };
 
-    it('is a promise-returning function', () => {
-        (axiosInstance.get as jest.Mock).mockResolvedValue({ data: {} });
+        mockedAxiosGet.mockResolvedValue(mockApiResponse);
+        mockedMapper.mockReturnValue(expectedMappedResult);
 
-        const result = EventsNewsPageApi.get();
+        const result = await EventsNewsPageApi.get();
 
-        expect(result).toBeInstanceOf(Promise);
+        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data, DEFAULT_LOCALE);
+        expect(result).toEqual(expectedMappedResult);
     });
 
     it('propagates rejection when implementation fails with specific message', async () => {
-        (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('Failed to fetch events news data'));
+        mockedAxiosGet.mockRejectedValue(new Error('Failed to fetch events news data'));
 
         await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed to fetch events news data');
+        expect(mockedMapper).not.toHaveBeenCalled();
     });
 });

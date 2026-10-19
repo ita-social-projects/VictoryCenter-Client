@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
+import { ReactComponent as SquareArrowIcon } from '@/assets/icons/square-arrow-out-up-right.svg';
 import { EventsNews } from '@/types/public/events-news';
 import styles from './SingleEventNews.module.scss';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
@@ -12,7 +12,7 @@ export const SingleEventNews = memo(
     ({
         name = '',
         date = '',
-        tags = [],
+        tag,
         description = '',
         resource = '',
         previewImage = '',
@@ -38,16 +38,11 @@ export const SingleEventNews = memo(
 
         return (
             <div className={styles['event-card']}>
-                <img src={previewImage as string} alt="Event" className={styles['event-image']} />
+                <img src={previewImage as string} alt={name || 'Event'} className={styles['event-image']} />
                 <div className={styles['event-header']}>
-                    {tags &&
-                        tags.map((tag) => (
-                            <span key={tag.id} className={styles['event-tag']}>
-                                {tag.name}
-                            </span>
-                        ))}
+                    {tag && <span className={styles['event-tag']}>{tag.name}</span>}
                     <span className={styles['event-date']}>
-                        {resource && resource + ' | '}
+                        {resource ? `${resource} | ` : ''}
                         {date}
                     </span>
                 </div>
@@ -56,7 +51,7 @@ export const SingleEventNews = memo(
                 <p className={styles['event-description']}>{localized.description}</p>
 
                 <div>
-                    <Button onClick={handleClick} icon={ArrowIcon} iconPosition="right" variant="tertiary">
+                    <Button onClick={handleClick} icon={SquareArrowIcon} iconPosition="right" variant="tertiary">
                         {t('LINK_TO_ARTICLE')}
                     </Button>
                 </div>

@@ -41,7 +41,7 @@ const mockArticle = (id: string): EventsNews => ({
     description: 'Test description',
     previewImage: null,
     backgroundImage: null,
-    tags: [],
+    tag: { id: '1', name: 'Media' },
     slug: `article-${id}`,
     sections: [],
 });

@@ -76,4 +76,10 @@ describe('events-news-api', () => {
 
             const result = await EventNewsApi.get('my-slug');
 
-            expect(mockedAxiosGet).toHaveBeenCalledWith
+            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/my-slug`, {
+                signal: undefined,
+            });
+            expect(result).toEqual({ id: '5', sections: [] });
+        });
+    });
+});

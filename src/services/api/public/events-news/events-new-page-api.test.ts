@@ -3,7 +3,6 @@ import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { mapToEventsNewsPage } from '@/utils/functions/mappers/public/event-news/events-news-page';
 import { axiosInstance } from '@/services/api/axios';
 import { EventsNewsPageApi } from './events-new-page-api';
-import { eventsNewsPageMock } from '@/utils/mock-data/public/event-news';
 
 jest.mock('@/services/api/axios', () => ({
     axiosInstance: { get: jest.fn() },
@@ -18,7 +17,7 @@ const mockedMapper = mapToEventsNewsPage as jest.Mock;
 
 describe('EventsNewsPageApi', () => {
     const dto = { eventsBlockTitle: 'Title', pageDescription: 'Description', categories: [] };
-    const mapped = { description: 'mapped', chooseProgram: {}, eventsData: { tags: [] } };
+    const mapped = { description: 'mapped', eventsData: { tags: [] } };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -75,7 +74,6 @@ describe('EventsNewsPageApi', () => {
         const expectedMappedResult = {
             description: 'Test Description',
             isPageDescriptionHidden: false,
-            chooseProgram: eventsNewsPageMock.chooseProgram,
             eventsData: {
                 title: 'Test Title',
                 tags: [
@@ -104,7 +102,6 @@ describe('EventsNewsPageApi', () => {
         const expectedMappedResult = {
             description: '',
             isPageDescriptionHidden: true,
-            chooseProgram: eventsNewsPageMock.chooseProgram,
             eventsData: {
                 title: '',
                 tags: [],

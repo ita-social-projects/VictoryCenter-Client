@@ -68,7 +68,7 @@ export const TranslateEventsIntroModal = ({
         onClose();
     };
     const handleSave = () => {
-        // API persistence will be connected after the translation contract is finalized.
+        // Translation persistence is handled in a separate task.
     };
     const isFormValid = !getEventsPageTextValidationError(value, validationRule);
 

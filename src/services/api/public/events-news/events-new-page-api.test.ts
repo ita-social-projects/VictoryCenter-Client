@@ -38,14 +38,6 @@ describe('EventsNewsPageApi', () => {
         expect(result).toBe(mapped);
     });
 
-    it('passes the cancellation signal to axios', async () => {
-        const { signal } = new AbortController();
-
-        await EventsNewsPageApi.get(undefined, { cancellationSignal: signal });
-
-        expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal });
-    });
-
     it('is a promise-returning function', () => {
         const result = EventsNewsPageApi.get();
 

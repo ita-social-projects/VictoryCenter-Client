@@ -1,5 +1,4 @@
 import { EventsNewsPageData, PublicEventsPageDto, Tag } from '@/types/public/events-news';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 const isBlank = (value?: string | null): boolean => !value?.trim();
 

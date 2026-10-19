@@ -18,6 +18,7 @@ interface LocalizationModalProps {
     isDirty?: boolean;
     children: React.ReactNode;
     maxWidth?: string;
+    modalClassName?: string;
     titleClassName?: string;
 }
 
@@ -33,6 +34,7 @@ export const LocalizationModal = ({
     isDirty,
     children,
     maxWidth,
+    modalClassName,
     titleClassName,
 }: LocalizationModalProps) => {
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
@@ -57,7 +59,7 @@ export const LocalizationModal = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleRequestClose} maxWidth={maxWidth}>
+            <Modal isOpen={isOpen} onClose={handleRequestClose} maxWidth={maxWidth} className={modalClassName}>
                 <Modal.Title>{titleClassName ? <div className={titleClassName}>{title}</div> : title}</Modal.Title>
                 <Modal.Content>{children}</Modal.Content>
                 <Modal.Actions>

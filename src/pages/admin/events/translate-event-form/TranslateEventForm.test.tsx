@@ -4,7 +4,7 @@ import { TranslateEventForm, TranslateEventFormRef, TranslateEventFormProps } fr
 import { EVENTS_TEXT } from '@/const/admin/events';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled }: any) => (
+    InputWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled, error }: any) => (
         <div data-testid={`input-group-${name}`}>
             <label htmlFor={id}>{label}</label>
             <input
@@ -16,6 +16,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
                 disabled={disabled}
                 data-testid={`input-${name}`}
             />
+            {error && <span data-testid={`error-${name}`}>{error}</span>}
         </div>
     ),
 }));
@@ -23,7 +24,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled }: any) => (
+        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, onBlur, name, id, disabled, error }: any) => (
             <div data-testid={`textarea-group-${name}`}>
                 <label htmlFor={id}>{label}</label>
                 <textarea
@@ -35,6 +36,7 @@ jest.mock(
                     disabled={disabled}
                     data-testid={`textarea-${name}`}
                 />
+                {error && <span data-testid={`error-${name}`}>{error}</span>}
             </div>
         ),
     }),
@@ -177,16 +179,55 @@ describe('TranslateEventForm', () => {
 
         render(<TranslateEventForm {...defaultProps} onSubmit={onSubmit} ref={ref} />);
 
-        fireEvent.change(screen.getByTestId('input-title'), { target: { value: '  Title  ' } });
-        fireEvent.change(screen.getByTestId('textarea-description'), { target: { value: '  Description  ' } });
-        fireEvent.change(screen.getByTestId('input-additionalDescription'), { target: { value: '  Extra  ' } });
+        fireEvent.change(screen.getByTestId('input-title'), { target: { value: '  Title long enough  ' } });
+        fireEvent.change(screen.getByTestId('textarea-description'), {
+            target: { value: '  Description long enough  ' },
+        });
+        fireEvent.change(screen.getByTestId('input-additionalDescription'), {
+            target: { value: '  Extra long enough  ' },
+        });
 
         ref.current?.submit();
 
         expect(onSubmit).toHaveBeenCalledWith({
-            title: 'Title',
-            description: 'Description',
-            additionalDescription: 'Extra',
+            title: 'Title long enough',
+            description: 'Description long enough',
+            additionalDescription: 'Extra long enough',
         });
+    });
+
+    it('validates on the fly while typing, but does not show required error', () => {
+        render(<TranslateEventForm {...defaultProps} />);
+
+        const title = screen.getByTestId('input-title');
+        fireEvent.change(title, { target: { value: 'a' } });
+        expect(screen.getByTestId('error-title')).toBeInTheDocument();
+
+        fireEvent.change(title, { target: { value: 'Valid title here' } });
+        expect(screen.queryByTestId('error-title')).not.toBeInTheDocument();
+
+        fireEvent.change(title, { target: { value: '' } });
+        expect(screen.queryByTestId('error-title')).not.toBeInTheDocument();
+
+        fireEvent.blur(title);
+        expect(screen.getByTestId('error-title')).toBeInTheDocument();
+    });
+
+    it('shows validation errors on blur for invalid values', () => {
+        render(<TranslateEventForm {...defaultProps} />);
+
+        const title = screen.getByTestId('input-title');
+        fireEvent.change(title, { target: { value: 'a' } });
+        fireEvent.blur(title);
+        expect(screen.getByTestId('error-title')).toBeInTheDocument();
+        expect(screen.queryByTestId('error-description')).not.toBeInTheDocument();
+
+        const desc = screen.getByTestId('textarea-description');
+        fireEvent.blur(desc);
+        expect(screen.getByTestId('error-description')).toBeInTheDocument();
+
+        fireEvent.change(title, { target: { value: 'Valid title here' } });
+        fireEvent.blur(title);
+        expect(screen.queryByTestId('error-title')).not.toBeInTheDocument();
     });
 });

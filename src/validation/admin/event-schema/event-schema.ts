@@ -66,4 +66,14 @@ export const EventValidationSchema = Yup.object({
         ),
 });
 
+export const TranslateEventValidationSchema = Yup.object({
+    title: EventValidationSchema.fields.title,
+    description: Yup.string()
+        .trim()
+        .required(EVENT_VALIDATION.description.getRequiredError())
+        .min(EVENT_VALIDATION.description.min, EVENT_VALIDATION.description.getMinError())
+        .max(EVENT_VALIDATION.description.max, EVENT_VALIDATION.description.getMaxError()),
+    additionalDescription: EventValidationSchema.fields.additionalDescription,
+});
+
 export type EventFormValues = Yup.InferType<typeof EventValidationSchema>;

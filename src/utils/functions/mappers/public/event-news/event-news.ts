@@ -20,5 +20,9 @@ export const mapToEventsNews = (dto: PublishedEventNewsDto, languageCode: string
         backgroundImage: dto.backgroundImage ?? null,
         slug: dto.slug ?? '',
         sections: [],
+        localizations: dto.localizations?.map((loc) => ({
+            ...loc,
+            name: loc.title || '',
+        })) as any,
     };
 };

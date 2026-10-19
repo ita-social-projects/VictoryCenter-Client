@@ -8,6 +8,10 @@ jest.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'en' }),
+}));
+
 const mockUseDataPaginationFetch = jest.fn();
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: (...args: any[]) => mockUseDataPaginationFetch(...args),
@@ -44,6 +48,7 @@ const mockArticle = (id: string): EventsNews => ({
     tag: { id: '1', name: 'Media' },
     slug: `article-${id}`,
     sections: [],
+    localizations: [],
 });
 
 describe('RecommendedArticles', () => {
@@ -107,7 +112,7 @@ describe('RecommendedArticles', () => {
         );
     });
 
-    it('fetchHandler calls EventsNewsApi.get with empty tagId, offset 0, and limit 2', async () => {
+    it('fetchHandler calls EventsNewsApi.get with undefined tagId, offset 0, limit 2, and current language', async () => {
         const articles = [mockArticle('1'), mockArticle('2')];
         mockGet.mockResolvedValueOnce({ items: articles, totalItemsCount: 2 });
 
@@ -115,6 +120,6 @@ describe('RecommendedArticles', () => {
         const { fetchHandler } = mockUseDataPaginationFetch.mock.calls[0][0];
         await fetchHandler({});
 
-        expect(mockGet).toHaveBeenCalledWith('', 0, 2);
+        expect(mockGet).toHaveBeenCalledWith(undefined, 0, 2, 'en');
     });
 });

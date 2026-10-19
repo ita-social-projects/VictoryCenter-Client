@@ -1,5 +1,4 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { mapToEventsNewsPage } from '@/utils/functions/mappers/public/event-news/events-news-page';
 import { axiosInstance } from '@/services/api/axios';
 import { EventsNewsPageApi } from './events-new-page-api';
@@ -32,23 +31,17 @@ describe('EventsNewsPageApi', () => {
         expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal: undefined });
     });
 
-    it('maps the response with the default locale', async () => {
+    it('maps the response correctly', async () => {
         const result = await EventsNewsPageApi.get();
 
-        expect(mockedMapper).toHaveBeenCalledWith(dto, DEFAULT_LOCALE);
+        expect(mockedMapper).toHaveBeenCalledWith(dto);
         expect(result).toBe(mapped);
-    });
-
-    it('maps the response with the provided language code', async () => {
-        await EventsNewsPageApi.get('en');
-
-        expect(mockedMapper).toHaveBeenCalledWith(dto, 'en');
     });
 
     it('passes the cancellation signal to axios', async () => {
         const { signal } = new AbortController();
 
-        await EventsNewsPageApi.get('uk', { cancellationSignal: signal });
+        await EventsNewsPageApi.get(undefined, { cancellationSignal: signal });
 
         expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal });
     });
@@ -90,7 +83,7 @@ describe('EventsNewsPageApi', () => {
         const result = await EventsNewsPageApi.get();
 
         expect(mockedAxiosGet).toHaveBeenCalledWith(API_ROUTES.EVENTS_PAGE.PUBLIC, { signal: undefined });
-        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data, DEFAULT_LOCALE);
+        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data);
         expect(result).toEqual(expectedMappedResult);
     });
 
@@ -114,7 +107,7 @@ describe('EventsNewsPageApi', () => {
 
         const result = await EventsNewsPageApi.get();
 
-        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data, DEFAULT_LOCALE);
+        expect(mockedMapper).toHaveBeenCalledWith(mockApiResponse.data);
         expect(result).toEqual(expectedMappedResult);
     });
 

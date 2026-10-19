@@ -21,6 +21,7 @@ describe('mapToEventsNews', () => {
             backgroundImage: background,
             slug: 'event-title',
             sections: [],
+            localizations: [],
         });
     });
 

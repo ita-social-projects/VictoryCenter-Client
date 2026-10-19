@@ -14,6 +14,6 @@ export const EventsNewsPageApi = {
             signal: requestOptions?.cancellationSignal,
         });
 
-        return mapToEventsNewsPage(data, languageCode);
+        return mapToEventsNewsPage(data);
     },
 };

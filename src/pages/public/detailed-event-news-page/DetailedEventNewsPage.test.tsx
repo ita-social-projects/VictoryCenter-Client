@@ -4,6 +4,16 @@ import { EventsNews } from '@/types/public/events-news';
 
 jest.mock('react-router-dom', () => ({
     useParams: jest.fn(),
+    useNavigate: () => jest.fn(),
+    useLocation: () => ({ pathname: '/events-and-news/test-event', search: '' }),
+}));
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+}));
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'en' }),
 }));
 
 jest.mock('@/services/api/public/events-news/events-news-api', () => ({
@@ -46,6 +56,7 @@ const mockEventNews = {
     previewImage: 'https://example.com/preview.jpg',
     backgroundImage: 'https://example.com/image.jpg',
     sections: [],
+    localizations: [],
 } as unknown as EventsNews;
 
 describe('DetailedEventNewsPage', () => {

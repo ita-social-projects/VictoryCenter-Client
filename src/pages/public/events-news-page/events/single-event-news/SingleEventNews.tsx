@@ -28,6 +28,10 @@ export const SingleEventNews = memo(
             description: description,
         });
 
+        const localizedTag = useGetLocalization(tag?.localizations, {
+            name: tag?.name || '',
+        });
+
         const finalName = localized.title || localized.name;
 
         const handleClick = () => {
@@ -40,7 +44,7 @@ export const SingleEventNews = memo(
             <div className={styles['event-card']}>
                 <img src={previewImage as string} alt={name || 'Event'} className={styles['event-image']} />
                 <div className={styles['event-header']}>
-                    {tag && <span className={styles['event-tag']}>{tag.name}</span>}
+                    {tag && <span className={styles['event-tag']}>{localizedTag.name}</span>}
                     <span className={styles['event-date']}>
                         {resource ? `${resource} | ` : ''}
                         {date}

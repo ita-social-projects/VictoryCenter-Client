@@ -6,11 +6,13 @@ import { SingleEventNews } from '../../events-news-page/events/single-event-news
 import { useDataPaginationFetch } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 import styles from './RecommendedArticles.module.scss';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 const RecommendedArticlesBase: React.FC = () => {
     const { t } = useTranslation('eventsNewsPage');
+    const { currentLanguage } = useLocale();
 
-    const getEvents = useCallback(async () => EventsNewsApi.get('', 0, 2), []);
+    const getEvents = useCallback(async () => EventsNewsApi.get(undefined, 0, 2, currentLanguage), [currentLanguage]);
 
     const { data, isLoading, error } = useDataPaginationFetch<EventsNews>({
         initialData: [],
@@ -33,8 +35,8 @@ const RecommendedArticlesBase: React.FC = () => {
                     <SingleEventNews
                         key={item?.id}
                         {...item}
-                        name={item.title || item.name}
-                        date={item.publishedAt || item.date}
+                        name={item.name || item.title}
+                        date={item.date || item.publishedAt}
                         id={String(item.id)}
                         previewImage={
                             typeof item.previewImage === 'string' ? item.previewImage : (item.previewImage?.url ?? null)

@@ -111,7 +111,7 @@ describe('Events component', () => {
 
             useDataPaginationFetch.mockImplementation(() => ({ ...mockHookImplementation, data: secondPage }));
             rerender(<Events {...mockData} />);
- 
+
             expect(screen.getAllByTestId('single-event-news')).toHaveLength(secondPage.length);
         });
 

@@ -1,0 +1,27 @@
+.translate-hippotherapy-section-modal-language-select {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem 0;
+
+    &-head {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+
+        &::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin: 4px;
+            background-image: url('~@/assets/icons/globe.svg');
+            background-size: contain;
+            background-position: center;
+            flex-shrink: 0;
+        }
+    }
+}

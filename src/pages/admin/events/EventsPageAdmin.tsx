@@ -625,10 +625,22 @@ export const EventsPageAdmin = () => {
             try {
                 const publishedSection = await EventsApi.updateEventsIntroSection(client, field, updatedSection);
                 setEventsIntroSection((currentSection) =>
-                    currentSection ? { ...currentSection, [field]: publishedSection[field] } : publishedSection,
+                    currentSection
+                        ? {
+                              ...currentSection,
+                              [field]: publishedSection[field],
+                              localizations: publishedSection.localizations,
+                          }
+                        : publishedSection,
                 );
                 setEventsIntroDraft((currentDraft) =>
-                    currentDraft ? { ...currentDraft, [field]: publishedSection[field] } : publishedSection,
+                    currentDraft
+                        ? {
+                              ...currentDraft,
+                              [field]: publishedSection[field],
+                              localizations: publishedSection.localizations,
+                          }
+                        : publishedSection,
                 );
                 setEditingSections((currentEditingSections) => ({
                     ...currentEditingSections,

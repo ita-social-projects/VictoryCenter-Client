@@ -117,12 +117,13 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
         localizedEntity,
     }: {
         languages: { id: number; code: string }[];
-        localizedEntity: EventCategoryDto;
+        localizedEntity: EventCategoryDto & { localizations?: unknown[] };
     }) => (
         <span
             data-testid="localization-statuses-mock"
             data-languages={languages?.map((lang) => lang.code).join(',')}
             data-entity-id={localizedEntity?.id}
+            data-localizations={JSON.stringify(localizedEntity?.localizations ?? [])}
         />
     ),
 }));
@@ -693,6 +694,37 @@ describe('EventsPageAdmin', () => {
         expect(descriptionStatusMock).toHaveAttribute('data-entity-id', '1');
         expect(titleStatusMock).toHaveAttribute('data-languages', 'en');
         expect(titleStatusMock).toHaveAttribute('data-entity-id', '1');
+    });
+
+    it('refreshes translation status indicators for both blocks after publishing a section', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+        const outdatedLocalizations = [{ entityId: 1, language: { id: 2, code: 'en' }, translationStatus: 2 }];
+
+        mockedEventsApi.updateEventsIntroSection.mockResolvedValueOnce({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Updated content</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+            id: 1,
+            localizations: outdatedLocalizations,
+        });
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            const descriptionSection = screen.getByTestId(`${descriptionId}-section`);
+            const descriptionStatusMock = within(descriptionSection).getByTestId('localization-statuses-mock');
+            expect(descriptionStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
+        });
+
+        const titleSection = screen.getByTestId(`${titleId}-section`);
+        const titleStatusMock = within(titleSection).getByTestId('localization-statuses-mock');
+        expect(titleStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {

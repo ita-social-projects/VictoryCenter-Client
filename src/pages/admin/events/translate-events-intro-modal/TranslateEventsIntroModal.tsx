@@ -51,10 +51,10 @@ export const TranslateEventsIntroModal = ({
             setValue(nextValue);
 
             if (validationError) {
-                setValidationError(getEventsPageTextValidationError(nextValue, validationRule));
+                setValidationError(undefined);
             }
         },
-        [validationError, validationRule],
+        [validationError],
     );
     const handleBlur = useCallback(() => {
         const normalizedValue = getNormalizedInputText(value);

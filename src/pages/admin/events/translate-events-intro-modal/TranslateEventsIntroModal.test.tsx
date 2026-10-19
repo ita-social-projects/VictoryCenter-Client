@@ -197,7 +197,7 @@ describe('TranslateEventsIntroModal', () => {
         ['pageDescription', EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
         ['eventsBlockTitle', EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE],
     ] as const)(
-        'validates the %s translation after blur and keeps saving disabled after correction',
+        'validates the %s translation on blur and clears errors while correcting the value',
         async (fieldName, label) => {
             const user = userEvent.setup();
             render(<TranslationModalHarness field={fieldName} />);
@@ -207,7 +207,13 @@ describe('TranslateEventsIntroModal', () => {
             await user.tab();
             expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
 
-            await user.type(field, '123456789');
+            await user.type(field, '12345678');
+            await user.tab();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
+
+            await user.type(field, '9');
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
+
             await user.tab();
             expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
 

@@ -276,7 +276,12 @@ export const EventsPageAdmin = () => {
     const handleTranslateEvent = useCallback(
         (updatedEvent: EventItemDto) => {
             setEventItems((prev) => prev.map((item) => (item.id === updatedEvent.id ? updatedEvent : item)));
-            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+            addToast(
+                updatedEvent.status === VisibilityStatus.Published
+                    ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
+                    : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+            );
         },
         [addToast],
     );

@@ -1928,48 +1928,57 @@ describe('EventsPageAdmin', () => {
         });
     });
 
-    it('updates event item in the list when onTranslateEvent is called', async () => {
-        const eventsResponse = {
-            items: [
-                {
-                    id: 1,
-                    title: 'Initial Event',
-                    description: 'Initial Description',
-                    publishedAt: '2024-01-01',
-                    status: VisibilityStatus.Published,
-                    previewImage: null,
-                    backgroundImage: null,
-                    priority: 1,
-                    resource: '',
-                    localizations: [],
-                },
-            ],
-            totalItemsCount: 1,
-        };
+    it.each([
+        [VisibilityStatus.Published, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS],
+        [VisibilityStatus.Draft, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS],
+    ])(
+        'updates event item and shows the toast for a %s event when onTranslateEvent is called',
+        async (status, toast) => {
+            const eventsResponse = {
+                items: [
+                    {
+                        id: 1,
+                        title: 'Initial Event',
+                        description: 'Initial Description',
+                        publishedAt: '2024-01-01',
+                        status,
+                        previewImage: null,
+                        backgroundImage: null,
+                        priority: 1,
+                        resource: '',
+                        localizations: [],
+                    },
+                ],
+                totalItemsCount: 1,
+            };
 
-        mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
+            mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
 
-        render(<EventsPageAdmin />);
+            render(<EventsPageAdmin />);
 
-        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+            expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
 
-        const updatedEvent: EventItemDto = {
-            ...eventsResponse.items[0],
-            title: 'Initial Event',
-            localizations: [
-                {
-                    language: { id: 2, code: 'en' },
-                    title: 'Translated Title',
-                    description: 'Translated Description',
-                    translationStatus: 1 as any,
-                },
-            ],
-        };
+            const updatedEvent: EventItemDto = {
+                ...eventsResponse.items[0],
+                title: 'Initial Event',
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        title: 'Translated Title',
+                        description: 'Translated Description',
+                        translationStatus: 1 as any,
+                    },
+                ],
+            };
 
-        act(() => {
-            mockOnTranslateEvent(updatedEvent);
-        });
-    });
+            act(() => {
+                mockOnTranslateEvent(updatedEvent);
+            });
+
+            expect(mockAddToast).toHaveBeenCalledWith(toast, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledTimes(1);
+        },
+    );
 
     it('opens delete confirmation modal for the selected event', async () => {
         mockedEventsApi.fetchEvents.mockResolvedValue({

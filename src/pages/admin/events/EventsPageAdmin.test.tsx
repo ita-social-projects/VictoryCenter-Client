@@ -1,6 +1,6 @@
 import React, { act } from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -237,6 +237,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             isHidden: _isHidden,
             onToggleVisibility,
             isToggleVisibilityDisabled,
+            headerExtra,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -250,12 +251,14 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             isHidden?: boolean;
             onToggleVisibility?: () => void;
             isToggleVisibilityDisabled?: boolean;
+            headerExtra?: React.ReactNode;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
             return (
                 <section data-testid={`${sectionId}-section`}>
                     <span>{mode}</span>
+                    {headerExtra}
                     <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
 
                     <button
@@ -539,6 +542,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         });
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
@@ -546,6 +551,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         });
 
         mockedEventsApi.deleteEvent.mockReset();
@@ -662,12 +669,30 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         const statusMocks = await screen.findAllByTestId('localization-statuses-mock');
+        const categoryStatusMocks = statusMocks.slice(-categories.length);
 
-        expect(statusMocks).toHaveLength(categories.length);
-        expect(statusMocks[0]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
-        expect(statusMocks[1]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+        expect(categoryStatusMocks).toHaveLength(categories.length);
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+    });
+
+    it('passes languages and the intro section as localizedEntity to LocalizationStatuses for each editable block', async () => {
+        await renderEventsPage();
+
+        const descriptionSection = await screen.findByTestId(
+            `${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID}-section`,
+        );
+        const titleSection = screen.getByTestId(`${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}-section`);
+
+        const descriptionStatusMock = await within(descriptionSection).findByTestId('localization-statuses-mock');
+        const titleStatusMock = await within(titleSection).findByTestId('localization-statuses-mock');
+
+        expect(descriptionStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(descriptionStatusMock).toHaveAttribute('data-entity-id', '1');
+        expect(titleStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(titleStatusMock).toHaveAttribute('data-entity-id', '1');
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -733,10 +758,12 @@ describe('EventsPageAdmin', () => {
 
     it('disables intro section editing until the published content is loaded', async () => {
         type IntroSection = {
+            id: number;
             eventsBlockTitle: string;
             pageDescription: string;
             isEventsBlockTitleHidden: boolean;
             isPageDescriptionHidden: boolean;
+            localizations: unknown[];
         };
 
         let resolveIntroSection!: (section: IntroSection) => void;
@@ -763,6 +790,8 @@ describe('EventsPageAdmin', () => {
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
         });
 
@@ -798,6 +827,8 @@ describe('EventsPageAdmin', () => {
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             },
         ],
         [
@@ -808,6 +839,8 @@ describe('EventsPageAdmin', () => {
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             },
         ],
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
@@ -853,12 +886,16 @@ describe('EventsPageAdmin', () => {
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             })
             .mockResolvedValueOnce({
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
 
         await renderEventsPage();
@@ -874,6 +911,8 @@ describe('EventsPageAdmin', () => {
                 eventsBlockTitle: '<p>Чернетка заголовка</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
         });
 
@@ -889,6 +928,8 @@ describe('EventsPageAdmin', () => {
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
         });
     });
@@ -927,10 +968,12 @@ describe('EventsPageAdmin', () => {
     });
     it('keeps another intro section available for publishing while a publish request is pending', async () => {
         type IntroSection = {
+            id: number;
             eventsBlockTitle: string;
             pageDescription: string;
             isEventsBlockTitleHidden: boolean;
             isPageDescriptionHidden: boolean;
+            localizations: unknown[];
         };
 
         const user = userEvent.setup();
@@ -982,6 +1025,8 @@ describe('EventsPageAdmin', () => {
                 pageDescription: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
         });
 
@@ -1002,10 +1047,12 @@ describe('EventsPageAdmin', () => {
 
     it('preserves both section updates when they are published concurrently', async () => {
         type IntroSection = {
+            id: number;
             eventsBlockTitle: string;
             pageDescription: string;
             isEventsBlockTitleHidden: boolean;
             isPageDescriptionHidden: boolean;
+            localizations: unknown[];
         };
 
         const user = userEvent.setup();
@@ -1043,6 +1090,8 @@ describe('EventsPageAdmin', () => {
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
             await titlePublishPromise;
         });
@@ -1052,6 +1101,8 @@ describe('EventsPageAdmin', () => {
                 pageDescription: '<p>Updated description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                id: 1,
+                localizations: [],
             });
             await descriptionPublishPromise;
         });
@@ -1087,6 +1138,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
 
@@ -1112,6 +1165,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
 
@@ -1137,6 +1192,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
 
@@ -1186,6 +1243,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: true,
             isPageDescriptionHidden: true,
+            id: 1,
+            localizations: [],
         });
 
         await renderEventsPage();

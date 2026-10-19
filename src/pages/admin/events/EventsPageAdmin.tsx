@@ -849,6 +849,12 @@ export const EventsPageAdmin = () => {
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)
                     }
+                    headerExtra={
+                        <LocalizationStatuses
+                            languages={translationLanguages}
+                            localizedEntity={eventsIntroSection ?? {}}
+                        />
+                    }
                 />
                 <EditableHeaderSection
                     sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}
@@ -883,6 +889,12 @@ export const EventsPageAdmin = () => {
                     isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)
+                    }
+                    headerExtra={
+                        <LocalizationStatuses
+                            languages={translationLanguages}
+                            localizedEntity={eventsIntroSection ?? {}}
+                        />
                     }
                 />
             </div>

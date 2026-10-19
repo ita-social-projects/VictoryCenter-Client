@@ -82,8 +82,27 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 Clear Search
             </button>
 
-            <button type="button" onClick={() => onSuggestionSelect?.({})}>
+            <button
+                type="button"
+                onClick={() =>
+                    onSuggestionSelect?.(1, { id: 1, title: 'Test event', categories: [{ id: 1, name: 'Category' }] })
+                }
+            >
                 Select Suggestion
+            </button>
+
+            <button
+                type="button"
+                data-testid="select-suggestion-category-2"
+                onClick={() =>
+                    onSuggestionSelect?.(2, {
+                        id: 2,
+                        title: 'Other category event',
+                        categories: [{ id: 2, name: 'Category 2' }],
+                    })
+                }
+            >
+                Select Suggestion From Category 2
             </button>
 
             <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
@@ -1703,6 +1722,114 @@ describe('EventsPageAdmin', () => {
         });
 
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    const setUpSingleEventPage = async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
+        });
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        return user;
+    };
+
+    const enableStatusFilter = async (user: ReturnType<typeof userEvent.setup>) => {
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+    };
+
+    const setUpStatusAwareEventPage = async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, _categoryId, _offset, _limit, _sort, status) =>
+            status === undefined
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        return user;
+    };
+
+    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByTestId('select-suggestion-category-2'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-2')).toBeInTheDocument();
+        expect(screen.getByText('Other category event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('load-more-events')).toBeDisabled();
+    });
+
+    it('narrows the list to the selected event and clears the status filter when the suggestion already belongs to the current category', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.getByText('Test event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('restores the full paginated list for the active category when the search is cleared after selecting a suggestion', async () => {
+        const user = await setUpSingleEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+    });
+
+    it('refetches the current category without the status filter when the search is cleared after selecting a same-category suggestion', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await enableStatusFilter(user);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('clears a selected search result when the status filter changes, so the filter actually takes effect', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-102')).not.toBeInTheDocument();
+
+        await enableStatusFilter(user);
+
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
     });
 
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {

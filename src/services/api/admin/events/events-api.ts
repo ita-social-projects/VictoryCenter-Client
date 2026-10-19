@@ -8,7 +8,6 @@ import {
     EventItemResponseDto,
     EventLocalization,
     EventLocalizationDto,
-    EventSearchItemData,
     EventsIntroSectionDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
@@ -153,11 +152,10 @@ export const EventsApi = {
         offset: number,
         limit: number,
         signal?: AbortSignal,
-    ): Promise<PaginationResult<EventSearchItemData>> => {
-        // TODO: add constant for existing search endpoint.
-        const response = await client.get<PaginationResult<EventSearchItemData>>(`${API_ROUTES.EVENTS.BASE}/search`, {
+    ): Promise<PaginationResult<EventItemDto>> => {
+        const response = await client.get<PaginationResult<EventItemDto>>(`${API_ROUTES.EVENTS.BASE}/search`, {
             params: {
-                searchTerm,
+                searchQuery: searchTerm,
                 offset,
                 limit,
             },

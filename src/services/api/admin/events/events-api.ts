@@ -141,6 +141,11 @@ export const EventsApi = {
     updateEvent: async (client: AxiosInstance, id: number, data: EventSaveData): Promise<EventItemDto> => {
         return saveEvent(client, 'put', data, id);
     },
+    deleteEvent: async (client: AxiosInstance, id: number): Promise<number> => {
+        const response = await client.delete<number>(`${API_ROUTES.EVENTS.BASE}/${id}`);
+
+        return response.data;
+    },
     fetchEventSearchItems: async (
         client: AxiosInstance,
         searchTerm: string,

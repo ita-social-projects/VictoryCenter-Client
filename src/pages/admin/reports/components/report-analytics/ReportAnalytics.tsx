@@ -57,8 +57,9 @@ export const ReportAnalytics = () => {
     const [isCancelling, setIsCancelling] = useState(false);
     const [renderKey, setRenderKey] = useState(0);
     const { setBlocked } = useAdminNavigationGuard();
-    const saveSettingsCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
+    const saveFundsExpendituresCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
     const refetchSettingsRef = useRef<(() => void) | null>(null);
+    const saveProgramExpensesCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
 
     const isReportDataValid = incomeCount >= 2 && expenseCount >= 2 && programRecordsCount >= 1 && isFundsValid;
     const isPublishEnabled = hasUnpublishedChanges && isReportDataValid && !hasSelectedRecords;
@@ -140,14 +141,20 @@ export const ReportAnalytics = () => {
     const handlePublishConfirm = useCallback(async () => {
         setIsPublishing(true);
         try {
-            if (saveSettingsCallbackRef.current) {
-                const isSaved = await saveSettingsCallbackRef.current();
-                if (!isSaved) {
-                    setIsPublishing(false);
-                    return;
-                }
+            let isFundsExpendituresSaved = true;
+            let isProgramExpensesSaved = true;
+
+            if (saveFundsExpendituresCallbackRef.current) {
+                isFundsExpendituresSaved = await saveFundsExpendituresCallbackRef.current();
             }
 
+            if (saveProgramExpensesCallbackRef.current) {
+                isProgramExpensesSaved = await saveProgramExpensesCallbackRef.current();
+            }
+
+            if (!isFundsExpendituresSaved || !isProgramExpensesSaved) {
+                return;
+            }
             await FundsExpendituresApi.publishRecords(adminClient);
 
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success, 3000);
@@ -227,7 +234,7 @@ export const ReportAnalytics = () => {
                         }}
                         onDataChange={() => setHasUnpublishedChanges(true)}
                         registerSaveCallback={(saveFn) => {
-                            saveSettingsCallbackRef.current = saveFn;
+                            saveFundsExpendituresCallbackRef.current = saveFn;
                         }}
                         onUnpublishedChangesChange={setHasUnpublishedChanges}
                         registerRefetchSettingsCallback={(fn) => {
@@ -244,6 +251,9 @@ export const ReportAnalytics = () => {
                         onCountsChange={setProgramRecordsCount}
                         onDataChange={() => setHasUnpublishedChanges(true)}
                         exchangeRate={exchangeRateDraft}
+                        registerSaveCallback={(saveFn) => {
+                            saveProgramExpensesCallbackRef.current = saveFn;
+                        }}
                     />
                 </div>
             </div>

@@ -10,6 +10,7 @@ import { LocalizationStatuses } from '@/components/admin/localization-statuses/L
 export interface EventItemComponentProps {
     item: EventItemDto;
     onEdit: (item: EventItemDto) => void;
+    onDelete: (itemId: number) => void;
     onTranslate: (item: EventItemDto) => void;
     language?: LocalizationLanguage | null;
     translationLanguages?: LocalizationLanguage[];
@@ -18,6 +19,7 @@ export interface EventItemComponentProps {
 export const EventItemComponent = ({
     item,
     onEdit,
+    onDelete,
     onTranslate,
     language,
     translationLanguages = [],
@@ -72,9 +74,7 @@ export const EventItemComponent = ({
                 <IconButton
                     aria-label={EVENT_ITEMS_TEXT.ACTIONS.DELETE}
                     type="button"
-                    onClick={() => {
-                        /*  TODO: add implementation */
-                    }}
+                    onClick={() => onDelete(item.id)}
                     DefaultIcon={ACTION_ICONS.delete.default}
                     FilledIcon={ACTION_ICONS.delete.hover}
                 />

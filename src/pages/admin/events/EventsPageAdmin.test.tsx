@@ -700,7 +700,15 @@ describe('EventsPageAdmin', () => {
         const user = userEvent.setup();
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
         const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
-        const outdatedLocalizations = [{ entityId: 1, language: { id: 2, code: 'en' }, translationStatus: 2 }];
+        const outdatedLocalizations = [
+            {
+                entityId: 1,
+                language: { id: 2, code: 'en' },
+                translationStatus: 2,
+                eventsBlockTitle: '<p>Title</p>',
+                pageDescription: '<p>Description</p>',
+            },
+        ];
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValueOnce({
             eventsBlockTitle: '<p>Loaded title</p>',

@@ -14,6 +14,11 @@ jest.mock('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug', () => ({
     useProgramBySlug: jest.fn(),
 }));
 
+const mockUseLocale = jest.fn();
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => mockUseLocale(),
+}));
+
 jest.mock('@/pages/public/not-found-page/NotFound', () => ({
     NotFound: () => <div data-testid="not-found-page">NotFound</div>,
 }));
@@ -35,6 +40,7 @@ jest.mock('@/components/public/detailed-program-section/DetailedProgramSection',
 const { useParams } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
+const { EventNewsApi } = require('@/services/api/public/events-news/events-news-api');
 
 const mockEventNews = {
     id: '1',
@@ -51,6 +57,7 @@ const mockEventNews = {
 describe('DetailedEventNewsPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockUseLocale.mockReturnValue({ currentLanguage: 'uk' });
         jest.spyOn(console, 'log').mockImplementation(() => {});
     });
 
@@ -178,5 +185,18 @@ describe('DetailedEventNewsPage', () => {
 
         const sections = screen.getAllByTestId('detailed-program-section');
         expect(sections).toHaveLength(2);
+    });
+
+    it('loads the event in the current language', async () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+        useParams.mockReturnValue({ slug: 'test-event' });
+        mockUseProgramBySlug.mockReturnValue({ program: mockEventNews, isLoading: false, error: null });
+
+        render(<DetailedEventNewsPage />);
+        const [fetchEventNews, slug] = mockUseProgramBySlug.mock.calls[0];
+        await fetchEventNews(slug);
+
+        expect(slug).toBe('test-event');
+        expect(EventNewsApi.get).toHaveBeenCalledWith('test-event', 'en');
     });
 });

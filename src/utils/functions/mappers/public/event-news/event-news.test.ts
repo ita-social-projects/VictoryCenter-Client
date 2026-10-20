@@ -1,4 +1,5 @@
 import { createPublishedEventNewsDto } from '@/utils/mock-data/public/published-event-news';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { mapToEventsNews } from './event-news';
 
 describe('mapToEventsNews', () => {
@@ -55,5 +56,46 @@ describe('mapToEventsNews', () => {
 
     it('always returns an empty sections list', () => {
         expect(mapToEventsNews(createPublishedEventNewsDto()).sections).toEqual([]);
+    });
+
+    describe('translation fallback', () => {
+        const english = { id: 2, code: 'en' };
+
+        it('shows the Ukrainian content on the English page when there is no translation', () => {
+            const result = mapToEventsNews(createPublishedEventNewsDto(), 'en');
+
+            expect(result.name).toBe('Event title');
+            expect(result.description).toBe('Event description');
+            expect(result.resource).toBe('NV');
+            expect(result.tag?.name).toBe('Media');
+        });
+
+        it('mixes translated and Ukrainian fields when only some fields are translated', () => {
+            const dto = createPublishedEventNewsDto({
+                localizations: [{ language: english, title: 'English title', description: null }],
+            });
+
+            const result = mapToEventsNews(dto, 'en');
+
+            expect(result.name).toBe('English title');
+            expect(result.description).toBe('Event description');
+        });
+
+        it('uses the English link on the English page when it is set', () => {
+            const dto = createPublishedEventNewsDto({ resourceEn: 'https://example.com/en' });
+
+            expect(mapToEventsNews(dto, 'en').resource).toBe('https://example.com/en');
+        });
+
+        it('keeps the Ukrainian content on the Ukrainian page even when a translation exists', () => {
+            const dto = createPublishedEventNewsDto({
+                localizations: [{ language: english, title: 'English title', description: 'English description' }],
+            });
+
+            const result = mapToEventsNews(dto, DEFAULT_LOCALE);
+
+            expect(result.name).toBe('Event title');
+            expect(result.description).toBe('Event description');
+        });
     });
 });

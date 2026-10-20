@@ -71,8 +71,9 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;
                 setFormState((prev) => ({ ...prev, questionText: value }));
+                setErrors((prev) => ({ ...prev, questionText: undefined }));
             },
-            [setFormState],
+            [setFormState, setErrors],
         );
 
         const handleQuestionBlur = useCallback(() => {
@@ -85,8 +86,9 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 const value = e.target.value;
                 setFormState((prev) => ({ ...prev, answerText: value }));
+                setErrors((prev) => ({ ...prev, answerText: undefined }));
             },
-            [setFormState],
+            [setFormState, setErrors],
         );
 
         const handleAnswerBlur = useCallback(() => {

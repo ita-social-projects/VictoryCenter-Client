@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { Select } from '@/components/common/select/Select';
@@ -26,8 +26,16 @@ export interface TranslateHippotherapySectionModalProps {
     translatedLanguages: LocalizationLanguage[];
 }
 
+const getAvailableLanguages = (languages: LocalizationLanguage[]): LocalizationLanguage[] => {
+    const englishOnly = languages.filter((lang) => lang.code === 'en');
+    return englishOnly.length > 0 ? englishOnly : languages;
+};
+
 const getDefaultLanguage = (languages: LocalizationLanguage[]): LocalizationLanguage | null =>
-    languages.find((lang) => lang.code !== DEFAULT_LOCALE) ?? languages[0] ?? null;
+    languages.find((lang) => lang.code === 'en') ??
+    languages.find((lang) => lang.code !== DEFAULT_LOCALE) ??
+    languages[0] ??
+    null;
 
 export const TranslateHippotherapySectionModal = ({
     isOpen,
@@ -37,23 +45,21 @@ export const TranslateHippotherapySectionModal = ({
     targetResearchLocalId,
     translatedLanguages,
 }: TranslateHippotherapySectionModalProps) => {
+    const availableLanguages = useMemo(() => getAvailableLanguages(translatedLanguages), [translatedLanguages]);
+
     const formRef = useRef<TranslateHippotherapySectionFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
     const [pendingLanguageCode, setPendingLanguageCode] = useState<string | null>(null);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(() =>
-        getDefaultLanguage(translatedLanguages),
-    );
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(() => getDefaultLanguage(availableLanguages));
 
     useEffect(() => {
         if (!isOpen) {
             setPendingLanguageCode(null);
             return;
         }
-        if (!language) {
-            setLanguage(getDefaultLanguage(translatedLanguages));
-        }
-    }, [isOpen, language, translatedLanguages]);
+        setLanguage(getDefaultLanguage(availableLanguages));
+    }, [isOpen, availableLanguages]);
 
     const sectionConfig = getHippotherapyTranslationConfig(block, subBlock);
 
@@ -67,7 +73,7 @@ export const TranslateHippotherapySectionModal = ({
     const checkIsDirty = () => formRef.current?.isDirty() ?? false;
 
     const applyLanguageChange = (code: string) => {
-        const newLanguage = translatedLanguages.find((lang) => lang.code === code);
+        const newLanguage = availableLanguages.find((lang) => lang.code === code);
         if (newLanguage) setLanguage(newLanguage);
     };
 
@@ -113,7 +119,7 @@ export const TranslateHippotherapySectionModal = ({
                             value={language.code}
                             onValueChange={handleLanguageChange}
                         >
-                            {translatedLanguages.map((lang) => (
+                            {availableLanguages.map((lang) => (
                                 <Select.Option key={lang.id} value={lang.code} name={lang.name} />
                             ))}
                         </Select>

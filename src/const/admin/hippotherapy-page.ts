@@ -61,10 +61,16 @@ export interface HippotherapyTranslationFieldConfig {
     maxLength: number;
     minLength?: number;
     isRequired: boolean;
+    type?: 'rich-text' | 'textarea' | 'text';
 }
 
+export type HippotherapyTranslationSectionKey =
+    | keyof HippotherapyPageLocalizedContent
+    | 'scientificReferencesSection-general'
+    | 'scientificReferencesSection-research';
+
 export interface HippotherapyTranslationSectionConfig {
-    sectionKey: keyof HippotherapyPageLocalizedContent | string;
+    sectionKey: HippotherapyTranslationSectionKey;
     fields: HippotherapyTranslationFieldConfig[];
 }
 
@@ -109,6 +115,7 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_CITATION_NAME,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
         isRequired: true,
+        type: 'textarea',
     },
 ];
 

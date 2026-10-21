@@ -676,5 +676,55 @@ describe('HippotherapyPageContent', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Edit reference item' }));
             expect(itemTranslateButton).toBeDisabled();
         });
+
+        it('disables the general research translation action when an English translation already exists', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        scientificReferencesSection: {
+                            title: 'English Title',
+                            description: 'English Description',
+                            scientificReferences: [],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-general',
+            });
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('disables the research reference item translation action when an English translation already exists for that item', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        scientificReferencesSection: {
+                            title: '',
+                            description: '',
+                            scientificReferences: [{ id: 1, name: 'Translated citation' }],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const itemTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-item',
+            });
+            expect(itemTranslateButton).toBeDisabled();
+        });
     });
 });

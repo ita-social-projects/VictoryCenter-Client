@@ -9,6 +9,7 @@ import {
     HippotherapyGallerySectionContent,
     HippotherapyImageValue,
     HippotherapyPageContentModel,
+    HippotherapyPageLocalization,
     HippotherapyPageLocalizationBlock,
     HippotherapyQuoteContent,
     HippotherapyScientificReference,
@@ -181,6 +182,30 @@ const hasUnpublishedScientificReference = (
     return published.name.trim() !== draftReference.name.trim() || published.url.trim() !== draftReference.url.trim();
 };
 
+const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.quoteSection?.quoteText?.trim());
+
+const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.anotherQuoteSection?.quoteText?.trim());
+
+const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        localization?.scientificReferencesSection?.title?.trim() ||
+            localization?.scientificReferencesSection?.description?.trim(),
+    );
+
+const hasScientificReferenceTranslation = (
+    localization: HippotherapyPageLocalization | null,
+    referenceId: number | null,
+): boolean => {
+    if (referenceId === null || !localization?.scientificReferencesSection?.scientificReferences) {
+        return false;
+    }
+    return localization.scientificReferencesSection.scientificReferences.some(
+        (ref) => ref.id === referenceId && Boolean(ref.name?.trim()),
+    );
+};
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -199,6 +224,19 @@ export const HippotherapyPageContent = () => {
     );
 
     const { translationLanguages } = useLocalizationToolkit({ setErrorState: setLanguagesErrorState });
+
+    const englishLanguage = useMemo(
+        () => translationLanguages.find((lang) => lang.code === 'en'),
+        [translationLanguages],
+    );
+
+    const targetLocalization = useMemo(
+        () =>
+            fetchedContent?.localizations?.find(
+                (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
+            ) ?? null,
+        [fetchedContent, englishLanguage],
+    );
 
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
 
@@ -354,12 +392,17 @@ export const HippotherapyPageContent = () => {
                 (ref) => ref.localId === localId,
             );
             if (!draftReference) return true;
-            return hasUnpublishedScientificReference(
-                fetchedContent.scientificReferencesSection.scientificReferences,
-                draftReference,
-            );
+            if (
+                hasUnpublishedScientificReference(
+                    fetchedContent.scientificReferencesSection.scientificReferences,
+                    draftReference,
+                )
+            ) {
+                return true;
+            }
+            return hasScientificReferenceTranslation(targetLocalization, draftReference.id);
         },
-        [isDisabled, fetchedContent, draftContent],
+        [isDisabled, fetchedContent, draftContent, targetLocalization],
     );
 
     const renderContent = () => {
@@ -419,8 +462,9 @@ export const HippotherapyPageContent = () => {
                     onTranslateClick={canTranslate ? translationHandlers.quoteSection : undefined}
                     isTranslateDisabled={
                         isDisabled ||
-                        (!!fetchedContent &&
-                            hasUnpublishedQuoteText(fetchedContent.quoteSection, draftContent.quoteSection))
+                        !fetchedContent ||
+                        hasUnpublishedQuoteText(fetchedContent.quoteSection, draftContent.quoteSection) ||
+                        hasQuoteTranslation(targetLocalization)
                     }
                 />
                 <hr />
@@ -465,7 +509,8 @@ export const HippotherapyPageContent = () => {
                         hasUnpublishedScientificGeneral(
                             fetchedContent.scientificReferencesSection,
                             draftContent.scientificReferencesSection,
-                        )
+                        ) ||
+                        hasScientificGeneralTranslation(targetLocalization)
                     }
                     onTranslateReferenceClick={canTranslate ? translationHandlers.scientificReference : undefined}
                     isTranslateReferenceDisabled={isTranslateReferenceDisabled}
@@ -481,11 +526,9 @@ export const HippotherapyPageContent = () => {
                     onTranslateClick={canTranslate ? translationHandlers.anotherQuoteSection : undefined}
                     isTranslateDisabled={
                         isDisabled ||
-                        (!!fetchedContent &&
-                            hasUnpublishedQuoteText(
-                                fetchedContent.anotherQuoteSection,
-                                draftContent.anotherQuoteSection,
-                            ))
+                        !fetchedContent ||
+                        hasUnpublishedQuoteText(fetchedContent.anotherQuoteSection, draftContent.anotherQuoteSection) ||
+                        hasAnotherQuoteTranslation(targetLocalization)
                     }
                 />
                 <hr />

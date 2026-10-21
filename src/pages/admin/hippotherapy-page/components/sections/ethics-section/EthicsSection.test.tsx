@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EthicsSection, EthicsSectionProps } from './EthicsSection';
+import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
@@ -125,30 +126,5 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
     });
 
-    it('does not render the translation icon without onTranslateClick', () => {
-        renderComponent();
-
-        expect(
-            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).not.toBeInTheDocument();
-    });
-
-    it('renders the translation icon and calls onTranslateClick when it is clicked', () => {
-        const onTranslateClick = jest.fn();
-        renderComponent({ onTranslateClick });
-
-        fireEvent.click(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        );
-
-        expect(onTranslateClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('disables the translation icon when isTranslateDisabled is true', () => {
-        renderComponent({ onTranslateClick: jest.fn(), isTranslateDisabled: true });
-
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).toBeDisabled();
-    });
+    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

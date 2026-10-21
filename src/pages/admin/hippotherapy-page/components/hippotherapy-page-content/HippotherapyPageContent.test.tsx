@@ -358,7 +358,7 @@ describe('HippotherapyPageContent', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
-    it('publishes changes, shows a success toast, and resets the dirty state on confirm', async () => {
+    it('publishes changes, shows a success toast, resets the dirty state, and enables translation again on confirm', async () => {
         const content = buildContent();
         mockedHippotherapyPageApi.get.mockResolvedValue(content);
         const publishedContent = { ...content, introSection: { ...content.introSection, title: 'Edited intro title' } };
@@ -386,9 +386,10 @@ describe('HippotherapyPageContent', () => {
             expect.objectContaining({ introSection: expect.objectContaining({ title: 'Edited intro title' }) }),
         );
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        expectTranslationDisabledForEverySection(false);
     });
 
-    it('shows a failure toast when publishing fails', async () => {
+    it('shows a failure toast and keeps translation disabled when publishing fails', async () => {
         mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
         mockedHippotherapyPageApi.update.mockRejectedValue(new Error('publish failed'));
 
@@ -405,6 +406,7 @@ describe('HippotherapyPageContent', () => {
                 ToastType.Error,
             ),
         );
+        expectTranslationDisabledForEverySection(true);
     });
 
     it('updates every non-intro section when its edit control is used', async () => {
@@ -516,44 +518,6 @@ describe('HippotherapyPageContent', () => {
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit ethics' }));
 
-        expectTranslationDisabledForEverySection(true);
-    });
-
-    it('enables translation for every section again after the changes are published', async () => {
-        const content = buildContent();
-        mockedHippotherapyPageApi.get.mockResolvedValue(content);
-        mockedHippotherapyPageApi.update.mockResolvedValue({
-            ...content,
-            introSection: { ...content.introSection, title: 'Edited intro title' },
-        });
-
-        render(<HippotherapyPageContent />);
-
-        await screen.findByTestId('section-intro');
-        fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
-        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
-        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-        await waitFor(() => expectTranslationDisabledForEverySection(false));
-    });
-
-    it('keeps translation disabled for every section when publishing fails', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-        mockedHippotherapyPageApi.update.mockRejectedValue(new Error('publish failed'));
-
-        render(<HippotherapyPageContent />);
-
-        await screen.findByTestId('section-intro');
-        fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
-        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
-        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-        await waitFor(() =>
-            expect(mockAddToast).toHaveBeenCalledWith(
-                COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
-                ToastType.Error,
-            ),
-        );
         expectTranslationDisabledForEverySection(true);
     });
 });

@@ -24,13 +24,13 @@ interface TranslateHippotherapySectionFormProps {
 }
 
 const validateField = (field: HippotherapyTranslationFieldConfig, value: string): string | undefined => {
-    const plainText = getPlainTextFromHtml(value);
+    const plainText = getPlainTextFromHtml(value).trim();
 
-    if (!field.isRequired && !plainText.trim()) {
+    if (!field.isRequired && !plainText) {
         return undefined;
     }
 
-    return HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText);
+    return HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText, field.minLength);
 };
 
 export const TranslateHippotherapySectionForm = forwardRef<

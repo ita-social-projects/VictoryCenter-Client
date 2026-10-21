@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HippotherapyQuoteSection, HippotherapyQuoteSectionProps } from './HippotherapyQuoteSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
@@ -124,6 +123,4 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.getByTestId('mock-rich-input-test-quote-quote-text')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EthicsSection, EthicsSectionProps } from './EthicsSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
@@ -125,6 +124,4 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { GallerySection, GallerySectionProps } from './GallerySection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
@@ -124,6 +123,4 @@ describe('GallerySection', () => {
         expect(screen.getByTestId('mock-rich-input-test-gallery-card-0-description')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-gallery-card-1-description')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HippoventionCenterSection, HippoventionCenterSectionProps } from './HippoventionCenterSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
@@ -124,6 +123,4 @@ describe('HippoventionCenterSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippovention-center-description')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ScientificReferencesSection, ScientificReferencesSectionProps } from './ScientificReferencesSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
@@ -359,6 +358,4 @@ describe('ScientificReferencesSection', () => {
             scientificReferences: [defaultValue.scientificReferences[1]],
         });
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

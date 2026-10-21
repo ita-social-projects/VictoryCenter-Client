@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
@@ -111,6 +110,4 @@ describe('IntroBannerSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-title')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

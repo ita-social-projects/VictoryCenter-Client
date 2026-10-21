@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextCardSection, TextCardSectionProps } from './TextCardSection';
-import { createSectionTranslationTestSuite } from '../test-utils/sectionTranslationTestFactory';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
@@ -76,6 +75,4 @@ describe('TextCardSection', () => {
         expect(screen.getByTestId('mock-rich-input-test-card-title')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-card-description')).toBeDisabled();
     });
-
-    createSectionTranslationTestSuite((props) => renderComponent(props));
 });

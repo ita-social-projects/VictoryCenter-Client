@@ -43,6 +43,24 @@ interface HistoryErrorState {
     type: HistoryErrorType | null;
 }
 
+const getSectionsSnapshot = (items: HistorySectionDto[]) =>
+    JSON.stringify(
+        items.map((section) => ({
+            id: section.id ?? null,
+            template: section.template,
+            order: section.order,
+            contents: section.contents.map((content) => ({
+                id: content.id ?? null,
+                contentType: content.contentType,
+                order: content.order,
+                title: content.title,
+                description: content.description,
+                imageId: content.imageId ?? null,
+                image: content.image,
+            })),
+        })),
+    );
+
 export const HistoryPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -152,7 +170,6 @@ export const HistoryPageContent = () => {
 
     const handleRequestSaveSection = useCallback(
         ({ onConfirm }: { onConfirm: () => void }) => {
-            // ignore new requests while the modal is already open to avoid silently overwriting the pending callback
             if (isSectionSaveModalOpen) return;
             pendingSaveConfirmRef.current = onConfirm;
             setIsSectionSaveModalOpen(true);
@@ -194,24 +211,6 @@ export const HistoryPageContent = () => {
                     })),
                 }));
                 await HistoryApi.syncSections(client, payload);
-
-                const getSectionsSnapshot = (items: HistorySectionDto[]) =>
-                    JSON.stringify(
-                        items.map((section) => ({
-                            id: section.id ?? null,
-                            template: section.template,
-                            order: section.order,
-                            contents: section.contents.map((content) => ({
-                                id: content.id ?? null,
-                                contentType: content.contentType,
-                                order: content.order,
-                                title: content.title,
-                                description: content.description,
-                                imageId: content.imageId ?? null,
-                                image: content.image,
-                            })),
-                        })),
-                    );
 
                 const currentSections = historyFormRef.current?.getSections() ?? [];
                 setCanPublish(getSectionsSnapshot(currentSections) !== getSectionsSnapshot(remainingSections));
@@ -325,25 +324,6 @@ export const HistoryPageContent = () => {
     const handleSectionChanged = useCallback(
         (updatedSections: HistorySectionDto[]) => {
             setLocalSectionsCount(updatedSections.length);
-
-            const getSectionsSnapshot = (items: HistorySectionDto[]) =>
-                JSON.stringify(
-                    items.map((section) => ({
-                        id: section.id ?? null,
-                        template: section.template,
-                        order: section.order,
-                        contents: section.contents.map((content) => ({
-                            id: content.id ?? null,
-                            contentType: content.contentType,
-                            order: content.order,
-                            title: content.title,
-                            description: content.description,
-                            imageId: content.imageId ?? null,
-                            image: content.image,
-                        })),
-                    })),
-                );
-
             setCanPublish(getSectionsSnapshot(updatedSections) !== getSectionsSnapshot(filteredSections));
         },
         [filteredSections],

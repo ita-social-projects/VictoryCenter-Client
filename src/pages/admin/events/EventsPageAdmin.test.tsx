@@ -253,6 +253,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
+            onTranslate,
             isHidden: _isHidden,
             onToggleVisibility,
             isToggleVisibilityDisabled,
@@ -266,6 +267,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml: string;
             isPublishDisabled?: boolean;
             disabled?: boolean;
+            onTranslate?: () => void;
             isHidden?: boolean;
             onToggleVisibility?: () => void;
             isToggleVisibilityDisabled?: boolean;
@@ -284,6 +286,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={disabled}
                     >
                         Edit section
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onTranslate}
+                        aria-label={`Перекласти ${sectionId}`}
+                        disabled={disabled}
+                    >
+                        Translate section
                     </button>
 
                     <button
@@ -731,6 +742,21 @@ describe('EventsPageAdmin', () => {
 
         expect(await screen.findByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
         expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
+    });
+
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE,
+        ],
+    ])('opens the matching translation modal for %s', async (sectionId, fieldLabel) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Перекласти ${sectionId}` }));
+
+        expect(screen.getByRole('textbox', { name: new RegExp(fieldLabel) })).toBeInTheDocument();
     });
 
     it('drafts content and cancels edit mode successfully', async () => {

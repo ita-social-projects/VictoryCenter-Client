@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { useState } from 'react';
-import { act, getDefaultNormalizer, render, screen } from '@testing-library/react';
+import { act, fireEvent, getDefaultNormalizer, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { EVENTS_TEXT } from '@/const/admin/events';
@@ -191,5 +191,58 @@ describe('TranslateEventsIntroModal', () => {
                 normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
             }),
         ).toBeInTheDocument();
+    });
+
+    it.each([
+        ['pageDescription', EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
+        ['eventsBlockTitle', EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE],
+    ] as const)(
+        'validates the %s translation on blur and clears errors while correcting the value',
+        async (fieldName, label) => {
+            const user = userEvent.setup();
+            render(<TranslationModalHarness field={fieldName} />);
+            const field = getTranslationField(label);
+
+            await user.click(field);
+            await user.tab();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+
+            await user.type(field, '12345678');
+            await user.tab();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
+
+            await user.type(field, '9');
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
+
+            await user.tab();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).toBeInTheDocument();
+
+            await user.type(field, '0');
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10))).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
+        },
+    );
+
+    it('normalizes whitespace before validating a page description translation', async () => {
+        const user = userEvent.setup();
+        render(<TranslationModalHarness />);
+        const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE);
+
+        await user.type(field, '   ');
+        await user.tab();
+
+        expect(field).toHaveValue('');
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+    });
+
+    it.each([
+        ['pageDescription', EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE, 1000],
+        ['eventsBlockTitle', EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE, 100],
+    ] as const)('keeps saving disabled at the %s maximum-length boundary', (fieldName, label, max) => {
+        render(<TranslationModalHarness field={fieldName} />);
+        const field = getTranslationField(label);
+
+        fireEvent.change(field, { target: { value: 'a'.repeat(max) } });
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
     });
 });

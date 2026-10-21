@@ -359,6 +359,19 @@ describe('FaqModal', () => {
             expect(mockFaqApi.post).not.toHaveBeenCalled();
             expect(mockOnAddFaq).not.toHaveBeenCalled();
         });
+
+        it('should keep the modal open when cancelling a draft save', () => {
+            render(<FaqModal {...addModeProps} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getDraftButton());
+            simulateFormSubmit(VisibilityStatus.Draft);
+            fireEvent.click(getQuestionCancelButton());
+
+            expect(getQuestionModal()).not.toBeInTheDocument();
+            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockFaqApi.post).not.toHaveBeenCalled();
+        });
     });
 
     // --- Edit Mode ---
@@ -434,6 +447,62 @@ describe('FaqModal', () => {
             });
             expect(mockOnEditFaq).not.toHaveBeenCalled();
             expect(mockOnClose).not.toHaveBeenCalled();
+        });
+
+        it('should close the modal without saving when cancelling "Save as draft" for a draft FAQ', () => {
+            render(<FaqModal {...editModeProps} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getDraftButton());
+            simulateFormSubmit(VisibilityStatus.Draft);
+            expect(getQuestionTitle()).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+
+            fireEvent.click(getQuestionCancelButton());
+
+            expect(getQuestionModal()).not.toBeInTheDocument();
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
+            expect(mockFaqApi.update).not.toHaveBeenCalled();
+            expect(mockOnEditFaq).not.toHaveBeenCalled();
+        });
+
+        it('should keep the modal open when cancelling "Publish" for a draft FAQ', () => {
+            render(<FaqModal {...editModeProps} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getPublishButton());
+            simulateFormSubmit(VisibilityStatus.Published);
+            fireEvent.click(getQuestionCancelButton());
+
+            expect(getQuestionModal()).not.toBeInTheDocument();
+            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockFaqApi.update).not.toHaveBeenCalled();
+        });
+
+        it('should keep the modal open when cancelling "Save as draft" for a published FAQ', () => {
+            const publishedFaq = { ...mockFaq, status: VisibilityStatus.Published };
+            render(<FaqModal {...editModeProps} faqToEdit={publishedFaq} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getDraftButton());
+            simulateFormSubmit(VisibilityStatus.Draft);
+            expect(getQuestionTitle()).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION);
+
+            fireEvent.click(getQuestionCancelButton());
+
+            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockFaqApi.update).not.toHaveBeenCalled();
+        });
+
+        it('should still save the draft when confirming "Save as draft" for a draft FAQ', async () => {
+            render(<FaqModal {...editModeProps} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getDraftButton());
+            simulateFormSubmit(VisibilityStatus.Draft);
+            fireEvent.click(getQuestionConfirmButton());
+
+            await waitFor(() => expect(mockFaqApi.update).toHaveBeenCalledTimes(1));
+            expect(mockOnEditFaq).toHaveBeenCalled();
         });
     });
 });

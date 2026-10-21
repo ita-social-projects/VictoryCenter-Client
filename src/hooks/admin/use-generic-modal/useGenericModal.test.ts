@@ -127,6 +127,61 @@ describe('useGenericModal', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
+    describe('handleCancelConfirmation with closeOnDraftCancel', () => {
+        const submitAs = (result: { current: ReturnType<typeof useGenericModal> }, status: VisibilityStatus) => {
+            result.current.formRef.current = makeFormRef({ isValid: () => true });
+            act(() => {
+                result.current.handleFormSubmit({ field: 'value' }, status);
+            });
+            expect(result.current.showFormConfirmModal).toBe(true);
+        };
+
+        it('closes the modal without calling the API when the pending action is Draft', () => {
+            const { result } = renderHook(() => useGenericModal({ ...defaultConfig, closeOnDraftCancel: true }));
+            submitAs(result, VisibilityStatus.Draft);
+
+            act(() => result.current.handleCancelConfirmation());
+
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(result.current.isSubmitting).toBe(false);
+            expect(onClose).toHaveBeenCalledTimes(1);
+            expect(apiCall).not.toHaveBeenCalled();
+            expect(onSuccess).not.toHaveBeenCalled();
+        });
+
+        it('keeps the modal open when the pending action is Publish', () => {
+            const { result } = renderHook(() => useGenericModal({ ...defaultConfig, closeOnDraftCancel: true }));
+            submitAs(result, VisibilityStatus.Published);
+
+            act(() => result.current.handleCancelConfirmation());
+
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        it('keeps the modal open for Draft when closeOnDraftCancel is not set', () => {
+            const { result } = renderHook(() => useGenericModal(defaultConfig));
+            submitAs(result, VisibilityStatus.Draft);
+
+            act(() => result.current.handleCancelConfirmation());
+
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        it('resets pending state so a later confirm does not call the API', async () => {
+            const { result } = renderHook(() => useGenericModal({ ...defaultConfig, closeOnDraftCancel: true }));
+            submitAs(result, VisibilityStatus.Draft);
+
+            act(() => result.current.handleCancelConfirmation());
+            await act(async () => {
+                await result.current.handleConfirmAction();
+            });
+
+            expect(apiCall).not.toHaveBeenCalled();
+        });
+    });
+
     it('handleDismissConfirmation hides the action confirmation and resets pending state without closing the modal', () => {
         const { result } = renderHook(() => useGenericModal(defaultConfig));
 

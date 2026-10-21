@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getRichTextContentFromHtml } from '@/utils/functions/rich-text-content/rich-text-content';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Content } from '@/types/admin/who-we-are';
@@ -63,7 +63,7 @@ export const CardContent = ({
     };
 
     const handleDescriptionValidate = (value: string) => {
-        const plainText = getPlainTextFromHtml(value);
+        const plainText = getRichTextContentFromHtml(value);
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText) || null;
 
         setDescriptionError(error);

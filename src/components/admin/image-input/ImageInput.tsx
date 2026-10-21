@@ -188,24 +188,12 @@ export const ImageInput = ({
         if (rawImage && 'base64' in rawImage) {
             setPreviewImage(rawImage);
             onChange(rawImage);
-
-            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(rawImage, cropWidth, cropHeight);
-            if (error) {
-                setError(error);
-            } else {
-                setError(null);
-            }
-
+            setError(null);
             return;
         }
 
         if (previewImage && 'base64' in previewImage) {
-            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, cropWidth, cropHeight);
-            if (error) {
-                setError(error);
-            } else {
-                setError(null);
-            }
+            setError(null);
         }
     };
 

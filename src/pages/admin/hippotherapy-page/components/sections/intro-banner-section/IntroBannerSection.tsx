@@ -11,6 +11,7 @@ import {
 import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './IntroBannerSection.scss';
 
 export interface IntroBannerSectionProps {
@@ -18,9 +19,18 @@ export interface IntroBannerSectionProps {
     onChange: (value: HippotherapyIntroSectionContent) => void;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
-const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }: IntroBannerSectionProps) => {
+const IntroBannerSectionComponent = ({
+    value,
+    onChange,
+    onImageError,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+}: IntroBannerSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
         onChange,
@@ -40,6 +50,12 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
 
     return (
         <div className="hippotherapy-intro-banner-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <div className="hippotherapy-intro-banner-section-image">
                 <ImageInput
                     variant="whoWeAre"

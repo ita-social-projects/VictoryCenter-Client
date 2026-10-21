@@ -32,8 +32,8 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 }));
 
 jest.mock('../sections/intro-banner-section/IntroBannerSection', () => ({
-    IntroBannerSection: ({ value, onChange, onImageError, disabled }: any) => (
-        <div data-testid="section-intro">
+    IntroBannerSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
+        <div data-testid="section-intro" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited intro title' })}>
                 Edit intro
@@ -45,8 +45,8 @@ jest.mock('../sections/intro-banner-section/IntroBannerSection', () => ({
 }));
 
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
-    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`}>
+    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled, isTranslateDisabled }: any) => (
+        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited text card title' })}>
                 Edit {fieldIdPrefix}
@@ -56,8 +56,15 @@ jest.mock('../sections/text-card-section/TextCardSection', () => ({
 }));
 
 jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () => ({
-    HippotherapyQuoteSection: ({ value, onChange, onImageError, fieldIdPrefix, disabled }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`}>
+    HippotherapyQuoteSection: ({
+        value,
+        onChange,
+        onImageError,
+        fieldIdPrefix,
+        disabled,
+        isTranslateDisabled,
+    }: any) => (
+        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.quoteText}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, quoteText: 'Edited quote' })}>
                 Edit {fieldIdPrefix}
@@ -69,8 +76,8 @@ jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () 
 }));
 
 jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', () => ({
-    HippoventionCenterSection: ({ value, onChange, onImageError, disabled }: any) => (
-        <div data-testid="section-hippovention-center">
+    HippoventionCenterSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
+        <div data-testid="section-hippovention-center" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited hippovention center' })}>
                 Edit hippovention center
@@ -82,8 +89,8 @@ jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', (
 }));
 
 jest.mock('../sections/gallery-section/GallerySection', () => ({
-    GallerySection: ({ value, onChange, onCardImageError, fieldIdPrefix, disabled }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`}>
+    GallerySection: ({ value, onChange, onCardImageError, fieldIdPrefix, disabled, isTranslateDisabled }: any) => (
+        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited gallery title' })}>
                 Edit {fieldIdPrefix}
@@ -97,8 +104,8 @@ jest.mock('../sections/gallery-section/GallerySection', () => ({
 }));
 
 jest.mock('../sections/scientific-references-section/ScientificReferencesSection', () => ({
-    ScientificReferencesSection: ({ value, onChange, disabled }: any) => (
-        <div data-testid="section-research">
+    ScientificReferencesSection: ({ value, onChange, disabled, isTranslateDisabled }: any) => (
+        <div data-testid="section-research" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited research title' })}>
                 Edit research
@@ -108,8 +115,8 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
 }));
 
 jest.mock('../sections/ethics-section/EthicsSection', () => ({
-    EthicsSection: ({ value, onChange, onImageError, disabled }: any) => (
-        <div data-testid="section-ethics">
+    EthicsSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
+        <div data-testid="section-ethics" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
                 Edit ethics
@@ -178,6 +185,26 @@ const buildContent = (): HippotherapyPageContentModel => ({
         imageId: savedImage.id,
     },
 });
+
+const SECTION_TEST_IDS = [
+    'section-intro',
+    'section-hippotherapy-description',
+    'section-hippotherapy-quote',
+    'section-hippotherapy-hippovention',
+    'section-hippovention-center',
+    'section-hippotherapy-advantages',
+    'section-hippotherapy-analysis',
+    'section-research',
+    'section-hippotherapy-another-quote',
+    'section-hippotherapy-participants',
+    'section-ethics',
+];
+
+const expectTranslationDisabledForEverySection = (isDisabled: boolean) => {
+    SECTION_TEST_IDS.forEach((testId) =>
+        expect(screen.getByTestId(testId)).toHaveAttribute('data-translate-disabled', String(isDisabled)),
+    );
+};
 
 describe('HippotherapyPageContent', () => {
     const mockClient = { get: jest.fn(), put: jest.fn() };
@@ -470,5 +497,63 @@ describe('HippotherapyPageContent', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Close' }));
         expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         expect(mockedHippotherapyPageApi.update).not.toHaveBeenCalled();
+    });
+
+    it('keeps translation enabled for every section while there are no unpublished changes', async () => {
+        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+        render(<HippotherapyPageContent />);
+
+        await screen.findByTestId('section-intro');
+        expectTranslationDisabledForEverySection(false);
+    });
+
+    it('disables translation for every section once any section has unpublished changes', async () => {
+        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+        render(<HippotherapyPageContent />);
+
+        await screen.findByTestId('section-intro');
+        fireEvent.click(screen.getByRole('button', { name: 'Edit ethics' }));
+
+        expectTranslationDisabledForEverySection(true);
+    });
+
+    it('enables translation for every section again after the changes are published', async () => {
+        const content = buildContent();
+        mockedHippotherapyPageApi.get.mockResolvedValue(content);
+        mockedHippotherapyPageApi.update.mockResolvedValue({
+            ...content,
+            introSection: { ...content.introSection, title: 'Edited intro title' },
+        });
+
+        render(<HippotherapyPageContent />);
+
+        await screen.findByTestId('section-intro');
+        fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => expectTranslationDisabledForEverySection(false));
+    });
+
+    it('keeps translation disabled for every section when publishing fails', async () => {
+        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+        mockedHippotherapyPageApi.update.mockRejectedValue(new Error('publish failed'));
+
+        render(<HippotherapyPageContent />);
+
+        await screen.findByTestId('section-intro');
+        fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() =>
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
+                ToastType.Error,
+            ),
+        );
+        expectTranslationDisabledForEverySection(true);
     });
 });

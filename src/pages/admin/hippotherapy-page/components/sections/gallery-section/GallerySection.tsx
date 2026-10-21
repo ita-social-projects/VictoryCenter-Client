@@ -6,6 +6,7 @@ import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
 import { ImageValues } from '@/types/common/image';
 import { GalleryCard } from './gallery-card/GalleryCard';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './GallerySection.scss';
 
 export interface GallerySectionProps {
@@ -15,6 +16,8 @@ export interface GallerySectionProps {
     defaultCardImageStyles?: CSSProperties[];
     onCardImageError?: (index: number, error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 const GallerySectionComponent = ({
@@ -24,6 +27,8 @@ const GallerySectionComponent = ({
     defaultCardImageStyles,
     onCardImageError,
     disabled,
+    onTranslateClick,
+    isTranslateDisabled,
 }: GallerySectionProps) => {
     const [cardImageErrors, setCardImageErrors] = useState<Record<number, string | null>>({});
 
@@ -50,6 +55,12 @@ const GallerySectionComponent = ({
 
     return (
         <div className="hippotherapy-gallery-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <RichTextInputGroup
                 label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                 isRequired

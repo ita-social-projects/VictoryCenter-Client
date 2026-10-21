@@ -4,6 +4,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './TextCardSection.scss';
 
 export interface TextCardSectionProps {
@@ -11,9 +12,18 @@ export interface TextCardSectionProps {
     onChange: (value: HippotherapyTextCardContent) => void;
     fieldIdPrefix: string;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
-const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: TextCardSectionProps) => {
+const TextCardSectionComponent = ({
+    value,
+    onChange,
+    fieldIdPrefix,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+}: TextCardSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
@@ -27,6 +37,12 @@ const TextCardSectionComponent = ({ value, onChange, fieldIdPrefix, disabled }: 
 
     return (
         <div className="hippotherapy-text-card-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <RichTextInputGroup
                 label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                 isRequired

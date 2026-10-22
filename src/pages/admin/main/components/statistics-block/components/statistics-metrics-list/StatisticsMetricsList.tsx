@@ -10,7 +10,12 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { ToastType } from '@/types/admin/toast';
 import { Metric, MetricType, UpdateMetricResult, UpdateSingleMetricDto } from '@/types/admin/main-page';
-import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
+import {
+    formatMetricValue,
+    getMetricName,
+    getRaisedMetricCurrency,
+} from '@/utils/functions/formatters/metric-formatters';
+import { formatCurrency } from '@/utils/functions/formatters/format-currency';
 import { useState } from 'react';
 import { RaisedMetricEditPanel } from '../raised-metric-edit-panel/RaisedMetricEditPanel';
 import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/StatisticsMetricEditPanel';
@@ -200,10 +205,10 @@ export const StatisticsMetricsList = ({
                     {metric.type === MetricType.Raised ? (
                         <div className={styles.raisedValues}>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                                {formatMetricValue(metric, 'UA')} {MAIN_PAGE_TEXT.BLOCKS.STATISTICS.CURRENCY_UAH}
+                                {formatCurrency(formatMetricValue(metric, 'UA'), getRaisedMetricCurrency(metric, 'UA'))}
                             </p>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                                ${formatMetricValue(metric, 'EN')}
+                                {formatCurrency(formatMetricValue(metric, 'EN'), getRaisedMetricCurrency(metric, 'EN'))}
                             </p>
                         </div>
                     ) : (

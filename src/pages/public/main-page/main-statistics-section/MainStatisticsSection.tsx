@@ -3,12 +3,14 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { useCounterAnimation } from '@/hooks/common/use-counter-animation/useCounterAnimation';
 import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricType } from '@/types/public/main-page';
-import { CURRENCY_LABELS } from '@/const/common/currency';
-import { DEFAULT_LOCALE, NUMBER_FORMAT_LOCALES } from '@/const/common/locales';
+import { LocaleCurrency } from '@/const/common/currency';
+import { getLocaleSettings } from '@/const/common/locales';
+import { formatCurrency } from '@/utils/functions/formatters/format-currency';
 import {
     applyMetricPrefix,
     resolveMetricValue,
     ResolvedMetricValue,
+    getAmountCurrency,
 } from '@/utils/functions/formatters/metric-formatters';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import fallbackImage from '@/assets/images/two-horses-gray.webp';
@@ -34,14 +36,14 @@ const formatMetricValue = (
     value: number,
     prefix: MetricPrefix | null | undefined,
     type: MetricType,
-    isUsd: boolean,
+    currency: LocaleCurrency,
     locale: string,
 ): string => {
     const formatted = applyMetricPrefix(value.toLocaleString(locale), prefix);
 
     if (type !== MetricType.Raised) return formatted;
 
-    return isUsd ? `${CURRENCY_LABELS.USD}${formatted}` : `${formatted} ${CURRENCY_LABELS.UAH}`;
+    return formatCurrency(formatted, currency);
 };
 
 const getStatisticTitle = (statistic: PublicImpactStatisticDto, currentLanguage: string): string => {
@@ -56,13 +58,14 @@ interface AnimatedCounterProps {
 }
 
 const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ metric, currentLanguage, isVisible }) => {
-    const { value: targetValue, usedLocalizedValue: isUsd } = getRaisedValue(metric, currentLanguage);
+    const { value: targetValue, usedLocalizedValue } = getRaisedValue(metric, currentLanguage);
     const displayValue = useCounterAnimation(targetValue, isVisible);
 
     const name = getMetricLocalizedName(metric, currentLanguage);
-    const locale = NUMBER_FORMAT_LOCALES[currentLanguage] ?? NUMBER_FORMAT_LOCALES[DEFAULT_LOCALE];
-    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type, isUsd, locale);
-    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.type, isUsd, locale);
+    const { numberFormat } = getLocaleSettings(currentLanguage);
+    const currency = getAmountCurrency(usedLocalizedValue, currentLanguage);
+    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type, currency, numberFormat);
+    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.type, currency, numberFormat);
 
     return (
         <div className={styles.metric} role="figure" aria-label={`${name}: ${finalValueText}`}>

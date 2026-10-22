@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
+import { useCallback } from 'react';
 import { LinearProgress } from '@mui/material';
 import { DetailedProgramHeader } from '@/components/public/detailed-program-header/DetailedProgramHeader';
 import { NotFound } from '@/pages/public/not-found-page/NotFound';
 import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { EventNewsApi } from '@/services/api/public/events-news/events-news-api';
 import styles from './DetailedEventNewsPage.module.scss';
 import { RecommendedArticles } from './recommended-articles/RecommendedArticles';
@@ -11,7 +13,11 @@ import { RecommendedArticles } from './recommended-articles/RecommendedArticles'
 export const DetailedEventNewsPage = () => {
     const { slug } = useParams();
 
-    const { program: eventNews, isLoading, error } = useProgramBySlug(EventNewsApi.get, slug);
+    const { currentLanguage } = useLocale();
+
+    const fetchEventNews = useCallback((eventSlug) => EventNewsApi.get(eventSlug, currentLanguage), [currentLanguage]);
+
+    const { program: eventNews, isLoading, error } = useProgramBySlug(fetchEventNews, slug);
 
     if (isLoading || (!eventNews && !error)) {
         return (

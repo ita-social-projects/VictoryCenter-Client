@@ -9,7 +9,7 @@ const TranslateEventsIntroFormHarness = ({ field }: { field: EventsIntroTranslat
 
     return (
         <>
-            <TranslateEventsIntroForm field={field} value={value} onChange={setValue} />
+            <TranslateEventsIntroForm field={field} value={value} onChange={setValue} onBlur={jest.fn()} />
             <output data-testid="controlled-value">{value}</output>
         </>
     );

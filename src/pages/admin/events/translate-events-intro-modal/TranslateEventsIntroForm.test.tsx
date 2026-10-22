@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { EventsIntroTranslationField, TranslateEventsIntroForm } from './TranslateEventsIntroForm';
 
@@ -10,6 +11,23 @@ const TranslateEventsIntroFormHarness = ({ field }: { field: EventsIntroTranslat
     return (
         <>
             <TranslateEventsIntroForm field={field} value={value} onChange={setValue} onBlur={jest.fn()} />
+            <output data-testid="controlled-value">{value}</output>
+        </>
+    );
+};
+
+const ClearableFormHarness = ({ error }: { error?: string }) => {
+    const [value, setValue] = useState('Translation text');
+
+    return (
+        <>
+            <TranslateEventsIntroForm
+                field="eventsBlockTitle"
+                value={value}
+                onChange={setValue}
+                onBlur={jest.fn()}
+                error={error}
+            />
             <output data-testid="controlled-value">{value}</output>
         </>
     );
@@ -40,5 +58,51 @@ describe('TranslateEventsIntroForm', () => {
         fireEvent.change(field, { target: { value: 'Title translation' } });
         expect(screen.getByTestId('controlled-value')).toHaveTextContent('Title translation');
         expect(screen.getByText('17/100')).toBeInTheDocument();
+    });
+
+    it('normalizes leading and consecutive spaces before updating the counter', () => {
+        render(<TranslateEventsIntroFormHarness field="eventsBlockTitle" />);
+        const field = screen.getByRole('textbox', {
+            name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
+        });
+
+        fireEvent.change(field, { target: { value: '   Hello   world' } });
+
+        expect(screen.getByTestId('controlled-value')).toHaveTextContent('Hello world');
+        expect(screen.getByText('11/100')).toBeInTheDocument();
+    });
+
+    it('prevents input past the configured character limit', async () => {
+        const user = userEvent.setup();
+        render(<TranslateEventsIntroFormHarness field="eventsBlockTitle" />);
+        const field = screen.getByRole('textbox', {
+            name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
+        });
+
+        await user.type(field, 'a'.repeat(EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE + 1));
+
+        expect(field).toHaveValue('a'.repeat(EVENTS_TEXT.PAGE_CONTENT.CHARACTER_LIMIT.EVENTS_BLOCK_TITLE));
+        expect(screen.getByText('100/100')).toBeInTheDocument();
+    });
+
+    it('shows the clean-up icon only while focused and clears only its field with error styling', async () => {
+        const user = userEvent.setup();
+        render(<ClearableFormHarness error="Validation error" />);
+        const field = screen.getByRole('textbox', {
+            name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
+        });
+
+        await user.click(field);
+        const clearButton = screen.getByRole('button', { name: 'Clear input' });
+        expect(clearButton).toHaveClass('char-limit-textarea__clear-button--error');
+
+        await user.tab();
+        expect(screen.queryByRole('button', { name: 'Clear input' })).not.toBeInTheDocument();
+
+        await user.click(field);
+        await user.click(screen.getByRole('button', { name: 'Clear input' }));
+
+        expect(screen.getByTestId('controlled-value')).toBeEmptyDOMElement();
+        expect(screen.getByText('0/100')).toBeInTheDocument();
     });
 });

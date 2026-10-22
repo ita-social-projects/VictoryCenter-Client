@@ -254,21 +254,21 @@ export const EventsPageAdmin = () => {
         fetchCategories();
     }, [fetchCategories]);
 
-    useEffect(() => {
-        const fetchEventsIntroSection = async () => {
-            try {
-                const introSection = await EventsApi.getEventsIntroSection(client);
-                setEventsIntroSection(introSection);
-                setEventsIntroDraft(introSection);
-            } catch {
-                setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events-intro');
-            } finally {
-                setIsEventsIntroSectionLoading(false);
-            }
-        };
-
-        fetchEventsIntroSection();
+    const fetchEventsIntroSection = useCallback(async () => {
+        try {
+            const introSection = await EventsApi.getEventsIntroSection(client);
+            setEventsIntroSection(introSection);
+            setEventsIntroDraft(introSection);
+        } catch {
+            setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events-intro');
+        } finally {
+            setIsEventsIntroSectionLoading(false);
+        }
     }, [client, setErrorState]);
+
+    useEffect(() => {
+        fetchEventsIntroSection();
+    }, [fetchEventsIntroSection]);
 
     const handleAddEvent = useCallback(() => {
         if (!selectedCategory) {
@@ -622,6 +622,15 @@ export const EventsPageAdmin = () => {
         setActiveIntroTranslationField(null);
     }, []);
 
+    const handleIntroTranslationSave = useCallback(async () => {
+        await fetchEventsIntroSection();
+        addToast(
+            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+            ToastType.Success,
+            EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
+        );
+    }, [addToast, fetchEventsIntroSection]);
+
     const openPublishConfirmation = useCallback(
         (sectionId: EditableHeaderSectionId, value: string) => {
             if (!eventsIntroDraft || publishingSectionsRef.current[sectionId]) return;
@@ -923,8 +932,10 @@ export const EventsPageAdmin = () => {
                 <TranslateEventsIntroModal
                     isOpen
                     field={activeIntroTranslationField}
+                    introSection={eventsIntroSection!}
                     translationLanguages={translationLanguages}
                     onClose={closeIntroTranslationModal}
+                    onSaveSuccess={handleIntroTranslationSave}
                 />
             )}
             <div className="events-page-list-container" ref={listContainerRef}>

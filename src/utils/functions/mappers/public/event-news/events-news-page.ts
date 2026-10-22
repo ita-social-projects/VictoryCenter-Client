@@ -8,16 +8,20 @@ export const mapToEventsNewsPage = (
     dto?: PublicEventsPageDto | null,
     languageCode: string = DEFAULT_LOCALE,
 ): EventsNewsPageData => {
-    const description = dto?.pageDescription ?? '';
-    const title = dto?.eventsBlockTitle ?? '';
+    const englishLocalization =
+        languageCode === 'en'
+            ? dto?.localizations?.find((localization) => localization.language.code === 'en')
+            : undefined;
+    const description = englishLocalization?.pageDescription || dto?.pageDescription || '';
+    const title = englishLocalization?.eventsBlockTitle || dto?.eventsBlockTitle || '';
 
     return {
         description,
-        isPageDescriptionHidden: isBlank(description),
+        isPageDescriptionHidden: dto?.isPageDescriptionHidden ?? isBlank(description),
         eventsData: {
             title,
             tags: mapToTags(dto?.categories, languageCode),
         },
-        isEventsBlockTitleHidden: isBlank(title),
+        isEventsBlockTitleHidden: dto?.isEventsBlockTitleHidden ?? isBlank(title),
     };
 };

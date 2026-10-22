@@ -70,6 +70,47 @@ describe('mapToEventsNewsPage', () => {
         expect(result.eventsData.tags).toEqual([{ id: '10', name: 'Media' }]);
     });
 
+    it('uses each available English intro translation independently', () => {
+        const result = mapToEventsNewsPage(
+            {
+                eventsBlockTitle: 'Base title',
+                pageDescription: 'Base description',
+                localizations: [
+                    {
+                        language: { code: 'en' },
+                        pageDescription: 'English description',
+                    },
+                ],
+            },
+            'en',
+        );
+
+        expect(result.description).toBe('English description');
+        expect(result.eventsData.title).toBe('Base title');
+    });
+
+    it('honors the server visibility flags even when translated content exists', () => {
+        const result = mapToEventsNewsPage(
+            {
+                eventsBlockTitle: 'Base title',
+                pageDescription: 'Base description',
+                isEventsBlockTitleHidden: true,
+                isPageDescriptionHidden: true,
+                localizations: [
+                    {
+                        language: { code: 'en' },
+                        eventsBlockTitle: 'English title',
+                        pageDescription: 'English description',
+                    },
+                ],
+            },
+            'en',
+        );
+
+        expect(result.isPageDescriptionHidden).toBe(true);
+        expect(result.isEventsBlockTitleHidden).toBe(true);
+    });
+
     it.each([undefined, null, {}, { categories: null }, { categories: [] }])(
         'returns empty tags and strings for %p',
         (dto) => {

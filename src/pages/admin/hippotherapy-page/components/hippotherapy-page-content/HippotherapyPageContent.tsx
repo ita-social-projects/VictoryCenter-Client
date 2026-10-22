@@ -147,8 +147,20 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
 
 const isNotFoundError = (error: unknown): boolean => axios.isAxiosError(error) && error.response?.status === 404;
 
+const hasIntroTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.introSection?.title?.trim() || localization?.introSection?.description?.trim());
+
+const hasDescriptionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.descriptionSection?.title?.trim() || localization?.descriptionSection?.description?.trim());
+
 const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(localization?.quoteSection?.quoteText?.trim());
+
+const hasHippoventionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.hippoventionSection?.title?.trim() || localization?.hippoventionSection?.description?.trim());
+
+const hasAnalysisTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.analysisSection?.title?.trim() || localization?.analysisSection?.description?.trim());
 
 const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(localization?.anotherQuoteSection?.quoteText?.trim());
@@ -319,7 +331,11 @@ export const HippotherapyPageContent = () => {
 
     const translationHandlers = useMemo(
         () => ({
+            introSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.Intro),
+            descriptionSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.Description),
             quoteSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.Quote),
+            hippoventionSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.Hippovention),
+            analysisSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.Analysis),
             anotherQuoteSection: () => setTranslationBlock(HippotherapyPageLocalizationBlock.AnotherQuote),
         }),
         [],
@@ -363,7 +379,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.introSection}
                     onImageError={imageErrorHandlers.introSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.introSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasIntroTranslation(targetLocalization)}
                 />
                 <hr />
                 <TextCardSection
@@ -371,7 +388,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.descriptionSection}
                     fieldIdPrefix="hippotherapy-description"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.descriptionSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasDescriptionTranslation(targetLocalization)}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -390,7 +408,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionSection}
                     fieldIdPrefix="hippotherapy-hippovention"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.hippoventionSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasHippoventionTranslation(targetLocalization)}
                 />
                 <hr />
                 <HippoventionCenterSection
@@ -416,7 +435,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.analysisSection}
                     fieldIdPrefix="hippotherapy-analysis"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.analysisSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasAnalysisTranslation(targetLocalization)}
                 />
                 <hr />
                 <ScientificReferencesSection

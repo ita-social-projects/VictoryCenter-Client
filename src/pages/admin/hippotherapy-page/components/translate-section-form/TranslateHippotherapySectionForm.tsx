@@ -30,7 +30,7 @@ const validateField = (field: HippotherapyTranslationFieldConfig, value: string)
         return undefined;
     }
 
-    return HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText);
+    return HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(plainText, field.minLength);
 };
 
 export const TranslateHippotherapySectionForm = forwardRef<

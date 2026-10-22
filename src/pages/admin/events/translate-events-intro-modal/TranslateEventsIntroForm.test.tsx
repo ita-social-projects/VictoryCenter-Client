@@ -31,31 +31,34 @@ const TranslateEventsIntroFormHarness = ({
 };
 
 describe('TranslateEventsIntroForm', () => {
-    it('renders a controlled textarea for the page description', () => {
-        render(<TranslateEventsIntroFormHarness field="pageDescription" />);
+    it.each([
+        [
+            'page description',
+            'pageDescription',
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE,
+            'Description translation',
+            '23/1000',
+        ],
+        [
+            'events block title',
+            'eventsBlockTitle',
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE,
+            'Title translation',
+            '17/100',
+        ],
+    ] as const)(
+        'renders a controlled textarea with a counter below for the %s',
+        (_, fieldName, label, value, counter) => {
+            render(<TranslateEventsIntroFormHarness field={fieldName} />);
 
-        const field = screen.getByRole('textbox', {
-            name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE),
-        });
+            const field = screen.getByRole('textbox', { name: new RegExp(label) });
 
-        expect(field).toBeInstanceOf(HTMLTextAreaElement);
-        fireEvent.change(field, { target: { value: 'Description translation' } });
-        expect(screen.getByTestId('controlled-value')).toHaveTextContent('Description translation');
-        expect(screen.getByText('23/1000')).toBeInTheDocument();
-    });
-
-    it('renders a controlled textarea with a counter below for the events block title', () => {
-        render(<TranslateEventsIntroFormHarness field="eventsBlockTitle" />);
-
-        const field = screen.getByRole('textbox', {
-            name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
-        });
-
-        expect(field).toBeInstanceOf(HTMLTextAreaElement);
-        fireEvent.change(field, { target: { value: 'Title translation' } });
-        expect(screen.getByTestId('controlled-value')).toHaveTextContent('Title translation');
-        expect(screen.getByText('17/100')).toBeInTheDocument();
-    });
+            expect(field).toBeInstanceOf(HTMLTextAreaElement);
+            fireEvent.change(field, { target: { value } });
+            expect(screen.getByTestId('controlled-value')).toHaveTextContent(value);
+            expect(screen.getByText(counter)).toBeInTheDocument();
+        },
+    );
 
     it('normalizes leading and consecutive spaces before updating the counter', () => {
         render(<TranslateEventsIntroFormHarness field="eventsBlockTitle" />);

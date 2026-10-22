@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getSelection, $isRangeSelection, RootNode } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, RootNode, COMMAND_PRIORITY_HIGH, PASTE_COMMAND } from 'lexical';
 import { trimTextContentFromAnchor } from '@lexical/selection';
 
 export interface MaxLengthPluginProps {
@@ -29,7 +29,50 @@ export const MaxLengthPlugin = ({
     }, [editor, onLengthChange, ignoreTrailingWhitespace]);
 
     useEffect(() => {
-        return editor.registerNodeTransform(RootNode, (rootNode: RootNode) => {
+        if (!enforceMaxLength) return;
+
+        const removePasteListener = editor.registerCommand(
+            PASTE_COMMAND,
+            (event: ClipboardEvent | KeyboardEvent | null) => {
+                const clipboardData = (event as ClipboardEvent)?.clipboardData;
+                if (!clipboardData) return false;
+
+                const clipboardText = clipboardData.getData('text/plain');
+                if (!clipboardText) return false;
+
+                let handled = false;
+
+                editor.getEditorState().read(() => {
+                    const currentLength = $getRoot().getTextContent().length;
+                    const selection = $getSelection();
+                    let selectedLength = 0;
+
+                    if ($isRangeSelection(selection)) {
+                        selectedLength = selection.getTextContent().length;
+                    }
+
+                    const availableSpace = Math.max(0, maxLength - currentLength + selectedLength);
+
+                    if (clipboardText.length > availableSpace) {
+                        event?.preventDefault();
+                        const textToInsert = clipboardText.slice(0, availableSpace);
+
+                        editor.update(() => {
+                            const currentSelection = $getSelection();
+                            if ($isRangeSelection(currentSelection)) {
+                                currentSelection.insertText(textToInsert);
+                            }
+                        });
+                        handled = true;
+                    }
+                });
+
+                return handled;
+            },
+            COMMAND_PRIORITY_HIGH,
+        );
+
+        const removeTransformListener = editor.registerNodeTransform(RootNode, (rootNode: RootNode) => {
             const selection = $getSelection();
             if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
                 return;
@@ -41,12 +84,19 @@ export const MaxLengthPlugin = ({
             if (prevTextContent !== currentTextContent) {
                 const textLength = currentTextContent.length;
 
-                if (enforceMaxLength && textLength > maxLength) {
+                if (textLength > maxLength) {
                     const overflowLength = textLength - maxLength;
-                    trimTextContentFromAnchor(editor, selection.anchor, overflowLength);
+                    try {
+                        trimTextContentFromAnchor(editor, selection.anchor, overflowLength);
+                    } catch (e) {}
                 }
             }
         });
+
+        return () => {
+            removePasteListener();
+            removeTransformListener();
+        };
     }, [editor, enforceMaxLength, maxLength]);
 
     return null;

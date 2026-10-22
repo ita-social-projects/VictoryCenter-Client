@@ -1,0 +1,42 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/colors' as colors;
+
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin: 48px 16px 63px;
+
+    @media (min-width: 560px) {
+        margin: 73px 64px 75px;
+    }
+
+    @media (min-width: 768px) {
+        margin: 73px 56px 63px;
+    }
+
+    @media (min-width: 1440px) {
+        margin: 70px 56px 48px;
+    }
+}
+
+.title {
+    @include type.h4-bold-uppercase;
+    color: colors.$blue-900;
+}
+
+.tiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 24px;
+    row-gap: 32px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+}

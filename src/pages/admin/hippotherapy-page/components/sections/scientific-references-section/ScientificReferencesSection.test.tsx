@@ -24,16 +24,26 @@ jest.mock('./scientific-reference-card/ScientificReferenceCard', () => ({
         onUrlChange,
         onNameBlur,
         onUrlBlur,
+        onTranslateClick,
+        isTranslateDisabled,
     }: any) => (
         <div
             data-testid={`reference-card-${localId}`}
             data-auto-focus={autoFocus}
             data-can-delete={canDelete}
             data-is-expanded={isExpanded}
+            data-translate-disabled={isTranslateDisabled}
         >
             <button data-testid={`toggle-expand-${localId}`} onClick={() => onToggleExpand(localId)} />
             <button data-testid={`toggle-unknown-${localId}`} onClick={() => onToggleExpand('unknown-local-id')} />
             <button data-testid={`delete-${localId}`} onClick={() => onDelete(localId)} />
+            {onTranslateClick && (
+                <button
+                    data-testid={`translate-${localId}`}
+                    disabled={isTranslateDisabled}
+                    onClick={onTranslateClick}
+                />
+            )}
             <input
                 data-testid={`name-input-${localId}`}
                 value={name}
@@ -357,5 +367,47 @@ describe('ScientificReferencesSection', () => {
             ...defaultValue,
             scientificReferences: [defaultValue.scientificReferences[1]],
         });
+    });
+
+    it('renders the general translation header and handles click when onTranslateGeneralClick is provided', () => {
+        const mockOnTranslateGeneralClick = jest.fn();
+        renderComponent({ onTranslateGeneralClick: mockOnTranslateGeneralClick });
+
+        const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButton).toBeInTheDocument();
+        expect(translateButton).toBeEnabled();
+
+        fireEvent.click(translateButton);
+        expect(mockOnTranslateGeneralClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('disables the general translation header button when isTranslateGeneralDisabled is true', () => {
+        const mockOnTranslateGeneralClick = jest.fn();
+        renderComponent({
+            onTranslateGeneralClick: mockOnTranslateGeneralClick,
+            isTranslateGeneralDisabled: true,
+        });
+
+        const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButton).toBeDisabled();
+    });
+
+    it('passes onTranslateReferenceClick and isTranslateReferenceDisabled to reference cards', () => {
+        const mockOnTranslateReferenceClick = jest.fn();
+        const isTranslateReferenceDisabled = jest.fn((localId: string) => localId === 'ref-2');
+
+        renderComponent({
+            onTranslateReferenceClick: mockOnTranslateReferenceClick,
+            isTranslateReferenceDisabled,
+        });
+
+        const translateRef1 = screen.getByTestId('translate-ref-1');
+        const translateRef2 = screen.getByTestId('translate-ref-2');
+
+        expect(translateRef1).toBeEnabled();
+        expect(translateRef2).toBeDisabled();
+
+        fireEvent.click(translateRef1);
+        expect(mockOnTranslateReferenceClick).toHaveBeenCalledWith('ref-1');
     });
 });

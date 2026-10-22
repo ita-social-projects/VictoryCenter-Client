@@ -3,7 +3,7 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { Select } from '@/components/common/select/Select';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_TRANSLATION_SECTIONS } from '@/const/admin/hippotherapy-page';
+import { getHippotherapyTranslationConfig } from '@/const/admin/hippotherapy-page';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { VisibilityStatus } from '@/types/admin/common';
 import { HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
@@ -15,10 +15,14 @@ import {
 } from '../translate-section-form/TranslateHippotherapySectionForm';
 import './TranslateHippotherapySectionModal.scss';
 
+export type HippotherapyTranslationSubBlock = 'general' | 'research';
+
 export interface TranslateHippotherapySectionModalProps {
     isOpen: boolean;
     onClose: () => void;
     block: HippotherapyPageLocalizationBlock | null;
+    subBlock?: HippotherapyTranslationSubBlock | null;
+    targetResearchLocalId?: string | null;
     translatedLanguages: LocalizationLanguage[];
 }
 
@@ -37,6 +41,8 @@ export const TranslateHippotherapySectionModal = ({
     isOpen,
     onClose,
     block,
+    subBlock,
+    targetResearchLocalId,
     translatedLanguages,
 }: TranslateHippotherapySectionModalProps) => {
     const availableLanguages = useMemo(() => getAvailableLanguages(translatedLanguages), [translatedLanguages]);
@@ -55,7 +61,7 @@ export const TranslateHippotherapySectionModal = ({
         setLanguage(getDefaultLanguage(availableLanguages));
     }, [isOpen, availableLanguages]);
 
-    const sectionConfig = block == null ? undefined : HIPPOTHERAPY_TRANSLATION_SECTIONS[block];
+    const sectionConfig = getHippotherapyTranslationConfig(block, subBlock);
 
     const handleSaveClick = () => {
         void formRef.current?.submit(VisibilityStatus.Published);
@@ -121,7 +127,7 @@ export const TranslateHippotherapySectionModal = ({
                 </div>
 
                 <TranslateHippotherapySectionForm
-                    key={`${block}-${language?.id}`}
+                    key={`${block}-${subBlock ?? 'default'}-${targetResearchLocalId ?? ''}-${language?.id}`}
                     ref={formRef}
                     fields={sectionConfig.fields}
                     fieldIdPrefix={`hippotherapy-translation-${sectionConfig.sectionKey}`}

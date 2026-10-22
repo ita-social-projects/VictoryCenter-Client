@@ -175,7 +175,6 @@ describe('TranslateHippotherapySectionModal', () => {
 
         expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
-
     it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', async () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,

@@ -142,7 +142,6 @@ describe('TranslateHippotherapySectionForm', () => {
         expect(quoteInput()).toBeDisabled();
         expect(authorInput()).toBeDisabled();
     });
-
     it('renders a character-limited textarea when field type is textarea', () => {
         const textareaField: HippotherapyTranslationFieldConfig = {
             name: 'name',

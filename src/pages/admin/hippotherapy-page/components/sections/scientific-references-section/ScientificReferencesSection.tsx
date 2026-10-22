@@ -19,6 +19,8 @@ export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
     onChange: (value: HippotherapyScientificReferencesSectionContent) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
     onTranslateGeneralClick?: () => void;
     isTranslateGeneralDisabled?: boolean;
     onTranslateReferenceClick?: (localId: string) => void;
@@ -38,6 +40,8 @@ const ScientificReferencesSectionComponent = ({
     value,
     onChange,
     disabled,
+    onTranslateClick,
+    isTranslateDisabled,
     onTranslateGeneralClick,
     isTranslateGeneralDisabled,
     onTranslateReferenceClick,
@@ -170,13 +174,16 @@ const ScientificReferencesSectionComponent = ({
         setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(reference?.url ?? '') }));
     };
 
+    const generalTranslateClick = onTranslateGeneralClick ?? onTranslateClick;
+    const generalTranslateDisabled = isTranslateGeneralDisabled ?? isTranslateDisabled;
+
     return (
         <div className="scientific-references-section">
             <div className="scientific-references-section-summary">
-                {onTranslateGeneralClick && (
+                {generalTranslateClick && (
                     <SectionTranslationHeader
-                        onTranslateClick={onTranslateGeneralClick}
-                        isTranslateDisabled={isTranslateGeneralDisabled}
+                        onTranslateClick={generalTranslateClick}
+                        isTranslateDisabled={generalTranslateDisabled}
                     />
                 )}
                 <RichTextInputGroup

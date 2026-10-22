@@ -71,6 +71,8 @@ export const CardContent = ({
         onDescriptionValidate(error);
     };
 
+    const { width: _width, ...responsiveImageStyle } = imageInputProps.style ?? {};
+
     return (
         <div style={{ width: imageInputProps.style?.width }} className="card-content">
             <ImageInput
@@ -81,6 +83,7 @@ export const CardContent = ({
                 setError={setImageError}
                 disabled={!isBaseLanguage}
                 {...imageInputProps}
+                style={responsiveImageStyle}
                 className={hasImageDimensionsTooSmallError ? whoWeAreVariantStyles['container-focused'] : undefined}
             />
             {imageError && <p className="error">{imageError}</p>}

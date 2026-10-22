@@ -2,8 +2,14 @@
 
 .hippotherapy-intro-banner-section {
     display: flex;
-    gap: 32px;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 24px;
+
+    &-content {
+        display: flex;
+        gap: 32px;
+        justify-content: space-between;
+    }
 
     &-image {
         flex-shrink: 0;

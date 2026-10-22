@@ -153,61 +153,26 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(await screen.findByText('Англійська')).toBeInTheDocument();
     });
 
-    it('switches the language right away when nothing has been entered', () => {
+    it('restricts the language options to English only even when other languages are provided', () => {
         renderModal({ translatedLanguages: [englishLanguage, frenchLanguage] });
 
-        fireEvent.click(screen.getByText('Англійська'));
-        fireEvent.click(screen.getByText('Французька'));
-
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
-        expect(screen.getByText('Французька')).toBeInTheDocument();
-    });
-
-    it('asks before switching the language with unsaved input and switches when confirmed', async () => {
-        renderModal({ translatedLanguages: [englishLanguage, frenchLanguage] });
-
-        fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
-        fireEvent.click(screen.getByText('Англійська'));
-        fireEvent.click(screen.getByText('Французька'));
-
-        expect(confirmationTitle()).toBe(COMMON_TEXT_ADMIN.QUESTION.CHANGE_LANGUAGE_UNSAVED_CHANGES);
-
-        fireEvent.click(screen.getByText('Так'));
-
-        await waitFor(() => expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument());
-        expect(screen.getByText('Французька')).toBeInTheDocument();
-        expect(quoteInput()).toHaveValue('');
-    });
-
-    it('keeps the language and input when the language switch is cancelled', () => {
-        renderModal({ translatedLanguages: [englishLanguage, frenchLanguage] });
-
-        fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
-        fireEvent.click(screen.getByText('Англійська'));
-        fireEvent.click(screen.getByText('Французька'));
-        fireEvent.click(screen.getByText('Ні'));
-
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         expect(screen.getByText('Англійська')).toBeInTheDocument();
-        expect(quoteInput()).toHaveValue(VALID_TEXT);
+        expect(screen.queryByText('Французька')).not.toBeInTheDocument();
     });
 
-    it('drops a pending language switch when the modal is closed', () => {
+    it('resets the language selection to English on reopen', () => {
         const props = {
             onClose: jest.fn(),
             block: HippotherapyPageLocalizationBlock.Quote,
-            translatedLanguages: [englishLanguage, frenchLanguage],
+            translatedLanguages: [englishLanguage],
         };
         const { rerender } = render(<TranslateHippotherapySectionModal isOpen {...props} />);
 
-        fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
-        fireEvent.click(screen.getByText('Англійська'));
-        fireEvent.click(screen.getByText('Французька'));
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+        expect(screen.getByText('Англійська')).toBeInTheDocument();
 
         rerender(<TranslateHippotherapySectionModal isOpen={false} {...props} />);
         rerender(<TranslateHippotherapySectionModal isOpen {...props} />);
 
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
 });

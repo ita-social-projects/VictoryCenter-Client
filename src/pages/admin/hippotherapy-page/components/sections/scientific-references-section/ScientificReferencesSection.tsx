@@ -12,12 +12,15 @@ import {
     HippotherapyScientificReferencesSectionContent,
 } from '@/types/admin/hippotherapy-page';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './ScientificReferencesSection.scss';
 
 export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
     onChange: (value: HippotherapyScientificReferencesSectionContent) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
@@ -29,7 +32,13 @@ const validateReferenceName = (text: string) =>
 const validateReferenceUrl = (text: string) =>
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH);
 
-const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
+const ScientificReferencesSectionComponent = ({
+    value,
+    onChange,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+}: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
@@ -160,6 +169,12 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
     return (
         <div className="scientific-references-section">
             <div className="scientific-references-section-summary">
+                {onTranslateClick && (
+                    <SectionTranslationHeader
+                        onTranslateClick={onTranslateClick}
+                        isTranslateDisabled={isTranslateDisabled}
+                    />
+                )}
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                     isRequired

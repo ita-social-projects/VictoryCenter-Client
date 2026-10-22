@@ -11,6 +11,7 @@ import {
 import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './HippoventionCenterSection.scss';
 
 export interface HippoventionCenterSectionProps {
@@ -18,6 +19,8 @@ export interface HippoventionCenterSectionProps {
     onChange: (value: HippoventionCenterSectionContent) => void;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 const HippoventionCenterSectionComponent = ({
@@ -25,6 +28,8 @@ const HippoventionCenterSectionComponent = ({
     onChange,
     onImageError,
     disabled,
+    onTranslateClick,
+    isTranslateDisabled,
 }: HippoventionCenterSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -51,6 +56,12 @@ const HippoventionCenterSectionComponent = ({
 
     return (
         <div className="hippovention-center-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <div className="hippovention-center-section-image-container">
                 <div className="hippovention-center-section-image">
                     <ImageInput

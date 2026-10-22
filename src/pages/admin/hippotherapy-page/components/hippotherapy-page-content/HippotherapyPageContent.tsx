@@ -151,6 +151,7 @@ export const HippotherapyPageContent = () => {
     const [draftContent, setDraftContent] = useState<HippotherapyPageContentModel | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [hasPublished, setHasPublished] = useState(false);
 
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
 
@@ -266,6 +267,7 @@ export const HippotherapyPageContent = () => {
             const result = await HippotherapyPageApi.update(client, draftContent);
             setFetchedContent(result);
             setDraftContent(result);
+            setHasPublished(true);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Info);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
@@ -277,6 +279,8 @@ export const HippotherapyPageContent = () => {
 
     const isDisabled = isPublishing;
     const isNotFound = isNotFoundError(error);
+    const isNeverPublished = isNotFound && !hasPublished;
+    const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
 
     const renderContent = () => {
         if (isLoading) {
@@ -316,6 +320,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.introSection}
                     onImageError={imageErrorHandlers.introSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <TextCardSection
@@ -323,6 +328,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.descriptionSection}
                     fieldIdPrefix="hippotherapy-description"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -332,6 +338,7 @@ export const HippotherapyPageContent = () => {
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.QUOTE}
                     onImageError={imageErrorHandlers.quoteSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <TextCardSection
@@ -339,6 +346,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionSection}
                     fieldIdPrefix="hippotherapy-hippovention"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <HippoventionCenterSection
@@ -346,6 +354,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionCenterSection}
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <GallerySection
@@ -355,6 +364,7 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ADVANTAGES_CARDS}
                     onCardImageError={imageErrorHandlers.advantagesSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <TextCardSection
@@ -362,12 +372,14 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.analysisSection}
                     fieldIdPrefix="hippotherapy-analysis"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <ScientificReferencesSection
                     value={draftContent.scientificReferencesSection}
                     onChange={sectionHandlers.scientificReferencesSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -377,6 +389,7 @@ export const HippotherapyPageContent = () => {
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ANOTHER_QUOTE}
                     onImageError={imageErrorHandlers.anotherQuoteSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <GallerySection
@@ -386,6 +399,7 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.PARTICIPANTS_CARDS}
                     onCardImageError={imageErrorHandlers.participantsSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <EthicsSection
@@ -393,6 +407,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <div className="hippotherapy-page-publish">
                     <Button

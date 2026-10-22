@@ -12,6 +12,7 @@ import {
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './EthicsSection.scss';
 
 export interface EthicsSectionProps {
@@ -19,9 +20,18 @@ export interface EthicsSectionProps {
     onChange: (value: HippotherapyEthicsSectionContent) => void;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
-const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: EthicsSectionProps) => {
+const EthicsSectionComponent = ({
+    value,
+    onChange,
+    onImageError,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+}: EthicsSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
         onChange,
@@ -46,6 +56,12 @@ const EthicsSectionComponent = ({ value, onChange, onImageError, disabled }: Eth
 
     return (
         <div className="hippotherapy-ethics-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <div className="hippotherapy-ethics-section-image-container">
                 <div className="hippotherapy-ethics-section-image">
                     <ImageInput

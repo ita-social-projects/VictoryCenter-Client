@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { HippotherapyPageLocalizationBlock, HippotherapyPageLocalizedContent } from '@/types/admin/hippotherapy-page';
 import introDefaultImage from '@/assets/images/man-touching-white-horse-side.webp';
 import quoteDefaultImage from '@/assets/images/man-holding-horse-cheek-close.webp';
 import anotherQuoteDefaultImage from '@/assets/images/man-facing-horse-forehead.webp';
@@ -51,6 +53,46 @@ export const HIPPOTHERAPY_PAGE_CHAR_LIMITS = {
     ETHICS_TITLE: 50,
     ETHICS_DESCRIPTION: 300,
     ETHICS_PRINCIPLE: 300,
+};
+
+export interface HippotherapyTranslationFieldConfig {
+    name: string;
+    label: string;
+    maxLength: number;
+    isRequired: boolean;
+}
+
+export interface HippotherapyTranslationSectionConfig {
+    sectionKey: keyof HippotherapyPageLocalizedContent;
+    fields: HippotherapyTranslationFieldConfig[];
+}
+
+const createQuoteTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'quoteText',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_TEXT,
+        isRequired: true,
+    },
+    {
+        name: 'authorName',
+        label: HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR,
+        isRequired: false,
+    },
+];
+
+export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
+    Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
+> = {
+    [HippotherapyPageLocalizationBlock.Quote]: {
+        sectionKey: 'quoteSection',
+        fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.AnotherQuote]: {
+        sectionKey: 'anotherQuoteSection',
+        fields: createQuoteTranslationFields(),
+    },
 };
 
 export interface HippotherapyImageConfig {

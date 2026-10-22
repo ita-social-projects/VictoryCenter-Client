@@ -1,5 +1,12 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { formatMetricValue, getMetricName, resolveMetricValue } from './metric-formatters';
+import { Currency } from '@/types/public/donate-page';
+import {
+    formatMetricValue,
+    getAmountCurrency,
+    getMetricName,
+    getRaisedMetricCurrency,
+    resolveMetricValue,
+} from './metric-formatters';
 
 const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
@@ -143,6 +150,47 @@ describe('metric-formatters', () => {
 
         it('should fall back to the base value when there is no localized value', () => {
             expect(resolveMetricValue(undefined, 500)).toEqual({ value: 500, usedLocalizedValue: false });
+        });
+    });
+
+    describe('getAmountCurrency', () => {
+        it.each([
+            [true, 'en', Currency.USD],
+            [false, 'en', Currency.UAH],
+            [true, 'uk', Currency.UAH],
+            [true, 'pl', Currency.UAH],
+        ])(
+            'returns the right currency (localized amount: %s, language: %s)',
+            (usedLocalizedValue, languageCode, expected) => {
+                expect(getAmountCurrency(usedLocalizedValue, languageCode)).toBe(expected);
+            },
+        );
+    });
+
+    describe('getRaisedMetricCurrency', () => {
+        const createRaisedMetric = (localizations: any[]): Metric => ({
+            id: 1,
+            name: 'Зібрано',
+            value: 5000000,
+            type: MetricType.Raised,
+            prefix: MetricPrefix.None,
+            isHidden: false,
+            priority: 1,
+            localizations,
+        });
+
+        it('uses UAH for the UA language', () => {
+            const metric = createRaisedMetric([{ languageId: 2, value: '120000' }]);
+            expect(getRaisedMetricCurrency(metric, 'UA')).toBe(Currency.UAH);
+        });
+
+        it('uses USD for the EN language when the English amount is set', () => {
+            const metric = createRaisedMetric([{ languageId: 2, value: '120000' }]);
+            expect(getRaisedMetricCurrency(metric, 'EN')).toBe(Currency.USD);
+        });
+
+        it('uses UAH for the EN language when there is no English amount', () => {
+            expect(getRaisedMetricCurrency(createRaisedMetric([]), 'EN')).toBe(Currency.UAH);
         });
     });
 });

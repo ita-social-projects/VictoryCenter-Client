@@ -151,6 +151,7 @@ export const HippotherapyPageContent = () => {
     const [draftContent, setDraftContent] = useState<HippotherapyPageContentModel | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [hasPublished, setHasPublished] = useState(false);
 
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
 
@@ -266,6 +267,7 @@ export const HippotherapyPageContent = () => {
             const result = await HippotherapyPageApi.update(client, draftContent);
             setFetchedContent(result);
             setDraftContent(result);
+            setHasPublished(true);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Info);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
@@ -276,8 +278,9 @@ export const HippotherapyPageContent = () => {
     }, [client, draftContent, addToast]);
 
     const isDisabled = isPublishing;
-    const isTranslateDisabled = isDisabled || isPublishButtonActive;
     const isNotFound = isNotFoundError(error);
+    const isNeverPublished = isNotFound && !hasPublished;
+    const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
 
     const renderContent = () => {
         if (isLoading) {

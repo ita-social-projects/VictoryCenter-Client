@@ -258,9 +258,10 @@ describe('HippotherapyPageContent', () => {
         expect(screen.queryByText(HIPPOTHERAPY_PAGE_TEXT.FAIL_TO_FETCH)).not.toBeInTheDocument();
         expect(screen.getByTestId('section-intro')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+        expectTranslationDisabledForEverySection(true);
     });
 
-    it('lets the admin fill in and publish a page that did not exist yet', async () => {
+    it('lets the admin fill in and publish a page that did not exist yet, enabling translation afterwards', async () => {
         jest.spyOn(axios, 'isAxiosError').mockImplementation((error: unknown) => Boolean((error as any)?.response));
         mockedHippotherapyPageApi.get.mockRejectedValue({ response: { status: 404 } });
         const created = { ...buildContent(), introSection: { ...buildContent().introSection, title: 'Created title' } };
@@ -283,6 +284,7 @@ describe('HippotherapyPageContent', () => {
             mockClient,
             expect.objectContaining({ introSection: expect.objectContaining({ title: 'Edited intro title' }) }),
         );
+        expectTranslationDisabledForEverySection(false);
     });
 
     it('renders every section once loaded and keeps the publish button disabled until something changes', async () => {

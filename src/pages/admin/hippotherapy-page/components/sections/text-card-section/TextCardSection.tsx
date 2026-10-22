@@ -43,30 +43,32 @@ const TextCardSectionComponent = ({
                     isTranslateDisabled={isTranslateDisabled}
                 />
             )}
-            <RichTextInputGroup
-                label={COMMON_TEXT_ADMIN.TYPE.TITLE}
-                isRequired
-                id={`${fieldIdPrefix}-title`}
-                name={`${fieldIdPrefix}-title`}
-                value={value.title}
-                onChange={title.handleChange}
-                onBlur={title.handleBlur}
-                maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE}
-                error={title.error}
-                disabled={disabled}
-            />
-            <RichTextInputGroup
-                label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                isRequired
-                id={`${fieldIdPrefix}-description`}
-                name={`${fieldIdPrefix}-description`}
-                value={value.description}
-                onChange={description.handleChange}
-                onBlur={description.handleBlur}
-                maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION}
-                error={description.error}
-                disabled={disabled}
-            />
+            <div className="hippotherapy-text-card-section-content">
+                <RichTextInputGroup
+                    label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                    isRequired
+                    id={`${fieldIdPrefix}-title`}
+                    name={`${fieldIdPrefix}-title`}
+                    value={value.title}
+                    onChange={title.handleChange}
+                    onBlur={title.handleBlur}
+                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE}
+                    error={title.error}
+                    disabled={disabled}
+                />
+                <RichTextInputGroup
+                    label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    isRequired
+                    id={`${fieldIdPrefix}-description`}
+                    name={`${fieldIdPrefix}-description`}
+                    value={value.description}
+                    onChange={description.handleChange}
+                    onBlur={description.handleBlur}
+                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION}
+                    error={description.error}
+                    disabled={disabled}
+                />
+            </div>
         </div>
     );
 };

@@ -43,6 +43,24 @@ interface HistoryErrorState {
     type: HistoryErrorType | null;
 }
 
+const getSectionsSnapshot = (items: HistorySectionDto[]) =>
+    JSON.stringify(
+        items.map((section) => ({
+            id: section.id ?? null,
+            template: section.template,
+            order: section.order,
+            contents: section.contents.map((content) => ({
+                id: content.id ?? null,
+                contentType: content.contentType,
+                order: content.order,
+                title: content.title,
+                description: content.description,
+                imageId: content.imageId ?? null,
+                image: content.image,
+            })),
+        })),
+    );
+
 export const HistoryPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -152,7 +170,6 @@ export const HistoryPageContent = () => {
 
     const handleRequestSaveSection = useCallback(
         ({ onConfirm }: { onConfirm: () => void }) => {
-            // ignore new requests while the modal is already open to avoid silently overwriting the pending callback
             if (isSectionSaveModalOpen) return;
             pendingSaveConfirmRef.current = onConfirm;
             setIsSectionSaveModalOpen(true);
@@ -194,6 +211,10 @@ export const HistoryPageContent = () => {
                     })),
                 }));
                 await HistoryApi.syncSections(client, payload);
+
+                const currentSections = historyFormRef.current?.getSections() ?? [];
+                setCanPublish(getSectionsSnapshot(currentSections) !== getSectionsSnapshot(remainingSections));
+
                 void refetchSections();
             } catch {
                 addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
@@ -300,6 +321,14 @@ export const HistoryPageContent = () => {
         });
     }, [normalizedSections, translationStatusFilter, translationLanguages]);
 
+    const handleSectionChanged = useCallback(
+        (updatedSections: HistorySectionDto[]) => {
+            setLocalSectionsCount(updatedSections.length);
+            setCanPublish(getSectionsSnapshot(updatedSections) !== getSectionsSnapshot(filteredSections));
+        },
+        [filteredSections],
+    );
+
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
             <HistoryPageToolbar
@@ -355,10 +384,7 @@ export const HistoryPageContent = () => {
                         sections={filteredSections}
                         onReplaceSection={handleReplaceSection}
                         onValidationChange={setIsFormValid}
-                        onSectionsChange={(s) => {
-                            setLocalSectionsCount(s.length);
-                            setCanPublish(true);
-                        }}
+                        onSectionsChange={handleSectionChanged}
                         onHasEditingSectionChange={setHasActiveSectionForm}
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}

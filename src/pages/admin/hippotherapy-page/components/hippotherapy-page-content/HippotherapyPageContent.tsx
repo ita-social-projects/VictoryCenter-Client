@@ -17,6 +17,7 @@ import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -156,20 +157,25 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
 
 const isNotFoundError = (error: unknown): boolean => axios.isAxiosError(error) && error.response?.status === 404;
 
+const hasRichTextContent = (value?: string | null): boolean => Boolean(value && getPlainTextFromHtml(value).trim());
+
+const hasTextCardTranslation = (section?: { title?: string | null; description?: string | null } | null): boolean =>
+    hasRichTextContent(section?.title) || hasRichTextContent(section?.description);
+
 const hasIntroTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.introSection?.title?.trim() || localization?.introSection?.description?.trim());
+    hasTextCardTranslation(localization?.introSection);
 
 const hasDescriptionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.descriptionSection?.title?.trim() || localization?.descriptionSection?.description?.trim());
+    hasTextCardTranslation(localization?.descriptionSection);
 
 const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(localization?.quoteSection?.quoteText?.trim());
 
 const hasHippoventionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.hippoventionSection?.title?.trim() || localization?.hippoventionSection?.description?.trim());
+    hasTextCardTranslation(localization?.hippoventionSection);
 
 const hasAnalysisTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.analysisSection?.title?.trim() || localization?.analysisSection?.description?.trim());
+    hasTextCardTranslation(localization?.analysisSection);
 
 const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(localization?.anotherQuoteSection?.quoteText?.trim());

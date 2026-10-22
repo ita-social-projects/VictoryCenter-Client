@@ -713,6 +713,33 @@ describe('HippotherapyPageContent', () => {
                 expect(screen.getByRole('button', { name: `Translate ${otherFieldIdPrefix}` })).toBeEnabled();
             },
         );
+
+        it.each([
+            ['intro', 'introSection'],
+            ['hippotherapy-description', 'descriptionSection'],
+            ['hippotherapy-hippovention', 'hippoventionSection'],
+            ['hippotherapy-analysis', 'analysisSection'],
+        ])(
+            'keeps the %s translation icon enabled when localization contains only empty rich-text markup',
+            async (fieldIdPrefix, sectionKey) => {
+                const contentWithEmptyMarkup: HippotherapyPageContentModel = {
+                    ...buildContent(),
+                    localizations: [
+                        {
+                            language: { id: 2, code: 'en' },
+                            translationStatus: 1 as any,
+                            [sectionKey]: { title: '<p><br></p>', description: '<p><br></p>' },
+                        } as any,
+                    ],
+                };
+                mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEmptyMarkup);
+
+                render(<HippotherapyPageContent />);
+
+                expect(await screen.findByRole('button', { name: `Translate ${fieldIdPrefix}` })).toBeEnabled();
+            },
+        );
+
         it('disables the translation icon while the page is being published', async () => {
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
             mockedHippotherapyPageApi.update.mockReturnValue(new Promise(() => {}));

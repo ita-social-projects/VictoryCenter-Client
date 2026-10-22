@@ -24,8 +24,27 @@ const article: StoriesOfVictoryReviewArticle = {
     image: 'story-image.jpg',
 };
 
+const createEnglishLocalizedArticle = (): StoriesOfVictoryReviewArticle => ({
+    ...article,
+    localizations: [
+        {
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+            title: 'English title',
+            story: 'English story',
+        },
+    ],
+});
+
 const longStory = 'A'.repeat(150);
 const collapsedStory = `"${'A'.repeat(100)}..."`;
+
+const expectDefaultArticleContent = (localizedArticle: StoriesOfVictoryReviewArticle) => {
+    render(<SuccessStoryCard article={localizedArticle} />);
+
+    expect(screen.getByRole('img', { name: 'Story title' })).toBeInTheDocument();
+    expect(screen.getByText('"Story text"')).toBeInTheDocument();
+};
 
 describe('SuccessStoryCard', () => {
     beforeEach(() => {
@@ -92,19 +111,7 @@ describe('SuccessStoryCard', () => {
 
     it('uses the active language localization for title and story', () => {
         mockCurrentLanguage = 'en';
-        const localizedArticle: StoriesOfVictoryReviewArticle = {
-            ...article,
-            localizations: [
-                {
-                    language: { id: 2, code: 'en' },
-                    translationStatus: TranslationStatus.Relevant,
-                    title: 'English title',
-                    story: 'English story',
-                },
-            ],
-        };
-
-        render(<SuccessStoryCard article={localizedArticle} />);
+        render(<SuccessStoryCard article={createEnglishLocalizedArticle()} />);
 
         expect(screen.getByRole('img', { name: 'English title' })).toBeInTheDocument();
         expect(screen.getByText('"English story"')).toBeInTheDocument();
@@ -112,29 +119,11 @@ describe('SuccessStoryCard', () => {
 
     it('uses the default language content when no matching translation exists', () => {
         mockCurrentLanguage = 'en';
-        render(<SuccessStoryCard article={article} />);
-
-        expect(screen.getByRole('img', { name: 'Story title' })).toBeInTheDocument();
-        expect(screen.getByText('"Story text"')).toBeInTheDocument();
+        expectDefaultArticleContent(article);
     });
 
     it('uses the default language content on the Ukrainian site when a translation exists', () => {
-        const localizedArticle: StoriesOfVictoryReviewArticle = {
-            ...article,
-            localizations: [
-                {
-                    language: { id: 2, code: 'en' },
-                    translationStatus: TranslationStatus.Relevant,
-                    title: 'English title',
-                    story: 'English story',
-                },
-            ],
-        };
-
-        render(<SuccessStoryCard article={localizedArticle} />);
-
-        expect(screen.getByRole('img', { name: 'Story title' })).toBeInTheDocument();
-        expect(screen.getByText('"Story text"')).toBeInTheDocument();
+        expectDefaultArticleContent(createEnglishLocalizedArticle());
     });
 
     it('does not render a read button when the story has no image', () => {

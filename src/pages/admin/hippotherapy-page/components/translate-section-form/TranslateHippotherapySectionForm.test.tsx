@@ -142,7 +142,6 @@ describe('TranslateHippotherapySectionForm', () => {
         expect(quoteInput()).toBeDisabled();
         expect(authorInput()).toBeDisabled();
     });
-
     it('uses custom minLength when configured on the field', () => {
         const customFields: HippotherapyTranslationFieldConfig[] = [
             { name: 'title', label: 'Заголовок', maxLength: 50, minLength: 5, isRequired: true },
@@ -164,5 +163,53 @@ describe('TranslateHippotherapySectionForm', () => {
 
         fireEvent.change(titleInput, { target: { value: '12345' } });
         expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5))).not.toBeInTheDocument();
+    });
+
+    it('renders a character-limited textarea when field type is textarea', () => {
+        const textareaField: HippotherapyTranslationFieldConfig = {
+            name: 'name',
+            label: 'Назва',
+            maxLength: 150,
+            minLength: 5,
+            isRequired: true,
+            type: 'textarea',
+        };
+
+        render(
+            <TranslateHippotherapySectionForm
+                fields={[textareaField]}
+                fieldIdPrefix="research-test"
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const textarea = screen.getByLabelText('Назва', { exact: false });
+        expect(textarea.tagName.toLowerCase()).toBe('textarea');
+        expect(textarea).toHaveAttribute('maxLength', '150');
+
+        fireEvent.change(textarea, { target: { value: 'Valid citation name' } });
+        expect(textarea).toHaveValue('Valid citation name');
+    });
+
+    it('renders a character-limited text input when field type is text', () => {
+        const textField: HippotherapyTranslationFieldConfig = {
+            name: 'title',
+            label: 'Заголовок',
+            maxLength: 50,
+            minLength: 5,
+            isRequired: true,
+            type: 'text',
+        };
+
+        render(
+            <TranslateHippotherapySectionForm fields={[textField]} fieldIdPrefix="text-test" onSubmit={jest.fn()} />,
+        );
+
+        const input = screen.getByLabelText('Заголовок', { exact: false });
+        expect(input.tagName.toLowerCase()).toBe('input');
+        expect(input).toHaveAttribute('maxLength', '50');
+
+        fireEvent.change(input, { target: { value: 'Valid title' } });
+        expect(input).toHaveValue('Valid title');
     });
 });

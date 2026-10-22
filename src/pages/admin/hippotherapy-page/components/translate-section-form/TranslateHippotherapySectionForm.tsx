@@ -1,7 +1,10 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { HippotherapyTranslationFieldConfig } from '@/const/admin/hippotherapy-page';
 import { FormManagerRef, useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
@@ -23,10 +26,14 @@ interface TranslateHippotherapySectionFormProps {
     formDisabled?: boolean;
 }
 
-const validateField = (field: HippotherapyTranslationFieldConfig, value: string): string | undefined => {
-    const plainText = getPlainTextFromHtml(value);
+const isPlainTextField = (field: HippotherapyTranslationFieldConfig): boolean =>
+    field.type === 'text' || field.type === 'textarea';
 
-    if (!field.isRequired && !plainText.trim()) {
+const validateField = (field: HippotherapyTranslationFieldConfig, value: string): string | undefined => {
+    const rawText = isPlainTextField(field) ? value : getPlainTextFromHtml(value);
+    const plainText = rawText.trim();
+
+    if (!field.isRequired && !plainText) {
         return undefined;
     }
 
@@ -65,11 +72,14 @@ export const TranslateHippotherapySectionForm = forwardRef<
                 currentValues: TranslateHippotherapySectionFormValues,
                 initialValues: TranslateHippotherapySectionFormValues,
             ) =>
-                fields.every(
-                    (field) =>
-                        normalizeRichTextHtmlForComparison(currentValues[field.name] ?? '') ===
-                        normalizeRichTextHtmlForComparison(initialValues[field.name] ?? ''),
-                ),
+                fields.every((field) => {
+                    const current = currentValues[field.name] ?? '';
+                    const initial = initialValues[field.name] ?? '';
+                    if (isPlainTextField(field)) {
+                        return current.trim() === initial.trim();
+                    }
+                    return normalizeRichTextHtmlForComparison(current) === normalizeRichTextHtmlForComparison(initial);
+                }),
             [fields],
         );
 
@@ -107,21 +117,69 @@ export const TranslateHippotherapySectionForm = forwardRef<
 
         return (
             <form className="translate-hippotherapy-section-form" onSubmit={(e) => e.preventDefault()} noValidate>
-                {fields.map((field) => (
-                    <RichTextInputGroup
-                        key={field.name}
-                        id={`${fieldIdPrefix}-${field.name}`}
-                        name={field.name}
-                        label={field.label}
-                        isRequired={field.isRequired}
-                        value={formState[field.name] ?? ''}
-                        onChange={(value) => handleChange(field, value)}
-                        onBlur={() => handleBlur(field)}
-                        error={errors[field.name]}
-                        maxLength={field.maxLength}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                ))}
+                {fields.map((field) => {
+                    const fieldId = `${fieldIdPrefix}-${field.name}`;
+                    const value = formState[field.name] ?? '';
+                    const error = touchedFields[field.name] ? errors[field.name] : undefined;
+                    const disabled = isSubmitting || formDisabled;
+
+                    if (field.type === 'textarea') {
+                        return (
+                            <TextAreaWithCharacterLimitGroup
+                                key={field.name}
+                                id={fieldId}
+                                name={field.name}
+                                label={field.label}
+                                isRequired={field.isRequired}
+                                maxLength={field.maxLength}
+                                value={value}
+                                error={error}
+                                disabled={disabled}
+                                onChange={(event) => handleChange(field, event.target.value)}
+                                onBlur={() => handleBlur(field)}
+                                rows={2}
+                                autoGrow
+                                maxRows={6}
+                                normalizeValue={getNormalizedInputTextWhileTyping}
+                            />
+                        );
+                    }
+
+                    if (field.type === 'text') {
+                        return (
+                            <InputWithCharacterLimitGroup
+                                key={field.name}
+                                id={fieldId}
+                                name={field.name}
+                                label={field.label}
+                                isRequired={field.isRequired}
+                                maxLength={field.maxLength}
+                                value={value}
+                                error={error}
+                                disabled={disabled}
+                                onChange={(event) => handleChange(field, event.target.value)}
+                                onBlur={() => handleBlur(field)}
+                                normalizeValue={getNormalizedInputTextWhileTyping}
+                            />
+                        );
+                    }
+
+                    return (
+                        <RichTextInputGroup
+                            key={field.name}
+                            id={fieldId}
+                            name={field.name}
+                            label={field.label}
+                            isRequired={field.isRequired}
+                            value={value}
+                            onChange={(val) => handleChange(field, val)}
+                            onBlur={() => handleBlur(field)}
+                            error={error}
+                            maxLength={field.maxLength}
+                            disabled={disabled}
+                        />
+                    );
+                })}
             </form>
         );
     },

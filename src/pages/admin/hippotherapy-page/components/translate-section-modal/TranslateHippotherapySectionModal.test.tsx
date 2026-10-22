@@ -235,4 +235,45 @@ describe('TranslateHippotherapySectionModal', () => {
 
         expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
+    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', async () => {
+        renderModal({
+            block: HippotherapyPageLocalizationBlock.ScientificReferences,
+            subBlock: 'general',
+        });
+
+        const titleInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE);
+        const descriptionInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
+
+        expect(titleInput).toBeInTheDocument();
+        expect(descriptionInput).toBeInTheDocument();
+        expect(titleInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE));
+        expect(descriptionInput).toHaveAttribute(
+            'maxLength',
+            String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION),
+        );
+        expect(saveButton()).toBeDisabled();
+
+        fireEvent.change(titleInput, { target: { value: 'Valid scientific title' } });
+        expect(saveButton()).toBeDisabled();
+
+        fireEvent.change(descriptionInput, { target: { value: 'Valid scientific description' } });
+        await waitFor(() => expect(saveButton()).toBeEnabled());
+    });
+
+    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', async () => {
+        renderModal({
+            block: HippotherapyPageLocalizationBlock.ScientificReferences,
+            subBlock: 'research',
+            targetResearchLocalId: 'ref-1',
+        });
+
+        const nameInput = screen.getByLabelText(HIPPOTHERAPY_PAGE_TEXT.LABEL.CITATION_NAME, { exact: false });
+        expect(nameInput).toBeInTheDocument();
+        expect(nameInput.tagName.toLowerCase()).toBe('textarea');
+        expect(nameInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_CITATION_NAME));
+        expect(saveButton()).toBeDisabled();
+
+        fireEvent.change(nameInput, { target: { value: 'Valid research item citation name' } });
+        await waitFor(() => expect(saveButton()).toBeEnabled());
+    });
 });

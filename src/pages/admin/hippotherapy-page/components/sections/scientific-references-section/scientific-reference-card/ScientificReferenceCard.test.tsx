@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ScientificReferenceCard, ScientificReferenceCardProps } from './ScientificReferenceCard';
 
 describe('ScientificReferenceCard', () => {
@@ -159,5 +160,44 @@ describe('ScientificReferenceCard', () => {
         fireEvent.click(screen.getByLabelText('Delete reference'));
 
         expect(mockOnDelete).toHaveBeenCalledWith('ref-1');
+    });
+
+    it('does not render the translate button when onTranslateClick is not provided', () => {
+        renderComponent();
+
+        expect(
+            screen.queryByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION),
+        ).not.toBeInTheDocument();
+    });
+
+    it('renders the translate button and calls onTranslateClick when clicked', () => {
+        const mockOnTranslateClick = jest.fn();
+        renderComponent({ onTranslateClick: mockOnTranslateClick });
+
+        const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButton).toBeInTheDocument();
+        expect(translateButton).toBeEnabled();
+
+        fireEvent.click(translateButton);
+        expect(mockOnTranslateClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('disables the translate button when isTranslateDisabled is true', () => {
+        const mockOnTranslateClick = jest.fn();
+        renderComponent({ onTranslateClick: mockOnTranslateClick, isTranslateDisabled: true });
+
+        const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButton).toBeDisabled();
+
+        fireEvent.click(translateButton);
+        expect(mockOnTranslateClick).not.toHaveBeenCalled();
+    });
+
+    it('disables the translate button when disabled is true', () => {
+        const mockOnTranslateClick = jest.fn();
+        renderComponent({ onTranslateClick: mockOnTranslateClick, disabled: true });
+
+        const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButton).toBeDisabled();
     });
 });

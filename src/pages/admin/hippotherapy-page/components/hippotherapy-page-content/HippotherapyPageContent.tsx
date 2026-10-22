@@ -6,6 +6,7 @@ import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/u
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { HippotherapyPageApi } from '@/services/api/admin/hippotherapy-page/hippotherapy-page-api';
 import {
+    HippotherapyEthicsSectionContent,
     HippotherapyGallerySectionContent,
     HippotherapyImageValue,
     HippotherapyPageContentModel,
@@ -206,6 +207,23 @@ const hasScientificReferenceTranslation = (
     );
 };
 
+const hasUnpublishedEthicsGeneral = (
+    published: HippotherapyEthicsSectionContent,
+    draft: HippotherapyEthicsSectionContent,
+): boolean =>
+    normalizeHtml(published.title) !== normalizeHtml(draft.title) ||
+    normalizeHtml(published.description) !== normalizeHtml(draft.description) ||
+    draft.principles.some(
+        (principle, index) => normalizeHtml(published.principles[index] ?? '') !== normalizeHtml(principle),
+    );
+
+const hasEthicsGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        localization?.ethicsSection?.title?.trim() ||
+            localization?.ethicsSection?.description?.trim() ||
+            localization?.ethicsSection?.principles?.some((principle) => principle?.trim()),
+    );
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -381,6 +399,11 @@ export const HippotherapyPageContent = () => {
                     subBlock: 'research',
                     targetResearchLocalId: localId,
                 }),
+            ethicsGeneral: () =>
+                setTranslationTarget({
+                    block: HippotherapyPageLocalizationBlock.Ethics,
+                    subBlock: 'general',
+                }),
         }),
         [],
     );
@@ -546,6 +569,13 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
+                    onTranslateGeneralClick={canTranslate ? translationHandlers.ethicsGeneral : undefined}
+                    isTranslateGeneralDisabled={
+                        isDisabled ||
+                        !fetchedContent ||
+                        hasUnpublishedEthicsGeneral(fetchedContent.ethicsSection, draftContent.ethicsSection) ||
+                        hasEthicsGeneralTranslation(targetLocalization)
+                    }
                 />
                 <div className="hippotherapy-page-publish">
                     <Button

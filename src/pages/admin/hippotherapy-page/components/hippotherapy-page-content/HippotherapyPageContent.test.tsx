@@ -154,14 +154,32 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
 }));
 
 jest.mock('../sections/ethics-section/EthicsSection', () => ({
-    EthicsSection: ({ value, onChange, onImageError, disabled }: any) => (
+    EthicsSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        onTranslateGeneralClick,
+        isTranslateGeneralDisabled,
+    }: any) => (
         <div data-testid="section-ethics">
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
                 Edit ethics
             </button>
+            <button
+                disabled={disabled}
+                onClick={() => onChange({ ...value, principles: ['Edited principle', ...value.principles.slice(1)] })}
+            >
+                Edit ethics principle
+            </button>
             <button onClick={() => onImageError?.('image size error')}>Set ethics image error</button>
             <button onClick={() => onImageError?.(null)}>Clear ethics image error</button>
+            {onTranslateGeneralClick && (
+                <button disabled={isTranslateGeneralDisabled} onClick={onTranslateGeneralClick}>
+                    Translate ethics-general
+                </button>
+            )}
         </div>
     ),
 }));
@@ -725,6 +743,88 @@ describe('HippotherapyPageContent', () => {
                 name: 'Translate research-item',
             });
             expect(itemTranslateButton).toBeDisabled();
+        });
+    });
+
+    describe('ethics section translation', () => {
+        it('opens the translation modal for the general ethics block and disables when edited', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate ethics-general' });
+            expect(generalTranslateButton).toBeEnabled();
+
+            fireEvent.click(generalTranslateButton);
+
+            expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(
+                String(HippotherapyPageLocalizationBlock.Ethics),
+            );
+            expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent('general');
+
+            fireEvent.click(screen.getByRole('button', { name: 'Close translation' }));
+            expect(screen.queryByTestId('translate-section-modal')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit ethics' }));
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('disables the general translation action when a principle is edited but not published', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate ethics-general' });
+            expect(generalTranslateButton).toBeEnabled();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit ethics principle' }));
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('disables the general ethics translation action when an English translation already exists', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        ethicsSection: {
+                            title: 'English Title',
+                            description: 'English Description',
+                            principles: [],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate ethics-general' });
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('disables the general ethics translation action when only a principle already has an English translation', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        ethicsSection: {
+                            title: '',
+                            description: '',
+                            principles: ['Translated principle'],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate ethics-general' });
+            expect(generalTranslateButton).toBeDisabled();
         });
     });
 });

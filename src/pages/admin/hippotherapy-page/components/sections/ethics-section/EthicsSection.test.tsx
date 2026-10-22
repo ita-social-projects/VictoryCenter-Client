@@ -124,4 +124,33 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
     });
+
+    it('does not render any translate button when no translate handlers are provided', () => {
+        renderComponent();
+
+        expect(
+            screen.queryByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION),
+        ).not.toBeInTheDocument();
+    });
+
+    it('renders the general translation header and handles click when onTranslateGeneralClick is provided', () => {
+        const mockOnTranslateGeneralClick = jest.fn();
+        renderComponent({ onTranslateGeneralClick: mockOnTranslateGeneralClick });
+
+        const translateButtons = screen.getAllByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
+        expect(translateButtons).toHaveLength(1);
+        expect(translateButtons[0]).toBeEnabled();
+
+        fireEvent.click(translateButtons[0]);
+        expect(mockOnTranslateGeneralClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('disables the general translation header button when isTranslateGeneralDisabled is true', () => {
+        renderComponent({
+            onTranslateGeneralClick: jest.fn(),
+            isTranslateGeneralDisabled: true,
+        });
+
+        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeDisabled();
+    });
 });

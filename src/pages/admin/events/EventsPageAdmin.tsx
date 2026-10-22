@@ -259,8 +259,10 @@ export const EventsPageAdmin = () => {
             const introSection = await EventsApi.getEventsIntroSection(client);
             setEventsIntroSection(introSection);
             setEventsIntroDraft(introSection);
+            return true;
         } catch {
             setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events-intro');
+            return false;
         } finally {
             setIsEventsIntroSectionLoading(false);
         }
@@ -623,12 +625,16 @@ export const EventsPageAdmin = () => {
     }, []);
 
     const handleIntroTranslationSave = useCallback(async () => {
-        await fetchEventsIntroSection();
+        const isIntroSectionRefreshed = await fetchEventsIntroSection();
+
+        if (!isIntroSectionRefreshed) return false;
+
         addToast(
             COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
             ToastType.Success,
             EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
         );
+        return true;
     }, [addToast, fetchEventsIntroSection]);
 
     const openPublishConfirmation = useCallback(

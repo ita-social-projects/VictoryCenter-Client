@@ -5,24 +5,21 @@ import userEvent from '@testing-library/user-event';
 import { EVENTS_TEXT } from '@/const/admin/events';
 import { EventsIntroTranslationField, TranslateEventsIntroForm } from './TranslateEventsIntroForm';
 
-const TranslateEventsIntroFormHarness = ({ field }: { field: EventsIntroTranslationField }) => {
-    const [value, setValue] = useState('');
-
-    return (
-        <>
-            <TranslateEventsIntroForm field={field} value={value} onChange={setValue} onBlur={jest.fn()} />
-            <output data-testid="controlled-value">{value}</output>
-        </>
-    );
-};
-
-const ClearableFormHarness = ({ error }: { error?: string }) => {
-    const [value, setValue] = useState('Translation text');
+const TranslateEventsIntroFormHarness = ({
+    field,
+    error,
+    initialValue = '',
+}: {
+    field: EventsIntroTranslationField;
+    error?: string;
+    initialValue?: string;
+}) => {
+    const [value, setValue] = useState(initialValue);
 
     return (
         <>
             <TranslateEventsIntroForm
-                field="eventsBlockTitle"
+                field={field}
                 value={value}
                 onChange={setValue}
                 onBlur={jest.fn()}
@@ -87,7 +84,13 @@ describe('TranslateEventsIntroForm', () => {
 
     it('shows the clean-up icon only while focused and clears only its field with error styling', async () => {
         const user = userEvent.setup();
-        render(<ClearableFormHarness error="Validation error" />);
+        render(
+            <TranslateEventsIntroFormHarness
+                field="eventsBlockTitle"
+                error="Validation error"
+                initialValue="Translation text"
+            />,
+        );
         const field = screen.getByRole('textbox', {
             name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE),
         });

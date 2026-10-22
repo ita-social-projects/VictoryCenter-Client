@@ -30,7 +30,7 @@ const introSection = {
     isPageDescriptionHidden: false,
     localizations: [],
 };
-const onSaveSuccess = jest.fn().mockResolvedValue(undefined);
+const onSaveSuccess = jest.fn().mockResolvedValue(true);
 const mockedLocalizationsApi = EventsIntroSectionLocalizationsApi as jest.Mocked<
     typeof EventsIntroSectionLocalizationsApi
 >;
@@ -64,7 +64,8 @@ const getTranslationField = (label: string) => screen.getByRole('textbox', { nam
 
 describe('TranslateEventsIntroModal', () => {
     beforeEach(() => {
-        onSaveSuccess.mockClear();
+        onSaveSuccess.mockReset();
+        onSaveSuccess.mockResolvedValue(true);
         mockedLocalizationsApi.create.mockReset();
         mockedLocalizationsApi.update.mockReset();
     });
@@ -112,6 +113,24 @@ describe('TranslateEventsIntroModal', () => {
 
         expect(screen.getAllByText('Англійська')).toHaveLength(2);
         expect(screen.queryByText('Німецька')).not.toBeInTheDocument();
+    });
+
+    it('disables saving when English is unavailable', async () => {
+        const user = userEvent.setup();
+        render(
+            <TranslateEventsIntroModal
+                isOpen
+                field="pageDescription"
+                introSection={introSection}
+                translationLanguages={[]}
+                onClose={jest.fn()}
+                onSaveSuccess={onSaveSuccess}
+            />,
+        );
+
+        await user.type(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE), 'English text');
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
     });
 
     it('closes an empty modal through the close control', async () => {
@@ -306,6 +325,25 @@ describe('TranslateEventsIntroModal', () => {
             }),
         );
         expect(onSaveSuccess).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
+    });
+
+    it('retries only the intro section refresh when it fails after saving', async () => {
+        const user = userEvent.setup();
+        mockedLocalizationsApi.create.mockResolvedValueOnce({} as never);
+        onSaveSuccess.mockResolvedValueOnce(false);
+        render(<TranslationModalHarness />);
+
+        await user.type(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE), 'English text');
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        expect(onSaveSuccess).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        expect(mockedLocalizationsApi.create).toHaveBeenCalledTimes(1);
+        expect(onSaveSuccess).toHaveBeenCalledTimes(2);
         expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
     });
 

@@ -21,7 +21,7 @@ interface TranslateEventsIntroModalProps {
     introSection: EventsIntroSectionDto;
     translationLanguages: LocalizationLanguage[];
     onClose: () => void;
-    onSaveSuccess: () => Promise<void>;
+    onSaveSuccess: () => Promise<boolean>;
 }
 
 export const TranslateEventsIntroModal = ({
@@ -36,6 +36,7 @@ export const TranslateEventsIntroModal = ({
     const [validationError, setValidationError] = useState<string>();
     const [saveError, setSaveError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isTranslationSaved, setIsTranslationSaved] = useState(false);
     const client = useAdminClient();
 
     const availableLanguages = useMemo(
@@ -54,12 +55,14 @@ export const TranslateEventsIntroModal = ({
         setValue('');
         setValidationError(undefined);
         setSaveError('');
+        setIsTranslationSaved(false);
     }, [field, isOpen]);
 
     const validationRule = getEventsIntroTranslationFieldConfig(field).validationRule;
     const handleChange = useCallback(
         (nextValue: string) => {
             setValue(nextValue);
+            setIsTranslationSaved(false);
 
             if (validationError) {
                 setValidationError(undefined);
@@ -80,6 +83,7 @@ export const TranslateEventsIntroModal = ({
         setValue('');
         setValidationError(undefined);
         setSaveError('');
+        setIsTranslationSaved(false);
         onClose();
     };
     const handleClose = () => {
@@ -101,18 +105,28 @@ export const TranslateEventsIntroModal = ({
         setIsSubmitting(true);
         setSaveError('');
         try {
-            if (existingLocalization) {
-                await EventsIntroSectionLocalizationsApi.update(client, introSection.id, selectedLanguage.id, payload);
-            } else {
-                await EventsIntroSectionLocalizationsApi.create(client, {
-                    entityId: introSection.id,
-                    languageId: selectedLanguage.id,
-                    ...payload,
-                });
+            if (!isTranslationSaved) {
+                if (existingLocalization) {
+                    await EventsIntroSectionLocalizationsApi.update(
+                        client,
+                        introSection.id,
+                        selectedLanguage.id,
+                        payload,
+                    );
+                } else {
+                    await EventsIntroSectionLocalizationsApi.create(client, {
+                        entityId: introSection.id,
+                        languageId: selectedLanguage.id,
+                        ...payload,
+                    });
+                }
+
+                setIsTranslationSaved(true);
             }
 
-            await onSaveSuccess();
-            closeModal();
+            const isIntroSectionRefreshed = await onSaveSuccess();
+
+            if (isIntroSectionRefreshed) closeModal();
         } catch {
             setSaveError(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
         } finally {
@@ -120,7 +134,7 @@ export const TranslateEventsIntroModal = ({
         }
     };
 
-    const isFormValid = !getEventsPageTextValidationError(value, validationRule);
+    const isFormValid = Boolean(selectedLanguage) && !getEventsPageTextValidationError(value, validationRule);
     return (
         <LocalizationModal
             isOpen={isOpen}

@@ -71,7 +71,10 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;
                 setFormState((prev) => ({ ...prev, questionText: value }));
-                setErrors((prev) => ({ ...prev, questionText: undefined }));
+
+                if (!FAQ_VALIDATION_FUNCTIONS.validateQuestion(value)?.length) {
+                    setErrors((prev) => ({ ...prev, questionText: undefined }));
+                }
             },
             [setFormState, setErrors],
         );
@@ -86,7 +89,10 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 const value = e.target.value;
                 setFormState((prev) => ({ ...prev, answerText: value }));
-                setErrors((prev) => ({ ...prev, answerText: undefined }));
+
+                if (!FAQ_VALIDATION_FUNCTIONS.validateAnswer(value)) {
+                    setErrors((prev) => ({ ...prev, answerText: undefined }));
+                }
             },
             [setFormState, setErrors],
         );

@@ -175,7 +175,7 @@ describe('FaqForm', () => {
         expect(ref.current?.isValid(false)).toBe(false);
     });
 
-    it('clears question validation error on change', () => {
+    it('keeps question validation error until the input becomes valid', () => {
         render(<FaqForm onSubmit={jest.fn()} pages={mockPages} />);
 
         const questionInput = screen.getByTestId('question-input');
@@ -184,11 +184,15 @@ describe('FaqForm', () => {
         expect(screen.getByTestId('question-error')).toBeInTheDocument();
 
         fireEvent.change(questionInput, { target: { value: 'A' } });
+        expect(screen.getByTestId('question-error')).toBeInTheDocument();
 
+        fireEvent.change(questionInput, {
+            target: { value: 'A'.repeat(FAQ_VALIDATION.question.min) },
+        });
         expect(screen.queryByTestId('question-error')).not.toBeInTheDocument();
     });
 
-    it('clears answer validation error on change', () => {
+    it('keeps answer validation error until the input becomes valid', () => {
         render(<FaqForm onSubmit={jest.fn()} pages={mockPages} />);
 
         const answerInput = screen.getByTestId('answer-input');
@@ -197,7 +201,11 @@ describe('FaqForm', () => {
         expect(screen.getByTestId('answer-error')).toBeInTheDocument();
 
         fireEvent.change(answerInput, { target: { value: 'A' } });
+        expect(screen.getByTestId('answer-error')).toBeInTheDocument();
 
+        fireEvent.change(answerInput, {
+            target: { value: 'A'.repeat(FAQ_VALIDATION.answer.min) },
+        });
         expect(screen.queryByTestId('answer-error')).not.toBeInTheDocument();
     });
 });

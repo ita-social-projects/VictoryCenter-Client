@@ -119,6 +119,30 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
     },
 ];
 
+const createHippoventionCenterTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'pros',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'description',
+        label: HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: false,
+    },
+];
+
 export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
 > = {
@@ -129,6 +153,10 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     [HippotherapyPageLocalizationBlock.AnotherQuote]: {
         sectionKey: 'anotherQuoteSection',
         fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.HippoventionCenter]: {
+        sectionKey: 'hippoventionCenterSection',
+        fields: createHippoventionCenterTranslationFields(),
     },
     [HippotherapyPageLocalizationBlock.ScientificReferences]: {
         sectionKey: 'scientificReferencesSection-general',

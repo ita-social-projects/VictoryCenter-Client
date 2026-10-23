@@ -5,8 +5,6 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
-    LocalizationInfo,
-    TranslationStatus,
 } from '../common/language';
 
 export interface EventLocalizableFields {
@@ -112,24 +110,27 @@ export interface EventsLocalizableFields {
     meetingsCount: string;
 }
 
-export interface EventsIntroSectionDto {
+export interface EventsIntroSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionLocalization extends EntityLocalization {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionDto extends EntityWithLocalizations<EventsIntroSectionLocalization> {
     id: number;
     eventsBlockTitle: string;
     pageDescription: string;
     isEventsBlockTitleHidden: boolean;
     isPageDescriptionHidden: boolean;
-    localizations: EventsIntroSectionLocalizationDto[];
 }
 
 export type EventsIntroSectionUpdateField = 'pageDescription' | 'eventsBlockTitle';
-
-export interface EventsIntroSectionLocalizationDto {
-    entityId: number;
-    localizationInfoDto: LocalizationInfo;
-    eventsBlockTitle?: string | null;
-    pageDescription?: string | null;
-    translationStatus: TranslationStatus;
-}
 
 export interface CreateEventsIntroSectionLocalizationDto {
     entityId: number;
@@ -142,3 +143,6 @@ export type UpdateEventsIntroSectionLocalizationDto = Pick<
     CreateEventsIntroSectionLocalizationDto,
     'eventsBlockTitle' | 'pageDescription'
 >;
+
+export type EventsIntroSectionResponseDto = Omit<EventsIntroSectionDto, 'localizations'> &
+    EntityWithDtoLocalizations<EventsIntroSectionLocalizationDto>;

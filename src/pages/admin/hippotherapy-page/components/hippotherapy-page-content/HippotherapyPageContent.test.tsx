@@ -111,12 +111,44 @@ jest.mock('../sections/gallery-section/GallerySection', () => ({
 }));
 
 jest.mock('../sections/scientific-references-section/ScientificReferencesSection', () => ({
-    ScientificReferencesSection: ({ value, onChange, disabled, isTranslateDisabled }: any) => (
-        <div data-testid="section-research" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    ScientificReferencesSection: ({
+        value,
+        onChange,
+        disabled,
+        onTranslateGeneralClick,
+        isTranslateGeneralDisabled,
+        onTranslateReferenceClick,
+        isTranslateReferenceDisabled,
+    }: any) => (
+        <div data-testid="section-research" data-translate-disabled={String(Boolean(isTranslateGeneralDisabled))}>
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited research title' })}>
                 Edit research
             </button>
+            <button
+                disabled={disabled}
+                onClick={() =>
+                    onChange({
+                        ...value,
+                        scientificReferences: [{ ...value.scientificReferences[0], name: 'Edited citation' }],
+                    })
+                }
+            >
+                Edit reference item
+            </button>
+            {onTranslateGeneralClick && (
+                <button disabled={isTranslateGeneralDisabled} onClick={onTranslateGeneralClick}>
+                    Translate research-general
+                </button>
+            )}
+            {onTranslateReferenceClick && (
+                <button
+                    disabled={isTranslateReferenceDisabled?.('local-1')}
+                    onClick={() => onTranslateReferenceClick('local-1')}
+                >
+                    Translate research-item
+                </button>
+            )}
         </div>
     ),
 }));
@@ -135,10 +167,19 @@ jest.mock('../sections/ethics-section/EthicsSection', () => ({
 }));
 
 jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => ({
-    TranslateHippotherapySectionModal: ({ isOpen, block, onClose, translatedLanguages }: any) =>
+    TranslateHippotherapySectionModal: ({
+        isOpen,
+        block,
+        subBlock,
+        targetResearchLocalId,
+        onClose,
+        translatedLanguages,
+    }: any) =>
         isOpen ? (
             <div data-testid="translate-section-modal">
                 <span data-testid="translate-section-modal-block">{block}</span>
+                <span data-testid="translate-section-modal-sub-block">{subBlock}</span>
+                <span data-testid="translate-section-modal-target-id">{targetResearchLocalId}</span>
                 <span>{translatedLanguages.map((language: any) => language.name).join(',')}</span>
                 <button onClick={onClose}>Close translation</button>
             </div>
@@ -545,7 +586,6 @@ describe('HippotherapyPageContent', () => {
 
         expectTranslationDisabledForEverySection(true);
     });
-
     describe('review section translation', () => {
         it.each([
             ['hippotherapy-quote', HippotherapyPageLocalizationBlock.Quote],
@@ -606,7 +646,6 @@ describe('HippotherapyPageContent', () => {
                 expect(screen.getByRole('button', { name: `Translate ${otherFieldIdPrefix}` })).toBeEnabled();
             },
         );
-
         it('disables the translation icon while the page is being published', async () => {
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
             mockedHippotherapyPageApi.update.mockReturnValue(new Promise(() => {}));
@@ -656,6 +695,106 @@ describe('HippotherapyPageContent', () => {
                 COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES,
                 ToastType.Error,
             );
+        });
+    });
+    describe('scientific references section translation', () => {
+        it('opens the translation modal for the general research block and disables when edited', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-general',
+            });
+            expect(generalTranslateButton).toBeEnabled();
+
+            fireEvent.click(generalTranslateButton);
+
+            expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(
+                String(HippotherapyPageLocalizationBlock.ScientificReferences),
+            );
+            expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent('general');
+
+            fireEvent.click(screen.getByRole('button', { name: 'Close translation' }));
+            expect(screen.queryByTestId('translate-section-modal')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit research' }));
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('opens the translation modal for a specific research reference item and disables when edited', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            const itemTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-item',
+            });
+            expect(itemTranslateButton).toBeEnabled();
+
+            fireEvent.click(itemTranslateButton);
+
+            expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(
+                String(HippotherapyPageLocalizationBlock.ScientificReferences),
+            );
+            expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent('research');
+            expect(screen.getByTestId('translate-section-modal-target-id')).toHaveTextContent('local-1');
+
+            fireEvent.click(screen.getByRole('button', { name: 'Close translation' }));
+            expect(screen.queryByTestId('translate-section-modal')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit reference item' }));
+            expect(itemTranslateButton).toBeDisabled();
+        });
+
+        it('disables the general research translation action when an English translation already exists', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        scientificReferencesSection: {
+                            title: 'English Title',
+                            description: 'English Description',
+                            scientificReferences: [],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-general',
+            });
+            expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('disables the research reference item translation action when an English translation already exists for that item', async () => {
+            const contentWithTranslation: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        scientificReferencesSection: {
+                            title: '',
+                            description: '',
+                            scientificReferences: [{ id: 1, name: 'Translated citation' }],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+            render(<HippotherapyPageContent />);
+
+            const itemTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-item',
+            });
+            expect(itemTranslateButton).toBeDisabled();
         });
     });
 });

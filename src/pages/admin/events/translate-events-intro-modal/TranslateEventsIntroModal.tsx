@@ -99,7 +99,7 @@ export const TranslateEventsIntroModal = ({
 
         const payload = { [field]: normalizedValue };
         const existingLocalization = (introSection.localizations ?? []).find(
-            (localization) => localization.localizationInfoDto.code === selectedLanguage.code,
+            (localization) => localization.language.code === selectedLanguage.code,
         );
 
         setIsSubmitting(true);

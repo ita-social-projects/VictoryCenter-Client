@@ -27,6 +27,13 @@
 
     &-heading-row {
         justify-content: space-between;
+    }
+
+    &-heading-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
 
         h2 {
             @include typography.small-text-medium;

@@ -1,6 +1,6 @@
 import React, { act } from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -136,12 +136,13 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
         localizedEntity,
     }: {
         languages: { id: number; code: string }[];
-        localizedEntity: EventCategoryDto;
+        localizedEntity: EventCategoryDto & { localizations?: unknown[] };
     }) => (
         <span
             data-testid="localization-statuses-mock"
             data-languages={languages?.map((lang) => lang.code).join(',')}
             data-entity-id={localizedEntity?.id}
+            data-localizations={JSON.stringify(localizedEntity?.localizations ?? [])}
         />
     ),
 }));
@@ -257,6 +258,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             isHidden: _isHidden,
             onToggleVisibility,
             isToggleVisibilityDisabled,
+            headerExtra,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -271,12 +273,14 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             isHidden?: boolean;
             onToggleVisibility?: () => void;
             isToggleVisibilityDisabled?: boolean;
+            headerExtra?: React.ReactNode;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
             return (
                 <section data-testid={`${sectionId}-section`}>
                     <span>{mode}</span>
+                    {headerExtra}
                     <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
 
                     <button
@@ -696,12 +700,69 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         const statusMocks = await screen.findAllByTestId('localization-statuses-mock');
+        const categoryStatusMocks = statusMocks.slice(-categories.length);
 
-        expect(statusMocks).toHaveLength(categories.length);
-        expect(statusMocks[0]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
-        expect(statusMocks[1]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+        expect(categoryStatusMocks).toHaveLength(categories.length);
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+    });
+
+    it('passes languages and the intro section as localizedEntity to LocalizationStatuses for each editable block', async () => {
+        await renderEventsPage();
+
+        const descriptionSection = await screen.findByTestId(
+            `${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID}-section`,
+        );
+        const titleSection = screen.getByTestId(`${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}-section`);
+
+        const descriptionStatusMock = await within(descriptionSection).findByTestId('localization-statuses-mock');
+        const titleStatusMock = await within(titleSection).findByTestId('localization-statuses-mock');
+
+        expect(descriptionStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(descriptionStatusMock).toHaveAttribute('data-entity-id', '1');
+        expect(titleStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(titleStatusMock).toHaveAttribute('data-entity-id', '1');
+    });
+
+    it('refreshes translation status indicators for both blocks after publishing a section', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+        const outdatedLocalizations = [
+            {
+                entityId: 1,
+                language: { id: 2, code: 'en' },
+                translationStatus: 2,
+                eventsBlockTitle: '<p>Title</p>',
+                pageDescription: '<p>Description</p>',
+            },
+        ];
+
+        mockedEventsApi.updateEventsIntroSection.mockResolvedValueOnce({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Updated content</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+            id: 1,
+            localizations: outdatedLocalizations,
+        });
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            const descriptionSection = screen.getByTestId(`${descriptionId}-section`);
+            const descriptionStatusMock = within(descriptionSection).getByTestId('localization-statuses-mock');
+            expect(descriptionStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
+        });
+
+        const titleSection = screen.getByTestId(`${titleId}-section`);
+        const titleStatusMock = within(titleSection).getByTestId('localization-statuses-mock');
+        expect(titleStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -1197,6 +1258,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
 

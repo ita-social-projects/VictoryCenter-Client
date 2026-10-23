@@ -7,6 +7,7 @@ import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-pag
 import {
     runsSectionImageInputTests,
     runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
     runsSectionDisablesInputsTest,
     runsSectionTranslationHeaderTests,
 } from '../test-utils/sectionTestHelpers';
@@ -81,17 +82,13 @@ describe('EthicsSection', () => {
         });
     });
 
-    it('shows a per-principle validation error', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0'));
-
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippotherapy-ethics-principle-0',
+        'shows a per-principle validation error',
+        { newValue: 'x' },
+    );
 
     runsSectionDisablesInputsTest(
         renderComponent,

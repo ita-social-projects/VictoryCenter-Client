@@ -8,6 +8,7 @@ import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
 import {
     runsSectionImageInputTests,
     runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
     runsSectionDisablesInputsTest,
     runsSectionTranslationHeaderTests,
 } from '../test-utils/sectionTestHelpers';
@@ -84,14 +85,12 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
-    it('shows an error for a filled but invalid author name on blur', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
-
-        fireEvent.blur(screen.getByTestId('mock-rich-input-test-quote-quote-author'));
-
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-test-quote-quote-author',
+        'shows an error for a filled but invalid author name on blur',
+    );
 
     runsSectionDisablesInputsTest(renderComponent, [
         'mock-image-input-file',

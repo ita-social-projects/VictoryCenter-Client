@@ -57,6 +57,28 @@ export const runsSectionFieldUpdateTests = <TValue extends object>(
     });
 };
 
+export const runsSectionFieldValidationErrorTest = (
+    renderComponent: (props?: Record<string, unknown>) => void,
+    getValidateTextMock: () => jest.Mock,
+    testId: string,
+    testName: string,
+    options: { errorMessage?: string; newValue?: string } = {},
+) => {
+    const { errorMessage = 'Too short', newValue } = options;
+
+    it(testName, () => {
+        getValidateTextMock().mockReturnValueOnce(errorMessage);
+        renderComponent();
+
+        if (newValue !== undefined) {
+            fireEvent.change(screen.getByTestId(testId), { target: { value: newValue } });
+        }
+        fireEvent.blur(screen.getByTestId(testId));
+
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    });
+};
+
 export const runsSectionDisablesInputsTest = (
     renderComponent: (props?: Record<string, unknown>) => void,
     testIds: string[],

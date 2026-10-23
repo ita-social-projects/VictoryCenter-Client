@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -7,6 +7,7 @@ import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page
 import {
     runsSectionImageInputTests,
     runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
     runsSectionDisablesInputsTest,
 } from '../test-utils/sectionTestHelpers';
 
@@ -67,17 +68,13 @@ describe('IntroBannerSection', () => {
         },
     ]);
 
-    it('shows a title validation error when validation fails', () => {
-        validateTextMock().mockReturnValueOnce('Title is too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'));
-
-        expect(screen.getByText('Title is too short')).toBeInTheDocument();
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippotherapy-intro-title',
+        'shows a title validation error when validation fails',
+        { errorMessage: 'Title is too short', newValue: 'x' },
+    );
 
     runsSectionDisablesInputsTest(
         renderComponent,

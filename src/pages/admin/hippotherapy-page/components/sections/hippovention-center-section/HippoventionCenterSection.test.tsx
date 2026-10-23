@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HippoventionCenterSection, HippoventionCenterSectionProps } from './HippoventionCenterSection';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -8,6 +8,7 @@ import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-pag
 import {
     runsSectionImageInputTests,
     runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
     runsSectionDisablesInputsTest,
 } from '../test-utils/sectionTestHelpers';
 
@@ -75,17 +76,13 @@ describe('HippoventionCenterSection', () => {
         },
     ]);
 
-    it('shows a validation error when the pros text is invalid', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-pros'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippovention-center-pros'));
-
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippovention-center-pros',
+        'shows a validation error when the pros text is invalid',
+        { newValue: 'x' },
+    );
 
     runsSectionDisablesInputsTest(renderComponent, [
         'mock-image-input-file',

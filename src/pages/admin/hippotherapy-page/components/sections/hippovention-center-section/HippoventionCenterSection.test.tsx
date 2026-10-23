@@ -5,7 +5,11 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
-import { runsSectionImageInputTests } from '../test-utils/sectionTestHelpers';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionDisablesInputsTest,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -50,35 +54,26 @@ describe('HippoventionCenterSection', () => {
 
     runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated pros text', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-pros'), {
-            target: { value: 'Updated pros' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, pros: 'Updated pros' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippovention-center-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippovention-center-pros',
+            fieldName: 'pros',
+            label: 'pros text',
+            newValue: 'Updated pros',
+        },
+        {
+            testId: 'mock-rich-input-hippovention-center-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
     it('shows a validation error when the pros text is invalid', () => {
         validateTextMock().mockReturnValueOnce('Too short');
@@ -92,12 +87,10 @@ describe('HippoventionCenterSection', () => {
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });
 
-    it('disables all inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-description')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(renderComponent, [
+        'mock-image-input-file',
+        'mock-rich-input-hippovention-center-title',
+        'mock-rich-input-hippovention-center-pros',
+        'mock-rich-input-hippovention-center-description',
+    ]);
 });

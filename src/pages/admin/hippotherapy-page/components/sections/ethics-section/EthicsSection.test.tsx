@@ -4,7 +4,12 @@ import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
-import { runsSectionImageInputTests, runsSectionTranslationHeaderTests } from '../test-utils/sectionTestHelpers';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionDisablesInputsTest,
+    runsSectionTranslationHeaderTests,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -48,25 +53,20 @@ describe('EthicsSection', () => {
 
     runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippotherapy-ethics-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippotherapy-ethics-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
     it('updates only the targeted principle, leaving others intact', () => {
         renderComponent();
@@ -93,14 +93,16 @@ describe('EthicsSection', () => {
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });
 
-    it('disables every input when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(
+        renderComponent,
+        [
+            'mock-image-input-file',
+            'mock-rich-input-hippotherapy-ethics-title',
+            'mock-rich-input-hippotherapy-ethics-description',
+            'mock-rich-input-hippotherapy-ethics-principle-0',
+        ],
+        'disables every input when disabled is true',
+    );
 
     runsSectionTranslationHeaderTests(
         renderComponent,

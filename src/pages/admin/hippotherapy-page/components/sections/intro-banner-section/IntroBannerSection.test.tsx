@@ -4,7 +4,11 @@ import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSectio
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
-import { runsSectionImageInputTests } from '../test-utils/sectionTestHelpers';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionDisablesInputsTest,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -48,25 +52,20 @@ describe('IntroBannerSection', () => {
 
     runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippotherapy-intro-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippotherapy-intro-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
     it('shows a title validation error when validation fails', () => {
         validateTextMock().mockReturnValueOnce('Title is too short');
@@ -80,11 +79,13 @@ describe('IntroBannerSection', () => {
         expect(screen.getByText('Title is too short')).toBeInTheDocument();
     });
 
-    it('disables inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(
+        renderComponent,
+        [
+            'mock-image-input-file',
+            'mock-rich-input-hippotherapy-intro-title',
+            'mock-rich-input-hippotherapy-intro-description',
+        ],
+        'disables inputs when disabled is true',
+    );
 });

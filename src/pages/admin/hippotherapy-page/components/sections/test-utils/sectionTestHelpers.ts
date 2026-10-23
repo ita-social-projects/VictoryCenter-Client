@@ -33,6 +33,42 @@ export const runsSectionImageInputTests = <TValue extends object>(
     });
 };
 
+export interface SectionFieldUpdateConfig<TValue> {
+    testId: string;
+    fieldName: keyof TValue & string;
+    label: string;
+    newValue: string;
+}
+
+export const runsSectionFieldUpdateTests = <TValue extends object>(
+    renderComponent: (props?: Record<string, unknown>) => void,
+    defaultValue: TValue,
+    getMockOnChange: () => jest.Mock,
+    fields: SectionFieldUpdateConfig<TValue>[],
+) => {
+    fields.forEach(({ testId, fieldName, label, newValue }) => {
+        it(`calls onChange with the updated ${label}`, () => {
+            renderComponent();
+
+            fireEvent.change(screen.getByTestId(testId), { target: { value: newValue } });
+
+            expect(getMockOnChange()).toHaveBeenCalledWith({ ...defaultValue, [fieldName]: newValue });
+        });
+    });
+};
+
+export const runsSectionDisablesInputsTest = (
+    renderComponent: (props?: Record<string, unknown>) => void,
+    testIds: string[],
+    testName = 'disables all inputs when disabled is true',
+) => {
+    it(testName, () => {
+        renderComponent({ disabled: true });
+
+        testIds.forEach((testId) => expect(screen.getByTestId(testId)).toBeDisabled());
+    });
+};
+
 export const runsSectionTranslationHeaderTests = (
     renderComponent: (props?: Record<string, unknown>) => void,
     buildEnabledProps: (onTranslateClick: jest.Mock) => Record<string, unknown>,

@@ -5,7 +5,12 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
-import { runsSectionImageInputTests, runsSectionTranslationHeaderTests } from '../test-utils/sectionTestHelpers';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionDisablesInputsTest,
+    runsSectionTranslationHeaderTests,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -55,25 +60,20 @@ describe('HippotherapyQuoteSection', () => {
 
     runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-    it('calls onChange with the updated quote text', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-quote-quote-text'), {
-            target: { value: 'New quote' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, quoteText: 'New quote' });
-    });
-
-    it('calls onChange with the updated author name', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-quote-quote-author'), {
-            target: { value: 'New author' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, authorName: 'New author' });
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-test-quote-quote-text',
+            fieldName: 'quoteText',
+            label: 'quote text',
+            newValue: 'New quote',
+        },
+        {
+            testId: 'mock-rich-input-test-quote-quote-author',
+            fieldName: 'authorName',
+            label: 'author name',
+            newValue: 'New author',
+        },
+    ]);
 
     it('does not show an error for an empty author name on blur', () => {
         validateTextMock().mockReturnValue('Too short');
@@ -93,13 +93,11 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.getByText('Too short')).toBeInTheDocument();
     });
 
-    it('disables all inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-test-quote-quote-text')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(renderComponent, [
+        'mock-image-input-file',
+        'mock-rich-input-test-quote-quote-text',
+        'mock-rich-input-test-quote-quote-author',
+    ]);
 
     runsSectionTranslationHeaderTests(
         renderComponent,

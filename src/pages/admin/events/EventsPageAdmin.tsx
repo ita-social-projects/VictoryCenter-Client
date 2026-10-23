@@ -654,10 +654,22 @@ export const EventsPageAdmin = () => {
             try {
                 const publishedSection = await EventsApi.updateEventsIntroSection(client, field, updatedSection);
                 setEventsIntroSection((currentSection) =>
-                    currentSection ? { ...currentSection, [field]: publishedSection[field] } : publishedSection,
+                    currentSection
+                        ? {
+                              ...currentSection,
+                              [field]: publishedSection[field],
+                              localizations: publishedSection.localizations,
+                          }
+                        : publishedSection,
                 );
                 setEventsIntroDraft((currentDraft) =>
-                    currentDraft ? { ...currentDraft, [field]: publishedSection[field] } : publishedSection,
+                    currentDraft
+                        ? {
+                              ...currentDraft,
+                              [field]: publishedSection[field],
+                              localizations: publishedSection.localizations,
+                          }
+                        : publishedSection,
                 );
                 setEditingSections((currentEditingSections) => ({
                     ...currentEditingSections,
@@ -881,6 +893,12 @@ export const EventsPageAdmin = () => {
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)
                     }
+                    headerExtra={
+                        <LocalizationStatuses
+                            languages={translationLanguages}
+                            localizedEntity={eventsIntroSection ?? {}}
+                        />
+                    }
                 />
                 <EditableHeaderSection
                     sectionId={EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}
@@ -916,6 +934,12 @@ export const EventsPageAdmin = () => {
                     isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)
+                    }
+                    headerExtra={
+                        <LocalizationStatuses
+                            languages={translationLanguages}
+                            localizedEntity={eventsIntroSection ?? {}}
+                        />
                     }
                 />
             </div>

@@ -110,11 +110,27 @@ export interface EventsLocalizableFields {
     meetingsCount: string;
 }
 
-export interface EventsIntroSectionDto {
+export interface EventsIntroSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionLocalization extends EntityLocalization {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionDto extends EntityWithLocalizations<EventsIntroSectionLocalization> {
+    id: number;
     eventsBlockTitle: string;
     pageDescription: string;
     isEventsBlockTitleHidden: boolean;
     isPageDescriptionHidden: boolean;
 }
+
+export type EventsIntroSectionResponseDto = Omit<EventsIntroSectionDto, 'localizations'> &
+    EntityWithDtoLocalizations<EventsIntroSectionLocalizationDto>;
 
 export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;

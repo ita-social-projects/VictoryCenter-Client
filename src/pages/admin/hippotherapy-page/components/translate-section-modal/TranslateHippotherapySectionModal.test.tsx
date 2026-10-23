@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -89,15 +89,12 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(closeButton()).toBeEnabled();
     });
 
-    it('enables the save button once the required field is valid', async () => {
+    it('keeps the save button disabled even once the required field is valid, since saving is not implemented yet', () => {
         renderModal();
 
         fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
 
-        expect(saveButton()).toBeEnabled();
-        fireEvent.click(saveButton());
-
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
         expect(quoteInput()).toHaveValue(VALID_TEXT);
     });
 
@@ -176,7 +173,7 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
 
-    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', async () => {
+    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'general',
@@ -198,10 +195,10 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(descriptionInput, { target: { value: 'Valid scientific description' } });
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
     });
 
-    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', async () => {
+    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'research',
@@ -215,6 +212,6 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(nameInput, { target: { value: 'Valid research item citation name' } });
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
     });
 });

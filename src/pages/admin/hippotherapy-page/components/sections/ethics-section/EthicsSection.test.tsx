@@ -4,6 +4,7 @@ import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
+import { runsSectionImageInputTests, runsSectionTranslationHeaderTests } from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -45,31 +46,7 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toHaveValue('Principle one');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
-
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
-
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
     it('calls onChange with the updated title', () => {
         renderComponent();
@@ -125,32 +102,9 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
     });
 
-    it('does not render any translate button when no translate handlers are provided', () => {
-        renderComponent();
-
-        expect(
-            screen.queryByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION),
-        ).not.toBeInTheDocument();
-    });
-
-    it('renders the general translation header and handles click when onTranslateGeneralClick is provided', () => {
-        const mockOnTranslateGeneralClick = jest.fn();
-        renderComponent({ onTranslateGeneralClick: mockOnTranslateGeneralClick });
-
-        const translateButtons = screen.getAllByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
-        expect(translateButtons).toHaveLength(1);
-        expect(translateButtons[0]).toBeEnabled();
-
-        fireEvent.click(translateButtons[0]);
-        expect(mockOnTranslateGeneralClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('disables the general translation header button when isTranslateGeneralDisabled is true', () => {
-        renderComponent({
-            onTranslateGeneralClick: jest.fn(),
-            isTranslateGeneralDisabled: true,
-        });
-
-        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeDisabled();
-    });
+    runsSectionTranslationHeaderTests(
+        renderComponent,
+        (onTranslateClick) => ({ onTranslateClick }),
+        (onTranslateClick) => ({ onTranslateClick, isTranslateDisabled: true }),
+    );
 });

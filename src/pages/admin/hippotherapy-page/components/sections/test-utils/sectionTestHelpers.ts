@@ -1,0 +1,67 @@
+import { screen, fireEvent } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+
+export const runsSectionImageInputTests = <TValue extends object>(
+    renderComponent: (props?: Record<string, unknown>) => void,
+    defaultValue: TValue,
+    getMockOnChange: () => jest.Mock,
+) => {
+    it('calls onChange with the updated image', () => {
+        renderComponent();
+
+        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
+        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
+
+        expect(getMockOnChange()).toHaveBeenCalledWith({ ...defaultValue, image: file });
+    });
+
+    it('shows an image error reported by ImageInput', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
+
+        expect(screen.getByText('image size error')).toBeInTheDocument();
+    });
+
+    it('reports the image error to the parent via onImageError', () => {
+        const onImageError = jest.fn();
+        renderComponent({ onImageError });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
+
+        expect(onImageError).toHaveBeenCalledWith('image size error');
+    });
+};
+
+export const runsSectionTranslationHeaderTests = (
+    renderComponent: (props?: Record<string, unknown>) => void,
+    buildEnabledProps: (onTranslateClick: jest.Mock) => Record<string, unknown>,
+    buildDisabledProps: (onTranslateClick: jest.Mock) => Record<string, unknown>,
+) => {
+    it('does not render the translation icon without a translate handler', () => {
+        renderComponent();
+
+        expect(
+            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        ).not.toBeInTheDocument();
+    });
+
+    it('renders the translation icon and calls the translate handler when it is clicked', () => {
+        const onTranslateClick = jest.fn();
+        renderComponent(buildEnabledProps(onTranslateClick));
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+
+        expect(onTranslateClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('disables the translation icon when the disabled flag is true', () => {
+        renderComponent(buildDisabledProps(jest.fn()));
+
+        expect(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        ).toBeDisabled();
+    });
+};

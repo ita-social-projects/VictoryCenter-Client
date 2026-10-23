@@ -5,6 +5,7 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
+import { runsSectionImageInputTests, runsSectionTranslationHeaderTests } from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -52,14 +53,7 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toHaveValue('Initial author');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
-
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
     it('calls onChange with the updated quote text', () => {
         renderComponent();
@@ -79,23 +73,6 @@ describe('HippotherapyQuoteSection', () => {
         });
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, authorName: 'New author' });
-    });
-
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
     });
 
     it('does not show an error for an empty author name on blur', () => {
@@ -124,30 +101,9 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toBeDisabled();
     });
 
-    it('does not render the translation icon without onTranslateClick', () => {
-        renderComponent();
-
-        expect(
-            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).not.toBeInTheDocument();
-    });
-
-    it('renders the translation icon and calls onTranslateClick when it is clicked', () => {
-        const onTranslateClick = jest.fn();
-        renderComponent({ onTranslateClick });
-
-        fireEvent.click(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        );
-
-        expect(onTranslateClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('disables the translation icon when isTranslateDisabled is true', () => {
-        renderComponent({ onTranslateClick: jest.fn(), isTranslateDisabled: true });
-
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).toBeDisabled();
-    });
+    runsSectionTranslationHeaderTests(
+        renderComponent,
+        (onTranslateClick) => ({ onTranslateClick }),
+        (onTranslateClick) => ({ onTranslateClick, isTranslateDisabled: true }),
+    );
 });

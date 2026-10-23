@@ -20,8 +20,8 @@ export interface EthicsSectionProps {
     onChange: (value: HippotherapyEthicsSectionContent) => void;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
-    onTranslateGeneralClick?: () => void;
-    isTranslateGeneralDisabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 const EthicsSectionComponent = ({
@@ -29,8 +29,8 @@ const EthicsSectionComponent = ({
     onChange,
     onImageError,
     disabled,
-    onTranslateGeneralClick,
-    isTranslateGeneralDisabled,
+    onTranslateClick,
+    isTranslateDisabled,
 }: EthicsSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -56,11 +56,11 @@ const EthicsSectionComponent = ({
 
     return (
         <div className="hippotherapy-ethics-section">
-            {onTranslateGeneralClick && (
+            {onTranslateClick && (
                 <div className="hippotherapy-ethics-section-header">
                     <SectionTranslationHeader
-                        onTranslateClick={onTranslateGeneralClick}
-                        isTranslateDisabled={isTranslateGeneralDisabled}
+                        onTranslateClick={onTranslateClick}
+                        isTranslateDisabled={isTranslateDisabled}
                     />
                 </div>
             )}

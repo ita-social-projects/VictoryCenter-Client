@@ -4,6 +4,7 @@ import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSectio
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
+import { runsSectionImageInputTests } from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -45,14 +46,7 @@ describe('IntroBannerSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toHaveValue('Initial description');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
-
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
     it('calls onChange with the updated title', () => {
         renderComponent();
@@ -72,23 +66,6 @@ describe('IntroBannerSection', () => {
         });
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
-
-    it('shows an error message reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
     });
 
     it('shows a title validation error when validation fails', () => {

@@ -67,8 +67,7 @@ export interface HippotherapyTranslationFieldConfig {
 export type HippotherapyTranslationSectionKey =
     | keyof HippotherapyPageLocalizedContent
     | 'scientificReferencesSection-general'
-    | 'scientificReferencesSection-research'
-    | 'ethicsSection-general';
+    | 'scientificReferencesSection-research';
 
 export interface HippotherapyTranslationSectionConfig {
     sectionKey: HippotherapyTranslationSectionKey;
@@ -124,7 +123,7 @@ export const ETHICS_PRINCIPLES_COUNT = 4;
 
 export const getEthicsPrincipleFieldName = (index: number) => `principle-${index}`;
 
-export const createEthicsGeneralTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+export const createEthicsTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -164,8 +163,8 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
         fields: createScientificReferencesGeneralTranslationFields(),
     },
     [HippotherapyPageLocalizationBlock.Ethics]: {
-        sectionKey: 'ethicsSection-general',
-        fields: createEthicsGeneralTranslationFields(),
+        sectionKey: 'ethicsSection',
+        fields: createEthicsTranslationFields(),
     },
 };
 

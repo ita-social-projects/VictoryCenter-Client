@@ -5,6 +5,7 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
+import { runsSectionImageInputTests } from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -47,31 +48,7 @@ describe('HippoventionCenterSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toHaveValue('Initial pros');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
-
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
-
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
     it('calls onChange with the updated title', () => {
         renderComponent();

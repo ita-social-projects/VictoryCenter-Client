@@ -303,6 +303,8 @@ const expectGeneralTranslationDisabledWhenTranslationExists = async (
 
     const generalTranslateButton = await screen.findByRole('button', { name: translateButtonLabel });
     expect(generalTranslateButton).toBeDisabled();
+};
+
 const SECTION_TEST_IDS = [
     'section-intro',
     'section-hippotherapy-description',

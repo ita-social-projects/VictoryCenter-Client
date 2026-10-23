@@ -62,6 +62,7 @@ export interface HippotherapyTranslationFieldConfig {
     minLength?: number;
     isRequired: boolean;
     type?: 'rich-text' | 'textarea' | 'text';
+    imageIndex?: number;
 }
 
 export type HippotherapyTranslationSectionKey =
@@ -119,6 +120,25 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
     },
 ];
 
+const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+        type: 'text',
+    },
+    ...Array.from({ length: 4 }, (_, imageIndex) => ({
+        name: `description${imageIndex + 1}`,
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+        imageIndex,
+    })),
+];
+
 export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
 > = {
@@ -129,6 +149,10 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     [HippotherapyPageLocalizationBlock.AnotherQuote]: {
         sectionKey: 'anotherQuoteSection',
         fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Advantages]: {
+        sectionKey: 'advantagesSection',
+        fields: createAdvantagesTranslationFields(),
     },
     [HippotherapyPageLocalizationBlock.ScientificReferences]: {
         sectionKey: 'scientificReferencesSection-general',
@@ -202,12 +226,16 @@ const createCardImageStyle = (imageUrl: string): CSSProperties => ({
     ...createGradientBackgroundStyle(imageUrl),
 });
 
-const defaultGalleryCardStyles = [
+const advantagesDefaultImages = [
     advantageDefaultImage0,
     advantageDefaultImage1,
     advantageDefaultImage2,
     advantageDefaultImage3,
-].map(createCardImageStyle);
+];
+
+const defaultGalleryCardStyles = advantagesDefaultImages.map(createCardImageStyle);
+
+export const HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES = advantagesDefaultImages;
 
 export const HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES = {
     INTRO: createDefaultImageStyle(introDefaultImage, 850, 472),

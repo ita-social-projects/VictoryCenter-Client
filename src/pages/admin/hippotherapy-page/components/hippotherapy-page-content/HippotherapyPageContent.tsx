@@ -13,10 +13,16 @@ import {
     HippotherapyPageLocalizationBlock,
 } from '@/types/admin/hippotherapy-page';
 import { isHippotherapyPageContentValid } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import {
+    HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES,
+    HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
+    HIPPOTHERAPY_PAGE_TEXT,
+} from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -105,6 +111,15 @@ const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPa
     },
 });
 
+const normalizeAdvantagesSection = (section: HippotherapyPageContentModel['advantagesSection']) => ({
+    ...section,
+    title: normalizeHtml(section.title),
+    cards: section.cards.map((card) => ({
+        ...card,
+        description: normalizeHtml(card.description),
+    })),
+});
+
 const hasDraftImage = (content: HippotherapyPageContentModel, errorKey: string): boolean => {
     const [sectionKey, cardIndex] = errorKey.split('-');
     const section = content[sectionKey as keyof HippotherapyPageContentModel];
@@ -168,6 +183,12 @@ const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalizat
             localization?.scientificReferencesSection?.description?.trim(),
     );
 
+const hasAdvantagesTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        getPlainTextFromHtml(localization?.advantagesSection?.title ?? '').trim() ||
+            localization?.advantagesSection?.cards?.some((card) => getPlainTextFromHtml(card.description ?? '').trim()),
+    );
+
 const hasScientificReferenceTranslation = (
     localization: HippotherapyPageLocalization | null,
     referenceId: number | null,
@@ -213,6 +234,15 @@ export const HippotherapyPageContent = () => {
         [fetchedContent, englishLanguage],
     );
 
+    const advantageDescriptionImages = useMemo(
+        () =>
+            Array.from({ length: 4 }, (_, index) => {
+                const cardImage = fetchedContent?.advantagesSection.cards[index]?.image;
+                return getImageSrc(cardImage) || HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES[index];
+            }),
+        [fetchedContent],
+    );
+
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
 
     const {
@@ -250,6 +280,14 @@ export const HippotherapyPageContent = () => {
         if (!normalizedFetchedContent || !normalizedDraftContent) return false;
         return normalizedFetchedContent !== normalizedDraftContent;
     }, [normalizedFetchedContent, normalizedDraftContent]);
+
+    const isAdvantagesSectionUnpublished = useMemo(() => {
+        if (!fetchedContent || !draftContent) return false;
+        return (
+            JSON.stringify(normalizeAdvantagesSection(fetchedContent.advantagesSection)) !==
+            JSON.stringify(normalizeAdvantagesSection(draftContent.advantagesSection))
+        );
+    }, [fetchedContent, draftContent]);
 
     const isFormValid = useMemo(
         () => (draftContent ? isHippotherapyPageContentValid(draftContent) : false),
@@ -342,12 +380,15 @@ export const HippotherapyPageContent = () => {
     const isNeverPublished = isNotFound && !hasPublished;
     const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
 
+    const isAdvantagesTranslateDisabled = isDisabled || isNeverPublished || isAdvantagesSectionUnpublished;
+
     const canTranslate = translationLanguages.length > 0;
 
     const translationHandlers = useMemo(
         () => ({
             quoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Quote }),
             anotherQuoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.AnotherQuote }),
+            advantagesSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Advantages }),
             scientificGeneral: () =>
                 setTranslationTarget({
                     block: HippotherapyPageLocalizationBlock.ScientificReferences,
@@ -457,7 +498,8 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ADVANTAGES_CARDS}
                     onCardImageError={imageErrorHandlers.advantagesSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.advantagesSection : undefined}
+                    isTranslateDisabled={isAdvantagesTranslateDisabled || hasAdvantagesTranslation(targetLocalization)}
                 />
                 <hr />
                 <TextCardSection
@@ -537,6 +579,7 @@ export const HippotherapyPageContent = () => {
                 isOpen={translationTarget != null}
                 onClose={() => setTranslationTarget(null)}
                 block={translationTarget?.block ?? null}
+                descriptionImages={advantageDescriptionImages}
                 subBlock={translationTarget?.subBlock}
                 targetResearchLocalId={translationTarget?.targetResearchLocalId}
                 translatedLanguages={translationLanguages}

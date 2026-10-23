@@ -26,6 +26,11 @@ jest.mock('@/services/api/public/events-news/events-news-api', () => ({
     EventsNewsApi: { get: (...args: any[]) => mockGet(...args) },
 }));
 
+const mockUseLocale = jest.fn();
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => mockUseLocale(),
+}));
+
 const makeHookReturn = (overrides: Record<string, any> = {}) => ({
     data: [] as EventsNews[],
     isLoading: false,
@@ -54,6 +59,7 @@ const mockArticle = (id: string): EventsNews => ({
 describe('RecommendedArticles', () => {
     beforeEach(() => {
         mockUseDataPaginationFetch.mockReturnValue(makeHookReturn());
+        mockUseLocale.mockReturnValue({ currentLanguage: 'uk' });
     });
 
     afterEach(() => {
@@ -112,7 +118,7 @@ describe('RecommendedArticles', () => {
         );
     });
 
-    it('fetchHandler calls EventsNewsApi.get with undefined tagId, offset 0, limit 2, and current language', async () => {
+    it('fetchHandler calls EventsNewsApi.get with empty tagId, offset 0, limit 2 and the current language', async () => {
         const articles = [mockArticle('1'), mockArticle('2')];
         mockGet.mockResolvedValueOnce({ items: articles, totalItemsCount: 2 });
 
@@ -120,6 +126,16 @@ describe('RecommendedArticles', () => {
         const { fetchHandler } = mockUseDataPaginationFetch.mock.calls[0][0];
         await fetchHandler({});
 
-        expect(mockGet).toHaveBeenCalledWith(undefined, 0, 2, 'en');
+        expect(mockGet).toHaveBeenCalledWith('', 0, 2, 'uk');
+    });
+
+    it('reloads the articles when the language changes', () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+
+        render(<RecommendedArticles />);
+
+        expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
+            expect.objectContaining({ autoFetchDependencies: ['en'] }),
+        );
     });
 });

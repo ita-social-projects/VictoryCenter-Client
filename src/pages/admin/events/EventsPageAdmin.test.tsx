@@ -82,8 +82,27 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 Clear Search
             </button>
 
-            <button type="button" onClick={() => onSuggestionSelect?.({})}>
+            <button
+                type="button"
+                onClick={() =>
+                    onSuggestionSelect?.(1, { id: 1, title: 'Test event', categories: [{ id: 1, name: 'Category' }] })
+                }
+            >
                 Select Suggestion
+            </button>
+
+            <button
+                type="button"
+                data-testid="select-suggestion-category-2"
+                onClick={() =>
+                    onSuggestionSelect?.(2, {
+                        id: 2,
+                        title: 'Other category event',
+                        categories: [{ id: 2, name: 'Category 2' }],
+                    })
+                }
+            >
+                Select Suggestion From Category 2
             </button>
 
             <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
@@ -234,6 +253,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
+            onTranslate,
             isHidden: _isHidden,
             onToggleVisibility,
             isToggleVisibilityDisabled,
@@ -247,6 +267,7 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml: string;
             isPublishDisabled?: boolean;
             disabled?: boolean;
+            onTranslate?: () => void;
             isHidden?: boolean;
             onToggleVisibility?: () => void;
             isToggleVisibilityDisabled?: boolean;
@@ -265,6 +286,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={disabled}
                     >
                         Edit section
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onTranslate}
+                        aria-label={`Перекласти ${sectionId}`}
+                        disabled={disabled}
+                    >
+                        Translate section
                     </button>
 
                     <button
@@ -712,6 +742,21 @@ describe('EventsPageAdmin', () => {
 
         expect(await screen.findByTestId(`${descriptionId}-html`)).toHaveTextContent('<p>Loaded description</p>');
         expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
+    });
+
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE,
+        ],
+    ])('opens the matching translation modal for %s', async (sectionId, fieldLabel) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Перекласти ${sectionId}` }));
+
+        expect(screen.getByRole('textbox', { name: new RegExp(fieldLabel) })).toBeInTheDocument();
     });
 
     it('drafts content and cancels edit mode successfully', async () => {
@@ -1705,6 +1750,114 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 
+    const setUpSingleEventPage = async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
+        });
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        return user;
+    };
+
+    const enableStatusFilter = async (user: ReturnType<typeof userEvent.setup>) => {
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+    };
+
+    const setUpStatusAwareEventPage = async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, _categoryId, _offset, _limit, _sort, status) =>
+            status === undefined
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        return user;
+    };
+
+    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByTestId('select-suggestion-category-2'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-2')).toBeInTheDocument();
+        expect(screen.getByText('Other category event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('load-more-events')).toBeDisabled();
+    });
+
+    it('narrows the list to the selected event and clears the status filter when the suggestion already belongs to the current category', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.getByText('Test event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('restores the full paginated list for the active category when the search is cleared after selecting a suggestion', async () => {
+        const user = await setUpSingleEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+    });
+
+    it('refetches the current category without the status filter when the search is cleared after selecting a same-category suggestion', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await enableStatusFilter(user);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('clears a selected search result when the status filter changes, so the filter actually takes effect', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-102')).not.toBeInTheDocument();
+
+        await enableStatusFilter(user);
+
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+    });
+
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
         const user = userEvent.setup();
 
@@ -1801,48 +1954,57 @@ describe('EventsPageAdmin', () => {
         });
     });
 
-    it('updates event item in the list when onTranslateEvent is called', async () => {
-        const eventsResponse = {
-            items: [
-                {
-                    id: 1,
-                    title: 'Initial Event',
-                    description: 'Initial Description',
-                    publishedAt: '2024-01-01',
-                    status: VisibilityStatus.Published,
-                    previewImage: null,
-                    backgroundImage: null,
-                    priority: 1,
-                    resource: '',
-                    localizations: [],
-                },
-            ],
-            totalItemsCount: 1,
-        };
+    it.each([
+        [VisibilityStatus.Published, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS],
+        [VisibilityStatus.Draft, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS],
+    ])(
+        'updates event item and shows the toast for a %s event when onTranslateEvent is called',
+        async (status, toast) => {
+            const eventsResponse = {
+                items: [
+                    {
+                        id: 1,
+                        title: 'Initial Event',
+                        description: 'Initial Description',
+                        publishedAt: '2024-01-01',
+                        status,
+                        previewImage: null,
+                        backgroundImage: null,
+                        priority: 1,
+                        resource: '',
+                        localizations: [],
+                    },
+                ],
+                totalItemsCount: 1,
+            };
 
-        mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
+            mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
 
-        render(<EventsPageAdmin />);
+            render(<EventsPageAdmin />);
 
-        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+            expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
 
-        const updatedEvent: EventItemDto = {
-            ...eventsResponse.items[0],
-            title: 'Initial Event',
-            localizations: [
-                {
-                    language: { id: 2, code: 'en' },
-                    title: 'Translated Title',
-                    description: 'Translated Description',
-                    translationStatus: 1 as any,
-                },
-            ],
-        };
+            const updatedEvent: EventItemDto = {
+                ...eventsResponse.items[0],
+                title: 'Initial Event',
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        title: 'Translated Title',
+                        description: 'Translated Description',
+                        translationStatus: 1 as any,
+                    },
+                ],
+            };
 
-        act(() => {
-            mockOnTranslateEvent(updatedEvent);
-        });
-    });
+            act(() => {
+                mockOnTranslateEvent(updatedEvent);
+            });
+
+            expect(mockAddToast).toHaveBeenCalledWith(toast, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledTimes(1);
+        },
+    );
 
     it('opens delete confirmation modal for the selected event', async () => {
         mockedEventsApi.fetchEvents.mockResolvedValue({

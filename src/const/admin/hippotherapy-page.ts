@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { HippotherapyPageLocalizationBlock, HippotherapyPageLocalizedContent } from '@/types/admin/hippotherapy-page';
 import introDefaultImage from '@/assets/images/man-touching-white-horse-side.webp';
 import quoteDefaultImage from '@/assets/images/man-holding-horse-cheek-close.webp';
 import anotherQuoteDefaultImage from '@/assets/images/man-facing-horse-forehead.webp';
@@ -51,6 +53,106 @@ export const HIPPOTHERAPY_PAGE_CHAR_LIMITS = {
     ETHICS_TITLE: 50,
     ETHICS_DESCRIPTION: 300,
     ETHICS_PRINCIPLE: 300,
+};
+
+export interface HippotherapyTranslationFieldConfig {
+    name: string;
+    label: string;
+    maxLength: number;
+    minLength?: number;
+    isRequired: boolean;
+    type?: 'rich-text' | 'textarea' | 'text';
+}
+
+export type HippotherapyTranslationSectionKey =
+    | keyof HippotherapyPageLocalizedContent
+    | 'scientificReferencesSection-general'
+    | 'scientificReferencesSection-research';
+
+export interface HippotherapyTranslationSectionConfig {
+    sectionKey: HippotherapyTranslationSectionKey;
+    fields: HippotherapyTranslationFieldConfig[];
+}
+
+const createQuoteTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'quoteText',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_TEXT,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'authorName',
+        label: HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: false,
+    },
+];
+
+export const createScientificReferencesGeneralTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'description',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+];
+
+export const createScientificReferenceItemTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'name',
+        label: HIPPOTHERAPY_PAGE_TEXT.LABEL.CITATION_NAME,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_CITATION_NAME,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH,
+        isRequired: true,
+        type: 'textarea',
+    },
+];
+
+export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
+    Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
+> = {
+    [HippotherapyPageLocalizationBlock.Quote]: {
+        sectionKey: 'quoteSection',
+        fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.AnotherQuote]: {
+        sectionKey: 'anotherQuoteSection',
+        fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.ScientificReferences]: {
+        sectionKey: 'scientificReferencesSection-general',
+        fields: createScientificReferencesGeneralTranslationFields(),
+    },
+};
+
+const SCIENTIFIC_REFERENCES_RESEARCH_CONFIG: HippotherapyTranslationSectionConfig = {
+    sectionKey: 'scientificReferencesSection-research',
+    fields: createScientificReferenceItemTranslationFields(),
+};
+
+export const getHippotherapyTranslationConfig = (
+    block: HippotherapyPageLocalizationBlock | null,
+    subBlock?: 'general' | 'research' | null,
+): HippotherapyTranslationSectionConfig | undefined => {
+    if (block == null) return undefined;
+    if (block === HippotherapyPageLocalizationBlock.ScientificReferences) {
+        if (subBlock === 'research') {
+            return SCIENTIFIC_REFERENCES_RESEARCH_CONFIG;
+        }
+        return HIPPOTHERAPY_TRANSLATION_SECTIONS[HippotherapyPageLocalizationBlock.ScientificReferences];
+    }
+    return HIPPOTHERAPY_TRANSLATION_SECTIONS[block];
 };
 
 export interface HippotherapyImageConfig {

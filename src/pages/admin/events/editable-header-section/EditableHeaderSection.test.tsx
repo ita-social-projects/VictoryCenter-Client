@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { fireEvent, getDefaultNormalizer, render, screen } from '@testing-library/react';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { EVENTS_PAGE_VALIDATION, EVENTS_TEXT } from '@/const/admin/events';
+import { EVENT_ITEMS_TEXT, EVENTS_PAGE_VALIDATION, EVENTS_TEXT } from '@/const/admin/events';
 import { EditableHeaderSection, EditableHeaderSectionProps, normalizeEventsDraftHtml } from './EditableHeaderSection';
 
 const TEST_EVENTS_INTRO_CONTENT = {
@@ -354,6 +354,37 @@ describe('EditableHeaderSection', () => {
         renderSection({ isToggleVisibilityDisabled: true });
 
         expect(screen.getByRole('button', { name: /сховати секцію/i })).toBeDisabled();
+    });
+
+    it('renders translation, edit, and visibility actions in order and preserves their callbacks', () => {
+        const onTranslate = jest.fn();
+        const onEnterEditMode = jest.fn();
+        const onToggleVisibility = jest.fn();
+
+        renderSection({ onTranslate, onEnterEditMode, onToggleVisibility });
+
+        const actions = screen.getAllByRole('button');
+        expect(actions.map((button) => button.getAttribute('aria-label'))).toEqual([
+            `${EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE}: ${defaultProps.heading}`,
+            `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.EDIT_SECTION}: ${defaultProps.heading}`,
+            `${EVENTS_TEXT.PAGE_CONTENT.ARIA_LABEL.HIDE_SECTION}: ${defaultProps.heading}`,
+        ]);
+
+        fireEvent.click(actions[0]);
+        fireEvent.click(actions[1]);
+        fireEvent.click(actions[2]);
+
+        expect(onTranslate).toHaveBeenCalledTimes(1);
+        expect(onEnterEditMode).toHaveBeenCalledTimes(1);
+        expect(onToggleVisibility).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not render translation action without a callback', () => {
+        renderSection();
+
+        expect(
+            screen.queryByRole('button', { name: `${EVENT_ITEMS_TEXT.ACTIONS.TRANSLATE}: ${defaultProps.heading}` }),
+        ).not.toBeInTheDocument();
     });
 });
 

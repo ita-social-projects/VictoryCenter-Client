@@ -1,8 +1,9 @@
 import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { EventsPageModals } from './event-page-modals/EventsPageModals';
 import { EventItemComponent } from './event-item-component/EventItemComponent';
+import { EventSearchItem } from './event-search-item/EventSearchItem';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -13,13 +14,13 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoryContextMenu } from '@/hooks/admin/use-category-context-menu/useCategoryContextMenu';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import {
     EventItemDto,
     EventSaveSuccessData,
-    EventSearchItemData,
     ErrorState,
     EventsErrorType,
     EventsIntroSectionDto,
@@ -40,6 +41,8 @@ import {
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
+import { TranslateEventsIntroModal } from './translate-events-intro-modal/TranslateEventsIntroModal';
+import { EventsIntroTranslationField } from './translate-events-intro-modal/TranslateEventsIntroForm';
 import {
     EventsPageTextValidationRule,
     getEventsPageTextValidationError,
@@ -90,8 +93,12 @@ export const EventsPageAdmin = () => {
     const [isEventItemsLoading, setIsEventItemsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const [selectedSearchItem, setSelectedSearchItem] = useState<EventItemDto | null>(null);
     const [eventToDeleteId, setEventToDeleteId] = useState<number | null>(null);
     const [isEventDeleting, setIsEventDeleting] = useState(false);
+    const [activeIntroTranslationField, setActiveIntroTranslationField] = useState<EventsIntroTranslationField | null>(
+        null,
+    );
 
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
@@ -122,21 +129,28 @@ export const EventsPageAdmin = () => {
         setError((currentError) => (currentError.type === type ? EMPTY_ERROR : currentError));
     }, []);
 
-    const resetEventItemsState = useCallback(() => {
-        eventItemsContextIdRef.current += 1;
-        requestIdRef.current += 1;
+    const resetEventItemsState = useCallback(
+        (nextCategory?: EventCategoryDto | null) => {
+            eventItemsContextIdRef.current += 1;
+            requestIdRef.current += 1;
 
-        setEventItems([]);
-        setHasMore(true);
+            setEventItems([]);
+            setHasMore(true);
 
-        if (error.type === 'events-items') {
-            clearError('events-items');
-        }
+            if (error.type === 'events-items') {
+                clearError('events-items');
+            }
 
-        currentPageRef.current = 0;
-        currentItemsCountRef.current = 0;
-        hasMoreRef.current = true;
-    }, [error.type, clearError]);
+            currentPageRef.current = 0;
+            currentItemsCountRef.current = 0;
+            hasMoreRef.current = true;
+
+            if (nextCategory !== undefined) {
+                setSelectedCategory(nextCategory);
+            }
+        },
+        [error.type, clearError],
+    );
 
     const {
         allLanguages,
@@ -168,7 +182,7 @@ export const EventsPageAdmin = () => {
         async (
             searchTerm: string,
             paginationRequest: PaginationRequestParams,
-        ): Promise<PaginationResult<EventSearchItemData>> =>
+        ): Promise<PaginationResult<EventItemDto>> =>
             EventsApi.fetchEventSearchItems(
                 client,
                 searchTerm,
@@ -183,37 +197,36 @@ export const EventsPageAdmin = () => {
     const onStatusFilterChange = useCallback(
         (status: VisibilityStatus | undefined) => {
             setStatusFilter(status);
+            setSelectedSearchItem(null);
 
             resetEventItemsState();
         },
         [resetEventItemsState],
     );
 
-    // Category handlers
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (id === 'add') {
-                openModalActions.openAddCategoryModal();
-            } else if (id === 'edit') {
-                openModalActions.openEditCategoryModal();
-            } else if (id === 'delete') {
-                openModalActions.openDeleteCategoryModal();
-            } else if (id === 'translate') {
-                openModalActions.openTranslateCategoryModal();
+    const handleEventSearchSelect = useCallback(
+        (_key: string | number, item: EventItemDto) => {
+            const targetCategoryId = item.categories?.[0]?.id;
+            const targetCategory = categories.find((category) => category.id === targetCategoryId);
+
+            setStatusFilter(undefined);
+
+            if (targetCategory && targetCategory.id !== selectedCategory?.id) {
+                setSelectedCategory(targetCategory);
             }
+
+            setSelectedSearchItem(item);
         },
-        [openModalActions],
+        [categories, selectedCategory?.id],
     );
 
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
-            { id: 'translate', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
-        ],
-        [],
-    );
+    const handleEventSearchClear = useCallback(() => {
+        setSelectedSearchItem(null);
+        resetEventItemsState();
+    }, [resetEventItemsState]);
+
+    // Category handlers
+    const { categoryContextMenuOptions, onContextMenuOptionSelected } = useCategoryContextMenu(openModalActions);
 
     // Category CRUD handlers
     const fetchCategories = useCallback(async () => {
@@ -268,7 +281,12 @@ export const EventsPageAdmin = () => {
     const handleTranslateEvent = useCallback(
         (updatedEvent: EventItemDto) => {
             setEventItems((prev) => prev.map((item) => (item.id === updatedEvent.id ? updatedEvent : item)));
-            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+            addToast(
+                updatedEvent.status === VisibilityStatus.Published
+                    ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
+                    : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+            );
         },
         [addToast],
     );
@@ -300,8 +318,8 @@ export const EventsPageAdmin = () => {
                 return;
             }
 
-            resetEventItemsState();
-            setSelectedCategory(nextCategories[0] ?? null);
+            setSelectedSearchItem(null);
+            resetEventItemsState(nextCategories[0] ?? null);
         },
         [categories, selectedCategory?.id, resetEventItemsState],
     );
@@ -413,6 +431,12 @@ export const EventsPageAdmin = () => {
         [client, selectedCategory, eventItems, setErrorState, addToast],
     );
 
+    const itemsToRender = useMemo(
+        () => (selectedSearchItem ? [selectedSearchItem] : eventItems),
+        [selectedSearchItem, eventItems],
+    );
+    const effectiveHasMore = selectedSearchItem ? false : hasMore;
+
     const renderEventItem = useCallback(
         (item: EventItemDto) => (
             <DraggableListItem
@@ -421,14 +445,14 @@ export const EventsPageAdmin = () => {
                 id={item.id}
                 renderEntityComponent={renderEntityComponent}
                 ariaLabel={EVENT_ITEMS_TEXT.ACTIONS.REORDER}
-                entities={eventItems}
+                entities={itemsToRender}
                 idSelector={(item) => item.id}
                 onEntitiesReordered={handleEntitiesReordered}
                 reorderDisabled={isReordering}
-                hideDragHandle={isFilteredView || eventItems.length < 2}
+                hideDragHandle={isFilteredView || itemsToRender.length < 2}
             ></DraggableListItem>
         ),
-        [renderEntityComponent, eventItems, handleEntitiesReordered, isFilteredView, isReordering],
+        [renderEntityComponent, itemsToRender, handleEntitiesReordered, isFilteredView, isReordering],
     );
 
     const fetchEventItems = useCallback(
@@ -506,30 +530,31 @@ export const EventsPageAdmin = () => {
     const selectedCategoryId = selectedCategory?.id;
 
     useEffect(() => {
-        if (!selectedCategoryId) {
+        if (!selectedCategoryId || selectedSearchItem) {
             return;
         }
 
         fetchEventItems(selectedCategoryId, true);
-    }, [selectedCategoryId, fetchEventItems]);
+    }, [selectedCategoryId, fetchEventItems, selectedSearchItem]);
 
     const handleCategorySelect = useCallback(
         (category: EventCategoryDto) => {
+            setSelectedSearchItem(null);
+
             if (selectedCategoryId === category.id) {
                 return;
             }
 
-            resetEventItemsState();
-            setSelectedCategory(category);
+            resetEventItemsState(category);
         },
         [selectedCategoryId, resetEventItemsState],
     );
 
     const handleOnLoadMore = useCallback(() => {
-        if (selectedCategory) {
+        if (selectedCategory && !selectedSearchItem) {
             fetchEventItems(selectedCategory.id);
         }
-    }, [fetchEventItems, selectedCategory]);
+    }, [fetchEventItems, selectedCategory, selectedSearchItem]);
 
     const moveDraftToTop = useCallback(
         async (event: EventItemDto, categoryId: number) => {
@@ -591,6 +616,10 @@ export const EventsPageAdmin = () => {
         const field = introSectionFieldById[sectionId];
 
         setEventsIntroDraft((currentDraft) => (currentDraft ? { ...currentDraft, [field]: value } : currentDraft));
+    }, []);
+
+    const closeIntroTranslationModal = useCallback(() => {
+        setActiveIntroTranslationField(null);
     }, []);
 
     const openPublishConfirmation = useCallback(
@@ -795,21 +824,23 @@ export const EventsPageAdmin = () => {
     return (
         <div className="events-page-wrapper" data-testid="events-page-content">
             <div className="events-page-toolbar-container">
-                <AdminPanelToolbar<EventSearchItemData>
+                <AdminPanelToolbar<EventItemDto>
                     getSearchItemKey={(item) => item.id}
-                    getSearchItemLabel={(item) => item.name}
+                    getSearchItemLabel={(item) => item.title}
                     fetchSearchItems={getEventSearchItems}
                     placeholder={EVENTS_TEXT.PLACEHOLDER.SEARCH_EVENTS}
-                    onSearchClear={() => null}
+                    onSearchClear={handleEventSearchClear}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddEvent}
                     AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
-                    onSuggestionSelect={() => null}
+                    onSuggestionSelect={handleEventSearchSelect}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={handleTranslationStatusFilterChange}
                     maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.EVENTS}
+                    searchPageSize={5}
+                    renderSearchItemComponent={EventSearchItem}
                 />
             </div>
             <div
@@ -845,6 +876,7 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.PAGE_DESCRIPTION}
+                    onTranslate={() => setActiveIntroTranslationField('pageDescription')}
                     isHidden={eventsIntroSection?.isPageDescriptionHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID)
@@ -880,12 +912,21 @@ export const EventsPageAdmin = () => {
                         !eventsIntroDraft
                     }
                     placeholder={EVENTS_TEXT.PAGE_CONTENT.PLACEHOLDER.EVENTS_BLOCK_TITLE}
+                    onTranslate={() => setActiveIntroTranslationField('eventsBlockTitle')}
                     isHidden={eventsIntroSection?.isEventsBlockTitleHidden}
                     onToggleVisibility={() =>
                         toggleSectionVisibility(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID)
                     }
                 />
             </div>
+            {activeIntroTranslationField && (
+                <TranslateEventsIntroModal
+                    isOpen
+                    field={activeIntroTranslationField}
+                    translationLanguages={translationLanguages}
+                    onClose={closeIntroTranslationModal}
+                />
+            )}
             <div className="events-page-list-container" ref={listContainerRef}>
                 <CategoryBar<EventCategoryDto>
                     categories={categories}
@@ -894,7 +935,7 @@ export const EventsPageAdmin = () => {
                     getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
-                    contextMenuOptions={categoryBarContextMenuOptions}
+                    contextMenuOptions={categoryContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                     renderCategoryExtra={(category) => (
                         <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
@@ -904,10 +945,10 @@ export const EventsPageAdmin = () => {
 
                 {selectedCategory && error.type !== 'events-items' && (
                     <InfiniteScrollList<EventItemDto>
-                        items={eventItems}
+                        items={itemsToRender}
                         renderItem={renderEventItem}
                         onLoadMore={handleOnLoadMore}
-                        hasMore={hasMore}
+                        hasMore={effectiveHasMore}
                         isLoading={isEventItemsLoading}
                         emptyStateMessage={emptyStateMessage}
                         emptyStateAction={addMaterialButton}

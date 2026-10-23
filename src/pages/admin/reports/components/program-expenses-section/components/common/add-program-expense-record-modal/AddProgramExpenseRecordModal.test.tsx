@@ -246,6 +246,22 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
     });
 
+    it('shows all program options when reopening the category dropdown after selecting a program already in use', () => {
+        renderModal();
+
+        selectCategoryOption('Program A');
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED)).toBeInTheDocument();
+
+        fireEvent.click(getCategoryInput());
+
+        expect(screen.getByRole('button', { name: 'Program A' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Program B' })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Program B' }));
+        expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_ALREADY_ADDED)).not.toBeInTheDocument();
+        expect(getCategoryInput()).toHaveValue('Program B');
+    });
+
     it('enables submit when all validation rules pass', () => {
         renderModal();
 

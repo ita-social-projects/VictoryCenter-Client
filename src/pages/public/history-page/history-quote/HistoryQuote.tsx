@@ -15,7 +15,7 @@ export const HistoryQuote = () => {
             overlay={{ opacity: 0.35, color: '#0f0600' }}
             buttons={[
                 { label: t('CLOSING_BTN_DONATE'), href: PUBLIC_ROUTES.DONATE.FULL },
-                { label: t('CLOSING_BTN_PARTNER'), href: PUBLIC_ROUTES.PARTNERS.FULL },
+                { label: t('CLOSING_BTN_PARTNER'), href: PUBLIC_ROUTES.SUPPORT_US.FULL },
             ]}
         />
     );

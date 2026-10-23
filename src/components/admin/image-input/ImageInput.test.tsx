@@ -304,9 +304,7 @@ describe('ImageInput', () => {
         expect(mockDimensionValidate).not.toHaveBeenCalled();
     });
 
-    it('displays error when dimension validation fails after crop cancel', async () => {
-        const dimensionError = DIMENSION_MISMATCH_ERROR;
-
+    it('clears error and accepts original image when crop is canceled', async () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
 
         const fileInput = screen.getByTestId('image-input-hidden');
@@ -321,7 +319,7 @@ describe('ImageInput', () => {
         fireEvent.click(screen.getByTestId('crop-cancel-button'));
 
         await waitFor(() => {
-            expect(setErrorMock).toHaveBeenCalledWith(dimensionError);
+            expect(setErrorMock).toHaveBeenCalledWith(null);
         });
     });
 

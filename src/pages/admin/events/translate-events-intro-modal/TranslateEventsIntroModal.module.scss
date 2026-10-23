@@ -1,0 +1,63 @@
+@use '@/assets/sass/mixins/typography.mixins' as typography;
+
+.translate-events-intro-modal {
+    width: 594px;
+    padding: 24px 40px 41px;
+
+    :global(.modal-header) {
+        margin-bottom: 16px;
+
+        :global(.modal-title-wrapper) {
+            margin-top: 36px;
+            padding: 0;
+        }
+    }
+
+    :global(.modal-body) {
+        margin-bottom: 35px;
+    }
+
+    :global(.modal-header-text) {
+        @include typography.h4-regular;
+    }
+
+    :global(.modal-footer) {
+        :global(.localization-modal) {
+            margin-bottom: 0;
+        }
+
+        button {
+            height: 40px;
+        }
+    }
+}
+
+.translate-events-intro-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    :global(.input-group) {
+        gap: 0;
+    }
+
+    :global(.input-label) {
+        @include typography.subtitle-1-semibold;
+        height: 36px;
+        margin-bottom: -4px;
+        flex-shrink: 0;
+        text-transform: uppercase;
+    }
+
+    :global(.char-limit-textarea__field) {
+        box-sizing: content-box;
+        min-height: 100px;
+        height: 100px;
+        padding: 16px 8px;
+    }
+
+    :global(.char-limit-textarea__clear-button) {
+        top: 4px;
+        right: 4px;
+    }
+}

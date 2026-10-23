@@ -1,18 +1,18 @@
-import { Content } from '@/types/admin/who-we-are';
 import { useState, useMemo } from 'react';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
-import './DescriptionSection.scss';
 import { Button } from '@/components/admin/button/Button';
 import { OurMission } from '@/pages/public/about-us-page/our-mission/OurMission';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { ContentType } from '@/types/common/about-us';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { LocalizationLanguage } from '@/types/common/language';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { LocalizationLanguage } from '@/types/common/language';
+import { ContentType } from '@/types/common/about-us';
+import { Content } from '@/types/admin/who-we-are';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import './DescriptionSection.scss';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -48,22 +48,41 @@ export const DescriptionSection = ({
     }
 
     const handleDescriptionChange = (value: string) => {
+        setDescriptionError(null);
+
         if (!isBaseLanguage) return;
         onChange({
             ...descriptionContent,
             description: value,
         });
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
-        setDescriptionError(error || null);
     };
 
     const handleBlur = () => {
         if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
+
+    const handlePublish = () => {
+        const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(
+            getPlainTextFromHtml(displayedDescription ?? ''),
+        );
+
+        setDescriptionError(descriptionError || null);
+
+        if (descriptionError) {
+            return;
+        }
+
+        onPublish();
+    };
+
+    const isPublishDisabled =
+        !isBaseLanguage ||
+        !isPublishButtonActive ||
+        !!descriptionError ||
+        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getPlainTextFromHtml(displayedDescription ?? ''));
 
     return (
         <div className="description-section">
@@ -99,9 +118,9 @@ export const DescriptionSection = ({
                     <Button
                         className="button"
                         buttonStyle={'primary'}
-                        onClick={onPublish}
+                        onClick={handlePublish}
                         type={'submit'}
-                        disabled={!!descriptionError || !isPublishButtonActive || !isBaseLanguage}
+                        disabled={isPublishDisabled}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>

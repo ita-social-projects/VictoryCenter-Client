@@ -7,7 +7,9 @@ import {
     HippotherapyPageContentModel,
     HippotherapyScientificReference,
     HippotherapyScientificReferenceDto,
+    UpdateHippotherapyPageContentDto,
 } from '@/types/admin/hippotherapy-page';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const resolveImageValue = async <T extends HippotherapyImageValue>(
     client: AxiosInstance,
@@ -43,6 +45,8 @@ const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
 
 const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => ({
     ...dto,
+    ...mapEntityWithLocalizations(dto),
+    translationStatuses: dto.translationStatuses ?? [],
     introSection: withImageId(dto.introSection),
     quoteSection: withImageId(dto.quoteSection),
     hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
@@ -99,9 +103,14 @@ export const HippotherapyPageApi = {
                 Promise.all(content.participantsSection.cards.map((card) => resolveImage(card))),
                 resolveImage(content.ethicsSection),
             ]);
+            const {
+                localizations: _localizations,
+                translationStatuses: _translationStatuses,
+                ...editableContent
+            } = content;
 
-            const payload: HippotherapyPageContentDto = {
-                ...content,
+            const payload: UpdateHippotherapyPageContentDto = {
+                ...editableContent,
                 introSection,
                 quoteSection,
                 hippoventionCenterSection,

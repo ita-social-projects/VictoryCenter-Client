@@ -1,10 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { LocalizationLanguage } from '@/types/common/language';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { getEventsPageTextValidationError } from '@/validation/admin/events-page-schema/events-page-schema';
 import styles from './TranslateEventsIntroModal.module.scss';
-import { EventsIntroTranslationField, TranslateEventsIntroForm } from './TranslateEventsIntroForm';
+import {
+    EventsIntroTranslationField,
+    getEventsIntroTranslationFieldConfig,
+    TranslateEventsIntroForm,
+} from './TranslateEventsIntroForm';
 
 interface TranslateEventsIntroModalProps {
     isOpen: boolean;
@@ -20,6 +26,7 @@ export const TranslateEventsIntroModal = ({
     onClose,
 }: TranslateEventsIntroModalProps) => {
     const [value, setValue] = useState('');
+    const [validationError, setValidationError] = useState<string>();
 
     const availableLanguages = useMemo(
         () => translationLanguages.filter((language) => language.code === 'en'),
@@ -35,19 +42,40 @@ export const TranslateEventsIntroModal = ({
 
     useEffect(() => {
         setValue('');
+        setValidationError(undefined);
     }, [field, isOpen]);
 
+    const validationRule = getEventsIntroTranslationFieldConfig(field).validationRule;
+    const handleChange = useCallback(
+        (nextValue: string) => {
+            setValue(nextValue);
+
+            if (validationError) {
+                setValidationError(undefined);
+            }
+        },
+        [validationError],
+    );
+    const handleBlur = useCallback(() => {
+        const normalizedValue = getNormalizedInputText(value);
+
+        setValue(normalizedValue);
+        setValidationError(getEventsPageTextValidationError(normalizedValue, validationRule));
+    }, [value, validationRule]);
     const handleClose = () => {
         setValue('');
+        setValidationError(undefined);
         onClose();
     };
-
+    const handleSave = () => {
+        // Translation persistence is handled in a separate task.
+    };
     return (
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
             title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
-            onSave={() => undefined}
+            onSave={handleSave}
             isSubmitting={false}
             isFormValid={false}
             isDirty={Boolean(value)}
@@ -62,7 +90,13 @@ export const TranslateEventsIntroModal = ({
                     selectedLanguage={selectedLanguage}
                     onLanguageChange={setSelectedLanguage}
                 />
-                <TranslateEventsIntroForm field={field} value={value} onChange={setValue} />
+                <TranslateEventsIntroForm
+                    field={field}
+                    value={value}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={validationError}
+                />
             </div>
         </LocalizationModal>
     );

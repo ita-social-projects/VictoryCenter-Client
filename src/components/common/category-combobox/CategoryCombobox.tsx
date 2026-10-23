@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, RefObject, useId, useMemo, useRef, useState } from 'react';
+import React, { KeyboardEvent, RefObject, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -43,6 +43,7 @@ export const CategoryCombobox = ({
 }: CategoryComboboxProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
+    const [isSearching, setIsSearching] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const generatedId = useId();
@@ -57,26 +58,38 @@ export const CategoryCombobox = ({
 
     const normalizedQuery = inputValue.trim().replace(/\s+/g, ' ').toLowerCase();
 
-    const filteredOptions = useMemo(
-        () =>
-            normalizedQuery === ''
-                ? options
-                : options.filter((option) => {
-                      const normalizedOptionName = option.name.trim().replace(/\s+/g, ' ').toLowerCase();
-                      return normalizedOptionName.includes(normalizedQuery);
-                  }),
+    const isExactMatch = useMemo(
+        () => options.some((option) => option.name.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedQuery),
         [options, normalizedQuery],
     );
+
+    const filteredOptions = useMemo(() => {
+        if (normalizedQuery === '' || (!isSearching && isExactMatch)) {
+            return options;
+        }
+
+        return options.filter((option) => {
+            const normalizedOptionName = option.name.trim().replace(/\s+/g, ' ').toLowerCase();
+            return normalizedOptionName.includes(normalizedQuery);
+        });
+    }, [options, normalizedQuery, isSearching, isExactMatch]);
 
     const openDropdown = () => {
         if (disabled) return;
         setIsOpen(true);
     };
 
-    const closeDropdown = () => {
+    const closeDropdown = useCallback(() => {
         setIsOpen(false);
         setHighlightedIndex(-1);
-    };
+        setIsSearching(false);
+    }, []);
+
+    useEffect(() => {
+        if (disabled) {
+            closeDropdown();
+        }
+    }, [disabled, closeDropdown]);
 
     useOnClickOutside({
         ignoreClickRefs: [containerRef],
@@ -90,6 +103,7 @@ export const CategoryCombobox = ({
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setIsSearching(true);
         onInputValueChange(event.target.value);
         setHighlightedIndex(-1);
         openDropdown();
@@ -139,6 +153,7 @@ export const CategoryCombobox = ({
                     value={inputValue}
                     onChange={handleInputChange}
                     onFocus={openDropdown}
+                    onClick={openDropdown}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     disabled={disabled}
@@ -152,22 +167,27 @@ export const CategoryCombobox = ({
                     {filteredOptions.length === 0 ? (
                         <div className="category-combobox-not-found">{notFoundMessage}</div>
                     ) : (
-                        filteredOptions.map((option, index) => (
-                            <button
-                                key={option.id}
-                                type="button"
-                                className={classNames(optionClassName, {
-                                    'category-combobox-option-active': index === highlightedIndex,
-                                })}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    selectOption(option);
-                                }}
-                                onMouseEnter={() => setHighlightedIndex(index)}
-                            >
-                                <span>{option.name}</span>
-                            </button>
-                        ))
+                        filteredOptions.map((option, index) => {
+                            const isSelected =
+                                option.name.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedQuery;
+                            return (
+                                <button
+                                    key={option.id}
+                                    type="button"
+                                    className={classNames(optionClassName, {
+                                        'category-combobox-option-active': index === highlightedIndex,
+                                        'select-options-selected': isSelected,
+                                    })}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        selectOption(option);
+                                    }}
+                                    onMouseEnter={() => setHighlightedIndex(index)}
+                                >
+                                    <span>{option.name}</span>
+                                </button>
+                            );
+                        })
                     )}
                 </div>
             )}

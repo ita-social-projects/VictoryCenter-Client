@@ -12,6 +12,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 import whoWeAreVariantStyles from '@/components/admin/image-input/WhoWeAreImageInput.module.scss';
+import './CardContent.scss';
 
 export interface CardContentProps {
     content: Content;
@@ -70,6 +71,8 @@ export const CardContent = ({
         onDescriptionValidate(error);
     };
 
+    const { width: _width, ...responsiveImageStyle } = imageInputProps.style ?? {};
+
     return (
         <div style={{ width: imageInputProps.style?.width }} className="card-content">
             <ImageInput
@@ -80,6 +83,7 @@ export const CardContent = ({
                 setError={setImageError}
                 disabled={!isBaseLanguage}
                 {...imageInputProps}
+                style={responsiveImageStyle}
                 className={hasImageDimensionsTooSmallError ? whoWeAreVariantStyles['container-focused'] : undefined}
             />
             {imageError && <p className="error">{imageError}</p>}

@@ -57,12 +57,10 @@ const EthicsSectionComponent = ({
     return (
         <div className="hippotherapy-ethics-section">
             {onTranslateClick && (
-                <div className="hippotherapy-ethics-section-header">
-                    <SectionTranslationHeader
-                        onTranslateClick={onTranslateClick}
-                        isTranslateDisabled={isTranslateDisabled}
-                    />
-                </div>
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
             )}
             <div className="hippotherapy-ethics-section-image-container">
                 <div className="hippotherapy-ethics-section-image">

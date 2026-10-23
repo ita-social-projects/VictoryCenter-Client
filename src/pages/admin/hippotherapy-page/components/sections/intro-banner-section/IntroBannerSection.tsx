@@ -11,6 +11,7 @@ import {
 import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './IntroBannerSection.scss';
 
 export interface IntroBannerSectionProps {
@@ -18,9 +19,18 @@ export interface IntroBannerSectionProps {
     onChange: (value: HippotherapyIntroSectionContent) => void;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
-const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }: IntroBannerSectionProps) => {
+const IntroBannerSectionComponent = ({
+    value,
+    onChange,
+    onImageError,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+}: IntroBannerSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
         onChange,
@@ -40,51 +50,59 @@ const IntroBannerSectionComponent = ({ value, onChange, onImageError, disabled }
 
     return (
         <div className="hippotherapy-intro-banner-section">
-            <div className="hippotherapy-intro-banner-section-image">
-                <ImageInput
-                    variant="whoWeAre"
-                    value={value.image}
-                    onChange={handleImageChange}
-                    setError={handleImageErrorChange}
-                    label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                    subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropHeight,
-                        HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropWidth,
-                    )}
-                    cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropWidth}
-                    cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropHeight}
-                    minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.minWidth}
-                    minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.minHeight}
-                    style={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.INTRO}
-                    disabled={disabled}
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
-                {imageError && <p className="hippotherapy-intro-banner-section-error">{imageError}</p>}
-            </div>
-            <div className="hippotherapy-intro-banner-section-fields">
-                <RichTextInputGroup
-                    label={COMMON_TEXT_ADMIN.TYPE.TITLE}
-                    isRequired
-                    id="hippotherapy-intro-title"
-                    name="hippotherapy-intro-title"
-                    value={value.title}
-                    onChange={title.handleChange}
-                    onBlur={title.handleBlur}
-                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE}
-                    error={title.error}
-                    disabled={disabled}
-                />
-                <RichTextInputGroup
-                    label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                    isRequired
-                    id="hippotherapy-intro-description"
-                    name="hippotherapy-intro-description"
-                    value={value.description}
-                    onChange={description.handleChange}
-                    onBlur={description.handleBlur}
-                    maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION}
-                    error={description.error}
-                    disabled={disabled}
-                />
+            )}
+            <div className="hippotherapy-intro-banner-section-content">
+                <div className="hippotherapy-intro-banner-section-image">
+                    <ImageInput
+                        variant="whoWeAre"
+                        value={value.image}
+                        onChange={handleImageChange}
+                        setError={handleImageErrorChange}
+                        label={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
+                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropHeight,
+                            HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropWidth,
+                        )}
+                        cropWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropWidth}
+                        cropHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.cropHeight}
+                        minWidth={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.minWidth}
+                        minHeight={HIPPOTHERAPY_PAGE_IMAGE_CONFIGS.INTRO.minHeight}
+                        style={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.INTRO}
+                        disabled={disabled}
+                    />
+                    {imageError && <p className="hippotherapy-intro-banner-section-error">{imageError}</p>}
+                </div>
+                <div className="hippotherapy-intro-banner-section-fields">
+                    <RichTextInputGroup
+                        label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                        isRequired
+                        id="hippotherapy-intro-title"
+                        name="hippotherapy-intro-title"
+                        value={value.title}
+                        onChange={title.handleChange}
+                        onBlur={title.handleBlur}
+                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE}
+                        error={title.error}
+                        disabled={disabled}
+                    />
+                    <RichTextInputGroup
+                        label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                        isRequired
+                        id="hippotherapy-intro-description"
+                        name="hippotherapy-intro-description"
+                        value={value.description}
+                        onChange={description.handleChange}
+                        onBlur={description.handleBlur}
+                        maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION}
+                        error={description.error}
+                        disabled={disabled}
+                    />
+                </div>
             </div>
         </div>
     );

@@ -43,14 +43,14 @@ export const MaxLengthPlugin = ({
                 let handled = false;
 
                 editor.getEditorState().read(() => {
-                    const currentLength = $getRoot().getTextContent().length;
                     const selection = $getSelection();
-                    let selectedLength = 0;
 
-                    if ($isRangeSelection(selection)) {
-                        selectedLength = selection.getTextContent().length;
+                    if (!$isRangeSelection(selection)) {
+                        return;
                     }
 
+                    const currentLength = $getRoot().getTextContent().length;
+                    const selectedLength = selection.getTextContent().length;
                     const availableSpace = Math.max(0, maxLength - currentLength + selectedLength);
 
                     if (clipboardText.length > availableSpace) {
@@ -86,9 +86,7 @@ export const MaxLengthPlugin = ({
 
                 if (textLength > maxLength) {
                     const overflowLength = textLength - maxLength;
-                    try {
-                        trimTextContentFromAnchor(editor, selection.anchor, overflowLength);
-                    } catch (e) {}
+                    trimTextContentFromAnchor(editor, selection.anchor, overflowLength);
                 }
             }
         });

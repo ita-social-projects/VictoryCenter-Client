@@ -42,6 +42,7 @@ export const FaqModal = (props: FaqModalProps) => {
             isOpen,
             onClose,
             entity: faq,
+            closeOnDraftCancel: isEditMode && faq?.status === VisibilityStatus.Draft,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: FaqCreateUpdate) => {
                 const response = isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);

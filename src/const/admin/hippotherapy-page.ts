@@ -74,6 +74,40 @@ export interface HippotherapyTranslationSectionConfig {
     fields: HippotherapyTranslationFieldConfig[];
 }
 
+const createIntroTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'description',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+];
+
+const createTextCardTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'description',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+];
+
 const createQuoteTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'quoteText',
@@ -122,9 +156,25 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
 export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
 > = {
+    [HippotherapyPageLocalizationBlock.Intro]: {
+        sectionKey: 'introSection',
+        fields: createIntroTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Description]: {
+        sectionKey: 'descriptionSection',
+        fields: createTextCardTranslationFields(),
+    },
     [HippotherapyPageLocalizationBlock.Quote]: {
         sectionKey: 'quoteSection',
         fields: createQuoteTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Hippovention]: {
+        sectionKey: 'hippoventionSection',
+        fields: createTextCardTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Analysis]: {
+        sectionKey: 'analysisSection',
+        fields: createTextCardTranslationFields(),
     },
     [HippotherapyPageLocalizationBlock.AnotherQuote]: {
         sectionKey: 'anotherQuoteSection',

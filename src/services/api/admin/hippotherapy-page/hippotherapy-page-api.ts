@@ -5,6 +5,8 @@ import {
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageContentModel,
+    HippotherapyPageTranslationStatusDto,
+    HippotherapyPageTranslationStatusInfo,
     HippotherapyScientificReference,
     HippotherapyScientificReferenceDto,
     UpdateHippotherapyPageContentDto,
@@ -43,10 +45,17 @@ const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
     imageId: value.image && 'id' in value.image ? value.image.id : (value.imageId ?? null),
 });
 
+const mapTranslationStatuses = (
+    statuses: HippotherapyPageTranslationStatusDto[] | undefined,
+): HippotherapyPageTranslationStatusInfo[] =>
+    (statuses ?? []).flatMap(({ block, languageId, translationStatus }) =>
+        translationStatus === null ? [] : [{ block, languageId, translationStatus }],
+    );
+
 const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => ({
     ...dto,
     ...mapEntityWithLocalizations(dto),
-    translationStatuses: dto.translationStatuses ?? [],
+    translationStatuses: mapTranslationStatuses(dto.translationStatuses),
     introSection: withImageId(dto.introSection),
     quoteSection: withImageId(dto.quoteSection),
     hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),

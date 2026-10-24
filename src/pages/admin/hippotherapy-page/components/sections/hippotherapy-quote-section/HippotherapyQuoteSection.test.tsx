@@ -5,6 +5,13 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
+    runsSectionDisablesInputsTest,
+    runsSectionTranslationHeaderTests,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -52,51 +59,22 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toHaveValue('Initial author');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
-
-    it('calls onChange with the updated quote text', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-quote-quote-text'), {
-            target: { value: 'New quote' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, quoteText: 'New quote' });
-    });
-
-    it('calls onChange with the updated author name', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-quote-quote-author'), {
-            target: { value: 'New author' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, authorName: 'New author' });
-    });
-
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-test-quote-quote-text',
+            fieldName: 'quoteText',
+            label: 'quote text',
+            newValue: 'New quote',
+        },
+        {
+            testId: 'mock-rich-input-test-quote-quote-author',
+            fieldName: 'authorName',
+            label: 'author name',
+            newValue: 'New author',
+        },
+    ]);
 
     it('does not show an error for an empty author name on blur', () => {
         validateTextMock().mockReturnValue('Too short');
@@ -107,47 +85,22 @@ describe('HippotherapyQuoteSection', () => {
         expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
-    it('shows an error for a filled but invalid author name on blur', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-test-quote-quote-author',
+        'shows an error for a filled but invalid author name on blur',
+    );
 
-        fireEvent.blur(screen.getByTestId('mock-rich-input-test-quote-quote-author'));
+    runsSectionDisablesInputsTest(renderComponent, [
+        'mock-image-input-file',
+        'mock-rich-input-test-quote-quote-text',
+        'mock-rich-input-test-quote-quote-author',
+    ]);
 
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
-
-    it('disables all inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-test-quote-quote-text')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-test-quote-quote-author')).toBeDisabled();
-    });
-
-    it('does not render the translation icon without onTranslateClick', () => {
-        renderComponent();
-
-        expect(
-            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).not.toBeInTheDocument();
-    });
-
-    it('renders the translation icon and calls onTranslateClick when it is clicked', () => {
-        const onTranslateClick = jest.fn();
-        renderComponent({ onTranslateClick });
-
-        fireEvent.click(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        );
-
-        expect(onTranslateClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('disables the translation icon when isTranslateDisabled is true', () => {
-        renderComponent({ onTranslateClick: jest.fn(), isTranslateDisabled: true });
-
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
-        ).toBeDisabled();
-    });
+    runsSectionTranslationHeaderTests(
+        renderComponent,
+        (onTranslateClick) => ({ onTranslateClick }),
+        (onTranslateClick) => ({ onTranslateClick, isTranslateDisabled: true }),
+    );
 });

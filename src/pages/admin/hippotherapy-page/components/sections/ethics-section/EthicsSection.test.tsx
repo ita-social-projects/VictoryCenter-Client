@@ -4,6 +4,13 @@ import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
+    runsSectionDisablesInputsTest,
+    runsSectionTranslationHeaderTests,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -45,51 +52,22 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toHaveValue('Principle one');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
-
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
-
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippotherapy-ethics-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippotherapy-ethics-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
     it('updates only the targeted principle, leaving others intact', () => {
         renderComponent();
@@ -104,24 +82,28 @@ describe('EthicsSection', () => {
         });
     });
 
-    it('shows a per-principle validation error', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippotherapy-ethics-principle-0',
+        'shows a per-principle validation error',
+        { newValue: 'x' },
+    );
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0'));
+    runsSectionDisablesInputsTest(
+        renderComponent,
+        [
+            'mock-image-input-file',
+            'mock-rich-input-hippotherapy-ethics-title',
+            'mock-rich-input-hippotherapy-ethics-description',
+            'mock-rich-input-hippotherapy-ethics-principle-0',
+        ],
+        'disables every input when disabled is true',
+    );
 
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
-
-    it('disables every input when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
-    });
+    runsSectionTranslationHeaderTests(
+        renderComponent,
+        (onTranslateClick) => ({ onTranslateClick }),
+        (onTranslateClick) => ({ onTranslateClick, isTranslateDisabled: true }),
+    );
 });

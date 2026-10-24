@@ -119,6 +119,34 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
     },
 ];
 
+export const ETHICS_PRINCIPLES_COUNT = 4;
+
+export const getEthicsPrincipleFieldName = (index: number) => `principle-${index}`;
+
+export const createEthicsTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+    },
+    {
+        name: 'description',
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    },
+    ...Array.from({ length: ETHICS_PRINCIPLES_COUNT }, (_, index) => ({
+        name: getEthicsPrincipleFieldName(index),
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+    })),
+];
+
 export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     Record<HippotherapyPageLocalizationBlock, HippotherapyTranslationSectionConfig>
 > = {
@@ -133,6 +161,10 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     [HippotherapyPageLocalizationBlock.ScientificReferences]: {
         sectionKey: 'scientificReferencesSection-general',
         fields: createScientificReferencesGeneralTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Ethics]: {
+        sectionKey: 'ethicsSection',
+        fields: createEthicsTranslationFields(),
     },
 };
 

@@ -1,10 +1,16 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HippoventionCenterSection, HippoventionCenterSectionProps } from './HippoventionCenterSection';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
+    runsSectionDisablesInputsTest,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -47,80 +53,41 @@ describe('HippoventionCenterSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toHaveValue('Initial pros');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippovention-center-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippovention-center-pros',
+            fieldName: 'pros',
+            label: 'pros text',
+            newValue: 'Updated pros',
+        },
+        {
+            testId: 'mock-rich-input-hippovention-center-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippovention-center-pros',
+        'shows a validation error when the pros text is invalid',
+        { newValue: 'x' },
+    );
 
-    it('shows an image error reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
-
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated pros text', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-pros'), {
-            target: { value: 'Updated pros' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, pros: 'Updated pros' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
-
-    it('shows a validation error when the pros text is invalid', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippovention-center-pros'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippovention-center-pros'));
-
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
-
-    it('disables all inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-description')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(renderComponent, [
+        'mock-image-input-file',
+        'mock-rich-input-hippovention-center-title',
+        'mock-rich-input-hippovention-center-pros',
+        'mock-rich-input-hippovention-center-description',
+    ]);
 });

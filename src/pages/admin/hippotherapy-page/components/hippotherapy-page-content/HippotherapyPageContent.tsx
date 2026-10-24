@@ -180,6 +180,13 @@ const hasScientificReferenceTranslation = (
     );
 };
 
+const hasEthicsTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        localization?.ethicsSection?.title?.trim() ||
+            localization?.ethicsSection?.description?.trim() ||
+            localization?.ethicsSection?.principles?.some((principle) => principle?.trim()),
+    );
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -359,6 +366,7 @@ export const HippotherapyPageContent = () => {
                     subBlock: 'research',
                     targetResearchLocalId: localId,
                 }),
+            ethicsSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Ethics }),
         }),
         [],
     );
@@ -506,7 +514,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.ethicsSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasEthicsTranslation(targetLocalization)}
                 />
                 <div className="hippotherapy-page-publish">
                     <Button

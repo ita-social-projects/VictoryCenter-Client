@@ -1,9 +1,15 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    runsSectionImageInputTests,
+    runsSectionFieldUpdateTests,
+    runsSectionFieldValidationErrorTest,
+    runsSectionDisablesInputsTest,
+} from '../test-utils/sectionTestHelpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -45,69 +51,38 @@ describe('IntroBannerSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toHaveValue('Initial description');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
+    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
 
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
+    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
+        {
+            testId: 'mock-rich-input-hippotherapy-intro-title',
+            fieldName: 'title',
+            label: 'title',
+            newValue: 'New title',
+        },
+        {
+            testId: 'mock-rich-input-hippotherapy-intro-description',
+            fieldName: 'description',
+            label: 'description',
+            newValue: 'New description',
+        },
+    ]);
 
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
-    });
+    runsSectionFieldValidationErrorTest(
+        renderComponent,
+        validateTextMock,
+        'mock-rich-input-hippotherapy-intro-title',
+        'shows a title validation error when validation fails',
+        { errorMessage: 'Title is too short', newValue: 'x' },
+    );
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
-
-    it('shows an error message reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
-
-    it('shows a title validation error when validation fails', () => {
-        validateTextMock().mockReturnValueOnce('Title is too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'));
-
-        expect(screen.getByText('Title is too short')).toBeInTheDocument();
-    });
-
-    it('disables inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toBeDisabled();
-    });
+    runsSectionDisablesInputsTest(
+        renderComponent,
+        [
+            'mock-image-input-file',
+            'mock-rich-input-hippotherapy-intro-title',
+            'mock-rich-input-hippotherapy-intro-description',
+        ],
+        'disables inputs when disabled is true',
+    );
 });

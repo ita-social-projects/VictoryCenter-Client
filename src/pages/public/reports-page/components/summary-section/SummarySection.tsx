@@ -7,6 +7,9 @@ import { formatAllocationAmount, formatCollectedAmount } from '@/utils/functions
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportsPublicApi } from '@/services/api/public/reports/reports-api';
 import { PublishedReportFundsExpendituresDto } from '@/types/public/reports';
+import { Currency } from '@/types/public/donate-page';
+import { LocaleCurrency } from '@/const/common/currency';
+import { getLocaleSettings } from '@/const/common/locales';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { StatCard } from './stat-card';
 import { ExpensesBreakdownChart } from './expenses-breakdown-chart';
@@ -14,8 +17,10 @@ import { FundingSourcesChart } from './funding-sources-chart';
 import { ProgramsAllocationChart } from './programs-allocation-chart';
 import styles from './SummarySection.module.scss';
 
-const UAH_LABEL = 'грн';
-const USD_LABEL = 'USD';
+const REPORT_CURRENCY_LABELS: Record<LocaleCurrency, string> = {
+    [Currency.UAH]: 'грн',
+    [Currency.USD]: 'USD',
+};
 
 export const SummarySection = () => {
     const { t } = useTranslation('reportsPage');
@@ -43,7 +48,9 @@ export const SummarySection = () => {
         fetchHandler,
     });
 
-    const currencyLabel = isEn ? USD_LABEL : UAH_LABEL;
+    const { currency } = getLocaleSettings(currentLanguage);
+    const isUsd = currency === Currency.USD;
+    const currencyLabel = REPORT_CURRENCY_LABELS[currency];
 
     const formatItemAmount = (amount: number) => {
         return `${formatAllocationAmount(amount, isEn)} ${currencyLabel}`;
@@ -75,12 +82,12 @@ export const SummarySection = () => {
 
     if (!data) return null;
 
-    const collectedAmount = isEn ? data.funding.totalUsd : data.funding.totalUah;
+    const collectedAmount = isUsd ? data.funding.totalUsd : data.funding.totalUah;
     const formattedCollectedValue = `${formatCollectedAmount(collectedAmount)} ${currencyLabel}`;
 
-    const totalExpenses = isEn ? data.expenses.totalUsd : data.expenses.totalUah;
+    const totalExpenses = isUsd ? data.expenses.totalUsd : data.expenses.totalUah;
     const expensesItems = data.expenses.items.map((item) => {
-        const amount = isEn ? item.amountUsd : item.amountUah;
+        const amount = isUsd ? item.amountUsd : item.amountUah;
         const percent = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
         return {
             ...item,
@@ -91,12 +98,12 @@ export const SummarySection = () => {
 
     const fundingItems = data.funding.items.map((item) => ({
         ...item,
-        amount: isEn ? item.amountUsd : item.amountUah,
+        amount: isUsd ? item.amountUsd : item.amountUah,
     }));
 
     const programsItems = data.programs.items.map((item) => ({
         ...item,
-        amount: isEn ? item.amountUsd : item.amountUah,
+        amount: isUsd ? item.amountUsd : item.amountUah,
     }));
 
     return (

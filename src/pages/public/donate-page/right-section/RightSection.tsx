@@ -8,6 +8,7 @@ import { Currency, DonatePageData } from '@/types/public/donate-page';
 import { useTranslation } from 'react-i18next';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { getLocaleSettings } from '@/const/common/locales';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;
@@ -46,20 +47,16 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
     const [isManualChange, setIsManualChange] = useState(false);
-    const { currentLanguage, isEn, isUk } = useLocale();
+    const { currentLanguage } = useLocale();
 
     useEffect(() => {
         if (isManualChange) return;
-        if (isEn) {
-            if (availableCurrencies.includes(Currency.USD)) {
-                setActiveTab(Currency.USD);
-            }
-        } else if (isUk) {
-            if (availableCurrencies.includes(Currency.UAH)) {
-                setActiveTab(Currency.UAH);
-            }
+
+        const { currency } = getLocaleSettings(currentLanguage);
+        if (availableCurrencies.includes(currency)) {
+            setActiveTab(currency);
         }
-    }, [currentLanguage, availableCurrencies, isManualChange, isEn, isUk]);
+    }, [currentLanguage, availableCurrencies, isManualChange]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {

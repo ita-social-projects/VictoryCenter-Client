@@ -1,6 +1,7 @@
 import { ChangeEvent } from 'react';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { EVENTS_PAGE_VALIDATION, EVENTS_TEXT } from '@/const/admin/events';
+import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
 import { EventsPageTextValidationRule } from '@/validation/admin/events-page-schema/events-page-schema';
 
 export type EventsIntroTranslationField = 'pageDescription' | 'eventsBlockTitle';
@@ -64,6 +65,7 @@ export const TranslateEventsIntroForm = ({
             error={error}
             disabled={disabled}
             rows={4}
+            normalizeValue={getNormalizedInputTextWhileTyping}
         />
     );
 };

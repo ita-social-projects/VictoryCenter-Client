@@ -8,7 +8,7 @@ import { EventCategoriesApi } from '@/services/api/admin/events/event-categories
 import { EventsApi } from '@/services/api/admin/events/events-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
-import { EventItemDto } from '@/types/admin/events';
+import { EventItemDto, EventsIntroSectionDto } from '@/types/admin/events';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
@@ -569,20 +569,20 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
-            id: 1,
             localizations: [],
         });
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
-            id: 1,
             localizations: [],
         });
 
@@ -842,14 +842,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('disables intro section editing until the published content is loaded', async () => {
-        type IntroSection = {
-            id: number;
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-            localizations: unknown[];
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         let resolveIntroSection!: (section: IntroSection) => void;
 
@@ -857,7 +850,7 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection = resolve;
         });
 
-        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise as any);
+        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise);
 
         render(<EventsPageAdmin />);
 
@@ -871,11 +864,11 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             resolveIntroSection({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
         });
@@ -908,11 +901,11 @@ describe('EventsPageAdmin', () => {
             EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
             'pageDescription',
             {
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             },
         ],
@@ -920,11 +913,11 @@ describe('EventsPageAdmin', () => {
             EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
             'eventsBlockTitle',
             {
+                id: 1,
                 pageDescription: '<p>Loaded description</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             },
         ],
@@ -967,19 +960,19 @@ describe('EventsPageAdmin', () => {
 
         mockedEventsApi.updateEventsIntroSection
             .mockResolvedValueOnce({
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             })
             .mockResolvedValueOnce({
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
 
@@ -992,11 +985,11 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, 'pageDescription', {
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Чернетка заголовка</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
         });
@@ -1008,14 +1001,16 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
         await waitFor(() => {
-            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith({}, 'eventsBlockTitle', {
-                pageDescription: '<p>Updated content</p>',
-                eventsBlockTitle: '<p>Updated content</p>',
-                isEventsBlockTitleHidden: false,
-                isPageDescriptionHidden: false,
-                id: 1,
-                localizations: [],
-            });
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith(
+                {},
+                'eventsBlockTitle',
+                expect.objectContaining({
+                    pageDescription: '<p>Updated content</p>',
+                    eventsBlockTitle: '<p>Updated content</p>',
+                    isEventsBlockTitleHidden: false,
+                    isPageDescriptionHidden: false,
+                }),
+            );
         });
     });
 
@@ -1052,14 +1047,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
     });
     it('keeps another intro section available for publishing while a publish request is pending', async () => {
-        type IntroSection = {
-            id: number;
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-            localizations: unknown[];
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         const user = userEvent.setup();
 
@@ -1069,7 +1057,7 @@ describe('EventsPageAdmin', () => {
             resolvePublish = resolve;
         });
 
-        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise as any);
+        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise);
 
         render(<EventsPageAdmin />);
 
@@ -1106,11 +1094,11 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             resolvePublish({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
         });
@@ -1131,14 +1119,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('preserves both section updates when they are published concurrently', async () => {
-        type IntroSection = {
-            id: number;
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-            localizations: unknown[];
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         const user = userEvent.setup();
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
@@ -1155,8 +1136,8 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.updateEventsIntroSection
-            .mockReturnValueOnce(descriptionPublishPromise as any)
-            .mockReturnValueOnce(titlePublishPromise as any);
+            .mockReturnValueOnce(descriptionPublishPromise)
+            .mockReturnValueOnce(titlePublishPromise);
 
         await renderEventsPage();
         await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
@@ -1171,22 +1152,22 @@ describe('EventsPageAdmin', () => {
 
         await act(async () => {
             resolveTitlePublish({
+                id: 1,
                 eventsBlockTitle: '<p>Updated title</p>',
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
             await titlePublishPromise;
         });
         await act(async () => {
             resolveDescriptionPublish({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
-                id: 1,
                 localizations: [],
             });
             await descriptionPublishPromise;
@@ -1219,11 +1200,11 @@ describe('EventsPageAdmin', () => {
     it('calls toggleEventsDescriptionVisibility when toggling visibility for page description', async () => {
         const user = userEvent.setup();
         const baseIntroSection = {
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
-            id: 1,
             localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
@@ -1246,11 +1227,11 @@ describe('EventsPageAdmin', () => {
     it('calls toggleEventsTitleVisibility when toggling visibility for events block title', async () => {
         const user = userEvent.setup();
         const baseIntroSection = {
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
-            id: 1,
             localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
@@ -1324,11 +1305,11 @@ describe('EventsPageAdmin', () => {
 
     it('renders with eye-closed icons when sections are initially hidden', async () => {
         mockedEventsApi.getEventsIntroSection.mockResolvedValueOnce({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: true,
             isPageDescriptionHidden: true,
-            id: 1,
             localizations: [],
         });
 

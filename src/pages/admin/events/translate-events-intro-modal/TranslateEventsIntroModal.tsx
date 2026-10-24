@@ -3,6 +3,9 @@ import { LocalizationModal } from '@/components/admin/localization-modal/Localiz
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { LocalizationLanguage } from '@/types/common/language';
+import { EventsIntroSectionDto } from '@/types/admin/events';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { EventsIntroSectionLocalizationsApi } from '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getEventsPageTextValidationError } from '@/validation/admin/events-page-schema/events-page-schema';
 import styles from './TranslateEventsIntroModal.module.scss';
@@ -15,18 +18,26 @@ import {
 interface TranslateEventsIntroModalProps {
     isOpen: boolean;
     field: EventsIntroTranslationField;
+    introSection: EventsIntroSectionDto;
     translationLanguages: LocalizationLanguage[];
     onClose: () => void;
+    onSaveSuccess: () => Promise<boolean>;
 }
 
 export const TranslateEventsIntroModal = ({
     isOpen,
     field,
+    introSection,
     translationLanguages,
     onClose,
+    onSaveSuccess,
 }: TranslateEventsIntroModalProps) => {
     const [value, setValue] = useState('');
     const [validationError, setValidationError] = useState<string>();
+    const [saveError, setSaveError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isTranslationSaved, setIsTranslationSaved] = useState(false);
+    const client = useAdminClient();
 
     const availableLanguages = useMemo(
         () => translationLanguages.filter((language) => language.code === 'en'),
@@ -43,18 +54,24 @@ export const TranslateEventsIntroModal = ({
     useEffect(() => {
         setValue('');
         setValidationError(undefined);
+        setSaveError('');
+        setIsTranslationSaved(false);
     }, [field, isOpen]);
 
     const validationRule = getEventsIntroTranslationFieldConfig(field).validationRule;
     const handleChange = useCallback(
         (nextValue: string) => {
             setValue(nextValue);
+            setIsTranslationSaved(false);
 
             if (validationError) {
                 setValidationError(undefined);
             }
+            if (saveError) {
+                setSaveError('');
+            }
         },
-        [validationError],
+        [saveError, validationError],
     );
     const handleBlur = useCallback(() => {
         const normalizedValue = getNormalizedInputText(value);
@@ -62,22 +79,70 @@ export const TranslateEventsIntroModal = ({
         setValue(normalizedValue);
         setValidationError(getEventsPageTextValidationError(normalizedValue, validationRule));
     }, [value, validationRule]);
-    const handleClose = () => {
+    const closeModal = () => {
         setValue('');
         setValidationError(undefined);
+        setSaveError('');
+        setIsTranslationSaved(false);
         onClose();
     };
-    const handleSave = () => {
-        // Translation persistence is handled in a separate task.
+    const handleClose = () => {
+        if (!isSubmitting) closeModal();
     };
+    const handleSave = async () => {
+        const normalizedValue = getNormalizedInputText(value);
+        const error = getEventsPageTextValidationError(normalizedValue, validationRule);
+
+        setValue(normalizedValue);
+        setValidationError(error);
+        if (error || !selectedLanguage) return;
+
+        const payload = { [field]: normalizedValue };
+        const existingLocalization = (introSection.localizations ?? []).find(
+            (localization) => localization.language.code === selectedLanguage.code,
+        );
+
+        setIsSubmitting(true);
+        setSaveError('');
+        try {
+            if (!isTranslationSaved) {
+                if (existingLocalization) {
+                    await EventsIntroSectionLocalizationsApi.update(
+                        client,
+                        introSection.id,
+                        selectedLanguage.id,
+                        payload,
+                    );
+                } else {
+                    await EventsIntroSectionLocalizationsApi.create(client, {
+                        entityId: introSection.id,
+                        languageId: selectedLanguage.id,
+                        ...payload,
+                    });
+                }
+
+                setIsTranslationSaved(true);
+            }
+
+            const isIntroSectionRefreshed = await onSaveSuccess();
+
+            if (isIntroSectionRefreshed) closeModal();
+        } catch {
+            setSaveError(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const isFormValid = Boolean(selectedLanguage) && !getEventsPageTextValidationError(value, validationRule);
     return (
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
             title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
             onSave={handleSave}
-            isSubmitting={false}
-            isFormValid={false}
+            isSubmitting={isSubmitting}
+            isFormValid={isFormValid}
             isDirty={Boolean(value)}
             checkIsDirty={() => Boolean(value)}
             maxWidth="594px"
@@ -85,7 +150,7 @@ export const TranslateEventsIntroModal = ({
         >
             <div className={styles['translate-events-intro-modal-content']}>
                 <TranslationControls
-                    isSubmitting={false}
+                    isSubmitting={isSubmitting}
                     languages={availableLanguages}
                     selectedLanguage={selectedLanguage}
                     onLanguageChange={setSelectedLanguage}
@@ -96,7 +161,9 @@ export const TranslateEventsIntroModal = ({
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={validationError}
+                    disabled={isSubmitting}
                 />
+                {saveError && <div className="error-message">{saveError}</div>}
             </div>
         </LocalizationModal>
     );

@@ -1,13 +1,8 @@
-import { EventsNewsPageData, PublicEventsPageDto } from '@/types/public/events-news';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
-import { mapToTags } from './localization';
+import { EventsNewsPageData, PublicEventsPageDto, Tag } from '@/types/public/events-news';
 
 const isBlank = (value?: string | null): boolean => !value?.trim();
 
-export const mapToEventsNewsPage = (
-    dto?: PublicEventsPageDto | null,
-    languageCode: string = DEFAULT_LOCALE,
-): EventsNewsPageData => {
+export const mapToEventsNewsPage = (dto?: PublicEventsPageDto | null): EventsNewsPageData => {
     const description = dto?.pageDescription ?? '';
     const title = dto?.eventsBlockTitle ?? '';
 
@@ -16,7 +11,19 @@ export const mapToEventsNewsPage = (
         isPageDescriptionHidden: isBlank(description),
         eventsData: {
             title,
-            tags: mapToTags(dto?.categories, languageCode),
+            tags: (dto?.categories || []).map(
+                (category): Tag => ({
+                    id: String(category.id),
+                    name: category.name,
+                    localizations: category.localizations?.map((loc) => ({
+                        ...loc,
+                        language: {
+                            code: loc.language?.code || '',
+                        },
+                        name: loc.name || '',
+                    })) as any,
+                }),
+            ),
         },
         isEventsBlockTitleHidden: isBlank(title),
     };

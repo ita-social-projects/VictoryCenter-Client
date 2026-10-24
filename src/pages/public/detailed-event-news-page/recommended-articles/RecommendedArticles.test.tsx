@@ -8,6 +8,10 @@ jest.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'en' }),
+}));
+
 const mockUseDataPaginationFetch = jest.fn();
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: (...args: any[]) => mockUseDataPaginationFetch(...args),
@@ -49,6 +53,7 @@ const mockArticle = (id: string): EventsNews => ({
     tag: { id: '1', name: 'Media' },
     slug: `article-${id}`,
     sections: [],
+    localizations: [],
 });
 
 describe('RecommendedArticles', () => {

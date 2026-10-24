@@ -7,12 +7,20 @@ import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+            resolvedLanguage: 'uk',
+        },
     }),
 }));
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
+    useLocation: () => ({
+        pathname: '/',
+        search: '',
+    }),
 }));
 
 // Змінна має починатися з "mock", інакше Jest не дозволить використати її у фабриці
@@ -33,6 +41,7 @@ const mockEventData: EventsNews = {
     resource: 'Test Source',
     slug: 'test-event',
     sections: [],
+    localizations: [],
 };
 
 describe('SingleEventNews', () => {

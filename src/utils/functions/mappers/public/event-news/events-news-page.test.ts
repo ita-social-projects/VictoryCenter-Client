@@ -19,22 +19,22 @@ describe('mapToEventsNewsPage', () => {
         expect(result.description).toBe('<p>D</p>');
         expect(result.eventsData).toEqual({
             title: '<p>T</p>',
-            tags: [{ id: '10', name: 'Media' }],
+            tags: [{ id: '10', name: 'Media', localizations: [] }],
         });
     });
 
-    it('maps every category to a tag with a string id', () => {
+    it('maps every category to a tag with a string id and properly initialized localizations', () => {
         const result = mapToEventsNewsPage({
             categories: [createCategory({ id: 1, name: 'News' }), createCategory({ id: 2, name: 'Events' })],
         });
 
         expect(result.eventsData.tags).toEqual([
-            { id: '1', name: 'News' },
-            { id: '2', name: 'Events' },
+            { id: '1', name: 'News', localizations: [] },
+            { id: '2', name: 'Events', localizations: [] },
         ]);
     });
 
-    it('uses the localized category name for the given language', () => {
+    it('maps category localizations safely into the tag object', () => {
         const category = createCategory({
             localizations: [
                 { language: { code: 'en' }, name: 'Media EN' },
@@ -42,32 +42,18 @@ describe('mapToEventsNewsPage', () => {
             ],
         });
 
-        expect(mapToEventsNewsPage({ categories: [category] }, 'en').eventsData.tags).toEqual([
-            { id: '10', name: 'Media EN' },
+        const result = mapToEventsNewsPage({ categories: [category] });
+
+        expect(result.eventsData.tags).toEqual([
+            {
+                id: '10',
+                name: 'Media',
+                localizations: [
+                    { language: { code: 'en' }, name: 'Media EN' },
+                    { language: { code: 'uk' }, name: 'Медіа' },
+                ],
+            },
         ]);
-        expect(mapToEventsNewsPage({ categories: [category] }, 'uk').eventsData.tags).toEqual([
-            { id: '10', name: 'Медіа' },
-        ]);
-    });
-
-    it('falls back to the base category name when no localization matches', () => {
-        const category = createCategory({
-            localizations: [{ language: { code: 'uk' }, name: 'Медіа' }],
-        });
-
-        const result = mapToEventsNewsPage({ categories: [category] }, 'en');
-
-        expect(result.eventsData.tags).toEqual([{ id: '10', name: 'Media' }]);
-    });
-
-    it('falls back to the base category name when the localized name is blank', () => {
-        const category = createCategory({
-            localizations: [{ language: { code: 'en' }, name: '   ' }],
-        });
-
-        const result = mapToEventsNewsPage({ categories: [category] }, 'en');
-
-        expect(result.eventsData.tags).toEqual([{ id: '10', name: 'Media' }]);
     });
 
     it.each([undefined, null, {}, { categories: null }, { categories: [] }])(

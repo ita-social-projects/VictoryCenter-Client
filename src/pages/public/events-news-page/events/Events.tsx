@@ -8,6 +8,7 @@ import { EventsData, EventsNews, Tag } from '@/types/public/events-news';
 import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 import { SingleEventNews } from './single-event-news/SingleEventNews';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
+import { EventCategoryButton } from './event-category-button/EventCategoryButton';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import {
     useDataPaginationFetch,
@@ -61,17 +62,14 @@ export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
             <div className={styles['menu-block']}>
                 <div className={styles['button-block']}>
                     {safeTags.map((tag) => (
-                        <button
-                            onClick={() => setSelectedTag(tag)}
+                        <EventCategoryButton
                             key={tag.id}
-                            className={classNames({
-                                [styles['white-button']]: selectedTagId !== tag.id,
-                                [styles['black-button']]: selectedTagId === tag.id,
-                            })}
-                        >
-                            {tag.name}
-                        </button>
+                            tag={tag}
+                            isActive={selectedTag?.id === tag.id}
+                            onClick={() => setSelectedTag(tag)}
+                        />
                     ))}
+
                     <button
                         onClick={() => setSelectedTag(null)}
                         className={classNames({
@@ -87,14 +85,28 @@ export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
                 {!isTitleHidden && title && <SafeHtml as="h2" className={styles['header-title']} html={title} />}
             </div>
             <div className={styles['cards-block']}>
+                {!isLoading && !error && events.length === 0 && (
+                    <div className={styles['empty-message']} style={{ textAlign: 'center', padding: '2rem 0' }}>
+                        {t('NO_EVENTS_FOUND', 'Ще немає матеріалу')}
+                    </div>
+                )}
                 {error && (
                     <div className={styles['error-message']} role="alert" style={{ color: 'red' }}>
                         {t('FAILED_TO_LOAD_THE_EVENTS_NEWS')}
                     </div>
                 )}
 
-                {events.map((item: EventsNews) => (
-                    <SingleEventNews key={item?.id} {...item} />
+                {events.map((item: any) => (
+                    <SingleEventNews
+                        key={item?.id}
+                        {...item}
+                        name={item.title || item.name}
+                        date={item.publishedAt || item.date}
+                        id={String(item.id)}
+                        previewImage={
+                            typeof item.previewImage === 'string' ? item.previewImage : (item.previewImage?.url ?? null)
+                        }
+                    />
                 ))}
 
                 {isLoading && <LinearProgress />}

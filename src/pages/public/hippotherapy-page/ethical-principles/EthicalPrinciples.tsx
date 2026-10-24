@@ -24,13 +24,11 @@ export const EthicalPrinciples = ({
                     <h3>{title}</h3>
                     <p>{text}</p>
                 </div>
-                <div>
-                    <ul>
-                        {principles.map((principle, index) => (
-                            <li key={index}>{principle}</li>
-                        ))}
-                    </ul>
-                </div>
+                <ul className={styles.principles}>
+                    {principles.map((principle, index) => (
+                        <li key={index}>{principle}</li>
+                    ))}
+                </ul>
             </div>
         </section>
     );

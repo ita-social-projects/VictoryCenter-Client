@@ -1,22 +1,30 @@
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .hippovention-center {
     position: relative;
-    height: 622px;
+    display: flex;
+    min-height: 622px;
     margin: 16px;
 
     @media (min-width: 560px) {
-        height: 880px;
+        min-height: 880px;
+    }
+
+    @media (min-width: 1440px) {
+        display: grid;
+        grid-template-columns: 1fr 4fr 1fr;
+        min-height: auto;
+        margin: 120px 0;
     }
 }
 
 .text {
     @include type.body-2-semibold;
-    position: absolute;
+    position: relative;
     display: flex;
+    flex: 1;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
     padding: 16px;
     color: white;
 
@@ -29,12 +37,53 @@
         max-width: 640px;
     }
 
+    @media (min-width: 1440px) {
+        @include type.body-1-regular;
+        grid-column: 2 / 3;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        max-width: none;
+        padding: 0 24px;
+        color: c.$blue-900;
+    }
+
     h3 {
         @include type.subtitle-1-bold;
+
+        @media (min-width: 1440px) {
+            @include type.body-1-bold;
+            display: inline;
+            margin-right: 0.3em;
+        }
     }
 
     ul {
+        margin-top: auto;
         padding: 24px;
+
+        @media (min-width: 1440px) {
+            display: inline;
+            padding: 0;
+        }
+    }
+
+    li {
+        @media (min-width: 1440px) {
+            display: inline;
+
+            &:not(:last-child)::after {
+                content: ', ';
+            }
+        }
+    }
+}
+
+.summary {
+    display: contents;
+
+    @media (min-width: 1440px) {
+        display: block;
     }
 }
 
@@ -47,4 +96,8 @@
     border-radius: 24px;
     object-position: top;
     filter: brightness(50%);
+
+    @media (min-width: 1440px) {
+        display: none;
+    }
 }

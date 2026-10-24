@@ -8,9 +8,12 @@ export const SloganSection = () => {
     const spacedClass = `${styles['break-text']} ${styles.spaced}`;
 
     return (
-        <section>
+        <section className={styles.root}>
             <h1 className={styles.slogan} data-testid="slogan-section">
-                <span className={yellowHighlightClass}>{t('SLOGAN.FIRST_HIGHLIGHT')}</span>
+                <span className={styles['no-wrap']}>
+                    <span className={yellowHighlightClass}>{t('SLOGAN.FIRST_HIGHLIGHT')}</span>
+                    <span className={styles.sign}>{t('SLOGAN.FIRST_SIGN')}</span>
+                </span>
                 {/* keep space for correct text breaking */}
                 <span className={spacedClass}> {t('SLOGAN.FIRST_TEXT')}</span>
                 <br />

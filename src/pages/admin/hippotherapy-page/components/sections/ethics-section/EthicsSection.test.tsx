@@ -4,6 +4,17 @@ import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: ({ languages, localizedEntity }: any) => (
+        <div
+            data-testid="localization-statuses"
+            data-languages-count={languages?.length ?? 0}
+            data-localizations-count={localizedEntity?.localizations?.length ?? 0}
+        />
+    ),
+}));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -123,5 +134,9 @@ describe('EthicsSection', () => {
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-title')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-description')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toBeDisabled();
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

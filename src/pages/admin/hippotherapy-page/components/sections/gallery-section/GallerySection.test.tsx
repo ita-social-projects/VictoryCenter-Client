@@ -4,6 +4,17 @@ import { GallerySection, GallerySectionProps } from './GallerySection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: ({ languages, localizedEntity }: any) => (
+        <div
+            data-testid="localization-statuses"
+            data-languages-count={languages?.length ?? 0}
+            data-localizations-count={localizedEntity?.localizations?.length ?? 0}
+        />
+    ),
+}));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -122,5 +133,9 @@ describe('GallerySection', () => {
         screen.getAllByTestId('mock-image-input-file').forEach((input) => expect(input).toBeDisabled());
         expect(screen.getByTestId('mock-rich-input-test-gallery-card-0-description')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-gallery-card-1-description')).toBeDisabled();
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

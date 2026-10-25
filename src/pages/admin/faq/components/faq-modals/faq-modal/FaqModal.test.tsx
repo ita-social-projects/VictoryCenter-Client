@@ -36,11 +36,13 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
         isOpen,
         onConfirm,
         onCancel,
+        onClose,
     }: {
         title: string;
         isOpen: boolean;
         onConfirm: () => void;
         onCancel: () => void;
+        onClose: () => void;
     }) =>
         isOpen ? (
             <div data-testid="question-modal">
@@ -50,6 +52,9 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
                 </button>
                 <button data-testid="question-cancel" onClick={onCancel}>
                     Cancel
+                </button>
+                <button data-testid="question-dismiss" onClick={onClose}>
+                    Dismiss
                 </button>
             </div>
         ) : null,
@@ -276,6 +281,19 @@ describe('FaqModal', () => {
             // Buttons should now be enabled
             expect(getDraftButton()).not.toBeDisabled();
             expect(getPublishButton()).not.toBeDisabled();
+        });
+
+        it('should keep the modal open when the draft confirmation is dismissed (Esc/overlay/X)', () => {
+            render(<FaqModal {...editModeProps} />);
+            simulateFormBecomesValid();
+
+            fireEvent.click(getDraftButton());
+            simulateFormSubmit(VisibilityStatus.Draft);
+            fireEvent.click(screen.getByTestId('question-dismiss'));
+
+            expect(getQuestionModal()).not.toBeInTheDocument();
+            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockFaqApi.update).not.toHaveBeenCalled();
         });
     });
 

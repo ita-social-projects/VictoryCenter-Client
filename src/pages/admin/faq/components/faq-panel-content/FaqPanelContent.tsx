@@ -255,16 +255,10 @@ export const FaqPanelContent = () => {
     useEffect(() => {
         if (!isSearchResultView || !fetchedSearchFaq || fetchedSearchFaq.pages.length === 0) return;
 
-        const isCurrentPageAssigned = fetchedSearchFaq.pages.some(
-            (page) => page.id === selectedVisitorPageRef.current?.id,
+        setSelectedVisitorPage((prev) =>
+            prev && fetchedSearchFaq.pages.some((page) => page.id === prev.id) ? prev : fetchedSearchFaq.pages[0],
         );
-        if (isCurrentPageAssigned) return;
-
-        const targetPageId = fetchedSearchFaq.pages[0].id;
-        const targetPage = visitorPages.find((page) => page.id === targetPageId) ?? fetchedSearchFaq.pages[0];
-
-        setSelectedVisitorPage(targetPage);
-    }, [fetchedSearchFaq, isSearchResultView, visitorPages]);
+    }, [fetchedSearchFaq, isSearchResultView]);
 
     const handleSearchClear = useCallback(() => {
         setIsSearchResultView(false);

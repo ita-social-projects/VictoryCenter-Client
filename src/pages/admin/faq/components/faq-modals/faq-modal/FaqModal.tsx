@@ -110,6 +110,7 @@ export const FaqModal = (props: FaqModalProps) => {
             onPublishSubmit={modalHookData.handlePublishSubmit}
             onActionConfirm={modalHookData.handleConfirmAction}
             onActionCancel={modalHookData.handleCancelConfirmation}
+            onActionDismiss={modalHookData.handleDismissConfirmation}
             onExitConfirm={modalHookData.handleConfirmClose}
             onExitCancel={modalHookData.handleCancelClose}
             buttonStates={modalHookData.buttonStates}

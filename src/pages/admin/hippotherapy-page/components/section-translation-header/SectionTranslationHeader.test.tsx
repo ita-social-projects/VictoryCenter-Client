@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { SectionTranslationHeader } from './SectionTranslationHeader';
+import { SectionTranslationHeader, SectionTranslationHeaderProps } from './SectionTranslationHeader';
 import { mockTranslationLanguages, mockLocalizations } from '@/utils/mock-data/admin/section-translation-test-helpers';
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
@@ -15,64 +15,98 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
 }));
 
 describe('SectionTranslationHeader', () => {
+    const renderHeader = (props: SectionTranslationHeaderProps = {}) => render(<SectionTranslationHeader {...props} />);
+
     const getTranslateButton = () =>
         screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION });
 
-    it('returns null when neither languages nor onTranslateClick are provided', () => {
-        const { container } = render(<SectionTranslationHeader />);
-        expect(container.firstChild).toBeNull();
+    const getStatuses = () => screen.queryByTestId('localization-statuses');
+
+    describe('when there is nothing to show', () => {
+        it.each<[string, SectionTranslationHeaderProps]>([
+            ['no props', {}],
+            ['empty languages and empty localizations', { languages: [], localizations: [] }],
+            ['empty languages without localizations', { languages: [] }],
+            ['languages without localizations', { languages: mockTranslationLanguages }],
+            ['localizations without languages', { localizations: mockLocalizations }],
+        ])('renders nothing for %s (no translate button)', (_name, props) => {
+            const { container } = renderHeader(props);
+
+            expect(container).toBeEmptyDOMElement();
+        });
     });
 
-    it('renders only translation statuses when languages and localizations are provided without translate button', () => {
-        render(<SectionTranslationHeader languages={mockTranslationLanguages} localizations={mockLocalizations} />);
+    describe('translation statuses', () => {
+        it('renders only statuses when languages and localizations are provided without translate button', () => {
+            renderHeader({ languages: mockTranslationLanguages, localizations: mockLocalizations });
 
-        const statuses = screen.getByTestId('localization-statuses');
-        expect(statuses).toBeInTheDocument();
-        expect(statuses).toHaveAttribute('data-languages-count', String(mockTranslationLanguages.length));
-        expect(getTranslateButton()).not.toBeInTheDocument();
+            const statuses = getStatuses();
+            expect(statuses).toBeInTheDocument();
+            expect(statuses).toHaveAttribute('data-languages-count', String(mockTranslationLanguages.length));
+            expect(statuses).toHaveAttribute('data-localizations-count', String(mockLocalizations.length));
+            expect(getTranslateButton()).not.toBeInTheDocument();
+        });
+
+        it('renders statuses when localizations is an empty array but languages are present', () => {
+            renderHeader({ languages: mockTranslationLanguages, localizations: [] });
+
+            expect(getStatuses()).toBeInTheDocument();
+        });
+
+        it.each<[string, SectionTranslationHeaderProps]>([
+            ['localizations are not provided', { languages: mockTranslationLanguages }],
+            ['languages are empty', { languages: [], localizations: mockLocalizations }],
+            ['languages are not provided', { localizations: mockLocalizations }],
+        ])('does not render statuses when %s', (_name, props) => {
+            renderHeader({ ...props, onTranslateClick: jest.fn() });
+
+            expect(getStatuses()).not.toBeInTheDocument();
+        });
     });
 
-    it('does not render localization statuses if localizations prop is not provided', () => {
-        render(<SectionTranslationHeader languages={mockTranslationLanguages} />);
+    describe('translate button', () => {
+        it('renders only the button when onTranslateClick is provided without languages', () => {
+            renderHeader({ onTranslateClick: jest.fn() });
 
-        expect(screen.queryByTestId('localization-statuses')).not.toBeInTheDocument();
-    });
+            expect(getTranslateButton()).toBeInTheDocument();
+            expect(getStatuses()).not.toBeInTheDocument();
+        });
 
-    it('renders only the translate button when onTranslateClick is provided without languages', () => {
-        render(<SectionTranslationHeader onTranslateClick={jest.fn()} />);
+        it('renders only the button when languages are empty (no empty statuses container content)', () => {
+            renderHeader({ languages: [], localizations: [], onTranslateClick: jest.fn() });
 
-        expect(getTranslateButton()).toBeInTheDocument();
-        expect(screen.queryByTestId('localization-statuses')).not.toBeInTheDocument();
-    });
+            expect(getTranslateButton()).toBeInTheDocument();
+            expect(getStatuses()).not.toBeInTheDocument();
+        });
 
-    it('renders both statuses and translate button when both are provided', () => {
-        render(
-            <SectionTranslationHeader
-                languages={mockTranslationLanguages}
-                localizations={mockLocalizations}
-                onTranslateClick={jest.fn()}
-            />,
-        );
+        it('renders both statuses and button when both are provided', () => {
+            renderHeader({
+                languages: mockTranslationLanguages,
+                localizations: mockLocalizations,
+                onTranslateClick: jest.fn(),
+            });
 
-        expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
-        expect(getTranslateButton()).toBeInTheDocument();
-    });
+            expect(getStatuses()).toBeInTheDocument();
+            expect(getTranslateButton()).toBeInTheDocument();
+        });
 
-    it('calls onTranslateClick when the translation icon is clicked', () => {
-        const onTranslateClick = jest.fn();
-        render(<SectionTranslationHeader onTranslateClick={onTranslateClick} />);
+        it('calls onTranslateClick when clicked', () => {
+            const onTranslateClick = jest.fn();
+            renderHeader({ onTranslateClick });
 
-        fireEvent.click(getTranslateButton()!);
+            fireEvent.click(getTranslateButton()!);
 
-        expect(onTranslateClick).toHaveBeenCalledTimes(1);
-    });
+            expect(onTranslateClick).toHaveBeenCalledTimes(1);
+        });
 
-    it('disables the translation icon when isTranslateDisabled is true', () => {
-        const onTranslateClick = jest.fn();
-        render(<SectionTranslationHeader onTranslateClick={onTranslateClick} isTranslateDisabled />);
+        it('is disabled and does not call onTranslateClick when isTranslateDisabled is true', () => {
+            const onTranslateClick = jest.fn();
+            renderHeader({ onTranslateClick, isTranslateDisabled: true });
 
-        expect(getTranslateButton()).toBeDisabled();
-        fireEvent.click(getTranslateButton()!);
-        expect(onTranslateClick).not.toHaveBeenCalled();
+            expect(getTranslateButton()).toBeDisabled();
+            fireEvent.click(getTranslateButton()!);
+
+            expect(onTranslateClick).not.toHaveBeenCalled();
+        });
     });
 });

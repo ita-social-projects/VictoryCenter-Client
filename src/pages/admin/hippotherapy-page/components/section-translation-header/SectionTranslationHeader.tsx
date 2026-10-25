@@ -18,13 +18,13 @@ export const SectionTranslationHeader = ({
     languages,
     localizations,
 }: SectionTranslationHeaderProps) => {
-    if (!languages && !onTranslateClick) return null;
+    const hasStatuses = !!languages?.length && !!localizations;
+
+    if (!hasStatuses && !onTranslateClick) return null;
 
     return (
         <div className="section-translation-header">
-            {languages && localizations && (
-                <LocalizationStatuses languages={languages} localizedEntity={{ localizations }} />
-            )}
+            {hasStatuses && <LocalizationStatuses languages={languages} localizedEntity={{ localizations }} />}
             {onTranslateClick && (
                 <IconButton
                     aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}

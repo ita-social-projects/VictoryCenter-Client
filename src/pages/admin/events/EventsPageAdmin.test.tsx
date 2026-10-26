@@ -6,6 +6,7 @@ import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventsApi } from '@/services/api/admin/events/events-api';
+import { EventsIntroSectionLocalizationsApi } from '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
 import { EventItemDto, EventsIntroSectionDto } from '@/types/admin/events';
@@ -15,6 +16,9 @@ import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/cons
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
+const mockedIntroLocalizationsApi = EventsIntroSectionLocalizationsApi as jest.Mocked<
+    typeof EventsIntroSectionLocalizationsApi
+>;
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -58,6 +62,16 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
         getAll: jest.fn(),
     },
 }));
+
+jest.mock(
+    '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api',
+    () => ({
+        EventsIntroSectionLocalizationsApi: {
+            create: jest.fn(),
+            update: jest.fn(),
+        },
+    }),
+);
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
     AdminPanelToolbar: ({
@@ -587,6 +601,8 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.deleteEvent.mockReset();
+        mockedIntroLocalizationsApi.create.mockReset();
+        mockedIntroLocalizationsApi.update.mockReset();
 
         mockAddToast.mockClear();
         mockOpenAddCategoryModal.mockClear();
@@ -724,6 +740,37 @@ describe('EventsPageAdmin', () => {
         expect(descriptionStatusMock).toHaveAttribute('data-entity-id', '1');
         expect(titleStatusMock).toHaveAttribute('data-languages', 'en');
         expect(titleStatusMock).toHaveAttribute('data-entity-id', '1');
+    });
+
+    it('updates intro localization statuses without refetching the intro section after translation is saved', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        mockedIntroLocalizationsApi.create.mockResolvedValueOnce({
+            entityId: 1,
+            pageDescription: 'English description',
+            eventsBlockTitle: '',
+            localizationInfoDto: { id: 2, code: 'en' },
+            translationStatus: 1,
+        } as never);
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Перекласти ${descriptionId}` }));
+        await user.type(
+            screen.getByRole('textbox', { name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE) }),
+            'English description',
+        );
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        const descriptionSection = screen.getByTestId(`${descriptionId}-section`);
+        const statusMock = within(descriptionSection).getByTestId('localization-statuses-mock');
+
+        expect(JSON.parse(statusMock.getAttribute('data-localizations') ?? '[]')).toEqual([
+            expect.objectContaining({
+                language: { id: 2, code: 'en' },
+                pageDescription: 'English description',
+            }),
+        ]);
+        expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalledTimes(1);
     });
 
     it('refreshes translation status indicators for both blocks after publishing a section', async () => {
@@ -1367,6 +1414,18 @@ describe('EventsPageAdmin', () => {
         expect(await screen.findByText(errorMessage)).toBeInTheDocument();
     });
 
+    it('keeps category and intro-section errors independent', async () => {
+        mockedEventCategoriesApi.getAll.mockRejectedValueOnce(new Error('Categories failed'));
+        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Intro section failed'));
+
+        render(<EventsPageAdmin />);
+
+        expect(
+            await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES),
+        ).toBeInTheDocument();
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
+    });
+
     it('disables intro section editing when intro content fetch fails', async () => {
         mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Failed to fetch intro content'));
 
@@ -1388,6 +1447,7 @@ describe('EventsPageAdmin', () => {
         ).toBeDisabled();
 
         expect(mockAddToast).not.toHaveBeenCalled();
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
     });
 
     it('allows another publish attempt after a publish failure', async () => {

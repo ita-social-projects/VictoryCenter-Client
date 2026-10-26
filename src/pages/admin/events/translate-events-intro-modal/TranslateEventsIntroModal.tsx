@@ -3,7 +3,7 @@ import { LocalizationModal } from '@/components/admin/localization-modal/Localiz
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { LocalizationLanguage } from '@/types/common/language';
-import { EventsIntroSectionDto } from '@/types/admin/events';
+import { EventsIntroSectionDto, EventsIntroSectionLocalizationDto } from '@/types/admin/events';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventsIntroSectionLocalizationsApi } from '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -21,7 +21,7 @@ interface TranslateEventsIntroModalProps {
     introSection: EventsIntroSectionDto;
     translationLanguages: LocalizationLanguage[];
     onClose: () => void;
-    onSaveSuccess: () => Promise<boolean>;
+    onSaveSuccess: (localization: EventsIntroSectionLocalizationDto) => void;
 }
 
 export const TranslateEventsIntroModal = ({
@@ -36,7 +36,6 @@ export const TranslateEventsIntroModal = ({
     const [validationError, setValidationError] = useState<string>();
     const [saveError, setSaveError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isTranslationSaved, setIsTranslationSaved] = useState(false);
     const client = useAdminClient();
 
     const availableLanguages = useMemo(
@@ -44,6 +43,14 @@ export const TranslateEventsIntroModal = ({
         [translationLanguages],
     );
     const [selectedLanguage, setSelectedLanguage] = useState<LocalizationLanguage | null>(null);
+    const existingLocalization = useMemo(
+        () =>
+            (introSection.localizations ?? []).find(
+                (localization) => localization.language.code === selectedLanguage?.code,
+            ),
+        [introSection.localizations, selectedLanguage?.code],
+    );
+    const initialValue = existingLocalization?.[field] ?? '';
 
     useEffect(() => {
         if (isOpen) {
@@ -52,17 +59,15 @@ export const TranslateEventsIntroModal = ({
     }, [availableLanguages, isOpen]);
 
     useEffect(() => {
-        setValue('');
+        setValue(initialValue);
         setValidationError(undefined);
         setSaveError('');
-        setIsTranslationSaved(false);
-    }, [field, isOpen]);
+    }, [field, initialValue, isOpen]);
 
     const validationRule = getEventsIntroTranslationFieldConfig(field).validationRule;
     const handleChange = useCallback(
         (nextValue: string) => {
             setValue(nextValue);
-            setIsTranslationSaved(false);
 
             if (validationError) {
                 setValidationError(undefined);
@@ -83,7 +88,6 @@ export const TranslateEventsIntroModal = ({
         setValue('');
         setValidationError(undefined);
         setSaveError('');
-        setIsTranslationSaved(false);
         onClose();
     };
     const handleClose = () => {
@@ -98,39 +102,19 @@ export const TranslateEventsIntroModal = ({
         if (error || !selectedLanguage) return;
 
         const payload = { [field]: normalizedValue };
-        const existingLocalization = (introSection.localizations ?? []).find(
-            (localization) => localization.language.code === selectedLanguage.code,
-        );
-
         setIsSubmitting(true);
         setSaveError('');
         try {
-            if (!isTranslationSaved) {
-                if (existingLocalization) {
-                    await EventsIntroSectionLocalizationsApi.update(
-                        client,
-                        introSection.id,
-                        selectedLanguage.id,
-                        payload,
-                    );
-                } else {
-                    await EventsIntroSectionLocalizationsApi.create(client, {
-                        entityId: introSection.id,
-                        languageId: selectedLanguage.id,
-                        ...payload,
-                    });
-                }
+            const savedLocalization = existingLocalization
+                ? await EventsIntroSectionLocalizationsApi.update(client, introSection.id, selectedLanguage.id, payload)
+                : await EventsIntroSectionLocalizationsApi.create(client, {
+                      entityId: introSection.id,
+                      languageId: selectedLanguage.id,
+                      ...payload,
+                  });
 
-                setIsTranslationSaved(true);
-            }
-
-            const isIntroSectionRefreshed = await onSaveSuccess();
-
-            if (isIntroSectionRefreshed) {
-                closeModal();
-            } else {
-                setSaveError(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA);
-            }
+            onSaveSuccess(savedLocalization);
+            closeModal();
         } catch {
             setSaveError(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
         } finally {
@@ -147,8 +131,8 @@ export const TranslateEventsIntroModal = ({
             onSave={handleSave}
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}
-            isDirty={Boolean(value)}
-            checkIsDirty={() => Boolean(value)}
+            isDirty={value !== initialValue}
+            checkIsDirty={() => value !== initialValue}
             maxWidth="594px"
             modalClassName={styles['translate-events-intro-modal']}
         >
@@ -167,7 +151,7 @@ export const TranslateEventsIntroModal = ({
                     error={validationError}
                     disabled={isSubmitting}
                 />
-                {saveError && <div className="error-message">{saveError}</div>}
+                {saveError && <div className={styles['translate-events-intro-modal-error']}>{saveError}</div>}
             </div>
         </LocalizationModal>
     );

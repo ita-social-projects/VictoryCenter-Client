@@ -1,4 +1,5 @@
 @use '@/assets/sass/mixins/typography.mixins' as typography;
+@use '@/assets/sass/variables/colors';
 
 .translate-events-intro-modal {
     width: 594px;
@@ -60,4 +61,8 @@
         top: 4px;
         right: 8px;
     }
+}
+
+.translate-events-intro-modal-error {
+    color: colors.$error;
 }

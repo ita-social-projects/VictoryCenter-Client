@@ -24,6 +24,8 @@ import {
     ErrorState,
     EventsErrorType,
     EventsIntroSectionDto,
+    EventsIntroSectionLocalization,
+    EventsIntroSectionLocalizationDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
@@ -42,7 +44,7 @@ import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { EditableHeaderSection, EditableHeaderSectionId } from './editable-header-section/EditableHeaderSection';
 import { TranslateEventsIntroModal } from './translate-events-intro-modal/TranslateEventsIntroModal';
-import { EventsIntroTranslationField } from './translate-events-intro-modal/TranslateEventsIntroForm';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import {
     EventsPageTextValidationRule,
     getEventsPageTextValidationError,
@@ -75,6 +77,22 @@ const createEditableSectionState = (): EditableSectionState => ({
     [EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID]: false,
 });
 
+const mergeIntroSectionLocalization = (
+    section: EventsIntroSectionDto | null,
+    localization: EventsIntroSectionLocalization,
+): EventsIntroSectionDto | null => {
+    if (!section) return section;
+
+    const hasLocalization = section.localizations.some((item) => item.language.id === localization.language.id);
+
+    return {
+        ...section,
+        localizations: hasLocalization
+            ? section.localizations.map((item) => (item.language.id === localization.language.id ? localization : item))
+            : [...section.localizations, localization],
+    };
+};
+
 export const EventsPageAdmin = () => {
     const [editingSections, setEditingSections] = useState<EditableSectionState>(createEditableSectionState);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
@@ -85,6 +103,7 @@ export const EventsPageAdmin = () => {
     const [isReordering, setIsReordering] = useState(false);
     const [eventsIntroSection, setEventsIntroSection] = useState<EventsIntroSectionDto | null>(null);
     const [eventsIntroDraft, setEventsIntroDraft] = useState<EventsIntroSectionDto | null>(null);
+    const [introSectionError, setIntroSectionError] = useState<string | null>(null);
     const [isEventsIntroSectionLoading, setIsEventsIntroSectionLoading] = useState(true);
     const [publishingSections, setPublishingSections] = useState<EditableSectionState>(createEditableSectionState);
     const [togglingVisibilitySections, setTogglingVisibilitySections] =
@@ -96,9 +115,8 @@ export const EventsPageAdmin = () => {
     const [selectedSearchItem, setSelectedSearchItem] = useState<EventItemDto | null>(null);
     const [eventToDeleteId, setEventToDeleteId] = useState<number | null>(null);
     const [isEventDeleting, setIsEventDeleting] = useState(false);
-    const [activeIntroTranslationField, setActiveIntroTranslationField] = useState<EventsIntroTranslationField | null>(
-        null,
-    );
+    const [activeIntroTranslationField, setActiveIntroTranslationField] =
+        useState<EventsIntroSectionUpdateField | null>(null);
 
     const modalsStateControl = useModalsState<EventItemDto>();
     const { addToast } = useToast();
@@ -255,18 +273,18 @@ export const EventsPageAdmin = () => {
     }, [fetchCategories]);
 
     const fetchEventsIntroSection = useCallback(async () => {
+        setIntroSectionError(null);
+
         try {
             const introSection = await EventsApi.getEventsIntroSection(client);
             setEventsIntroSection(introSection);
             setEventsIntroDraft(introSection);
-            return true;
         } catch {
-            setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, 'events-intro');
-            return false;
+            setIntroSectionError(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA);
         } finally {
             setIsEventsIntroSectionLoading(false);
         }
-    }, [client, setErrorState]);
+    }, [client]);
 
     useEffect(() => {
         fetchEventsIntroSection();
@@ -624,18 +642,23 @@ export const EventsPageAdmin = () => {
         setActiveIntroTranslationField(null);
     }, []);
 
-    const handleIntroTranslationSave = useCallback(async () => {
-        const isIntroSectionRefreshed = await fetchEventsIntroSection();
+    const handleIntroTranslationSave = useCallback(
+        (localizationDto: EventsIntroSectionLocalizationDto) => {
+            const localization = mapLocalizationDtoToModel<
+                EventsIntroSectionLocalizationDto,
+                EventsIntroSectionLocalization
+            >(localizationDto);
 
-        if (!isIntroSectionRefreshed) return false;
-
-        addToast(
-            COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
-            ToastType.Success,
-            EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
-        );
-        return true;
-    }, [addToast, fetchEventsIntroSection]);
+            setEventsIntroSection((currentSection) => mergeIntroSectionLocalization(currentSection, localization));
+            setEventsIntroDraft((currentDraft) => mergeIntroSectionLocalization(currentDraft, localization));
+            addToast(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+                EVENT_NOTIFICATION_TIMERS.SYNC_SUCCESS_MS,
+            );
+        },
+        [addToast],
+    );
 
     const openPublishConfirmation = useCallback(
         (sectionId: EditableHeaderSectionId, value: string) => {
@@ -757,6 +780,7 @@ export const EventsPageAdmin = () => {
             const requestId = ++toggleVisibilityRequestIdRef.current;
             togglingVisibilitySectionsRef.current[sectionId] = true;
             setTogglingVisibilitySections((prev) => ({ ...prev, [sectionId]: true }));
+            setIntroSectionError(null);
 
             try {
                 const isTitle = sectionId === EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
@@ -785,14 +809,14 @@ export const EventsPageAdmin = () => {
                 setEventsIntroDraft(reconcileState);
             } catch {
                 if (requestId === toggleVisibilityRequestIdRef.current) {
-                    setErrorState(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, 'events-intro');
+                    setIntroSectionError(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES);
                 }
             } finally {
                 togglingVisibilitySectionsRef.current[sectionId] = false;
                 setTogglingVisibilitySections((prev) => ({ ...prev, [sectionId]: false }));
             }
         },
-        [client, setErrorState],
+        [client],
     );
 
     const isAnySectionTogglingVisibility =
@@ -958,6 +982,7 @@ export const EventsPageAdmin = () => {
                     }
                 />
             </div>
+            {introSectionError && <div className="error-message">{introSectionError}</div>}
             {activeIntroTranslationField && (
                 <TranslateEventsIntroModal
                     isOpen

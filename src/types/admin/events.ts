@@ -89,7 +89,7 @@ export interface EventSaveSuccessData {
     shouldMoveDraftToTop: boolean;
 }
 
-export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
+export type EventsErrorType = 'categories' | 'events-items' | 'search' | 'events-reorder';
 
 export interface ErrorState {
     message: string | null;

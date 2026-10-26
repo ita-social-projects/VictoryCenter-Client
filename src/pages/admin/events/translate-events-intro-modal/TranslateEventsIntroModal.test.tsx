@@ -308,9 +308,16 @@ describe('TranslateEventsIntroModal', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeEnabled();
     });
 
-    it('saves a valid first translation and closes after the parent refreshes the intro section', async () => {
+    it('saves a valid first translation, updates the parent state and closes', async () => {
         const user = userEvent.setup();
-        mockedLocalizationsApi.create.mockResolvedValueOnce({} as never);
+        const savedLocalization = {
+            entityId: 1,
+            pageDescription: 'English text',
+            eventsBlockTitle: '',
+            localizationInfoDto: { id: 2, code: 'en' },
+            translationStatus: 1,
+        };
+        mockedLocalizationsApi.create.mockResolvedValueOnce(savedLocalization as never);
         render(<TranslationModalHarness />);
 
         await user.type(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE), 'English text');
@@ -324,28 +331,53 @@ describe('TranslateEventsIntroModal', () => {
                 pageDescription: 'English text',
             }),
         );
-        expect(onSaveSuccess).toHaveBeenCalledTimes(1);
+        expect(onSaveSuccess).toHaveBeenCalledWith(savedLocalization);
         expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
     });
 
-    it('retries only the intro section refresh when it fails after saving', async () => {
+    it('pre-fills and updates an existing translation without treating it as a changed form', async () => {
         const user = userEvent.setup();
-        mockedLocalizationsApi.create.mockResolvedValueOnce({} as never);
-        onSaveSuccess.mockResolvedValueOnce(false);
-        render(<TranslationModalHarness />);
+        const existingTranslation = {
+            entityId: 1,
+            language: { id: 2, code: 'en' },
+            translationStatus: 1,
+            pageDescription: 'Existing English text',
+            eventsBlockTitle: 'Existing English title',
+        };
+        const savedLocalization = {
+            ...existingTranslation,
+            pageDescription: 'Updated English text',
+            localizationInfoDto: existingTranslation.language,
+        };
 
-        await user.type(getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE), 'English text');
+        mockedLocalizationsApi.update.mockResolvedValueOnce(savedLocalization as never);
+        render(
+            <TranslateEventsIntroModal
+                isOpen
+                field="pageDescription"
+                introSection={{ ...introSection, localizations: [existingTranslation] }}
+                translationLanguages={translationLanguages}
+                onClose={jest.fn()}
+                onSaveSuccess={onSaveSuccess}
+            />,
+        );
+
+        const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE);
+
+        expect(field).toHaveValue('Existing English text');
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
+
+        await user.clear(field);
+        await user.type(field, 'Updated English text');
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
 
-        expect(onSaveSuccess).toHaveBeenCalledTimes(1);
-        expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
-        expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
-
-        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
-
-        expect(mockedLocalizationsApi.create).toHaveBeenCalledTimes(1);
-        expect(onSaveSuccess).toHaveBeenCalledTimes(2);
-        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
+        expect(mockedLocalizationsApi.update).toHaveBeenCalledWith(
+            {},
+            1,
+            2,
+            expect.objectContaining({ pageDescription: 'Updated English text' }),
+        );
+        expect(onSaveSuccess).toHaveBeenCalledWith(savedLocalization);
     });
 
     it('saves the events block title independently from the page description', async () => {

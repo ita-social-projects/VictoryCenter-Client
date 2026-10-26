@@ -111,6 +111,18 @@ describe('mapToEventsNewsPage', () => {
         expect(result.isEventsBlockTitleHidden).toBe(true);
     });
 
+    it('hides empty intro blocks when the server visibility flags are false', () => {
+        const result = mapToEventsNewsPage({
+            eventsBlockTitle: '',
+            pageDescription: '',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+        });
+
+        expect(result.isPageDescriptionHidden).toBe(true);
+        expect(result.isEventsBlockTitleHidden).toBe(true);
+    });
+
     it.each([undefined, null, {}, { categories: null }, { categories: [] }])(
         'returns empty tags and strings for %p',
         (dto) => {

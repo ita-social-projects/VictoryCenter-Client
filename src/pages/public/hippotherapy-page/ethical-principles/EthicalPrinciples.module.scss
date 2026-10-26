@@ -19,10 +19,6 @@ $card-gap: 16px;
     position: absolute;
     inset: 0;
     border-radius: 24px;
-
-    @media (min-width: 1440px) {
-        display: none;
-    }
 }
 
 .overlay {

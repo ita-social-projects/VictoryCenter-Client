@@ -31,11 +31,20 @@
 }
 
 .sign {
-    padding-left: 0.25em;
+    padding-left: 10px;
     background: colors.$yellow-400;
 
     @media (min-width: 560px) {
+        padding-left: 12px;
         background: none;
+    }
+
+    @media (min-width: 768px) {
+        padding-left: 16px;
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: 24px;
     }
 }
 

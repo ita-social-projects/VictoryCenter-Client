@@ -48,12 +48,12 @@ export const SummarySection = () => {
         fetchHandler,
     });
 
-    const { currency } = getLocaleSettings(currentLanguage);
+    const { currency, numberFormat } = getLocaleSettings(currentLanguage);
     const isUsd = currency === Currency.USD;
     const currencyLabel = REPORT_CURRENCY_LABELS[currency];
 
     const formatItemAmount = (amount: number) => {
-        return `${formatAllocationAmount(amount, isEn)} ${currencyLabel}`;
+        return `${formatAllocationAmount(amount, numberFormat)} ${currencyLabel}`;
     };
 
     if (isLoading) {
@@ -83,7 +83,7 @@ export const SummarySection = () => {
     if (!data) return null;
 
     const collectedAmount = isUsd ? data.funding.totalUsd : data.funding.totalUah;
-    const formattedCollectedValue = `${formatCollectedAmount(collectedAmount)} ${currencyLabel}`;
+    const formattedCollectedValue = `${formatCollectedAmount(collectedAmount, numberFormat)} ${currencyLabel}`;
 
     const totalExpenses = isUsd ? data.expenses.totalUsd : data.expenses.totalUah;
     const expensesItems = data.expenses.items.map((item) => {

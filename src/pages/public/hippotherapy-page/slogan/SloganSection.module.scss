@@ -1,10 +1,21 @@
 @use '@/assets/sass/mixins/utilits.mixins' as utils;
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography' as t;
 
-section {
+.root {
     overflow: hidden;
 }
+
 .slogan {
     @include utils.yellow-blue-text;
+
+    @media (max-width: 559px) {
+        font-size: min(t.$h3-size, 10.5vw);
+    }
+
+    .spaced {
+        display: inline;
+    }
 }
 
 .highlight {
@@ -13,6 +24,28 @@ section {
 
 .yellow {
     @include utils.yellow-bg-text;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+.sign {
+    padding-left: 10px;
+    background: colors.$yellow-400;
+
+    @media (min-width: 560px) {
+        padding-left: 12px;
+        background: none;
+    }
+
+    @media (min-width: 768px) {
+        padding-left: 16px;
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: 24px;
+    }
 }
 
 .blue {

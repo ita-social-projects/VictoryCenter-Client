@@ -52,12 +52,13 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: ConfirmationModalProps) =>
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose, isButtonsDisabled }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <div data-testid="modal-title">{title}</div>
                 <button data-testid="confirm-btn" onClick={onConfirm} disabled={isButtonsDisabled} />
                 <button data-testid="cancel-btn" onClick={onCancel} disabled={isButtonsDisabled} />
+                <button data-testid="dismiss-btn" onClick={onClose} />
             </div>
         ) : null,
 }));
@@ -325,6 +326,94 @@ describe('TeamMemberModal', () => {
         await userEvent.click(within(submitModal).getByTestId('modal-close'));
         await waitFor(() => {
             expect(onClose3).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe('Cancelling or dismissing the save confirmation keeps the modal open', () => {
+        const renderModal = (mode: ModalMode) => {
+            const onClose = jest.fn();
+            const onAddMember = jest.fn();
+            const onEditMember = jest.fn();
+
+            if (mode === ModalMode.Add) {
+                render(
+                    <TeamMemberModal
+                        mode={ModalMode.Add}
+                        isOpen={true}
+                        onClose={onClose}
+                        onAddMember={onAddMember}
+                        categories={mockCategories}
+                    />,
+                );
+            } else {
+                render(
+                    <TeamMemberModal
+                        mode={ModalMode.Edit}
+                        isOpen={true}
+                        onClose={onClose}
+                        onEditMember={onEditMember}
+                        memberToEdit={baseMember}
+                        categories={mockCategories}
+                    />,
+                );
+            }
+
+            return { onClose, onAddMember, onEditMember };
+        };
+
+        const submitAndAnswer = async (mode: ModalMode, saveButtonLabel: string, answerTestId: string) => {
+            const view = renderModal(mode);
+
+            if (mode === ModalMode.Edit) {
+                await userEvent.click(screen.getByTestId('toggle-dirty'));
+            }
+            await userEvent.click(screen.getByTestId('toggle-valid'));
+            await userEvent.click(screen.getByText(saveButtonLabel));
+            const confirmModal = await screen.findByTestId('question-modal');
+            await userEvent.click(within(confirmModal).getByTestId(answerTestId));
+
+            return view;
+        };
+
+        const expectAbortedWithModalOpen = (handlers: ReturnType<typeof renderModal>) => {
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(handlers.onClose).not.toHaveBeenCalled();
+            expect(handlers.onAddMember).not.toHaveBeenCalled();
+            expect(handlers.onEditMember).not.toHaveBeenCalled();
+            expect(mockedApi.postMember).not.toHaveBeenCalled();
+            expect(mockedApi.updateMember).not.toHaveBeenCalled();
+        };
+
+        it.each([
+            ['Add', ModalMode.Add, 'Save Draft'],
+            ['Add', ModalMode.Add, 'Save Published'],
+            ['Edit', ModalMode.Edit, 'Save Draft'],
+            ['Edit', ModalMode.Edit, 'Save Published'],
+        ])('%s mode: "No" after "%s" does not close the modal', async (_name, mode, label) => {
+            const handlers = await submitAndAnswer(mode, label, 'cancel-btn');
+
+            expectAbortedWithModalOpen(handlers);
+        });
+
+        it.each([
+            ['Add', ModalMode.Add, 'Save Draft'],
+            ['Edit', ModalMode.Edit, 'Save Draft'],
+        ])('%s mode: dismissing the confirmation after "%s" does not close the modal', async (_name, mode, label) => {
+            const handlers = await submitAndAnswer(mode, label, 'dismiss-btn');
+
+            expectAbortedWithModalOpen(handlers);
+        });
+
+        it('can be submitted again after "No" on a draft', async () => {
+            mockedApi.postMember.mockResolvedValue({ ...baseMember, id: 123 });
+            const handlers = await submitAndAnswer(ModalMode.Add, 'Save Draft', 'cancel-btn');
+
+            await userEvent.click(screen.getByText('Save Draft'));
+            const confirmModal = await screen.findByTestId('question-modal');
+            await userEvent.click(within(confirmModal).getByTestId('confirm-btn'));
+
+            await waitFor(() => expect(mockedApi.postMember).toHaveBeenCalledTimes(1));
+            expect(handlers.onClose).toHaveBeenCalledTimes(1);
         });
     });
 });

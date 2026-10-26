@@ -1713,6 +1713,35 @@ describe('FundsExpenditureSection add buttons disabled state based on selection'
             expectAddButtonsDisabled(false);
         });
     });
+
+    it('should clear selection and re-enable add buttons when the type filter changes', async () => {
+        renderSection({ isEditing: true });
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+        expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'false');
+
+        fireEvent.click(screen.getByTestId('filter-expense'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+            expectAddButtonsDisabled(false);
+        });
+    });
+
+    it('should clear selection and re-enable add buttons when the category filter changes', async () => {
+        renderSection({ isEditing: true });
+
+        selectRow('select-row-1');
+        expectAddButtonsDisabled(true);
+
+        fireEvent.click(screen.getByTestId('filter-cat-1'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+            expectAddButtonsDisabled(false);
+        });
+    });
 });
 
 describe('FundsExpenditureSection onSelectionChange callback', () => {

@@ -446,6 +446,10 @@ export const FundsExpenditureSection = ({
         onSelectionChange?.(hasSelectedRecords);
     }, [hasSelectedRecords, onSelectionChange]);
 
+    useEffect(() => {
+        setSelectedRecordIds((prev) => (prev.length === 0 ? prev : []));
+    }, [selectedType, selectedCategoryId]);
+
     const hasReachedIncomeCategoryLimit =
         summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
     const hasReachedExpenseCategoryLimit =

@@ -2,12 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RightSection } from './RightSection';
 import {
-    Currency,
     DonatePageData,
     PublishedUahBankDetailsDto,
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
 } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import donatePageUk from '@/locales/uk/donate.json';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 

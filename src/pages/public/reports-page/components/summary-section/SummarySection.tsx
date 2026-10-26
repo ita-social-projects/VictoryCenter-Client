@@ -7,7 +7,7 @@ import { formatAllocationAmount, formatCollectedAmount } from '@/utils/functions
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportsPublicApi } from '@/services/api/public/reports/reports-api';
 import { PublishedReportFundsExpendituresDto } from '@/types/public/reports';
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { LocaleCurrency } from '@/const/common/currency';
 import { getLocaleSettings } from '@/const/common/locales';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';

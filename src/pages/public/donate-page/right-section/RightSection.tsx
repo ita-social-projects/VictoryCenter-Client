@@ -4,7 +4,8 @@ import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDeta
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '@/components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
-import { Currency, DonatePageData } from '@/types/public/donate-page';
+import { DonatePageData } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { useTranslation } from 'react-i18next';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';

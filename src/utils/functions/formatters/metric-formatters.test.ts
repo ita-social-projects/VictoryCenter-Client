@@ -1,5 +1,5 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import {
     formatMetricValue,
     getAmountCurrency,

@@ -1,4 +1,4 @@
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { LocaleCurrency } from '@/const/common/currency';
 
 export const DEFAULT_LOCALE = 'uk';

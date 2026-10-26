@@ -1,7 +1,8 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
 import { DONATION_AMOUNTS } from '@/const/public/donate-page';
-import { DonateTab, PaymentSystem, Currency } from '@/types/public/donate-page';
+import { DonateTab, PaymentSystem } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { getEnvVariable } from '@/utils/functions/get-env-variable/get-env-variable';
 import { Tabs } from '@/components/common/tabs/Tabs';

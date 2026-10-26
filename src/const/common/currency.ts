@@ -1,4 +1,4 @@
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 
 export type LocaleCurrency = Currency.UAH | Currency.USD;
 

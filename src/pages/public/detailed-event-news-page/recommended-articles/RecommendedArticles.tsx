@@ -32,17 +32,8 @@ const RecommendedArticlesBase: React.FC = () => {
                     </div>
                 )}
 
-                {data.map((item: any) => (
-                    <SingleEventNews
-                        key={item?.id}
-                        {...item}
-                        name={item.name || item.title}
-                        date={item.date || item.publishedAt}
-                        id={String(item.id)}
-                        previewImage={
-                            typeof item.previewImage === 'string' ? item.previewImage : (item.previewImage?.url ?? null)
-                        }
-                    />
+                {data.map((item) => (
+                    <SingleEventNews key={item.id} {...item} />
                 ))}
 
                 {isLoading && <LinearProgress />}

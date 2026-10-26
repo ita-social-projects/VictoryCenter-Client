@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EventsNews } from '@/types/public/events-news';
-
 import { RecommendedArticles } from './RecommendedArticles';
 
 jest.mock('react-i18next', () => ({
@@ -52,7 +50,6 @@ const mockArticle = (id: string): EventsNews => ({
     backgroundImage: null,
     tag: { id: '1', name: 'Media' },
     slug: `article-${id}`,
-    sections: [],
     localizations: [],
 });
 

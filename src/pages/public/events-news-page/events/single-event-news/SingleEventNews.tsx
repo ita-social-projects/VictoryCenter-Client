@@ -23,7 +23,6 @@ export const SingleEventNews = memo(
         const navigate = useNavigate();
 
         const localized = useGetLocalization(localizations, {
-            name: name,
             title: name,
             description: description,
         });
@@ -32,7 +31,7 @@ export const SingleEventNews = memo(
             name: tag?.name || '',
         });
 
-        const finalName = localized.title || localized.name;
+        const finalName = localized.title;
 
         const handleClick = () => {
             if (slug) {

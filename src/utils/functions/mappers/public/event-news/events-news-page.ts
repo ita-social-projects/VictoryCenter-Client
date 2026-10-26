@@ -15,13 +15,7 @@ export const mapToEventsNewsPage = (dto?: PublicEventsPageDto | null): EventsNew
                 (category): Tag => ({
                     id: String(category.id),
                     name: category.name,
-                    localizations: category.localizations?.map((loc) => ({
-                        ...loc,
-                        language: {
-                            code: loc.language?.code || '',
-                        },
-                        name: loc.name || '',
-                    })) as any,
+                    localizations: category.localizations ?? [],
                 }),
             ),
         },

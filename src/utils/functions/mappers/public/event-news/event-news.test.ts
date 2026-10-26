@@ -21,7 +21,6 @@ describe('mapToEventsNews', () => {
             previewImage: '/preview.webp',
             backgroundImage: background,
             slug: 'event-title',
-            sections: [],
             localizations: [],
         });
     });
@@ -34,29 +33,25 @@ describe('mapToEventsNews', () => {
     });
 
     it.each([
-        ['title', { title: null }, 'name', ''],
-        ['description', { description: null }, 'description', ''],
-        ['publishedAt', { publishedAt: null }, 'date', ''],
-        ['preview image', { previewImage: null }, 'previewImage', ''],
+        ['title', { title: undefined }, 'name', ''],
+        ['description', { description: undefined }, 'description', ''],
+        ['publishedAt', { publishedAt: undefined }, 'date', ''],
+        ['preview image', { previewImage: undefined }, 'previewImage', ''],
         ['background image', { backgroundImage: null }, 'backgroundImage', null],
-        ['slug', { slug: null }, 'slug', ''],
-        ['resource', { resource: null }, 'resource', undefined],
+        ['slug', { slug: undefined }, 'slug', ''],
+        ['resource', { resource: undefined }, 'resource', undefined],
     ] as const)('uses a fallback when %s is missing', (_field, overrides, resultKey, expected) => {
-        const result = mapToEventsNews(createPublishedEventNewsDto(overrides));
+        const result = mapToEventsNews(createPublishedEventNewsDto(overrides as any));
 
-        expect(result[resultKey]).toBe(expected);
+        expect(result[resultKey as keyof typeof result]).toBe(expected);
     });
 
     it('returns an empty date when publishedAt has an unexpected format', () => {
-        expect(mapToEventsNews(createPublishedEventNewsDto({ publishedAt: 'not-a-date' })).date).toBe('');
+        expect(mapToEventsNews(createPublishedEventNewsDto({ publishedAt: 'not-a-date' } as any)).date).toBe('');
     });
 
     it('returns no tags when the news has no categories', () => {
         expect(mapToEventsNews(createPublishedEventNewsDto({ category: undefined })).tag).toEqual(undefined);
-    });
-
-    it('always returns an empty sections list', () => {
-        expect(mapToEventsNews(createPublishedEventNewsDto()).sections).toEqual([]);
     });
 
     describe('translation fallback', () => {
@@ -73,7 +68,7 @@ describe('mapToEventsNews', () => {
 
         it('mixes translated and Ukrainian fields when only some fields are translated', () => {
             const dto = createPublishedEventNewsDto({
-                localizations: [{ language: english, title: 'English title', description: null }],
+                localizations: [{ language: english, title: 'English title', description: undefined }],
             });
 
             const result = mapToEventsNews(dto, 'en');

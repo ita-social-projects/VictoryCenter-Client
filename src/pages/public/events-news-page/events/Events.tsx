@@ -96,17 +96,8 @@ export const Events = ({ title, tags, isTitleHidden }: EventsProps) => {
                     </div>
                 )}
 
-                {events.map((item: any) => (
-                    <SingleEventNews
-                        key={item?.id}
-                        {...item}
-                        name={item.title || item.name}
-                        date={item.publishedAt || item.date}
-                        id={String(item.id)}
-                        previewImage={
-                            typeof item.previewImage === 'string' ? item.previewImage : (item.previewImage?.url ?? null)
-                        }
-                    />
+                {events.map((item) => (
+                    <SingleEventNews key={item.id} {...item} />
                 ))}
 
                 {isLoading && <LinearProgress />}

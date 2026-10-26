@@ -1,6 +1,4 @@
 import { Image } from '@/types/common/image';
-import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { EntityLocalization } from '@/types/common/language';
 
 export interface chooseProgramData {
     title: string;
@@ -11,7 +9,7 @@ export interface chooseProgramData {
 export interface Tag {
     id: string;
     name: string;
-    localizations?: EntityLocalization[];
+    localizations?: EventNewsCategoryLocalizationDto[];
 }
 
 export interface EventsData {
@@ -34,11 +32,10 @@ export interface EventsNews {
     date: string;
     tag?: Tag;
     tags?: Tag[];
-    previewImage: Image | string | { url?: string } | null; // string для моків, Image для реальних даних
-    backgroundImage: Image | string | null; // string для моків, Image для реальних даних
+    previewImage: Image | string | { url?: string } | null;
+    backgroundImage: Image | string | null;
     slug: string;
-    sections: HippotherapyProgramSectionDto[];
-    localizations?: EntityLocalization[];
+    localizations?: PublishedEventNewsLocalizationDto[];
 }
 
 export interface LocalizationLanguageDto {
@@ -67,17 +64,17 @@ export interface PublishedEventNewsLocalizationDto {
 
 export interface PublishedEventNewsDto {
     id: number;
-    title?: string | null;
-    description?: string | null;
-    additionalDescription?: string | null;
-    slug?: string | null;
-    resource?: string | null;
-    resourceEn?: string | null;
-    publishedAt?: string | null;
-    previewImage?: Image | null;
+    title: string;
+    description: string;
+    additionalDescription?: string;
+    slug: string;
+    resource?: string;
+    resourceEn?: string;
+    publishedAt: string;
+    previewImage?: Image;
     backgroundImage?: Image | null;
-    category?: EventNewsCategoryDto | null;
-    localizations: PublishedEventNewsLocalizationDto[];
+    category?: EventNewsCategoryDto;
+    localizations?: PublishedEventNewsLocalizationDto[];
 }
 
 export interface PublicEventsPageDto {

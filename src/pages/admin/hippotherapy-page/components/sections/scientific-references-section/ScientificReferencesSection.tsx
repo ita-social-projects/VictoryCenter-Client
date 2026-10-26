@@ -11,6 +11,7 @@ import {
     HippotherapyScientificReference,
     HippotherapyScientificReferencesSectionContent,
 } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
 
@@ -18,6 +19,12 @@ export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
     onChange: (value: HippotherapyScientificReferencesSectionContent) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
+    onTranslateGeneralClick?: () => void;
+    isTranslateGeneralDisabled?: boolean;
+    onTranslateReferenceClick?: (localId: string) => void;
+    isTranslateReferenceDisabled?: (localId: string) => boolean;
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
@@ -29,7 +36,17 @@ const validateReferenceName = (text: string) =>
 const validateReferenceUrl = (text: string) =>
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_URL_LENGTH);
 
-const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: ScientificReferencesSectionProps) => {
+const ScientificReferencesSectionComponent = ({
+    value,
+    onChange,
+    disabled,
+    onTranslateClick,
+    isTranslateDisabled,
+    onTranslateGeneralClick,
+    isTranslateGeneralDisabled,
+    onTranslateReferenceClick,
+    isTranslateReferenceDisabled,
+}: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
@@ -157,9 +174,18 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
         setUrlErrors((prev) => ({ ...prev, [localId]: validateReferenceUrl(reference?.url ?? '') }));
     };
 
+    const generalTranslateClick = onTranslateGeneralClick ?? onTranslateClick;
+    const generalTranslateDisabled = isTranslateGeneralDisabled ?? isTranslateDisabled;
+
     return (
         <div className="scientific-references-section">
             <div className="scientific-references-section-summary">
+                {generalTranslateClick && (
+                    <SectionTranslationHeader
+                        onTranslateClick={generalTranslateClick}
+                        isTranslateDisabled={generalTranslateDisabled}
+                    />
+                )}
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                     isRequired
@@ -204,6 +230,12 @@ const ScientificReferencesSectionComponent = ({ value, onChange, disabled }: Sci
                         onUrlChange={handleUrlChange}
                         onNameBlur={handleNameBlur}
                         onUrlBlur={handleUrlBlur}
+                        onTranslateClick={
+                            onTranslateReferenceClick ? () => onTranslateReferenceClick(reference.localId) : undefined
+                        }
+                        isTranslateDisabled={
+                            isTranslateReferenceDisabled ? isTranslateReferenceDisabled(reference.localId) : false
+                        }
                     />
                 ))}
                 <Button

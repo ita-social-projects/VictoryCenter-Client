@@ -50,7 +50,7 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{FAQ_TEXT.FORM.TITLE.DELETE_FAQ}</Modal.Title>
             <Modal.Content>
-                {isPublished && <p>{FAQ_TEXT.QUESTION.DELETE_PUBLISHED_FAQ}</p>}
+                {isPublished && <p className="delete-published-text">{FAQ_TEXT.QUESTION.DELETE_PUBLISHED_FAQ}</p>}
                 {error && <div className="delete-faq-error-container">{error}</div>}
             </Modal.Content>
             <Modal.Actions>

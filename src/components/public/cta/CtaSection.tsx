@@ -8,6 +8,8 @@ import styles from './CtaSection.module.scss';
 interface CtaButtonConfig {
     label: string;
     href: string;
+    target?: React.HTMLAttributeAnchorTarget;
+    rel?: string;
 }
 
 interface CtaSectionProps {
@@ -37,6 +39,8 @@ export const CtaSection: React.FC<CtaSectionProps> = memo(
                                 <Button
                                     key={`${btn.href}-${index}`}
                                     href={btn.href}
+                                    target={btn.target}
+                                    rel={btn.rel}
                                     variant={variant}
                                     className={styles.button}
                                 >

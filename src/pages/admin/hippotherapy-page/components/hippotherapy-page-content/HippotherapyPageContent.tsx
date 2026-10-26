@@ -2,12 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { HippotherapyPageApi } from '@/services/api/admin/hippotherapy-page/hippotherapy-page-api';
 import {
     HippotherapyGallerySectionContent,
     HippotherapyImageValue,
     HippotherapyPageContentModel,
+    HippotherapyPageLocalization,
+    HippotherapyPageLocalizationBlock,
 } from '@/types/admin/hippotherapy-page';
 import { isHippotherapyPageContentValid } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -25,7 +28,17 @@ import { HippoventionCenterSection } from '../sections/hippovention-center-secti
 import { GallerySection } from '../sections/gallery-section/GallerySection';
 import { ScientificReferencesSection } from '../sections/scientific-references-section/ScientificReferencesSection';
 import { EthicsSection } from '../sections/ethics-section/EthicsSection';
+import {
+    HippotherapyTranslationSubBlock,
+    TranslateHippotherapySectionModal,
+} from '../translate-section-modal/TranslateHippotherapySectionModal';
 import './HippotherapyPageContent.scss';
+
+interface TranslationTarget {
+    block: HippotherapyPageLocalizationBlock;
+    subBlock?: HippotherapyTranslationSubBlock | null;
+    targetResearchLocalId?: string | null;
+}
 
 const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPageContentModel => ({
     localizations: [],
@@ -143,6 +156,30 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
 
 const isNotFoundError = (error: unknown): boolean => axios.isAxiosError(error) && error.response?.status === 404;
 
+const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.quoteSection?.quoteText?.trim());
+
+const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(localization?.anotherQuoteSection?.quoteText?.trim());
+
+const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        localization?.scientificReferencesSection?.title?.trim() ||
+            localization?.scientificReferencesSection?.description?.trim(),
+    );
+
+const hasScientificReferenceTranslation = (
+    localization: HippotherapyPageLocalization | null,
+    referenceId: number | null,
+): boolean => {
+    if (referenceId === null || !localization?.scientificReferencesSection?.scientificReferences) {
+        return false;
+    }
+    return localization.scientificReferencesSection.scientificReferences.some(
+        (ref) => ref.id === referenceId && Boolean(ref.name?.trim()),
+    );
+};
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -151,6 +188,30 @@ export const HippotherapyPageContent = () => {
     const [draftContent, setDraftContent] = useState<HippotherapyPageContentModel | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [hasPublished, setHasPublished] = useState(false);
+    const [translationTarget, setTranslationTarget] = useState<TranslationTarget | null>(null);
+
+    const setLanguagesErrorState = useCallback(
+        (message: string) => {
+            addToast(message, ToastType.Error);
+        },
+        [addToast],
+    );
+
+    const { translationLanguages } = useLocalizationToolkit({ setErrorState: setLanguagesErrorState });
+
+    const englishLanguage = useMemo(
+        () => translationLanguages.find((lang) => lang.code === 'en'),
+        [translationLanguages],
+    );
+
+    const targetLocalization = useMemo(
+        () =>
+            fetchedContent?.localizations?.find(
+                (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
+            ) ?? null,
+        [fetchedContent, englishLanguage],
+    );
 
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
 
@@ -266,6 +327,7 @@ export const HippotherapyPageContent = () => {
             const result = await HippotherapyPageApi.update(client, draftContent);
             setFetchedContent(result);
             setDraftContent(result);
+            setHasPublished(true);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Info);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
@@ -277,6 +339,40 @@ export const HippotherapyPageContent = () => {
 
     const isDisabled = isPublishing;
     const isNotFound = isNotFoundError(error);
+    const isNeverPublished = isNotFound && !hasPublished;
+    const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
+
+    const canTranslate = translationLanguages.length > 0;
+
+    const translationHandlers = useMemo(
+        () => ({
+            quoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Quote }),
+            anotherQuoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.AnotherQuote }),
+            scientificGeneral: () =>
+                setTranslationTarget({
+                    block: HippotherapyPageLocalizationBlock.ScientificReferences,
+                    subBlock: 'general',
+                }),
+            scientificReference: (localId: string) =>
+                setTranslationTarget({
+                    block: HippotherapyPageLocalizationBlock.ScientificReferences,
+                    subBlock: 'research',
+                    targetResearchLocalId: localId,
+                }),
+        }),
+        [],
+    );
+
+    const isTranslateReferenceDisabled = useCallback(
+        (localId: string) => {
+            if (isTranslateDisabled || !fetchedContent) return true;
+            const reference = fetchedContent.scientificReferencesSection.scientificReferences.find(
+                (ref) => ref.localId === localId,
+            );
+            return !reference || hasScientificReferenceTranslation(targetLocalization, reference.id);
+        },
+        [isTranslateDisabled, fetchedContent, targetLocalization],
+    );
 
     const renderContent = () => {
         if (isLoading) {
@@ -316,6 +412,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.introSection}
                     onImageError={imageErrorHandlers.introSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <TextCardSection
@@ -323,6 +420,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.descriptionSection}
                     fieldIdPrefix="hippotherapy-description"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -332,6 +430,8 @@ export const HippotherapyPageContent = () => {
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.QUOTE}
                     onImageError={imageErrorHandlers.quoteSection}
                     disabled={isDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.quoteSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasQuoteTranslation(targetLocalization)}
                 />
                 <hr />
                 <TextCardSection
@@ -339,6 +439,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionSection}
                     fieldIdPrefix="hippotherapy-hippovention"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <HippoventionCenterSection
@@ -346,6 +447,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionCenterSection}
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <GallerySection
@@ -355,6 +457,7 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ADVANTAGES_CARDS}
                     onCardImageError={imageErrorHandlers.advantagesSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <TextCardSection
@@ -362,12 +465,19 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.analysisSection}
                     fieldIdPrefix="hippotherapy-analysis"
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <ScientificReferencesSection
                     value={draftContent.scientificReferencesSection}
                     onChange={sectionHandlers.scientificReferencesSection}
                     disabled={isDisabled}
+                    onTranslateGeneralClick={canTranslate ? translationHandlers.scientificGeneral : undefined}
+                    isTranslateGeneralDisabled={
+                        isTranslateDisabled || hasScientificGeneralTranslation(targetLocalization)
+                    }
+                    onTranslateReferenceClick={canTranslate ? translationHandlers.scientificReference : undefined}
+                    isTranslateReferenceDisabled={isTranslateReferenceDisabled}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -377,6 +487,8 @@ export const HippotherapyPageContent = () => {
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ANOTHER_QUOTE}
                     onImageError={imageErrorHandlers.anotherQuoteSection}
                     disabled={isDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.anotherQuoteSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasAnotherQuoteTranslation(targetLocalization)}
                 />
                 <hr />
                 <GallerySection
@@ -386,6 +498,7 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.PARTICIPANTS_CARDS}
                     onCardImageError={imageErrorHandlers.participantsSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <hr />
                 <EthicsSection
@@ -393,6 +506,7 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
+                    isTranslateDisabled={isTranslateDisabled}
                 />
                 <div className="hippotherapy-page-publish">
                     <Button
@@ -418,6 +532,14 @@ export const HippotherapyPageContent = () => {
                 onConfirm={handlePublish}
                 onCancel={() => setConfirmationModalOpen(false)}
                 isButtonsDisabled={isPublishing}
+            />
+            <TranslateHippotherapySectionModal
+                isOpen={translationTarget != null}
+                onClose={() => setTranslationTarget(null)}
+                block={translationTarget?.block ?? null}
+                subBlock={translationTarget?.subBlock}
+                targetResearchLocalId={translationTarget?.targetResearchLocalId}
+                translatedLanguages={translationLanguages}
             />
             <ToastContainer />
         </>

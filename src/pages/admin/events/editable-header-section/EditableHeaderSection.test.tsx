@@ -139,6 +139,22 @@ describe('EditableHeaderSection', () => {
         expect(screen.queryByLabelText(defaultProps.inputLabel)).not.toBeInTheDocument();
     });
 
+    it('renders headerExtra next to the heading in view mode but not in edit mode', () => {
+        const { rerender } = renderSection({ headerExtra: <span data-testid="header-extra">EN</span> });
+
+        expect(screen.getByTestId('header-extra')).toBeInTheDocument();
+
+        rerender(
+            <EditableHeaderSection
+                {...defaultProps}
+                mode="edit"
+                headerExtra={<span data-testid="header-extra">EN</span>}
+            />,
+        );
+
+        expect(screen.queryByTestId('header-extra')).not.toBeInTheDocument();
+    });
+
     it('renders the complete long description in view mode', () => {
         const longDescription =
             'Довгий опис подій для перевірки відображення всього тексту без прихованої частини у режимі перегляду.';

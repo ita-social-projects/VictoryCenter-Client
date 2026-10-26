@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
@@ -42,6 +42,8 @@ export interface EditableHeaderSectionProps {
     isHidden?: boolean;
     onToggleVisibility?: () => void;
     isToggleVisibilityDisabled?: boolean;
+    /** Rendered next to the heading, e.g. per-language translation status indicators. */
+    headerExtra?: ReactNode;
 }
 
 const sanitizeViewHtml = (html: string) =>
@@ -96,6 +98,7 @@ export const EditableHeaderSection = ({
     isHidden,
     onToggleVisibility,
     isToggleVisibilityDisabled = false,
+    headerExtra,
 }: EditableHeaderSectionProps) => {
     const [draftValue, setDraftValue] = useState(initialPublishedHtml);
     const [validationError, setValidationError] = useState<string>();
@@ -169,10 +172,13 @@ export const EditableHeaderSection = ({
             >
                 {!isEditMode && (
                     <div className={styles['editable-header-section-heading-row']}>
-                        <h2>
-                            <span className={styles['editable-header-section-required-mark']}>*</span>
-                            {heading}
-                        </h2>
+                        <div className={styles['editable-header-section-heading-group']}>
+                            <h2>
+                                <span className={styles['editable-header-section-required-mark']}>*</span>
+                                {heading}
+                            </h2>
+                            {headerExtra}
+                        </div>
                         <div className={styles['editable-header-section-actions']}>
                             {onTranslate && (
                                 <button

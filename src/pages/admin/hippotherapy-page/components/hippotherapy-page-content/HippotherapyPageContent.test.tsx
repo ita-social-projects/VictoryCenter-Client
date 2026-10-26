@@ -16,7 +16,15 @@ function mockDisabledAttr(isDisabled: unknown) {
     return String(Boolean(isDisabled));
 }
 
-function mockTranslateButton({ onClick, disabled, label }: { onClick?: () => void; disabled?: boolean; label: string }) {
+function mockTranslateButton({
+    onClick,
+    disabled,
+    label,
+}: {
+    onClick?: () => void;
+    disabled?: boolean;
+    label: string;
+}) {
     return onClick ? (
         <button disabled={disabled} onClick={onClick}>
             Translate {label}
@@ -261,9 +269,7 @@ const buildContent = (): HippotherapyPageContentModel => ({
 
 const withEnglishLocalization = (localization: Record<string, unknown>): HippotherapyPageContentModel => ({
     ...buildContent(),
-    localizations: [
-        { language: { id: 2, code: 'en' }, translationStatus: 1, ...localization } as any,
-    ],
+    localizations: [{ language: { id: 2, code: 'en' }, translationStatus: 1, ...localization } as any],
 });
 
 const SECTION_TEST_IDS = [
@@ -601,9 +607,7 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('disables the Advantages translation icon when an English translation exists', async () => {
-            await renderLoaded(
-                withEnglishLocalization({ advantagesSection: { title: 'English title', cards: [] } }),
-            );
+            await renderLoaded(withEnglishLocalization({ advantagesSection: { title: 'English title', cards: [] } }));
 
             expect(translateButton('hippotherapy-advantages')).toBeDisabled();
         });
@@ -727,7 +731,7 @@ describe('HippotherapyPageContent', () => {
 
     describe('scientific references section translation', () => {
         it.each([
-            ['general block', 'Translate research-general', 'Edit research', 'general', undefined],
+            ['general block', 'Translate research-general', 'Edit research', 'general', expect.any(String)],
             ['specific reference item', 'Translate research-item', 'Edit reference item', 'research', 'local-1'],
         ])(
             'opens the translation modal for the %s and disables when edited',
@@ -741,11 +745,8 @@ describe('HippotherapyPageContent', () => {
 
                 expectTranslationModalBlock(HippotherapyPageLocalizationBlock.ScientificReferences);
                 expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent(expectedSubBlock);
-                if (expectedTargetId) {
-                    expect(screen.getByTestId('translate-section-modal-target-id')).toHaveTextContent(
-                        expectedTargetId,
-                    );
-                }
+                const targetId = screen.getByTestId('translate-section-modal-target-id');
+                expect(targetId.textContent).toEqual(expectedTargetId);
 
                 closeTranslationModal();
 

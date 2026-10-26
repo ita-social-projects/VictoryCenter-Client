@@ -7,7 +7,6 @@ import { useDataPaginationFetch } from '@/hooks/admin/fetch/use-data-pagination-
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 import styles from './RecommendedArticles.module.scss';
-import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 const RecommendedArticlesBase: React.FC = () => {
     const { t } = useTranslation('eventsNewsPage');

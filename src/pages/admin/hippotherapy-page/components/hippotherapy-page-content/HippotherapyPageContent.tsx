@@ -180,6 +180,13 @@ const hasScientificReferenceTranslation = (
     );
 };
 
+const hasHippoventionCenterTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        localization?.hippoventionCenterSection?.title?.trim() ||
+            localization?.hippoventionCenterSection?.pros?.trim() ||
+            localization?.hippoventionCenterSection?.description?.trim(),
+    );
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -359,6 +366,8 @@ export const HippotherapyPageContent = () => {
                     subBlock: 'research',
                     targetResearchLocalId: localId,
                 }),
+            hippoventionCenterSection: () =>
+                setTranslationTarget({ block: HippotherapyPageLocalizationBlock.HippoventionCenter }),
         }),
         [],
     );
@@ -447,7 +456,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionCenterSection}
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.hippoventionCenterSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasHippoventionCenterTranslation(targetLocalization)}
                 />
                 <hr />
                 <GallerySection

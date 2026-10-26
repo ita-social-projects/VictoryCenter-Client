@@ -338,6 +338,7 @@ describe('TranslateEventsIntroModal', () => {
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
 
         expect(onSaveSuccess).toHaveBeenCalledTimes(1);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
         expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));

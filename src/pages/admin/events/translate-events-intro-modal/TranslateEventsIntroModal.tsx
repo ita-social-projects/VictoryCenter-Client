@@ -126,7 +126,11 @@ export const TranslateEventsIntroModal = ({
 
             const isIntroSectionRefreshed = await onSaveSuccess();
 
-            if (isIntroSectionRefreshed) closeModal();
+            if (isIntroSectionRefreshed) {
+                closeModal();
+            } else {
+                setSaveError(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA);
+            }
         } catch {
             setSaveError(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
         } finally {

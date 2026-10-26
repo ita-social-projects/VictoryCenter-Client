@@ -1,0 +1,9 @@
+.section-translation-header {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+
+    &-button {
+        margin-left: auto;
+    }
+}

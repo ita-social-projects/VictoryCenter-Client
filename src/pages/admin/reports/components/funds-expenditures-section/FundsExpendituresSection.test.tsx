@@ -17,6 +17,7 @@ import {
     ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { ToastType } from '@/types/admin/toast';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -159,6 +160,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isEditing,
         isAddIncomeDisabled,
         isAddExpenseDisabled,
+        categoryLimitMessage,
         onTypeChange,
         onCategoryChange,
         onExchangeRateChange,
@@ -172,6 +174,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isEditing: boolean;
         isAddIncomeDisabled: boolean;
         isAddExpenseDisabled: boolean;
+        categoryLimitMessage?: string;
         onTypeChange: (v: unknown) => void;
         onCategoryChange: (v: unknown) => void;
         onExchangeRateChange: (v: string) => void;
@@ -185,6 +188,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
             data-editing={String(isEditing)}
             data-add-income-disabled={String(isAddIncomeDisabled)}
             data-add-expense-disabled={String(isAddExpenseDisabled)}
+            data-category-limit-message={categoryLimitMessage ?? ''}
         >
             <span data-testid="exchange-rate">{exchangeRate}</span>
             <span data-testid="selected-category-id">{selectedCategoryId ?? 'none'}</span>
@@ -1799,6 +1803,233 @@ describe('FundsExpenditureSection onSelectionChange callback', () => {
 
         await waitFor(() => {
             expect(mockOnSelectionChange).toHaveBeenLastCalledWith(false);
+        });
+    });
+});
+
+describe('FundsExpenditureSection category limit', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        // Records: 3 income + 3 regular expense + 1 reserved 'Програмні' expense.
+        // Summary reports zero categories so the limit can only come from the records.
+        setupMockDataFetch(
+            MOCK_FUNDS_EXPENDITURES_SETTINGS,
+            MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            MOCK_FUNDS_EXPENDITURES_RECORDS,
+            {
+                ...MOCK_FUNDS_EXPENDITURES_SUMMARY,
+                incomeCategories: 0,
+                expenseCategories: 0,
+            },
+        );
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    const { LIMIT_INCOME, LIMIT_EXPENSE, LIMIT_BOTH } = FUNDS_EXPENDITURES_TEXT.MESSAGE;
+
+    const getToolbar = () => screen.getByTestId('funds-toolbar');
+
+    const expectLimitState = (incomeDisabled: boolean, expenseDisabled: boolean, message = '') => {
+        expect(getToolbar()).toHaveAttribute('data-add-income-disabled', String(incomeDisabled));
+        expect(getToolbar()).toHaveAttribute('data-add-expense-disabled', String(expenseDisabled));
+        expect(getToolbar()).toHaveAttribute('data-category-limit-message', message);
+    };
+
+    const addRecord = (type: 'income' | 'expense') => {
+        fireEvent.click(screen.getByTestId(type === 'income' ? 'open-add-income' : 'open-add-expense'));
+        fireEvent.click(screen.getByTestId('add-record-submit'));
+    };
+
+    const deleteRecordVia = (testIds: string[]) => {
+        testIds.forEach((testId) => fireEvent.click(screen.getByTestId(testId)));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+    };
+
+    it('does not count the reserved program category toward the expense limit', () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        expectLimitState(false, false);
+    });
+
+    it.each([
+        { type: 'income' as const, incomeDisabled: true, expenseDisabled: false, message: LIMIT_INCOME },
+        { type: 'expense' as const, incomeDisabled: false, expenseDisabled: true, message: LIMIT_EXPENSE },
+    ])(
+        'disables add $type after the 4th unpublished $type record is added',
+        async ({ type, incomeDisabled, expenseDisabled, message }) => {
+            render(<FundsExpenditureSection isEditing />);
+
+            addRecord(type);
+
+            await waitFor(() => expectLimitState(incomeDisabled, expenseDisabled, message));
+        },
+    );
+
+    it('shows the combined message when both limits are reached', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('income');
+        addRecord('expense');
+
+        await waitFor(() => expectLimitState(true, true, LIMIT_BOTH));
+    });
+
+    it('re-enables add income when a record is removed after reaching the limit', async () => {
+        render(<FundsExpenditureSection isEditing />);
+
+        addRecord('income');
+        await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+
+        deleteRecordVia(['trigger-record-delete']);
+
+        await waitFor(() => expectLimitState(false, false));
+    });
+
+    describe('when the limit is reached by already published records', () => {
+        // 4 income + 4 regular expense records + 1 reserved 'Програмні' record
+        const fullRecords: ReportFundsExpendituresRecord[] = [
+            ...MOCK_FUNDS_EXPENDITURES_RECORDS,
+            { id: 8, categoryId: 4, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+            { id: 9, categoryId: 9, type: 'expense', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+        ];
+        const fullCategories: ReportFundsExpendituresCategory[] = [
+            ...MOCK_FUNDS_EXPENDITURES_CATEGORIES,
+            { id: 9, name: 'Оренда', type: 'expense', localizations: [] },
+        ];
+
+        beforeEach(() => {
+            setupMockDataFetch(MOCK_FUNDS_EXPENDITURES_SETTINGS, fullCategories, fullRecords, {
+                ...MOCK_FUNDS_EXPENDITURES_SUMMARY,
+                incomeCategories: 4,
+                expenseCategories: 4,
+            });
+        });
+
+        it('starts with both add buttons disabled', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            expectLimitState(true, true, LIMIT_BOTH);
+        });
+
+        it.each([
+            {
+                action: 'deleting a published income record',
+                testIds: ['filter-income', 'trigger-record-delete'],
+                incomeDisabled: false,
+                expenseDisabled: true,
+                message: LIMIT_EXPENSE,
+            },
+            {
+                action: 'deleting a published non-program expense record',
+                testIds: ['filter-expense', 'trigger-record-delete'],
+                incomeDisabled: true,
+                expenseDisabled: false,
+                message: LIMIT_INCOME,
+            },
+            {
+                action: 'bulk-deleting a published income record',
+                testIds: ['select-row-1', 'delete-selected'],
+                incomeDisabled: false,
+                expenseDisabled: true,
+                message: LIMIT_EXPENSE,
+            },
+        ])(
+            're-enables the matching add button right after $action',
+            async ({ testIds, incomeDisabled, expenseDisabled, message }) => {
+                render(<FundsExpenditureSection isEditing />);
+
+                deleteRecordVia(testIds);
+
+                await waitFor(() => expectLimitState(incomeDisabled, expenseDisabled, message));
+            },
+        );
+    });
+
+    describe('refetches after publishing', () => {
+        const SLOT = { settings: 0, records: 2, summary: 3 };
+
+        const getRefetchCallCount = (slot: number) =>
+            mockUseDataFetch.mock.results
+                .filter((_, index) => index % 5 === slot)
+                .reduce((count, result) => count + (result.value.refetch as jest.Mock).mock.calls.length, 0);
+
+        const setupPublish = () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            mockUpdateSettings.mockResolvedValueOnce({ id: 1, disclaimerTitle: 'Updated', exchangeRate: '42.18' });
+            mockBatchSaveRecords.mockResolvedValueOnce(undefined);
+
+            render(
+                <FundsExpenditureSection
+                    isEditing
+                    registerSaveCallback={(fn) => {
+                        saveFn = fn;
+                    }}
+                />,
+            );
+
+            return () => saveFn!();
+        };
+
+        it('refetches settings, records and summary when records changed', async () => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBeGreaterThan(0);
+        });
+
+        it('refetches only settings when records did not change', async () => {
+            const save = setupPublish();
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBe(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBe(0);
+        });
+
+        const failRefetch = (slot: number) =>
+            mockUseDataFetch.mock.results
+                .filter((_, index) => index % 5 === slot)
+                .forEach((result) => (result.value.refetch as jest.Mock).mockRejectedValue(new Error('Network Error')));
+
+        it('does not warn when every refetch succeeds', async () => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(mockAddToast).not.toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA,
+                ToastType.Warning,
+            );
+        });
+
+        it.each([
+            { failed: 'settings', slot: SLOT.settings },
+            { failed: 'records', slot: SLOT.records },
+            { failed: 'summary', slot: SLOT.summary },
+        ])('still publishes, runs the other refetches and warns when the $failed refetch fails', async ({ slot }) => {
+            const save = setupPublish();
+
+            addRecord('income');
+            await waitFor(() => expectLimitState(true, false, LIMIT_INCOME));
+            failRefetch(slot);
+
+            await expect(save()).resolves.toBe(true);
+
+            expect(getRefetchCallCount(SLOT.settings)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.records)).toBeGreaterThan(0);
+            expect(getRefetchCallCount(SLOT.summary)).toBeGreaterThan(0);
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, ToastType.Warning);
+            expect(mockAddToast).not.toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         });
     });
 });

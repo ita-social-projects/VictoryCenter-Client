@@ -4,18 +4,22 @@ import { EventsNews } from '@/types/public/events-news';
 import { LinearProgress } from '@mui/material';
 import { SingleEventNews } from '../../events-news-page/events/single-event-news/SingleEventNews';
 import { useDataPaginationFetch } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { EventsNewsApi } from '@/services/api/public/events-news/events-news-api';
 import styles from './RecommendedArticles.module.scss';
 
 const RecommendedArticlesBase: React.FC = () => {
     const { t } = useTranslation('eventsNewsPage');
 
-    const getEvents = useCallback(async () => EventsNewsApi.get('', 0, 2), []);
+    const { currentLanguage } = useLocale();
+
+    const getEvents = useCallback(async () => EventsNewsApi.get('', 0, 2, currentLanguage), [currentLanguage]);
 
     const { data, isLoading, error } = useDataPaginationFetch<EventsNews>({
         initialData: [],
         fetchHandler: getEvents,
         autoFetchDisabled: false,
+        autoFetchDependencies: [currentLanguage],
         pageSize: 2,
     });
 

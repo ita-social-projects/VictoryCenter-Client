@@ -449,11 +449,21 @@ export const FundsExpenditureSection = ({
     useEffect(() => {
         setSelectedRecordIds((prev) => (prev.length === 0 ? prev : []));
     }, [selectedType, selectedCategoryId]);
+    // Counted from local records (not summary) so unpublished additions hit the limit too; one record per category.
+    const usedCategoryCounts = useMemo(() => {
+        const countByType = (type: FundsExpendituresTransactionType) =>
+            enrichedRecords.filter(
+                (record) =>
+                    record.type === type && !isReservedFundsExpendituresCategoryName(record.categoryName, record.type),
+            ).length;
+
+        return { income: countByType('income'), expense: countByType('expense') };
+    }, [enrichedRecords]);
 
     const hasReachedIncomeCategoryLimit =
-        summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+        usedCategoryCounts.income >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
     const hasReachedExpenseCategoryLimit =
-        summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+        usedCategoryCounts.expense >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
     const isAddIncomeDisabled = hasReachedIncomeCategoryLimit || hasSelectedRecords || hasExchangeRateError;
     const isAddExpenseDisabled = hasReachedExpenseCategoryLimit || hasSelectedRecords || hasExchangeRateError;
     const categoryLimitMessage = getCategoryLimitMessage(hasReachedIncomeCategoryLimit, hasReachedExpenseCategoryLimit);
@@ -778,12 +788,20 @@ export const FundsExpenditureSection = ({
 
             fetchDisclaimerLocalizations(updatedSettings.id);
 
-            try {
-                await refetchSettings(true);
-                if (hasRecordChanges) {
-                    await refetchRecords(true);
-                }
-            } catch {}
+            let hasRefetchFailed = false;
+            const markRefetchFailed = () => {
+                hasRefetchFailed = true;
+            };
+
+            await refetchSettings(true).catch(markRefetchFailed);
+            if (hasRecordChanges) {
+                await refetchRecords(true).catch(markRefetchFailed);
+                await refetchSummary(true).catch(markRefetchFailed);
+            }
+
+            if (hasRefetchFailed) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA, ToastType.Warning);
+            }
 
             return true;
         } catch {
@@ -799,6 +817,7 @@ export const FundsExpenditureSection = ({
         onExchangeRateValueChange,
         refetchSettings,
         refetchRecords,
+        refetchSummary,
         programYearValue,
         updatedRecordIds,
         recordsState,

@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { CardContent } from '../../card-content/CardContent';
 import './CardsSection.scss';
 import { Button } from '@/components/admin/button/Button';
-import { ContentType } from '@/types/common/about-us';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
-import { LocalizationLanguage } from '@/types/common/language';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { ContentType } from '@/types/common/about-us';
+import { LocalizationLanguage } from '@/types/common/language';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface CardsSectionProps {
@@ -44,17 +44,14 @@ export const CardsSection = ({
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
-    const handleDescriptionValidate = (id: number, value: string) => {
-        const plainText = getPlainTextFromHtml(value);
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
-
+    const handleDescriptionError = (id: number, error: string | null) => {
         setErrors((prev) => {
             const cardErrors = prev[id] || { image: null, description: null };
             return {
                 ...prev,
                 [id]: {
                     ...cardErrors,
-                    description: error || null,
+                    description: error,
                 },
             };
         });
@@ -77,6 +74,40 @@ export const CardsSection = ({
         return null;
     }
 
+    const handlePublish = () => {
+        const updatedErrors = { ...errors };
+
+        cardContents.forEach((card) => {
+            const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(
+                getPlainTextFromHtml(card.description ?? ''),
+            );
+
+            updatedErrors[card.id] = {
+                image: errors[card.id]?.image ?? null,
+                description: descriptionError || null,
+            };
+        });
+
+        setErrors(updatedErrors);
+
+        const hasErrors = cardContents.some((card) => {
+            const error = updatedErrors[card.id];
+            return error?.description != null || error?.image != null;
+        });
+
+        if (hasErrors || !isPublishButtonActive || !isBaseLanguage) return;
+
+        onPublish();
+    };
+
+    const isPublishDisabled =
+        cardContents.some((card) =>
+            Boolean(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(card.description ?? ''))),
+        ) ||
+        cardContents.some((card) => errors[card.id]?.image != null) ||
+        !isPublishButtonActive ||
+        !isBaseLanguage;
+
     return (
         <>
             <div className="cards-section-wrapper">
@@ -97,8 +128,7 @@ export const CardsSection = ({
                             key={c.id}
                             content={c}
                             onChange={onChange}
-                            onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value)}
-                            descriptionError={errors[c.id]?.description ?? null}
+                            onDescriptionValidate={(error) => handleDescriptionError(c.id, error)}
                             imageError={errors[c.id]?.image ?? null}
                             setImageError={(value) => handleSetImageError(c.id, value)}
                             descriptionLimit={descriptionLimit}
@@ -114,13 +144,9 @@ export const CardsSection = ({
                     <Button
                         className="button"
                         buttonStyle="primary"
-                        onClick={onPublish}
+                        onClick={handlePublish}
                         type="submit"
-                        disabled={
-                            Object.values(errors).some((error) => error.description != null) ||
-                            !isPublishButtonActive ||
-                            !isBaseLanguage
-                        }
+                        disabled={isPublishDisabled}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>

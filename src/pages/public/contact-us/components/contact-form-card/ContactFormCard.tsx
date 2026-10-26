@@ -115,6 +115,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
     const subjectValue = watch('subject') ?? '';
     const messageValue = watch('message') ?? '';
+    const isFormValid = contactFormSchema.isValidSync(watch());
 
     const subjectHint = getCharacterLimitHint(
         subjectValue.length,
@@ -338,7 +339,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 <button
                     type="submit"
                     className={styles['contact-form-submit']}
-                    disabled={!turnstileToken || Object.keys(errors).length > 0}
+                    disabled={!turnstileToken || !isFormValid}
                 >
                     {submitLabel}
                 </button>

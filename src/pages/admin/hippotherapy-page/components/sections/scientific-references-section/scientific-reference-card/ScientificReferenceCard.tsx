@@ -6,6 +6,7 @@ import { ACTION_ICONS } from '@/const/common/action-icons';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputError } from '@/components/admin/input-error/InputError';
 import './ScientificReferenceCard.scss';
 import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
@@ -26,6 +27,8 @@ export interface ScientificReferenceCardProps {
     onUrlChange: (localId: string, value: string) => void;
     onNameBlur: (localId: string) => void;
     onUrlBlur: (localId: string) => void;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 export const ScientificReferenceCard = ({
@@ -44,6 +47,8 @@ export const ScientificReferenceCard = ({
     onUrlChange,
     onNameBlur,
     onUrlBlur,
+    onTranslateClick,
+    isTranslateDisabled,
 }: ScientificReferenceCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +71,16 @@ export const ScientificReferenceCard = ({
                 >
                     {isExpanded ? <CrossIcon /> : <ArrowIcon className="scientific-reference-card-arrow-icon" />}
                 </button>
+                {onTranslateClick && (
+                    <IconButton
+                        type="button"
+                        className="scientific-reference-card-translate-button"
+                        aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                        onClick={onTranslateClick}
+                        disabled={disabled || isTranslateDisabled}
+                    />
+                )}
                 {canDelete && (
                     <IconButton
                         type="button"

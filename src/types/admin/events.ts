@@ -38,6 +38,7 @@ export interface EventItemDto extends EntityWithLocalizations<EventLocalization>
     previewImage: Image | ImageValues | null;
     backgroundImage: Image | ImageValues | null;
     priority: number;
+    categories?: EventSearchItemCategory[];
 }
 
 export type EventItemResponseDto = Omit<EventItemDto, 'localizations'> &
@@ -88,18 +89,16 @@ export interface EventSaveSuccessData {
     shouldMoveDraftToTop: boolean;
 }
 
-export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
+export type EventsErrorType = 'categories' | 'events-items' | 'search' | 'events-reorder';
 
 export interface ErrorState {
     message: string | null;
     type: EventsErrorType | null;
 }
 
-// this is a test interface and most probably will need adjustments in the future
-export interface EventSearchItemData {
+export interface EventSearchItemCategory {
     id: number;
     name: string;
-    categories: string[];
 }
 
 // this is a test interface and most probably will need adjustments in the future
@@ -111,11 +110,39 @@ export interface EventsLocalizableFields {
     meetingsCount: string;
 }
 
-export interface EventsIntroSectionDto {
+export interface EventsIntroSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionLocalization extends EntityLocalization {
+    entityId: number;
+    eventsBlockTitle: string;
+    pageDescription: string;
+}
+
+export interface EventsIntroSectionDto extends EntityWithLocalizations<EventsIntroSectionLocalization> {
+    id: number;
     eventsBlockTitle: string;
     pageDescription: string;
     isEventsBlockTitleHidden: boolean;
     isPageDescriptionHidden: boolean;
 }
 
-export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;
+export type EventsIntroSectionUpdateField = 'pageDescription' | 'eventsBlockTitle';
+
+export interface CreateEventsIntroSectionLocalizationDto {
+    entityId: number;
+    languageId: number;
+    eventsBlockTitle?: string;
+    pageDescription?: string;
+}
+
+export type UpdateEventsIntroSectionLocalizationDto = Pick<
+    CreateEventsIntroSectionLocalizationDto,
+    'eventsBlockTitle' | 'pageDescription'
+>;
+
+export type EventsIntroSectionResponseDto = Omit<EventsIntroSectionDto, 'localizations'> &
+    EntityWithDtoLocalizations<EventsIntroSectionLocalizationDto>;

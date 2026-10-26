@@ -1,20 +1,24 @@
 import React, { act } from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EventsPageAdmin } from './EventsPageAdmin';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { EventsApi } from '@/services/api/admin/events/events-api';
+import { EventsIntroSectionLocalizationsApi } from '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { ToastType } from '@/types/admin/toast';
-import { EventItemDto } from '@/types/admin/events';
+import { EventItemDto, EventsIntroSectionDto } from '@/types/admin/events';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { EVENTS_TEXT, EVENT_ITEMS_TEXT, EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
+const mockedIntroLocalizationsApi = EventsIntroSectionLocalizationsApi as jest.Mocked<
+    typeof EventsIntroSectionLocalizationsApi
+>;
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -49,6 +53,7 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
         toggleEventsTitleVisibility: jest.fn(),
         toggleEventsDescriptionVisibility: jest.fn(),
         reorder: jest.fn(),
+        deleteEvent: jest.fn(),
     },
 }));
 
@@ -57,6 +62,16 @@ jest.mock('@/services/api/admin/events/event-categories-api', () => ({
         getAll: jest.fn(),
     },
 }));
+
+jest.mock(
+    '@/services/api/admin/events/events-intro-section-localizations/events-intro-section-localizations-api',
+    () => ({
+        EventsIntroSectionLocalizationsApi: {
+            create: jest.fn(),
+            update: jest.fn(),
+        },
+    }),
+);
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
     AdminPanelToolbar: ({
@@ -81,8 +96,27 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
                 Clear Search
             </button>
 
-            <button type="button" onClick={() => onSuggestionSelect?.({})}>
+            <button
+                type="button"
+                onClick={() =>
+                    onSuggestionSelect?.(1, { id: 1, title: 'Test event', categories: [{ id: 1, name: 'Category' }] })
+                }
+            >
                 Select Suggestion
+            </button>
+
+            <button
+                type="button"
+                data-testid="select-suggestion-category-2"
+                onClick={() =>
+                    onSuggestionSelect?.(2, {
+                        id: 2,
+                        title: 'Other category event',
+                        categories: [{ id: 2, name: 'Category 2' }],
+                    })
+                }
+            >
+                Select Suggestion From Category 2
             </button>
 
             <button type="button" data-testid="enable-status-filter" onClick={() => onStatusFilterChange?.(1)}>
@@ -116,12 +150,13 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
         localizedEntity,
     }: {
         languages: { id: number; code: string }[];
-        localizedEntity: EventCategoryDto;
+        localizedEntity: EventCategoryDto & { localizations?: unknown[] };
     }) => (
         <span
             data-testid="localization-statuses-mock"
             data-languages={languages?.map((lang) => lang.code).join(',')}
             data-entity-id={localizedEntity?.id}
+            data-localizations={JSON.stringify(localizedEntity?.localizations ?? [])}
         />
     ),
 }));
@@ -233,9 +268,11 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml,
             isPublishDisabled,
             disabled,
+            onTranslate,
             isHidden: _isHidden,
             onToggleVisibility,
             isToggleVisibilityDisabled,
+            headerExtra,
         }: {
             sectionId: string;
             mode: 'edit' | 'view';
@@ -246,15 +283,18 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
             initialPublishedHtml: string;
             isPublishDisabled?: boolean;
             disabled?: boolean;
+            onTranslate?: () => void;
             isHidden?: boolean;
             onToggleVisibility?: () => void;
             isToggleVisibilityDisabled?: boolean;
+            headerExtra?: React.ReactNode;
         }) => {
             const [isCancelConfirmationOpen, setIsCancelConfirmationOpen] = mockReact.useState(false);
 
             return (
                 <section data-testid={`${sectionId}-section`}>
                     <span>{mode}</span>
+                    {headerExtra}
                     <span data-testid={`${sectionId}-html`}>{initialPublishedHtml}</span>
 
                     <button
@@ -264,6 +304,15 @@ jest.mock('./editable-header-section/EditableHeaderSection', () => {
                         disabled={disabled}
                     >
                         Edit section
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={onTranslate}
+                        aria-label={`Перекласти ${sectionId}`}
+                        disabled={disabled}
+                    >
+                        Translate section
                     </button>
 
                     <button
@@ -371,12 +420,48 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('./event-item-component/EventItemComponent', () => ({
-    EventItemComponent: ({ item }: { item: EventItemDto }) => (
+    EventItemComponent: ({ item, onDelete }: { item: EventItemDto; onDelete: (itemId: number) => void }) => (
         <div data-testid={`rendered-event-${item.id}`}>
             <span>{item.title}</span>
             <span>{item.description}</span>
+            <button type="button" onClick={() => onDelete(item.id)}>
+                Delete event {item.id}
+            </button>
         </div>
     ),
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
+        isOpen,
+        title,
+        onConfirm,
+        onCancel,
+        isButtonsDisabled,
+        confirmText,
+        cancelText,
+    }: {
+        isOpen: boolean;
+        title: string;
+        onConfirm: () => void;
+        onCancel: () => void;
+        isButtonsDisabled?: boolean;
+        confirmText: string;
+        cancelText: string;
+    }) =>
+        isOpen ? (
+            <div role="dialog">
+                <span>{title}</span>
+
+                <button type="button" onClick={onCancel} disabled={isButtonsDisabled}>
+                    {cancelText}
+                </button>
+
+                <button type="button" onClick={onConfirm} disabled={isButtonsDisabled}>
+                    {confirmText}
+                </button>
+            </div>
+        ) : null,
 }));
 
 const mockAddToast = jest.fn();
@@ -498,18 +583,26 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.getEventsIntroSection.mockResolvedValue({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            localizations: [],
         });
 
         mockedEventsApi.updateEventsIntroSection.mockResolvedValue({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            localizations: [],
         });
+
+        mockedEventsApi.deleteEvent.mockReset();
+        mockedIntroLocalizationsApi.create.mockReset();
+        mockedIntroLocalizationsApi.update.mockReset();
 
         mockAddToast.mockClear();
         mockOpenAddCategoryModal.mockClear();
@@ -623,12 +716,100 @@ describe('EventsPageAdmin', () => {
         await renderEventsPage();
 
         const statusMocks = await screen.findAllByTestId('localization-statuses-mock');
+        const categoryStatusMocks = statusMocks.slice(-categories.length);
 
-        expect(statusMocks).toHaveLength(categories.length);
-        expect(statusMocks[0]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
-        expect(statusMocks[1]).toHaveAttribute('data-languages', 'en');
-        expect(statusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+        expect(categoryStatusMocks).toHaveLength(categories.length);
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[0]).toHaveAttribute('data-entity-id', String(categories[0].id));
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-languages', 'en');
+        expect(categoryStatusMocks[1]).toHaveAttribute('data-entity-id', String(categories[1].id));
+    });
+
+    it('passes languages and the intro section as localizedEntity to LocalizationStatuses for each editable block', async () => {
+        await renderEventsPage();
+
+        const descriptionSection = await screen.findByTestId(
+            `${EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID}-section`,
+        );
+        const titleSection = screen.getByTestId(`${EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID}-section`);
+
+        const descriptionStatusMock = await within(descriptionSection).findByTestId('localization-statuses-mock');
+        const titleStatusMock = await within(titleSection).findByTestId('localization-statuses-mock');
+
+        expect(descriptionStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(descriptionStatusMock).toHaveAttribute('data-entity-id', '1');
+        expect(titleStatusMock).toHaveAttribute('data-languages', 'en');
+        expect(titleStatusMock).toHaveAttribute('data-entity-id', '1');
+    });
+
+    it('updates intro localization statuses without refetching the intro section after translation is saved', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        mockedIntroLocalizationsApi.create.mockResolvedValueOnce({
+            entityId: 1,
+            pageDescription: 'English description',
+            eventsBlockTitle: '',
+            localizationInfoDto: { id: 2, code: 'en' },
+            translationStatus: 1,
+        } as never);
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Перекласти ${descriptionId}` }));
+        await user.type(
+            screen.getByRole('textbox', { name: new RegExp(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE) }),
+            'English description',
+        );
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        const descriptionSection = screen.getByTestId(`${descriptionId}-section`);
+        const statusMock = within(descriptionSection).getByTestId('localization-statuses-mock');
+
+        expect(JSON.parse(statusMock.getAttribute('data-localizations') ?? '[]')).toEqual([
+            expect.objectContaining({
+                language: { id: 2, code: 'en' },
+                pageDescription: 'English description',
+            }),
+        ]);
+        expect(mockedEventsApi.getEventsIntroSection).toHaveBeenCalledTimes(1);
+    });
+
+    it('refreshes translation status indicators for both blocks after publishing a section', async () => {
+        const user = userEvent.setup();
+        const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
+        const titleId = EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID;
+        const outdatedLocalizations = [
+            {
+                entityId: 1,
+                language: { id: 2, code: 'en' },
+                translationStatus: 2,
+                eventsBlockTitle: '<p>Title</p>',
+                pageDescription: '<p>Description</p>',
+            },
+        ];
+
+        mockedEventsApi.updateEventsIntroSection.mockResolvedValueOnce({
+            eventsBlockTitle: '<p>Loaded title</p>',
+            pageDescription: '<p>Updated content</p>',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
+            id: 1,
+            localizations: outdatedLocalizations,
+        });
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: `Опублікувати ${descriptionId}` }));
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            const descriptionSection = screen.getByTestId(`${descriptionId}-section`);
+            const descriptionStatusMock = within(descriptionSection).getByTestId('localization-statuses-mock');
+            expect(descriptionStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
+        });
+
+        const titleSection = screen.getByTestId(`${titleId}-section`);
+        const titleStatusMock = within(titleSection).getByTestId('localization-statuses-mock');
+        expect(titleStatusMock).toHaveAttribute('data-localizations', JSON.stringify(outdatedLocalizations));
     });
 
     it('renders the toolbar with the events placeholder and add-item text', async () => {
@@ -675,6 +856,21 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByTestId(`${titleId}-html`)).toHaveTextContent('<p>Loaded title</p>');
     });
 
+    it.each([
+        [EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID, EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE],
+        [
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE,
+        ],
+    ])('opens the matching translation modal for %s', async (sectionId, fieldLabel) => {
+        const user = userEvent.setup();
+
+        await renderEventsPage();
+        await user.click(screen.getByRole('button', { name: `Перекласти ${sectionId}` }));
+
+        expect(screen.getByRole('textbox', { name: new RegExp(fieldLabel) })).toBeInTheDocument();
+    });
+
     it('drafts content and cancels edit mode successfully', async () => {
         const user = userEvent.setup();
         render(<EventsPageAdmin />);
@@ -693,12 +889,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('disables intro section editing until the published content is loaded', async () => {
-        type IntroSection = {
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         let resolveIntroSection!: (section: IntroSection) => void;
 
@@ -706,7 +897,7 @@ describe('EventsPageAdmin', () => {
             resolveIntroSection = resolve;
         });
 
-        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise as any);
+        mockedEventsApi.getEventsIntroSection.mockReturnValueOnce(introSectionPromise);
 
         render(<EventsPageAdmin />);
 
@@ -720,10 +911,12 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             resolveIntroSection({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
         });
 
@@ -755,20 +948,24 @@ describe('EventsPageAdmin', () => {
             EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID,
             'pageDescription',
             {
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             },
         ],
         [
             EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.ID,
             'eventsBlockTitle',
             {
+                id: 1,
                 pageDescription: '<p>Loaded description</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             },
         ],
     ])('publishes a valid %s draft with the existing field and payload', async (sectionId, field, payload) => {
@@ -810,16 +1007,20 @@ describe('EventsPageAdmin', () => {
 
         mockedEventsApi.updateEventsIntroSection
             .mockResolvedValueOnce({
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Loaded title</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             })
             .mockResolvedValueOnce({
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
 
         await renderEventsPage();
@@ -831,10 +1032,12 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenCalledWith({}, 'pageDescription', {
+                id: 1,
                 pageDescription: '<p>Updated content</p>',
                 eventsBlockTitle: '<p>Чернетка заголовка</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
         });
 
@@ -845,12 +1048,16 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
         await waitFor(() => {
-            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith({}, 'eventsBlockTitle', {
-                pageDescription: '<p>Updated content</p>',
-                eventsBlockTitle: '<p>Updated content</p>',
-                isEventsBlockTitleHidden: false,
-                isPageDescriptionHidden: false,
-            });
+            expect(mockedEventsApi.updateEventsIntroSection).toHaveBeenLastCalledWith(
+                {},
+                'eventsBlockTitle',
+                expect.objectContaining({
+                    pageDescription: '<p>Updated content</p>',
+                    eventsBlockTitle: '<p>Updated content</p>',
+                    isEventsBlockTitleHidden: false,
+                    isPageDescriptionHidden: false,
+                }),
+            );
         });
     });
 
@@ -887,12 +1094,7 @@ describe('EventsPageAdmin', () => {
         expect(screen.getByTestId(`${descriptionId}-section`)).toHaveTextContent('edit');
     });
     it('keeps another intro section available for publishing while a publish request is pending', async () => {
-        type IntroSection = {
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         const user = userEvent.setup();
 
@@ -902,7 +1104,7 @@ describe('EventsPageAdmin', () => {
             resolvePublish = resolve;
         });
 
-        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise as any);
+        mockedEventsApi.updateEventsIntroSection.mockReturnValueOnce(publishPromise);
 
         render(<EventsPageAdmin />);
 
@@ -939,10 +1141,12 @@ describe('EventsPageAdmin', () => {
 
         await waitFor(() => {
             resolvePublish({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated content</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
         });
 
@@ -962,12 +1166,7 @@ describe('EventsPageAdmin', () => {
     });
 
     it('preserves both section updates when they are published concurrently', async () => {
-        type IntroSection = {
-            eventsBlockTitle: string;
-            pageDescription: string;
-            isEventsBlockTitleHidden: boolean;
-            isPageDescriptionHidden: boolean;
-        };
+        type IntroSection = EventsIntroSectionDto;
 
         const user = userEvent.setup();
         const descriptionId = EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.ID;
@@ -984,8 +1183,8 @@ describe('EventsPageAdmin', () => {
         });
 
         mockedEventsApi.updateEventsIntroSection
-            .mockReturnValueOnce(descriptionPublishPromise as any)
-            .mockReturnValueOnce(titlePublishPromise as any);
+            .mockReturnValueOnce(descriptionPublishPromise)
+            .mockReturnValueOnce(titlePublishPromise);
 
         await renderEventsPage();
         await user.click(screen.getByRole('button', { name: `Редагувати ${descriptionId}` }));
@@ -1000,19 +1199,23 @@ describe('EventsPageAdmin', () => {
 
         await act(async () => {
             resolveTitlePublish({
+                id: 1,
                 eventsBlockTitle: '<p>Updated title</p>',
                 pageDescription: '<p>Loaded description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
             await titlePublishPromise;
         });
         await act(async () => {
             resolveDescriptionPublish({
+                id: 1,
                 eventsBlockTitle: '<p>Loaded title</p>',
                 pageDescription: '<p>Updated description</p>',
                 isEventsBlockTitleHidden: false,
                 isPageDescriptionHidden: false,
+                localizations: [],
             });
             await descriptionPublishPromise;
         });
@@ -1044,10 +1247,12 @@ describe('EventsPageAdmin', () => {
     it('calls toggleEventsDescriptionVisibility when toggling visibility for page description', async () => {
         const user = userEvent.setup();
         const baseIntroSection = {
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
 
@@ -1069,10 +1274,12 @@ describe('EventsPageAdmin', () => {
     it('calls toggleEventsTitleVisibility when toggling visibility for events block title', async () => {
         const user = userEvent.setup();
         const baseIntroSection = {
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isEventsBlockTitleHidden: true };
 
@@ -1098,6 +1305,8 @@ describe('EventsPageAdmin', () => {
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            id: 1,
+            localizations: [],
         };
         const mockResponse = { ...baseIntroSection, isPageDescriptionHidden: true };
 
@@ -1143,10 +1352,12 @@ describe('EventsPageAdmin', () => {
 
     it('renders with eye-closed icons when sections are initially hidden', async () => {
         mockedEventsApi.getEventsIntroSection.mockResolvedValueOnce({
+            id: 1,
             eventsBlockTitle: '<p>Loaded title</p>',
             pageDescription: '<p>Loaded description</p>',
             isEventsBlockTitleHidden: true,
             isPageDescriptionHidden: true,
+            localizations: [],
         });
 
         await renderEventsPage();
@@ -1203,6 +1414,18 @@ describe('EventsPageAdmin', () => {
         expect(await screen.findByText(errorMessage)).toBeInTheDocument();
     });
 
+    it('keeps category and intro-section errors independent', async () => {
+        mockedEventCategoriesApi.getAll.mockRejectedValueOnce(new Error('Categories failed'));
+        mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Intro section failed'));
+
+        render(<EventsPageAdmin />);
+
+        expect(
+            await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES),
+        ).toBeInTheDocument();
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
+    });
+
     it('disables intro section editing when intro content fetch fails', async () => {
         mockedEventsApi.getEventsIntroSection.mockRejectedValueOnce(new Error('Failed to fetch intro content'));
 
@@ -1224,6 +1447,7 @@ describe('EventsPageAdmin', () => {
         ).toBeDisabled();
 
         expect(mockAddToast).not.toHaveBeenCalled();
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_FETCH_DATA)).toBeInTheDocument();
     });
 
     it('allows another publish attempt after a publish failure', async () => {
@@ -1666,6 +1890,114 @@ describe('EventsPageAdmin', () => {
         expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
     });
 
+    const setUpSingleEventPage = async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: [eventItems[0]],
+            totalItemsCount: 1,
+        });
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        return user;
+    };
+
+    const enableStatusFilter = async (user: ReturnType<typeof userEvent.setup>) => {
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(await screen.findByTestId('active-status-filter')).toBeInTheDocument();
+    };
+
+    const setUpStatusAwareEventPage = async () => {
+        mockedEventCategoriesApi.getAll.mockResolvedValue(categories);
+        mockedEventsApi.fetchEvents.mockImplementation(async (_filters, _categoryId, _offset, _limit, _sort, status) =>
+            status === undefined
+                ? { items: [eventItems[1]], totalItemsCount: 1 }
+                : { items: [eventItems[0]], totalItemsCount: 1 },
+        );
+
+        const user = userEvent.setup();
+        render(<EventsPageAdmin />);
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        return user;
+    };
+
+    it('narrows the list to the selected event, switches category and clears the status filter when a suggestion from another category is selected', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByTestId('select-suggestion-category-2'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-2')).toBeInTheDocument();
+        expect(screen.getByText('Other category event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('load-more-events')).toBeDisabled();
+    });
+
+    it('narrows the list to the selected event and clears the status filter when the suggestion already belongs to the current category', async () => {
+        const user = await setUpSingleEventPage();
+
+        await enableStatusFilter(user);
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(screen.queryByTestId('active-status-filter')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.getByText('Test event')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('restores the full paginated list for the active category when the search is cleared after selecting a suggestion', async () => {
+        const user = await setUpSingleEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+    });
+
+    it('refetches the current category without the status filter when the search is cleared after selecting a same-category suggestion', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await enableStatusFilter(user);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+
+        await user.click(screen.getByText('Clear Search'));
+
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+    });
+
+    it('clears a selected search result when the status filter changes, so the filter actually takes effect', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await user.click(screen.getByText('Select Suggestion'));
+
+        expect(await screen.findByTestId('rendered-event-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('rendered-event-102')).not.toBeInTheDocument();
+
+        await enableStatusFilter(user);
+
+        expect(screen.queryByTestId('rendered-event-1')).not.toBeInTheDocument();
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+    });
+
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
         const user = userEvent.setup();
 
@@ -1762,46 +2094,171 @@ describe('EventsPageAdmin', () => {
         });
     });
 
-    it('updates event item in the list when onTranslateEvent is called', async () => {
-        const eventsResponse = {
-            items: [
-                {
-                    id: 1,
-                    title: 'Initial Event',
-                    description: 'Initial Description',
-                    publishedAt: '2024-01-01',
-                    status: VisibilityStatus.Published,
-                    previewImage: null,
-                    backgroundImage: null,
-                    priority: 1,
-                    resource: '',
-                    localizations: [],
-                },
-            ],
-            totalItemsCount: 1,
-        };
+    it.each([
+        [VisibilityStatus.Published, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS],
+        [VisibilityStatus.Draft, COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS],
+    ])(
+        'updates event item and shows the toast for a %s event when onTranslateEvent is called',
+        async (status, toast) => {
+            const eventsResponse = {
+                items: [
+                    {
+                        id: 1,
+                        title: 'Initial Event',
+                        description: 'Initial Description',
+                        publishedAt: '2024-01-01',
+                        status,
+                        previewImage: null,
+                        backgroundImage: null,
+                        priority: 1,
+                        resource: '',
+                        localizations: [],
+                    },
+                ],
+                totalItemsCount: 1,
+            };
 
-        mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
+            mockedEventsApi.fetchEvents.mockResolvedValueOnce(eventsResponse);
 
-        render(<EventsPageAdmin />);
+            render(<EventsPageAdmin />);
 
-        expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
+            expect(await screen.findByText('Localized Cat 1')).toBeInTheDocument();
 
-        const updatedEvent: EventItemDto = {
-            ...eventsResponse.items[0],
-            title: 'Initial Event',
-            localizations: [
-                {
-                    language: { id: 2, code: 'en' },
-                    title: 'Translated Title',
-                    description: 'Translated Description',
-                    translationStatus: 1 as any,
-                },
-            ],
-        };
+            const updatedEvent: EventItemDto = {
+                ...eventsResponse.items[0],
+                title: 'Initial Event',
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        title: 'Translated Title',
+                        description: 'Translated Description',
+                        translationStatus: 1 as any,
+                    },
+                ],
+            };
 
-        act(() => {
-            mockOnTranslateEvent(updatedEvent);
+            act(() => {
+                mockOnTranslateEvent(updatedEvent);
+            });
+
+            expect(mockAddToast).toHaveBeenCalledWith(toast, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledTimes(1);
+        },
+    );
+
+    it('opens delete confirmation modal for the selected event', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
         });
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByText(EVENTS_TEXT.QUESTION.DELETE_MATERIAL)).toBeInTheDocument();
+        expect(mockedEventsApi.deleteEvent).not.toHaveBeenCalled();
+    });
+
+    it('deletes the event and refreshes the event list', async () => {
+        const remainingEvents = [eventItems[1]];
+
+        mockedEventsApi.fetchEvents
+            .mockResolvedValueOnce({
+                items: eventItems,
+                totalItemsCount: eventItems.length,
+            })
+            .mockResolvedValueOnce({
+                items: remainingEvents,
+                totalItemsCount: remainingEvents.length,
+            });
+
+        mockedEventsApi.deleteEvent.mockResolvedValue(101);
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockedEventsApi.deleteEvent).toHaveBeenCalledWith({}, 101);
+        });
+
+        await waitFor(() => {
+            expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith(
+                {},
+                categories[0].id,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
+        });
+
+        await waitFor(() => {
+            expect(mockedEventCategoriesApi.getAll).toHaveBeenCalledTimes(2);
+        });
+
+        expect(screen.queryByTestId('rendered-event-101')).not.toBeInTheDocument();
+        expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
+    });
+
+    it('shows an error and keeps the event when deletion fails', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        mockedEventsApi.deleteEvent.mockRejectedValue(new Error('Delete failed'));
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                EVENTS_TEXT.MESSAGE.FAIL_TO_DELETE_EVENT,
+                ToastType.Error,
+                EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS,
+            );
+        });
+
+        expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('cancels event deletion without calling the API', async () => {
+        mockedEventsApi.fetchEvents.mockResolvedValue({
+            items: eventItems,
+            totalItemsCount: eventItems.length,
+        });
+
+        await renderEventsPage();
+
+        const deleteButton = await screen.findByRole('button', {
+            name: 'Delete event 101',
+        });
+
+        await userEvent.click(deleteButton);
+        await userEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(mockedEventsApi.deleteEvent).not.toHaveBeenCalled();
+        expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
     });
 });

@@ -1,5 +1,5 @@
-import { Image } from '../common/image';
-import { HippotherapyProgramSectionDto } from '../common/program-sections';
+import { Image } from '@/types/common/image';
+import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 export interface chooseProgramData {
     title: string;
     description: string;
@@ -19,7 +19,6 @@ export interface EventsData {
 export interface EventsNewsPageData {
     description: string;
     isPageDescriptionHidden?: boolean;
-    chooseProgram: chooseProgramData;
     eventsData: EventsData;
     isEventsBlockTitleHidden?: boolean;
 }
@@ -30,9 +29,63 @@ export interface EventsNews {
     resource?: string;
     description: string;
     date: string;
-    tags: Tag[];
+    tag?: Tag;
     previewImage: Image | string | null; // string для моків, Image для реальних даних
     backgroundImage: Image | string | null; // string для моків, Image для реальних даних
     slug: string;
     sections: HippotherapyProgramSectionDto[];
+}
+
+export interface LocalizationLanguageDto {
+    id?: number;
+    code: string;
+}
+
+export interface EventNewsCategoryLocalizationDto {
+    language: LocalizationLanguageDto;
+    name: string;
+}
+
+export interface EventNewsCategoryDto {
+    id: number;
+    name: string;
+    localizations: EventNewsCategoryLocalizationDto[];
+}
+
+export interface PublishedEventNewsLocalizationDto {
+    language: LocalizationLanguageDto;
+    title?: string | null;
+    description?: string | null;
+    additionalDescription?: string | null;
+    resource?: string | null;
+}
+
+export interface PublishedEventNewsDto {
+    id: number;
+    title?: string | null;
+    description?: string | null;
+    additionalDescription?: string | null;
+    slug?: string | null;
+    resource?: string | null;
+    resourceEn?: string | null;
+    publishedAt?: string | null;
+    previewImage?: Image | null;
+    backgroundImage?: Image | null;
+    category?: EventNewsCategoryDto | null;
+    localizations: PublishedEventNewsLocalizationDto[];
+}
+
+export interface PublicEventsPageDto {
+    eventsBlockTitle?: string | null;
+    pageDescription?: string | null;
+    isEventsBlockTitleHidden?: boolean;
+    isPageDescriptionHidden?: boolean;
+    localizations?: PublicEventsIntroSectionLocalizationDto[] | null;
+    categories?: EventNewsCategoryDto[] | null;
+}
+
+export interface PublicEventsIntroSectionLocalizationDto {
+    language: LocalizationLanguageDto;
+    eventsBlockTitle?: string | null;
+    pageDescription?: string | null;
 }

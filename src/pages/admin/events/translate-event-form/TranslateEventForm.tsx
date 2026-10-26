@@ -2,6 +2,8 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { EVENTS_TEXT, EVENT_VALIDATION } from '@/const/admin/events';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import * as Yup from 'yup';
+import { TranslateEventValidationSchema } from '@/validation/admin/event-schema/event-schema';
 import {
     getNormalizedInputText,
     getNormalizedInputTextWhileTyping,
@@ -27,6 +29,8 @@ export interface TranslateEventFormProps {
     onDirtyChange?: (isDirty: boolean) => void;
 }
 
+type FieldErrors = Partial<Record<keyof TranslateEventFormValues, string>>;
+
 const DEFAULT_FORM_STATE: TranslateEventFormValues = {
     title: '',
     description: '',
@@ -37,7 +41,19 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
     ({ initialData = null, onSubmit, formDisabled = false, onValidationChange, onDirtyChange }, ref) => {
         const [formState, setFormState] = useState<TranslateEventFormValues>(initialData ?? DEFAULT_FORM_STATE);
 
-        const isFormValid = formState.title.trim().length > 0 && formState.description.trim().length > 0;
+        const [errors, setErrors] = useState<FieldErrors>({});
+
+        const isFormValid = TranslateEventValidationSchema.isValidSync(formState);
+
+        const validateField = (field: keyof TranslateEventFormValues, value: string) => {
+            let message: string | undefined;
+            try {
+                TranslateEventValidationSchema.validateSyncAt(field, { ...formState, [field]: value });
+            } catch (err) {
+                message = err instanceof Yup.ValidationError ? err.message : undefined;
+            }
+            setErrors((prev) => ({ ...prev, [field]: message }));
+        };
         const isFormDirty = JSON.stringify(formState) !== JSON.stringify(initialData ?? DEFAULT_FORM_STATE);
 
         useEffect(() => {
@@ -67,13 +83,18 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
             (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 const normalized = getNormalizedInputTextWhileTyping(e.target.value);
                 setFormState((prev) => ({ ...prev, [field]: normalized }));
+
+                if (normalized.trim().length === 0) {
+                    setErrors((prev) => ({ ...prev, [field]: undefined }));
+                } else {
+                    validateField(field, normalized);
+                }
             };
 
         const handleBlur = (field: keyof TranslateEventFormValues) => () => {
-            setFormState((prev) => ({
-                ...prev,
-                [field]: getNormalizedInputText(prev[field]),
-            }));
+            const normalized = getNormalizedInputText(formState[field]);
+            setFormState((prev) => ({ ...prev, [field]: normalized }));
+            validateField(field, normalized);
         };
 
         return (
@@ -89,6 +110,7 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     value={formState.title}
                     onChange={handleChange('title')}
                     onBlur={handleBlur('title')}
+                    error={errors.title}
                     normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     maxLength={EVENT_VALIDATION.title.max}
@@ -103,6 +125,7 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     value={formState.description}
                     onChange={handleChange('description')}
                     onBlur={handleBlur('description')}
+                    error={errors.description}
                     normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     rows={5}
@@ -116,6 +139,7 @@ export const TranslateEventForm = forwardRef<TranslateEventFormRef, TranslateEve
                     value={formState.additionalDescription}
                     onChange={handleChange('additionalDescription')}
                     onBlur={handleBlur('additionalDescription')}
+                    error={errors.additionalDescription}
                     normalizeValue={getNormalizedInputTextWhileTyping}
                     disabled={formDisabled}
                     maxLength={EVENT_VALIDATION.additionalDescription.max}

@@ -746,12 +746,14 @@ describe('HistoryPageContent', () => {
     });
 
     it('enables publish button when sections are reordered/changed', async () => {
-        mockSingleSectionData();
+        const sections = mockSingleSectionData();
 
         render(<HistoryPageContent />);
 
         const publishButton = screen.getByRole('button', { name: 'Publish' });
         expect(publishButton).toBeDisabled();
+
+        mockHistoryFormSections = [{ ...sections[0], order: 1 }];
 
         await user.click(screen.getByTestId('trigger-sections-change'));
 

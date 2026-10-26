@@ -10,6 +10,7 @@ import {
 import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
+import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './HippotherapyQuoteSection.scss';
 
 export interface HippotherapyQuoteSectionProps {
@@ -19,6 +20,8 @@ export interface HippotherapyQuoteSectionProps {
     defaultImageStyle?: CSSProperties;
     onImageError?: (error: string | null) => void;
     disabled?: boolean;
+    onTranslateClick?: () => void;
+    isTranslateDisabled?: boolean;
 }
 
 const HippotherapyQuoteSectionComponent = ({
@@ -28,6 +31,8 @@ const HippotherapyQuoteSectionComponent = ({
     defaultImageStyle,
     onImageError,
     disabled,
+    onTranslateClick,
+    isTranslateDisabled,
 }: HippotherapyQuoteSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -48,6 +53,12 @@ const HippotherapyQuoteSectionComponent = ({
 
     return (
         <div className="hippotherapy-quote-section">
+            {onTranslateClick && (
+                <SectionTranslationHeader
+                    onTranslateClick={onTranslateClick}
+                    isTranslateDisabled={isTranslateDisabled}
+                />
+            )}
             <div className="hippotherapy-quote-section-image-container">
                 <div className="hippotherapy-quote-section-image">
                     <ImageInput

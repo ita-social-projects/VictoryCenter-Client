@@ -7,21 +7,17 @@ $img-height: 600px;
 .container {
     display: flex;
     flex-direction: column;
-    gap: 64px;
-    padding: 60px 16px 0px 16px;
+    gap: 32px;
+    padding: 64px 16px;
 
     @media (min-width: 560px) {
-        padding: 60px 64px 0px 64px;
+        padding: 64px 64px;
     }
 
-    @media (min-width: 768px) {
-        padding: 60px 56px 0px 56px;
-    }
-
-    @media (min-width: 1440px) {
+    @media (min-width: 1024px) {
         padding: 80px 56px 20px 56px;
         flex-direction: row;
-        gap: 128px;
+        gap: 64px;
     }
 }
 
@@ -31,8 +27,11 @@ $img-height: 600px;
     min-width: 0;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     gap: 32px;
+
+    @media (min-width: 1024px) {
+        flex: 0 0 50%;
+    }
 }
 
 .title-section {
@@ -43,11 +42,10 @@ $img-height: 600px;
 }
 
 .title {
-    @include type.h3-semibold-uppercase;
+    @include type.h4-bold-uppercase;
     min-width: 0;
     overflow-wrap: anywhere;
     word-break: normal;
-    white-space: pre-wrap;
 }
 
 .description-section {
@@ -55,17 +53,20 @@ $img-height: 600px;
     display: flex;
     min-width: 0;
     align-items: start;
+
     > div {
         flex: 1;
     }
 }
 
 .description {
-    @include type.body-1-medium;
+    @include type.small-text-regular;
     min-width: 0;
     overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;
+    margin: 0;
+    padding: 0;
 }
 
 .right-section {
@@ -75,8 +76,8 @@ $img-height: 600px;
     justify-content: center;
     padding: 0;
 
-    @media (min-width: 1440px) {
-        padding: 20px 0px;
+    @media (min-width: 1024px) {
+        flex: 0 0 50%;
     }
 }
 
@@ -88,6 +89,7 @@ $img-height: 600px;
 
 .image {
     width: 100%;
+    height: 100%;
     object-fit: cover;
     max-width: 100%;
 }

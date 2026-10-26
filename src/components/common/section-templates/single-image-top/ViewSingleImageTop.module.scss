@@ -1,5 +1,10 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@import '../shared/BaseSectionTemplate.module.scss';
+
 .container {
     padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .top-section {
@@ -13,6 +18,10 @@
 
 .image {
     width: 100%;
+    height: 100%;
     object-fit: cover;
-    max-height: 100%;
+}
+
+.bottom-section {
+    width: 100%;
 }

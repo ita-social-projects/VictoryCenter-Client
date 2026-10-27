@@ -39,7 +39,7 @@ export const SuccessStoryCard: React.FC<SuccessStoryCardProps> = ({ article }) =
     }, []);
 
     const handleReadStoryClick = () => {
-        if (isExpandedByClick) {
+        if (isExpanded) {
             collapse();
             return;
         }

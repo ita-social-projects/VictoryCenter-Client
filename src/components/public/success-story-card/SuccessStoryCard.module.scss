@@ -61,6 +61,7 @@
     box-sizing: border-box;
     min-height: 100%;
     max-height: 50vh;
+    overscroll-behavior: contain;
     padding: 12px 0;
     overflow-y: auto;
     background: rgba(colors.$white, 0.9);

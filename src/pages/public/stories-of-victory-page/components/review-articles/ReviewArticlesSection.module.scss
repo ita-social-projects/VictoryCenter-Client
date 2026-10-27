@@ -20,7 +20,7 @@
         max-width: 1440px;
 
         .articleCard:nth-child(n + 2) {
-            display: flex;
+            display: block;
         }
     }
 }

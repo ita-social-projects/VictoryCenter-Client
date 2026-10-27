@@ -1,23 +1,24 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/public/ui/button/Button';
 import { SuccessStoryCard } from '@/components/public/success-story-card/SuccessStoryCard';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PublicFeedbackApi } from '@/services/api/public/feedback/feedback-api';
 import { StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
-import { RequestOptions } from '@/types/common/api';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { localizePath } from '@/utils/functions/localize-path/localize-path';
 import styles from './StoriesOfVictorySection.module.scss';
 
 export const MAIN_PAGE_STORIES_OF_VICTORY_COUNT = 4;
 
 export const StoriesOfVictorySection: React.FC = () => {
     const { t } = useTranslation('mainPage');
-    const fetchHistories = useCallback((options: RequestOptions) => PublicFeedbackApi.fetchHistories(options), []);
+    const { currentLanguage } = useLocale();
 
     const histories = useDataFetch<StoriesOfVictoryReviewArticle[]>({
         initialData: [],
-        fetchHandler: fetchHistories,
+        fetchHandler: PublicFeedbackApi.fetchHistories,
     });
 
     const articles = useMemo(
@@ -25,7 +26,22 @@ export const StoriesOfVictorySection: React.FC = () => {
         [histories.data],
     );
 
-    if (histories.isLoading || articles.length === 0) {
+    if (histories.isLoading) {
+        return null;
+    }
+
+    if (histories.error) {
+        return (
+            <section className={styles.root}>
+                <h2 className={styles.title}>{t('SUCCESS_STORIES.TITLE')}</h2>
+                <div className={styles.error} role="alert">
+                    {t('SUCCESS_STORIES.LOADING_ERROR')}
+                </div>
+            </section>
+        );
+    }
+
+    if (articles.length === 0) {
         return null;
     }
 
@@ -42,7 +58,7 @@ export const StoriesOfVictorySection: React.FC = () => {
             <div className={styles.actions}>
                 <Button
                     variant="primary-dark"
-                    href={PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL}
+                    href={localizePath(PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL, currentLanguage)}
                     target="_blank"
                     rel="noopener noreferrer"
                 >

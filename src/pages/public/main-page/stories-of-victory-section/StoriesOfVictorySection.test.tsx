@@ -19,6 +19,11 @@ jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: (_localizations: unknown, fallback: unknown) => fallback,
 }));
 
+let mockCurrentLanguage = 'uk';
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: mockCurrentLanguage }),
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 
 const article = (id: number, image: string | null = 'img.jpg', story = 's') => ({
@@ -28,8 +33,8 @@ const article = (id: number, image: string | null = 'img.jpg', story = 's') => (
     image,
 });
 
-const mockFetches = (histories: unknown[], isLoading = false) => {
-    mockedUseDataFetch.mockReturnValue({ data: histories, isLoading, error: null });
+const mockFetches = (histories: unknown[], isLoading = false, error: unknown = null) => {
+    mockedUseDataFetch.mockReturnValue({ data: histories, isLoading, error });
 };
 
 const renderSection = () =>
@@ -42,6 +47,23 @@ const renderSection = () =>
 describe('StoriesOfVictorySection', () => {
     beforeEach(() => {
         mockedUseDataFetch.mockReset();
+        mockCurrentLanguage = 'uk';
+    });
+
+    it('shows an error message when fetching stories fails', () => {
+        mockFetches([], false, new Error('fail'));
+        renderSection();
+        expect(screen.getByRole('alert')).toHaveTextContent('SUCCESS_STORIES.LOADING_ERROR');
+    });
+
+    it('links to the localized stories page for English', () => {
+        mockCurrentLanguage = 'en';
+        mockFetches([article(1)]);
+        renderSection();
+        expect(screen.getByRole('link', { name: 'SUCCESS_STORIES.ALL_STORIES' })).toHaveAttribute(
+            'href',
+            '/en/stories',
+        );
     });
 
     it('renders nothing while loading', () => {

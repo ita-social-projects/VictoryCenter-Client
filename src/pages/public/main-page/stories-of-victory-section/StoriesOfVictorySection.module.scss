@@ -25,6 +25,10 @@
     color: colors.$blue-900;
 }
 
+.error {
+    color: red;
+}
+
 .tiles {
     display: grid;
     grid-template-columns: 1fr;

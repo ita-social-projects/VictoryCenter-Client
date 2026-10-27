@@ -158,27 +158,27 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
 }));
 
 jest.mock('../sections/ethics-section/EthicsSection', () => ({
-EthicsSection: ({ value, onChange, onImageError, disabled, onTranslateClick, isTranslateDisabled }: any) => (
-    <div data-testid="section-ethics" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
-        <span>{value.title}</span>
-        <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
-            Edit ethics
-        </button>
-        <button
-            disabled={disabled}
-            onClick={() => onChange({ ...value, principles: ['Edited principle', ...value.principles.slice(1)] })}
-        >
-            Edit ethics principle
-        </button>
-        <button onClick={() => onImageError?.('image size error')}>Set ethics image error</button>
-        <button onClick={() => onImageError?.(null)}>Clear ethics image error</button>
-        {onTranslateClick && (
-            <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
-                Translate ethics
+    EthicsSection: ({ value, onChange, onImageError, disabled, onTranslateClick, isTranslateDisabled }: any) => (
+        <div data-testid="section-ethics" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+            <span>{value.title}</span>
+            <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
+                Edit ethics
             </button>
-        )}
-    </div>
-),
+            <button
+                disabled={disabled}
+                onClick={() => onChange({ ...value, principles: ['Edited principle', ...value.principles.slice(1)] })}
+            >
+                Edit ethics principle
+            </button>
+            <button onClick={() => onImageError?.('image size error')}>Set ethics image error</button>
+            <button onClick={() => onImageError?.(null)}>Clear ethics image error</button>
+            {onTranslateClick && (
+                <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
+                    Translate ethics
+                </button>
+            )}
+        </div>
+    ),
 }));
 
 jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => ({

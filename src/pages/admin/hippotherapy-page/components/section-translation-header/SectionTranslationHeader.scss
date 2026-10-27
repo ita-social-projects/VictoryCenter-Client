@@ -1,8 +1,8 @@
 .section-translation-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     min-height: 24px;
-
     &-button {
         margin-left: auto;
     }

@@ -62,10 +62,10 @@
 }
 
 .feedback-form-modal {
-    .modal-footer {
+    > .modal-footer {
         justify-content: center;
 
-        button {
+        > button {
             width: auto;
             min-width: 227px;
         }

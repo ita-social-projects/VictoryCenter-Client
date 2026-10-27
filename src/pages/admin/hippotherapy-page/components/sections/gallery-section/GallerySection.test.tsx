@@ -2,23 +2,27 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { GallerySection, GallerySectionProps } from './GallerySection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    getValidateTextMock,
+    itDisablesInputsWhenDisabled,
+    itShowsValidationErrorOnBlur,
+    itSupportsTranslateButton,
+    itUpdatesFieldsOnChange,
+    setupValidateTextMock,
+} from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
 
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
-
 jest.mock('@/components/admin/image-input/ImageInput');
-
-jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
-    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
-        validateText: jest.fn(() => undefined),
-    },
-}));
+jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema');
 
 describe('GallerySection', () => {
-    let mockOnChange: jest.Mock;
+    setupValidateTextMock();
 
-    const validateTextMock = () => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
+    const TITLE_ID = 'mock-rich-input-test-gallery-title';
+    const cardDescriptionId = (index: number) => `mock-rich-input-test-gallery-card-${index}-description`;
 
     const defaultValue: HippotherapyGallerySectionContent = {
         title: 'Initial title',
@@ -29,53 +33,39 @@ describe('GallerySection', () => {
     };
 
     const renderComponent = (props: Partial<GallerySectionProps> = {}) =>
-        render(<GallerySection value={defaultValue} onChange={mockOnChange} fieldIdPrefix="test-gallery" {...props} />);
-
-    beforeEach(() => {
-        mockOnChange = jest.fn();
-        validateTextMock().mockReset();
-        validateTextMock().mockReturnValue(undefined);
-    });
+        render(<GallerySection value={defaultValue} onChange={jest.fn()} fieldIdPrefix="test-gallery" {...props} />);
 
     it('renders the title and one image/description pair per card', () => {
         renderComponent();
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBeInTheDocument();
         expect(screen.getAllByTestId('mock-image-input')).toHaveLength(2);
-        expect(screen.getByTestId('mock-rich-input-test-gallery-card-0-description')).toHaveValue('Card one');
-        expect(screen.getByTestId('mock-rich-input-test-gallery-card-1-description')).toHaveValue('Card two');
+        expect(screen.getByTestId(cardDescriptionId(0))).toHaveValue('Card one');
+        expect(screen.getByTestId(cardDescriptionId(1))).toHaveValue('Card two');
     });
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-gallery-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
+    itUpdatesFieldsOnChange(renderComponent, defaultValue, [{ testId: TITLE_ID, field: 'title', value: 'New title' }]);
 
     it('updates only the targeted card image, leaving the others untouched', () => {
-        renderComponent();
-
+        const onChange = jest.fn();
+        renderComponent({ onChange });
         const file = new File(['dummy'], 'test.png', { type: 'image/png' });
+
         fireEvent.change(screen.getAllByTestId('mock-image-input-file')[1], { target: { files: [file] } });
 
-        expect(mockOnChange).toHaveBeenCalledWith({
+        expect(onChange).toHaveBeenCalledWith({
             ...defaultValue,
             cards: [defaultValue.cards[0], { ...defaultValue.cards[1], image: file }],
         });
     });
 
     it('updates only the targeted card description, leaving the others untouched', () => {
-        renderComponent();
+        const onChange = jest.fn();
+        renderComponent({ onChange });
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-test-gallery-card-0-description'), {
-            target: { value: 'Updated card one' },
-        });
+        fireEvent.change(screen.getByTestId(cardDescriptionId(0)), { target: { value: 'Updated card one' } });
 
-        expect(mockOnChange).toHaveBeenCalledWith({
+        expect(onChange).toHaveBeenCalledWith({
             ...defaultValue,
             cards: [{ ...defaultValue.cards[0], description: 'Updated card one' }, defaultValue.cards[1]],
         });
@@ -98,17 +88,10 @@ describe('GallerySection', () => {
         expect(onCardImageError).toHaveBeenCalledWith(1, 'image size error');
     });
 
-    it('shows a card description error on blur', () => {
-        validateTextMock().mockReturnValueOnce('Too short');
-        renderComponent();
-
-        fireEvent.blur(screen.getByTestId('mock-rich-input-test-gallery-card-0-description'));
-
-        expect(screen.getByText('Too short')).toBeInTheDocument();
-    });
+    itShowsValidationErrorOnBlur(renderComponent, cardDescriptionId(0));
 
     it('does not show an error on the card description when the image input is blurred', () => {
-        validateTextMock().mockReturnValue('Too short');
+        getValidateTextMock().mockReturnValue('Too short');
         renderComponent();
 
         fireEvent.blur(screen.getAllByTestId('mock-image-input-file')[0]);
@@ -116,11 +99,13 @@ describe('GallerySection', () => {
         expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
-    it('disables every card input when disabled is true', () => {
-        renderComponent({ disabled: true });
+    itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, cardDescriptionId(0), cardDescriptionId(1)]);
 
-        screen.getAllByTestId('mock-image-input-file').forEach((input) => expect(input).toBeDisabled());
-        expect(screen.getByTestId('mock-rich-input-test-gallery-card-0-description')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-test-gallery-card-1-description')).toBeDisabled();
+    describe('translate button', () => {
+        itSupportsTranslateButton(renderComponent);
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

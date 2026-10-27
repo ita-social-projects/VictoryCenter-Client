@@ -42,6 +42,7 @@ export const FaqModal = (props: FaqModalProps) => {
             isOpen,
             onClose,
             entity: faq,
+            closeOnDraftCancel: isEditMode && faq?.status === VisibilityStatus.Draft,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: FaqCreateUpdate) => {
                 const response = isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);
@@ -109,6 +110,7 @@ export const FaqModal = (props: FaqModalProps) => {
             onPublishSubmit={modalHookData.handlePublishSubmit}
             onActionConfirm={modalHookData.handleConfirmAction}
             onActionCancel={modalHookData.handleCancelConfirmation}
+            onActionDismiss={modalHookData.handleDismissConfirmation}
             onExitConfirm={modalHookData.handleConfirmClose}
             onExitCancel={modalHookData.handleCancelClose}
             buttonStates={modalHookData.buttonStates}

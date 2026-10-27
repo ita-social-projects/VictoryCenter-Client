@@ -13,6 +13,7 @@ import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './HippoventionCenterSection.scss';
+import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
 
 export interface HippoventionCenterSectionProps {
     value: HippoventionCenterSectionContent;
@@ -21,6 +22,8 @@ export interface HippoventionCenterSectionProps {
     disabled?: boolean;
     onTranslateClick?: () => void;
     isTranslateDisabled?: boolean;
+    translationLanguages?: LocalizationLanguage[];
+    localizations?: EntityLocalization[];
 }
 
 const HippoventionCenterSectionComponent = ({
@@ -30,6 +33,8 @@ const HippoventionCenterSectionComponent = ({
     disabled,
     onTranslateClick,
     isTranslateDisabled,
+    translationLanguages,
+    localizations,
 }: HippoventionCenterSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -56,12 +61,13 @@ const HippoventionCenterSectionComponent = ({
 
     return (
         <div className="hippovention-center-section">
-            {onTranslateClick && (
-                <SectionTranslationHeader
-                    onTranslateClick={onTranslateClick}
-                    isTranslateDisabled={isTranslateDisabled}
-                />
-            )}
+            <SectionTranslationHeader
+                onTranslateClick={onTranslateClick}
+                isTranslateDisabled={isTranslateDisabled}
+                languages={translationLanguages}
+                localizations={localizations}
+            />
+
             <div className="hippovention-center-section-image-container">
                 <div className="hippovention-center-section-image">
                     <ImageInput

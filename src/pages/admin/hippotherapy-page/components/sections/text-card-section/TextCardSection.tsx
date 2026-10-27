@@ -6,6 +6,7 @@ import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './TextCardSection.scss';
+import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
 
 export interface TextCardSectionProps {
     value: HippotherapyTextCardContent;
@@ -14,6 +15,8 @@ export interface TextCardSectionProps {
     disabled?: boolean;
     onTranslateClick?: () => void;
     isTranslateDisabled?: boolean;
+    translationLanguages?: LocalizationLanguage[];
+    localizations?: EntityLocalization[];
 }
 
 const TextCardSectionComponent = ({
@@ -23,6 +26,8 @@ const TextCardSectionComponent = ({
     disabled,
     onTranslateClick,
     isTranslateDisabled,
+    translationLanguages,
+    localizations,
 }: TextCardSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
@@ -37,12 +42,13 @@ const TextCardSectionComponent = ({
 
     return (
         <div className="hippotherapy-text-card-section">
-            {onTranslateClick && (
-                <SectionTranslationHeader
-                    onTranslateClick={onTranslateClick}
-                    isTranslateDisabled={isTranslateDisabled}
-                />
-            )}
+            <SectionTranslationHeader
+                onTranslateClick={onTranslateClick}
+                isTranslateDisabled={isTranslateDisabled}
+                languages={translationLanguages}
+                localizations={localizations}
+            />
+
             <div className="hippotherapy-text-card-section-content">
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.TITLE}

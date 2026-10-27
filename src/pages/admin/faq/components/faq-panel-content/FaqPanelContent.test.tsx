@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FaqPanelContent } from './FaqPanelContent';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -7,7 +7,79 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
 import { FaqQuestion, FaqQuestionDto, VisitorPage } from '@/types/admin/faq';
 import { FAQ_TEXT } from '@/const/admin/faq';
+import { ToastType } from '@/types/admin/toast';
 import axios from 'axios';
+
+const mockPages: VisitorPage[] = [
+    { id: 1, title: 'Page A', slug: 'page-a' },
+    { id: 2, title: 'Page B', slug: 'page-b' },
+    { id: 3, title: 'Page C', slug: 'page-c' },
+];
+
+let mockEditedFaqStatus: VisibilityStatus | undefined;
+let mockCreatedFaqStatus: VisibilityStatus | undefined;
+
+const createLocalization = (questionText: string, answerText: string) => ({
+    language: { id: 1, code: 'ua' },
+    translationStatus: 1,
+    questionText,
+    answerText,
+});
+
+const createFaq = (overrides: Partial<FaqQuestion> & { id: number }): FaqQuestion => ({
+    questionText: `Test FAQ ${overrides.id}`,
+    answerText: 'A sample answer.',
+    status: VisibilityStatus.Draft,
+    pages: [mockPages[0]],
+    localizations: [createLocalization('Питання', 'Відповідь')],
+    ...overrides,
+});
+
+const mockFaqs: FaqQuestion[] = [
+    createFaq({
+        id: 1,
+        questionText: 'Test FAQ Alpha',
+        answerText: 'A sample answer.',
+        status: VisibilityStatus.Published,
+        pages: [mockPages[0]],
+        localizations: [createLocalization('Тест Альфа', 'Відповідь Альфа')],
+    }),
+    createFaq({
+        id: 2,
+        questionText: 'Test FAQ Beta',
+        answerText: 'Another sample answer.',
+        status: VisibilityStatus.Draft,
+        pages: [mockPages[1]],
+        localizations: [createLocalization('Тест Бета', 'Відповідь Бета')],
+    }),
+];
+
+const mockNewFaq: FaqQuestion = createFaq({
+    id: 3,
+    questionText: 'Test FAQ Gamma',
+    answerText: 'Yet another sample answer.',
+    status: VisibilityStatus.Draft,
+    pages: mockPages,
+    localizations: [createLocalization('Тест Гамма', 'Відповідь Гамма')],
+});
+
+const convertFaqsToDto = (faqs: FaqQuestion[]): FaqQuestionDto[] =>
+    faqs.map((faq) => ({
+        id: faq.id,
+        questionText: faq.questionText,
+        answerText: faq.answerText,
+        status: faq.status,
+        pageIds: faq.pages.map((p) => p.id),
+        localizations: faq.localizations.map((l) => ({
+            localizationInfoDto: { id: l.language.id, code: l.language.code },
+            translationStatus: l.translationStatus,
+            entityId: faq.id,
+            questionText: l.questionText,
+            answerText: l.answerText,
+        })),
+    }));
+
+const convertFaqToDto = (faq: FaqQuestion): FaqQuestionDto => convertFaqsToDto([faq])[0];
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
     useLocalizationToolkit: () => ({
@@ -21,29 +93,20 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
 }));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
-
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
 jest.mock('@/services/api/admin/faq/faq-api');
 const mockFaqApi = FaqApi as jest.Mocked<typeof FaqApi>;
 
-jest.mock('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => {
-    const mockPages = [
-        { id: 1, title: 'Page A', slug: 'page-a' },
-        { id: 2, title: 'Page B', slug: 'page-b' },
-        { id: 3, title: 'Page C', slug: 'page-c' },
-    ];
-
-    return {
-        VisitorPagesProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        useVisitorPages: () => ({
-            pages: mockPages,
-            isLoading: false,
-            error: null,
-            refetchPages: jest.fn(),
-        }),
-    };
-});
+jest.mock('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => ({
+    VisitorPagesProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    useVisitorPages: () => ({
+        pages: mockPages,
+        isLoading: false,
+        error: null,
+        refetchPages: jest.fn(),
+    }),
+}));
 
 const mockAddToast = jest.fn();
 
@@ -55,59 +118,51 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => 
     }),
 }));
 
-jest.mock('../faq-modals/faq-modal/FaqModal', () => {
-    return {
-        FaqModal: (props: any) => {
-            if (!props.isOpen) return null;
+jest.mock('../faq-modals/faq-modal/FaqModal', () => ({
+    FaqModal: (props: any) => {
+        if (!props.isOpen) return null;
 
-            const { ModalMode } = require('@/types/admin/common');
-            const isAddMode = props.mode === ModalMode.Add;
-            const isEditMode = props.mode === ModalMode.Edit;
+        const { ModalMode, VisibilityStatus: Status } = require('@/types/admin/common');
+        const isAddMode = props.mode === ModalMode.Add;
+        const isEditMode = props.mode === ModalMode.Edit;
 
-            return (
-                <div data-testid={isAddMode ? 'add-faq-modal' : 'edit-faq-modal'}>
-                    <h2>{isAddMode ? 'Add FAQ Modal' : 'Edit FAQ Modal'}</h2>
-                    {isEditMode && props.faqToEdit && <p>Editing: {props.faqToEdit.questionText}</p>}
-                    {isAddMode && <p>Adding new FAQ</p>}
-                    <button
-                        data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
-                        onClick={() => {
-                            if (isAddMode && props.onAddFaq) {
-                                const mockNewFaq = {
-                                    id: 3,
-                                    questionText: 'Test FAQ Gamma',
-                                    answerText: 'Yet another sample answer.',
-                                    status: 'draft',
-                                    pages: [
-                                        { id: 1, title: 'Page A', slug: 'page-a' },
-                                        { id: 2, title: 'Page B', slug: 'page-b' },
-                                        { id: 3, title: 'Page C', slug: 'page-c' },
-                                    ],
-                                };
-                                props.onAddFaq(mockNewFaq);
-                            } else if (isEditMode && props.onEditFaq && props.faqToEdit) {
-                                // Return FAQ in DTO format (with pageIds instead of pages)
-                                const updatedFaq = {
-                                    ...props.faqToEdit,
-                                    questionText: 'Updated FAQ',
-                                    pageIds: props.faqToEdit.pages.map((p: any) => p.id),
-                                    localizations: props.faqToEdit.localizations || [],
-                                };
-                                props.onEditFaq(updatedFaq);
-                            }
-                            props.onClose();
-                        }}
-                    >
-                        {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
-                    </button>
-                    <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
-                        {isAddMode ? 'Close Add' : 'Close Edit'}
-                    </button>
-                </div>
-            );
-        },
-    };
-});
+        const handleConfirm = () => {
+            if (isAddMode && props.onAddFaq) {
+                props.onAddFaq({
+                    id: 3,
+                    questionText: 'Test FAQ Gamma',
+                    answerText: 'Yet another sample answer.',
+                    status: mockCreatedFaqStatus ?? Status.Draft,
+                    pages: mockPages,
+                    localizations: [],
+                });
+            } else if (isEditMode && props.onEditFaq && props.faqToEdit) {
+                props.onEditFaq({
+                    ...props.faqToEdit,
+                    questionText: 'Updated FAQ',
+                    status: mockEditedFaqStatus ?? props.faqToEdit.status,
+                    pageIds: props.faqToEdit.pages.map((p: any) => p.id),
+                    localizations: props.faqToEdit.localizations || [],
+                });
+            }
+            props.onClose();
+        };
+
+        return (
+            <div data-testid={isAddMode ? 'add-faq-modal' : 'edit-faq-modal'}>
+                <h2>{isAddMode ? 'Add FAQ Modal' : 'Edit FAQ Modal'}</h2>
+                {isEditMode && props.faqToEdit && <p>Editing: {props.faqToEdit.questionText}</p>}
+                {isAddMode && <p>Adding new FAQ</p>}
+                <button data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'} onClick={handleConfirm}>
+                    {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
+                </button>
+                <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
+                    {isAddMode ? 'Close Add' : 'Close Edit'}
+                </button>
+            </div>
+        );
+    },
+}));
 
 jest.mock('../faq-modals/delete-faq-modal/DeleteFaqModal', () => ({
     DeleteFaqModal: (props: any) =>
@@ -129,6 +184,38 @@ jest.mock('../faq-modals/delete-faq-modal/DeleteFaqModal', () => ({
                 </button>
             </div>
         ) : null,
+}));
+
+jest.mock('../faq-modals/translate-faq-modal/TranslateFaqModal', () => ({
+    TranslateFaqModal: (props: any) => {
+        if (!props.isOpen) return null;
+
+        const { VisibilityStatus: Status } = require('@/types/admin/common');
+
+        return (
+            <div data-testid="translate-faq-modal">
+                <p>Translate FAQ Modal</p>
+                <button
+                    data-testid="confirm-translate"
+                    onClick={() =>
+                        props.onTranslateFaq({
+                            id: props.faqToTranslate?.id ?? 1,
+                            questionText: 'Translated question',
+                            answerText: 'Translated answer',
+                            status: props.faqToTranslate?.status ?? Status.Draft,
+                            pages: props.faqToTranslate?.pages ?? [],
+                            localizations: props.faqToTranslate?.localizations ?? [],
+                        })
+                    }
+                >
+                    Confirm Translate
+                </button>
+                <button data-testid="close-translate" onClick={props.onClose}>
+                    Close Translate
+                </button>
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -175,68 +262,10 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     ),
 }));
 
-const mockPages: VisitorPage[] = [
-    { id: 1, title: 'Page A', slug: 'page-a' },
-    { id: 2, title: 'Page B', slug: 'page-b' },
-    { id: 3, title: 'Page C', slug: 'page-c' },
-];
-
-const mockFaqs: FaqQuestion[] = [
-    {
-        id: 1,
-        questionText: 'Test FAQ Alpha',
-        answerText: 'A sample answer.',
-        status: 'published' as unknown as VisibilityStatus,
-        pages: [mockPages[0]],
-        localizations: [
-            {
-                language: { id: 1, code: 'ua' },
-                translationStatus: 1,
-                questionText: 'Тест Альфа',
-                answerText: 'Відповідь Альфа',
-            },
-        ],
-    },
-    {
-        id: 2,
-        questionText: 'Test FAQ Beta',
-        answerText: 'Another sample answer.',
-        status: 'draft' as unknown as VisibilityStatus,
-        pages: [mockPages[1]],
-        localizations: [
-            {
-                language: { id: 1, code: 'ua' },
-                translationStatus: 1,
-                questionText: 'Тест Бета',
-                answerText: 'Відповідь Бета',
-            },
-        ],
-    },
-];
-
-const mockNewFaq: FaqQuestion = {
-    id: 3,
-    questionText: 'Test FAQ Gamma',
-    answerText: 'Yet another sample answer.',
-    status: 'draft' as unknown as VisibilityStatus,
-    pages: mockPages,
-    localizations: [
-        {
-            language: { id: 1, code: 'ua' },
-            translationStatus: 1,
-            questionText: 'Тест Гамма',
-            answerText: 'Відповідь Гамма',
-        },
-    ],
-};
-
 let lastToolbarProps: any = null;
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
-    const mockVisibilityStatus = {
-        Published: 'published',
-        Draft: 'draft',
-    };
+    const { VisibilityStatus: Status } = require('@/types/admin/common');
 
     return {
         AdminPanelToolbar: (props: any) => {
@@ -252,14 +281,11 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
                     />
                     <button
                         data-testid="filter-published"
-                        onClick={() => props.onStatusFilterChange?.(mockVisibilityStatus.Published)}
+                        onClick={() => props.onStatusFilterChange?.(Status.Published)}
                     >
                         Filter Published
                     </button>
-                    <button
-                        data-testid="filter-draft"
-                        onClick={() => props.onStatusFilterChange?.(mockVisibilityStatus.Draft)}
-                    >
+                    <button data-testid="filter-draft" onClick={() => props.onStatusFilterChange?.(Status.Draft)}>
                         Filter Draft
                     </button>
                     <button data-testid="filter-clear" onClick={() => props.onStatusFilterChange?.(undefined)}>
@@ -292,36 +318,6 @@ jest.mock('../faq-component/FaqComponent', () => ({
             </button>
         </div>
     ),
-}));
-
-jest.mock('../faq-modals/translate-faq-modal/TranslateFaqModal', () => ({
-    TranslateFaqModal: (props: any) => {
-        if (!props.isOpen) return null;
-
-        return (
-            <div data-testid="translate-faq-modal">
-                <p>Translate FAQ Modal</p>
-                <button
-                    data-testid="confirm-translate"
-                    onClick={() =>
-                        props.onTranslateFaq({
-                            id: props.faqToTranslate?.id ?? 1,
-                            questionText: 'Translated question',
-                            answerText: 'Translated answer',
-                            status: props.faqToTranslate?.status ?? 'draft',
-                            pages: props.faqToTranslate?.pages ?? [],
-                            localizations: props.faqToTranslate?.localizations ?? [],
-                        })
-                    }
-                >
-                    Confirm Translate
-                </button>
-                <button data-testid="close-translate" onClick={props.onClose}>
-                    Close Translate
-                </button>
-            </div>
-        );
-    },
 }));
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
@@ -358,28 +354,14 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container"></div>,
 }));
 
-const convertFaqsToDto = (faqs: FaqQuestion[]): FaqQuestionDto[] => {
-    return faqs.map((faq) => ({
-        id: faq.id,
-        questionText: faq.questionText,
-        answerText: faq.answerText,
-        status: faq.status,
-        pageIds: faq.pages.map((p) => p.id),
-        localizations: faq.localizations.map((l) => ({
-            localizationInfoDto: {
-                id: l.language.id,
-                code: l.language.code,
-            },
-            translationStatus: l.translationStatus,
-            entityId: faq.id,
-            questionText: l.questionText,
-            answerText: l.answerText,
-        })),
-    }));
-};
-
 describe('FaqPanelContent', () => {
     const renderFaqPanelContent = () => render(<FaqPanelContent />);
+
+    const renderPanelWithFaqs = async (expectedCount = mockFaqs.length) => {
+        const view = renderFaqPanelContent();
+        await waitFor(() => expect(getFaqItems()).toHaveLength(expectedCount));
+        return view;
+    };
 
     const getFaqItems = () => screen.getAllByTestId('faq-item');
     const getAddFaqModal = () => screen.queryByTestId('add-faq-modal');
@@ -387,15 +369,76 @@ describe('FaqPanelContent', () => {
     const getDeleteFaqModal = () => screen.queryByTestId('delete-faq-modal');
     const getTranslateFaqModal = () => screen.queryByTestId('translate-faq-modal');
     const getFaqErrorContainer = () => screen.getByTestId('faq-error-container');
+    const getCategoryButton = (id: number) => screen.getByTestId(`category-${id}`);
 
-    const clickAddFaqButton = () => fireEvent.click(screen.getByTestId('add-faq-button'));
-    const clickFilterPublishedButton = () => fireEvent.click(screen.getByTestId('filter-published'));
-    const clickEditFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`edit-faq-${id}`));
-    const clickDeleteFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`delete-faq-${id}`));
-    const clickTranslateFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`translate-faq-${id}`));
+    const click = (testId: string) => fireEvent.click(screen.getByTestId(testId));
+    const clickAddFaqButton = () => click('add-faq-button');
+    const clickFilterPublishedButton = () => click('filter-published');
+    const clickEditFaqButton = (id: number) => click(`edit-faq-${id}`);
+    const clickDeleteFaqButton = (id: number) => click(`delete-faq-${id}`);
+    const clickTranslateFaqButton = (id: number) => click(`translate-faq-${id}`);
+
+    const dragFaq = (fromId: number, toId: number) => {
+        const draggedId = String(fromId);
+        fireEvent.dragStart(screen.getByTestId(`draggable-item-${fromId}`), {
+            dataTransfer: { setData: jest.fn(), getData: jest.fn().mockReturnValue(draggedId) },
+        });
+        fireEvent.drop(screen.getByTestId(`draggable-item-${toId}`), {
+            dataTransfer: { getData: jest.fn().mockReturnValue(draggedId) },
+        });
+    };
+
+    const editFaqAndConfirm = (id: number, statusAfterEdit?: VisibilityStatus) => {
+        mockEditedFaqStatus = statusAfterEdit;
+        clickEditFaqButton(id);
+        click('confirm-edit');
+    };
+
+    const addFaqAndConfirm = (statusOfCreatedFaq?: VisibilityStatus) => {
+        mockCreatedFaqStatus = statusOfCreatedFaq;
+        clickAddFaqButton();
+        click('confirm-add');
+    };
+
+    const selectSuggestion = (faqId: number) =>
+        act(() => {
+            getLastToolbarProps().onSuggestionSelect(faqId);
+        });
+
+    const clearSearch = () => fireEvent.change(screen.getByTestId('search-input'), { target: { value: '' } });
+
+    const mockGetAllOnce = (faqs: FaqQuestion[], totalItemsCount = faqs.length) =>
+        mockFaqApi.getAll.mockResolvedValueOnce({ items: convertFaqsToDto(faqs), totalItemsCount });
+
+    const mockGetById = (faq: FaqQuestion, overrides: Partial<FaqQuestionDto> = {}) =>
+        mockFaqApi.getById.mockResolvedValue({ ...convertFaqToDto(faq), ...overrides });
+
+    const getAllArgs = (pageId: number, status?: VisibilityStatus | string, offset: unknown = 0) => [
+        expect.anything(),
+        pageId,
+        0,
+        status,
+        offset,
+        expect.any(Number),
+    ];
+
+    const expectGetAllCalledWith = (pageId: number, status?: VisibilityStatus | string, offset: unknown = 0) =>
+        expect(mockFaqApi.getAll).toHaveBeenCalledWith(...getAllArgs(pageId, status, offset));
+
+    const expectActiveTab = (activeId: number) =>
+        mockPages.forEach((page) => {
+            const button = getCategoryButton(page.id);
+            if (page.id === activeId) {
+                expect(button).toBeDisabled();
+            } else {
+                expect(button).not.toBeDisabled();
+            }
+        });
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockEditedFaqStatus = undefined;
+        mockCreatedFaqStatus = undefined;
 
         (global as any).AbortController = function () {
             return {
@@ -404,15 +447,13 @@ describe('FaqPanelContent', () => {
             };
         };
 
-        mockedUseAdminClient.mockReturnValue({
-            client: {},
-        });
+        mockedUseAdminClient.mockReturnValue({ client: {} });
 
         mockFaqApi.getAll = jest.fn().mockResolvedValue({
             items: convertFaqsToDto(mockFaqs),
             totalItemsCount: mockFaqs.length,
         });
-
+        mockFaqApi.getById = jest.fn();
         mockFaqApi.reorder = jest.fn().mockResolvedValue({});
         mockFaqApi.fetchFaqSearchItems = jest.fn().mockResolvedValue([]);
 
@@ -433,26 +474,14 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1);
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    0,
-                    undefined,
-                    0,
-                    expect.any(Number),
-                );
+                expectGetAllCalledWith(1);
             });
 
-            await waitFor(() => {
-                expect(getFaqItems()).toHaveLength(2);
-            });
+            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
         });
 
         it('should show empty state when no faqs are found', async () => {
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: [],
-                totalItemsCount: 0,
-            });
+            mockGetAllOnce([]);
 
             renderFaqPanelContent();
 
@@ -465,101 +494,37 @@ describe('FaqPanelContent', () => {
 
     describe('Category selection and filtering', () => {
         it('should change faqs when different category is selected', async () => {
-            const categoryBFaqs = [mockFaqs[1]];
-            renderFaqPanelContent();
+            await renderPanelWithFaqs();
+            mockGetAllOnce([mockFaqs[1]]);
 
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            click('category-2');
 
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto(categoryBFaqs),
-                totalItemsCount: 1,
-            });
-
-            fireEvent.click(screen.getByTestId(`category-2`));
-
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    2,
-                    0,
-                    undefined,
-                    0,
-                    expect.any(Number),
-                );
-            });
+            await waitFor(() => expectGetAllCalledWith(2));
         });
 
-        it('should handle published status filter changes', async () => {
-            renderFaqPanelContent();
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+        it.each([
+            ['published', 'filter-published', VisibilityStatus.Published, mockFaqs[0]],
+            ['draft', 'filter-draft', VisibilityStatus.Draft, mockFaqs[1]],
+        ])('should handle %s status filter changes', async (_name, buttonTestId, status, faq) => {
+            await renderPanelWithFaqs();
+            mockGetAllOnce([faq]);
 
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto([mockFaqs[0]]),
-                totalItemsCount: 1,
-            });
+            click(buttonTestId);
 
-            clickFilterPublishedButton();
-
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    0,
-                    'published',
-                    0,
-                    expect.any(Number),
-                );
-            });
-        });
-
-        it('should handle draft status filter changes', async () => {
-            renderFaqPanelContent();
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto([mockFaqs[1]]),
-                totalItemsCount: 1,
-            });
-
-            fireEvent.click(screen.getByTestId('filter-draft'));
-
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, 0, 'draft', 0, expect.any(Number));
-            });
+            await waitFor(() => expectGetAllCalledWith(1, status));
         });
 
         it('should clear filters when clear filter button is clicked', async () => {
-            renderFaqPanelContent();
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto([mockFaqs[0]]),
-                totalItemsCount: 1,
-            });
+            await renderPanelWithFaqs();
+            mockGetAllOnce([mockFaqs[0]]);
 
             clickFilterPublishedButton();
+            await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2));
 
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-            });
+            mockGetAllOnce(mockFaqs);
+            click('filter-clear');
 
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto(mockFaqs),
-                totalItemsCount: mockFaqs.length,
-            });
-
-            fireEvent.click(screen.getByTestId('filter-clear'));
-
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    0,
-                    undefined,
-                    0,
-                    expect.any(Number),
-                );
-            });
+            await waitFor(() => expectGetAllCalledWith(1, undefined));
         });
     });
 
@@ -573,74 +538,29 @@ describe('FaqPanelContent', () => {
                 expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_FAQ)).toBeInTheDocument();
             });
 
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto(mockFaqs),
-                totalItemsCount: mockFaqs.length,
-            });
-
+            mockGetAllOnce(mockFaqs);
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-            });
+            await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2));
         });
 
-        it('should handle canceled axios errors gracefully', async () => {
-            const canceledError = {
-                name: 'CanceledError',
-                message: 'Request canceled',
-            };
-
-            mockFaqApi.getAll.mockRejectedValueOnce(canceledError);
+        it.each([
+            ['canceled axios', { name: 'CanceledError', message: 'Request canceled' }],
+            ['abort', { name: 'AbortError', message: 'The operation was aborted' }],
+        ])('should handle %s errors gracefully', async (_name, error) => {
+            mockFaqApi.getAll.mockRejectedValueOnce(error);
 
             renderFaqPanelContent();
 
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalled();
-            });
-
-            expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
-        });
-
-        it('should handle abort errors gracefully', async () => {
-            const abortError = {
-                name: 'AbortError',
-                message: 'The operation was aborted',
-            };
-
-            mockFaqApi.getAll.mockRejectedValueOnce(abortError);
-
-            renderFaqPanelContent();
-
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalled();
-            });
-
+            await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalled());
             expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
         });
 
         it('should handle reorder errors', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
+            await renderPanelWithFaqs();
             mockFaqApi.reorder.mockRejectedValueOnce(new Error('Reorder error'));
 
-            const draggedItem = screen.getByTestId('draggable-item-1');
-            const targetItem = screen.getByTestId('draggable-item-2');
-
-            fireEvent.dragStart(draggedItem, {
-                dataTransfer: {
-                    setData: jest.fn(),
-                    getData: jest.fn().mockReturnValue('1'),
-                },
-            });
-
-            fireEvent.drop(targetItem, {
-                dataTransfer: {
-                    getData: jest.fn().mockReturnValue('1'),
-                },
-            });
+            dragFaq(1, 2);
 
             await waitFor(() => {
                 expect(getFaqErrorContainer()).toBeInTheDocument();
@@ -651,26 +571,19 @@ describe('FaqPanelContent', () => {
 
     describe('Modal operations', () => {
         it('should open and close add FAQ modal', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-add'));
+            click('close-add');
             expect(getAddFaqModal()).not.toBeInTheDocument();
         });
 
         it('should add a new FAQ', async () => {
-            renderFaqPanelContent();
+            await renderPanelWithFaqs();
 
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-            clickAddFaqButton();
-            expect(getAddFaqModal()).toBeInTheDocument();
-
-            fireEvent.click(screen.getByTestId('confirm-add'));
+            addFaqAndConfirm();
 
             await waitFor(() => {
                 expect(getAddFaqModal()).not.toBeInTheDocument();
@@ -679,53 +592,40 @@ describe('FaqPanelContent', () => {
         });
 
         it('should open and close edit FAQ modal', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-edit'));
+            click('close-edit');
             expect(getEditFaqModal()).not.toBeInTheDocument();
         });
 
         it('should edit an existing FAQ', async () => {
-            renderFaqPanelContent();
+            await renderPanelWithFaqs();
 
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            editFaqAndConfirm(1);
 
-            clickEditFaqButton(1);
-            expect(getEditFaqModal()).toBeInTheDocument();
-
-            fireEvent.click(screen.getByTestId('confirm-edit'));
-
-            await waitFor(() => {
-                expect(getEditFaqModal()).not.toBeInTheDocument();
-            });
+            await waitFor(() => expect(getEditFaqModal()).not.toBeInTheDocument());
         });
 
         it('should open and close delete FAQ modal', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-delete'));
+            click('close-delete');
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
         });
 
         it('should delete an existing FAQ', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('confirm-delete'));
+            click('confirm-delete');
 
             await waitFor(() => {
                 expect(getDeleteFaqModal()).not.toBeInTheDocument();
@@ -734,9 +634,7 @@ describe('FaqPanelContent', () => {
         });
 
         it('should not open multiple modals at the same time', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
@@ -745,16 +643,14 @@ describe('FaqPanelContent', () => {
             expect(getEditFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-add'));
+            click('close-add');
 
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
         });
 
         it('should not open delete modal when another modal is open', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
@@ -763,38 +659,34 @@ describe('FaqPanelContent', () => {
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-add'));
+            click('close-add');
 
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
         });
 
         it('should open and close translate FAQ modal', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickTranslateFaqButton(1);
             expect(getTranslateFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('close-translate'));
+            click('close-translate');
             expect(getTranslateFaqModal()).not.toBeInTheDocument();
         });
 
         it('should handle translate success and show toast', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             clickTranslateFaqButton(1);
             expect(getTranslateFaqModal()).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('confirm-translate'));
+            click('confirm-translate');
 
             await waitFor(() => {
                 expect(getTranslateFaqModal()).not.toBeInTheDocument();
                 expect(mockAddToast).toHaveBeenCalledWith(
-                    COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                    COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
                     expect.anything(),
                 );
             });
@@ -803,10 +695,7 @@ describe('FaqPanelContent', () => {
 
     describe('Infinite scrolling', () => {
         it('should load more faqs when load more button is clicked', async () => {
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto(mockFaqs),
-                totalItemsCount: 4,
-            });
+            mockGetAllOnce(mockFaqs, 4);
 
             renderFaqPanelContent();
 
@@ -815,42 +704,24 @@ describe('FaqPanelContent', () => {
                 expect(screen.getByTestId('load-more')).toBeInTheDocument();
             });
 
-            const moreFaqs = [
-                {
-                    id: 3,
-                    questionText: 'Test FAQ Gamma',
-                    answerText: 'Third answer.',
-                    status: VisibilityStatus.Published,
-                    pages: [mockPages[0]],
-                    localizations: mockFaqs[0].localizations,
-                },
-                {
-                    id: 4,
-                    questionText: 'Test FAQ Delta',
-                    answerText: 'Fourth answer.',
-                    status: VisibilityStatus.Draft,
-                    pages: [mockPages[1]],
-                    localizations: mockFaqs[0].localizations,
-                },
-            ];
+            mockGetAllOnce(
+                [
+                    createFaq({ id: 3, questionText: 'Test FAQ Gamma', status: VisibilityStatus.Published }),
+                    createFaq({
+                        id: 4,
+                        questionText: 'Test FAQ Delta',
+                        status: VisibilityStatus.Draft,
+                        pages: [mockPages[1]],
+                    }),
+                ],
+                4,
+            );
 
-            mockFaqApi.getAll.mockResolvedValueOnce({
-                items: convertFaqsToDto(moreFaqs),
-                totalItemsCount: 4,
-            });
-
-            fireEvent.click(screen.getByTestId('load-more'));
+            click('load-more');
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    0,
-                    undefined,
-                    expect.any(Number),
-                    expect.any(Number),
-                );
+                expectGetAllCalledWith(1, undefined, expect.any(Number));
             });
 
             await waitFor(() => {
@@ -862,25 +733,24 @@ describe('FaqPanelContent', () => {
 
     describe('Search functionality', () => {
         it('should handle search input changes', async () => {
-            renderFaqPanelContent();
-
-            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            await renderPanelWithFaqs();
 
             fireEvent.change(screen.getByTestId('search-input'), { target: { value: 'test search query' } });
             expect(screen.getByTestId('search-input')).toHaveValue('test search query');
         });
 
         it('passes maxCharactersToSearch for FAQ to AdminPanelToolbar', async () => {
-            render(<FaqPanelContent />);
+            renderFaqPanelContent();
 
             await waitFor(() => {
-                const props = getLastToolbarProps();
-                expect(props.maxCharactersToSearch).toBe(UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FAQ);
+                expect(getLastToolbarProps().maxCharactersToSearch).toBe(
+                    UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FAQ,
+                );
             });
         });
 
         it('passes placeholder and add button text to AdminPanelToolbar', async () => {
-            render(<FaqPanelContent />);
+            renderFaqPanelContent();
 
             await waitFor(() => {
                 const props = getLastToolbarProps();
@@ -893,37 +763,26 @@ describe('FaqPanelContent', () => {
             const fetchSearchItemsMock = jest.fn().mockResolvedValue([]);
             mockFaqApi.fetchFaqSearchItems.mockImplementation(fetchSearchItemsMock);
 
-            render(<FaqPanelContent />);
+            renderFaqPanelContent();
 
             await waitFor(() => expect(getLastToolbarProps()).toBeTruthy());
 
-            const props = getLastToolbarProps();
             const pagination = { offset: 2, limit: 7, requestOptions: { cancellationSignal: 'signal' } } as any;
-            await props.fetchSearchItems('query', pagination);
+            await getLastToolbarProps().fetchSearchItems('query', pagination);
 
             expect(fetchSearchItemsMock).toHaveBeenCalledWith({ client: {} }, 'query', 2, 7, 'signal');
         });
 
         it('clears search and refetches faq list when search is cleared', async () => {
             renderFaqPanelContent();
-
             await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1));
 
             const input = screen.getByTestId('search-input');
-
             fireEvent.change(input, { target: { value: 'test' } });
-
-            fireEvent.change(input, { target: { value: '' } });
+            clearSearch();
 
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenLastCalledWith(
-                    expect.anything(),
-                    1,
-                    0,
-                    undefined,
-                    0,
-                    expect.any(Number),
-                );
+                expect(mockFaqApi.getAll).toHaveBeenLastCalledWith(...getAllArgs(1));
             });
         });
     });
@@ -934,11 +793,9 @@ describe('FaqPanelContent', () => {
             const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
 
             const { unmount } = renderFaqPanelContent();
-
             expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
 
             unmount();
-
             expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
         });
 
@@ -951,45 +808,129 @@ describe('FaqPanelContent', () => {
             });
 
             renderFaqPanelContent();
-
             mockUpdateListSize();
 
             expect(mockUpdateListSize).toHaveBeenCalled();
         });
     });
+
+    describe('Reminder toast ("set display order")', () => {
+        const expectReminderToast = (shouldBeShown: boolean) => {
+            if (shouldBeShown) {
+                expect(mockAddToast).toHaveBeenCalledWith(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
+                expect(mockAddToast).toHaveBeenCalledTimes(1);
+            } else {
+                expect(mockAddToast).not.toHaveBeenCalledWith(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
+            }
+        };
+
+        it.each([
+            ['a draft FAQ is published via the edit modal', 2, VisibilityStatus.Published, true],
+            ['a draft FAQ is saved as a draft', 2, VisibilityStatus.Draft, false],
+            ['an already published FAQ is edited and stays published', 1, VisibilityStatus.Published, false],
+            ['a published FAQ is moved back to draft', 1, VisibilityStatus.Draft, false],
+        ])('edit mode: when %s', async (_name, faqId, statusAfterEdit, shouldBeShown) => {
+            await renderPanelWithFaqs();
+
+            editFaqAndConfirm(faqId, statusAfterEdit);
+
+            await waitFor(() => expect(getEditFaqModal()).not.toBeInTheDocument());
+            expectReminderToast(shouldBeShown);
+        });
+
+        it.each([
+            ['published', VisibilityStatus.Published, true],
+            ['draft', VisibilityStatus.Draft, false],
+        ])('add mode: when a %s FAQ is created', async (_name, status, shouldBeShown) => {
+            await renderPanelWithFaqs();
+
+            addFaqAndConfirm(status);
+
+            await waitFor(() => expect(getAddFaqModal()).not.toBeInTheDocument());
+            expectReminderToast(shouldBeShown);
+        });
+    });
+
+    describe('Search suggestion selection syncs the active tab', () => {
+        it('switches to the tab of the selected FAQ when it belongs to another tab', async () => {
+            mockGetById(mockFaqs[1]);
+            await renderPanelWithFaqs();
+            expectActiveTab(1);
+
+            selectSuggestion(2);
+
+            await waitFor(() => expectActiveTab(2));
+            expect(mockFaqApi.getById).toHaveBeenCalledWith(expect.anything(), 2);
+            await waitFor(() => {
+                expect(screen.getByTestId('faq-question-2')).toHaveTextContent('Test FAQ Beta');
+            });
+        });
+
+        it.each([
+            ['belongs to it', {}],
+            ['belongs to several tabs including the current one', { pageIds: [1, 2] }],
+        ])('keeps the current tab when the selected FAQ %s', async (_name, dtoOverrides) => {
+            mockGetById(mockFaqs[0], dtoOverrides);
+            await renderPanelWithFaqs();
+
+            selectSuggestion(1);
+
+            await waitFor(() => expect(mockFaqApi.getById).toHaveBeenCalledWith(expect.anything(), 1));
+            await waitFor(() => expect(getFaqItems()).toHaveLength(1));
+            expectActiveTab(1);
+        });
+
+        it('does not move the user back after they manually pick another tab', async () => {
+            mockGetById(mockFaqs[1]);
+            await renderPanelWithFaqs();
+
+            selectSuggestion(2);
+            await waitFor(() => expectActiveTab(2));
+
+            click('category-3');
+
+            await waitFor(() => expectActiveTab(3));
+        });
+
+        it('loads the list of the highlighted tab after the search is cleared', async () => {
+            mockGetById(mockFaqs[1]);
+            await renderPanelWithFaqs();
+
+            selectSuggestion(2);
+            await waitFor(() => expectActiveTab(2));
+
+            clearSearch();
+
+            await waitFor(() => {
+                expect(mockFaqApi.getAll).toHaveBeenLastCalledWith(...getAllArgs(2));
+            });
+        });
+    });
+
     describe('Edge cases', () => {
         afterEach(() => {
             jest.restoreAllMocks();
         });
 
-        it('should handle case when no visitor pages are available', async () => {
-            jest.spyOn(
+        const mockVisitorPages = (value: Record<string, unknown>, once = false) => {
+            const spy = jest.spyOn(
                 require('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
                 'useVisitorPages',
-            ).mockReturnValueOnce({
-                pages: [],
-                isLoading: false,
-                error: null,
-                refetchPages: jest.fn(),
-            });
+            );
+            const result = { pages: [], isLoading: false, error: null, refetchPages: jest.fn(), ...value };
+            return once ? spy.mockReturnValueOnce(result) : spy.mockReturnValue(result);
+        };
+
+        it('should handle case when no visitor pages are available', async () => {
+            mockVisitorPages({}, true);
 
             renderFaqPanelContent();
 
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).not.toHaveBeenCalled();
-            });
+            await waitFor(() => expect(mockFaqApi.getAll).not.toHaveBeenCalled());
         });
 
-        it('should handle visitor pages loading state', async () => {
-            jest.spyOn(
-                require('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValueOnce({
-                pages: [],
-                isLoading: true,
-                error: null,
-                refetchPages: jest.fn(),
-            });
+        it('should handle visitor pages loading state', () => {
+            mockVisitorPages({ isLoading: true }, true);
 
             renderFaqPanelContent();
 
@@ -997,15 +938,7 @@ describe('FaqPanelContent', () => {
         });
 
         it('should handle visitor pages error', async () => {
-            jest.spyOn(
-                require('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValue({
-                pages: [],
-                isLoading: false,
-                error: new Error('Failed to fetch pages'),
-                refetchPages: jest.fn(),
-            });
+            mockVisitorPages({ error: new Error('Failed to fetch pages') });
 
             renderFaqPanelContent();
 
@@ -1017,16 +950,7 @@ describe('FaqPanelContent', () => {
 
         it('should retry fetching pages when error type is Pages', async () => {
             const mockRefetchPages = jest.fn();
-
-            jest.spyOn(
-                require('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValue({
-                pages: [],
-                isLoading: false,
-                error: new Error('Failed to fetch pages'),
-                refetchPages: mockRefetchPages,
-            });
+            mockVisitorPages({ error: new Error('Failed to fetch pages'), refetchPages: mockRefetchPages });
 
             renderFaqPanelContent();
 
@@ -1062,11 +986,7 @@ describe('FaqPanelContent', () => {
                 }
             };
 
-            const faqToAdd = {
-                ...mockNewFaq,
-                pages: [{ id: 1, title: 'Selected Page', slug: 'selected' }],
-            };
-
+            const faqToAdd = { ...mockNewFaq, pages: [{ id: 1, title: 'Selected Page', slug: 'selected' }] };
             handleAddFaq(faqToAdd);
 
             expect(mockSetFaqs).toHaveBeenCalledWith([...mockFaqs, faqToAdd]);
@@ -1074,11 +994,7 @@ describe('FaqPanelContent', () => {
 
             jest.clearAllMocks();
 
-            const faqWithDifferentPage = {
-                ...mockNewFaq,
-                pages: [{ id: 999, title: 'Other Page', slug: 'other' }],
-            };
-
+            const faqWithDifferentPage = { ...mockNewFaq, pages: [{ id: 999, title: 'Other Page', slug: 'other' }] };
             handleAddFaq(faqWithDifferentPage);
 
             expect(mockSetFaqs).not.toHaveBeenCalled();
@@ -1090,56 +1006,32 @@ describe('FaqPanelContent', () => {
     describe('Additional coverage tests', () => {
         describe('FAQ filtering and visibility', () => {
             it('should remove FAQ from list when edited to not match status filter', async () => {
-                renderFaqPanelContent();
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto([mockFaqs[0]]),
-                    totalItemsCount: 1,
-                });
+                await renderPanelWithFaqs();
+                mockGetAllOnce([mockFaqs[0]]);
                 clickFilterPublishedButton();
-
                 await waitFor(() => expect(getFaqItems()).toHaveLength(1));
 
-                clickEditFaqButton(1);
-                fireEvent.click(screen.getByTestId('confirm-edit'));
+                editFaqAndConfirm(1);
 
-                await waitFor(() => {
-                    expect(getEditFaqModal()).not.toBeInTheDocument();
-                });
+                await waitFor(() => expect(getEditFaqModal()).not.toBeInTheDocument());
             });
         });
 
         describe('AbortController behavior', () => {
+            const createAbortController = (abort = jest.fn()) => ({ signal: { aborted: false }, abort });
+
             it('should abort previous request when new fetch is triggered', async () => {
                 const mockAbort = jest.fn();
-                const firstController = {
-                    signal: { aborted: false },
-                    abort: mockAbort,
-                };
+                (global as any).AbortController = jest.fn(() => createAbortController(mockAbort));
 
-                (global as any).AbortController = jest.fn(() => firstController);
+                await renderPanelWithFaqs();
 
-                renderFaqPanelContent();
-
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                const secondController = {
-                    signal: { aborted: false },
-                    abort: jest.fn(),
-                };
-                (global as any).AbortController = jest.fn(() => secondController);
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto(mockFaqs),
-                    totalItemsCount: 2,
-                });
+                (global as any).AbortController = jest.fn(() => createAbortController());
+                mockGetAllOnce(mockFaqs);
 
                 clickFilterPublishedButton();
 
-                await waitFor(() => {
-                    expect(mockAbort).toHaveBeenCalled();
-                });
+                await waitFor(() => expect(mockAbort).toHaveBeenCalled());
             });
 
             it('should return early when fetch is aborted during execution', async () => {
@@ -1154,105 +1046,50 @@ describe('FaqPanelContent', () => {
                         abortedSignal = true;
                     }),
                 };
-
                 (global as any).AbortController = jest.fn(() => abortedController);
 
                 mockFaqApi.getAll.mockImplementation(async () => {
                     abortedSignal = true;
-                    return {
-                        items: convertFaqsToDto(mockFaqs),
-                        totalItemsCount: 2,
-                    };
+                    return { items: convertFaqsToDto(mockFaqs), totalItemsCount: 2 };
                 });
 
                 renderFaqPanelContent();
 
-                await waitFor(() => {
-                    expect(mockFaqApi.getAll).toHaveBeenCalled();
-                });
+                await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalled());
             });
         });
 
         describe('FAQ additions with filters', () => {
             it('should handle adding FAQ with status filter applied', async () => {
-                renderFaqPanelContent();
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto([mockFaqs[1]]),
-                    totalItemsCount: 1,
-                });
-                fireEvent.click(screen.getByTestId('filter-draft'));
-
+                await renderPanelWithFaqs();
+                mockGetAllOnce([mockFaqs[1]]);
+                click('filter-draft');
                 await waitFor(() => expect(getFaqItems()).toHaveLength(1));
 
                 clickAddFaqButton();
                 expect(getAddFaqModal()).toBeInTheDocument();
+                click('confirm-add');
 
-                fireEvent.click(screen.getByTestId('confirm-add'));
-
-                await waitFor(() => {
-                    expect(getAddFaqModal()).not.toBeInTheDocument();
-                });
+                await waitFor(() => expect(getAddFaqModal()).not.toBeInTheDocument());
             });
         });
 
         describe('Drag and drop reordering', () => {
             it('should not reorder when dragging item to itself', async () => {
-                renderFaqPanelContent();
+                await renderPanelWithFaqs();
 
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                const draggedItem = screen.getByTestId('draggable-item-1');
-
-                fireEvent.dragStart(draggedItem, {
-                    dataTransfer: {
-                        setData: jest.fn(),
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
-
-                fireEvent.drop(draggedItem, {
-                    dataTransfer: {
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
+                dragFaq(1, 1);
 
                 expect(mockFaqApi.reorder).not.toHaveBeenCalled();
             });
 
             it('should handle reorder cancel error gracefully', async () => {
-                const cancelError = {
-                    name: 'CanceledError',
-                    message: 'Request canceled',
-                };
+                await renderPanelWithFaqs();
+                mockFaqApi.reorder.mockRejectedValueOnce({ name: 'CanceledError', message: 'Request canceled' });
 
-                renderFaqPanelContent();
+                dragFaq(1, 2);
 
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.reorder.mockRejectedValueOnce(cancelError);
-
-                const draggedItem = screen.getByTestId('draggable-item-1');
-                const targetItem = screen.getByTestId('draggable-item-2');
-
-                fireEvent.dragStart(draggedItem, {
-                    dataTransfer: {
-                        setData: jest.fn(),
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
-
-                fireEvent.drop(targetItem, {
-                    dataTransfer: {
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
-
-                await waitFor(() => {
-                    expect(mockFaqApi.reorder).toHaveBeenCalled();
-                });
-
+                await waitFor(() => expect(mockFaqApi.reorder).toHaveBeenCalled());
                 expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
             });
         });
@@ -1261,51 +1098,21 @@ describe('FaqPanelContent', () => {
             it('should fetch with translation status filter', async () => {
                 renderFaqPanelContent();
 
-                await waitFor(() => {
-                    expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                        expect.anything(),
-                        1,
-                        0,
-                        undefined,
-                        0,
-                        expect.any(Number),
-                    );
-                });
+                await waitFor(() => expectGetAllCalledWith(1));
             });
 
-            it('should reset list when status filter changes', async () => {
-                renderFaqPanelContent();
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+            it.each([
+                ['status filter changes', () => clickFilterPublishedButton(), mockFaqs[0]],
+                ['selected page changes', () => click('category-2'), mockFaqs[1]],
+            ])('should reset list when %s', async (_name, trigger, faqAfterChange) => {
+                await renderPanelWithFaqs();
+                mockGetAllOnce([faqAfterChange]);
 
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto([mockFaqs[0]]),
-                    totalItemsCount: 1,
-                });
-
-                clickFilterPublishedButton();
+                trigger();
 
                 await waitFor(() => {
                     expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-                    const lastCall = mockFaqApi.getAll.mock.calls[1];
-                    expect(lastCall[4]).toBe(0);
-                });
-            });
-
-            it('should reset list when selected page changes', async () => {
-                renderFaqPanelContent();
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto([mockFaqs[1]]),
-                    totalItemsCount: 1,
-                });
-
-                fireEvent.click(screen.getByTestId('category-2'));
-
-                await waitFor(() => {
-                    expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2); // test
-                    const lastCall = mockFaqApi.getAll.mock.calls[1];
-                    expect(lastCall[4]).toBe(0);
+                    expect(mockFaqApi.getAll.mock.calls[1][4]).toBe(0);
                 });
             });
         });

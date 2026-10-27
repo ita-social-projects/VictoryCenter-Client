@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AlternativeSupportWays } from './AlternativeSupportWays';
-import { PublishedSupportOptionsDto, Currency } from '@/types/public/donate-page';
+import { PublishedSupportOptionsDto } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 
 jest.mock('../../copy-text-button/CopyTextButton', () => ({
     CopyTextButton: ({ textToCopy }: { textToCopy: string }) => (

@@ -3,9 +3,9 @@ import {
     PublishedUahBankDetailsDto,
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
-    Currency,
     DonatePageData,
 } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { axiosInstance } from '@/services/api/axios';
 
 export const donatePageDataFetch = async (): Promise<DonatePageData> => {

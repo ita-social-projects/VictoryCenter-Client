@@ -1,7 +1,6 @@
-import { EventsNewsPageData, PublicEventsPageDto } from '@/types/public/events-news';
+import { EventsNewsPageData, PublicEventsPageDto, Tag } from '@/types/public/events-news';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { getPublicLocalization } from '@/utils/functions/localization/get-public-localization';
-import { mapToTags } from './localization';
 
 const isBlank = (value?: string | null): boolean => !value?.trim();
 

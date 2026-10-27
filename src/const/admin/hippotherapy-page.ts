@@ -74,35 +74,21 @@ export interface HippotherapyTranslationSectionConfig {
     fields: HippotherapyTranslationFieldConfig[];
 }
 
-const createIntroTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+export const createTitleDescriptionTranslationFields = (
+    titleMaxLength: number,
+    descriptionMaxLength: number,
+): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE,
+        maxLength: titleMaxLength,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
         isRequired: true,
     },
     {
         name: 'description',
         label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
-        isRequired: true,
-    },
-];
-
-const createTextCardTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
-    {
-        name: 'title',
-        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-        isRequired: true,
-    },
-    {
-        name: 'description',
-        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        maxLength: descriptionMaxLength,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
         isRequired: true,
     },
@@ -125,22 +111,11 @@ const createQuoteTranslationFields = (): HippotherapyTranslationFieldConfig[] =>
     },
 ];
 
-export const createScientificReferencesGeneralTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
-    {
-        name: 'title',
-        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-        isRequired: true,
-    },
-    {
-        name: 'description',
-        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
-        isRequired: true,
-    },
-];
+export const createScientificReferencesGeneralTranslationFields = (): HippotherapyTranslationFieldConfig[] =>
+    createTitleDescriptionTranslationFields(
+        HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE,
+        HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION,
+    );
 
 export const createScientificReferenceItemTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
     {
@@ -158,11 +133,17 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
 > = {
     [HippotherapyPageLocalizationBlock.Intro]: {
         sectionKey: 'introSection',
-        fields: createIntroTranslationFields(),
+        fields: createTitleDescriptionTranslationFields(
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION,
+        ),
     },
     [HippotherapyPageLocalizationBlock.Description]: {
         sectionKey: 'descriptionSection',
-        fields: createTextCardTranslationFields(),
+        fields: createTitleDescriptionTranslationFields(
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ),
     },
     [HippotherapyPageLocalizationBlock.Quote]: {
         sectionKey: 'quoteSection',
@@ -170,11 +151,17 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     },
     [HippotherapyPageLocalizationBlock.Hippovention]: {
         sectionKey: 'hippoventionSection',
-        fields: createTextCardTranslationFields(),
+        fields: createTitleDescriptionTranslationFields(
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ),
     },
     [HippotherapyPageLocalizationBlock.Analysis]: {
         sectionKey: 'analysisSection',
-        fields: createTextCardTranslationFields(),
+        fields: createTitleDescriptionTranslationFields(
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ),
     },
     [HippotherapyPageLocalizationBlock.AnotherQuote]: {
         sectionKey: 'anotherQuoteSection',

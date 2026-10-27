@@ -169,7 +169,7 @@ const hasDescriptionTranslation = (localization: HippotherapyPageLocalization | 
     hasTextCardTranslation(localization?.descriptionSection);
 
 const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.quoteSection?.quoteText?.trim());
+    hasRichTextContent(localization?.quoteSection?.quoteText);
 
 const hasHippoventionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     hasTextCardTranslation(localization?.hippoventionSection);
@@ -178,13 +178,10 @@ const hasAnalysisTranslation = (localization: HippotherapyPageLocalization | nul
     hasTextCardTranslation(localization?.analysisSection);
 
 const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.anotherQuoteSection?.quoteText?.trim());
+    hasRichTextContent(localization?.anotherQuoteSection?.quoteText);
 
 const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(
-        localization?.scientificReferencesSection?.title?.trim() ||
-            localization?.scientificReferencesSection?.description?.trim(),
-    );
+    hasTextCardTranslation(localization?.scientificReferencesSection);
 
 const hasScientificReferenceTranslation = (
     localization: HippotherapyPageLocalization | null,
@@ -360,7 +357,7 @@ export const HippotherapyPageContent = () => {
     const isNeverPublished = isNotFound && !hasPublished;
     const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
 
-    const canTranslate = translationLanguages.length > 0;
+    const canTranslate = Boolean(englishLanguage);
 
     const translationHandlers = useMemo(
         () => ({

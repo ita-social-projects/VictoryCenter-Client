@@ -715,20 +715,22 @@ describe('HippotherapyPageContent', () => {
         );
 
         it.each([
-            ['intro', 'introSection'],
-            ['hippotherapy-description', 'descriptionSection'],
-            ['hippotherapy-hippovention', 'hippoventionSection'],
-            ['hippotherapy-analysis', 'analysisSection'],
+            ['intro', 'introSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-description', 'descriptionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-quote', 'quoteSection', { quoteText: '<p><br></p>', authorName: '' }],
+            ['hippotherapy-hippovention', 'hippoventionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-analysis', 'analysisSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-another-quote', 'anotherQuoteSection', { quoteText: '<p><br></p>', authorName: '' }],
         ])(
             'keeps the %s translation icon enabled when localization contains only empty rich-text markup',
-            async (fieldIdPrefix, sectionKey) => {
+            async (fieldIdPrefix, sectionKey, sectionContent) => {
                 const contentWithEmptyMarkup: HippotherapyPageContentModel = {
                     ...buildContent(),
                     localizations: [
                         {
                             language: { id: 2, code: 'en' },
                             translationStatus: 1 as any,
-                            [sectionKey]: { title: '<p><br></p>', description: '<p><br></p>' },
+                            [sectionKey]: sectionContent,
                         } as any,
                     ],
                 };
@@ -758,6 +760,18 @@ describe('HippotherapyPageContent', () => {
 
         it('hides the translation icons while no translation languages are available', async () => {
             mockedUseLocalizationToolkit.mockReturnValue({ translationLanguages: [] });
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-hippotherapy-quote');
+            expect(screen.queryByRole('button', { name: /^Translate / })).not.toBeInTheDocument();
+        });
+
+        it('hides the translation icons when English is not among the translation languages', async () => {
+            mockedUseLocalizationToolkit.mockReturnValue({
+                translationLanguages: [{ id: 3, code: 'pl', name: 'Польська' }],
+            });
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
 
             render(<HippotherapyPageContent />);
@@ -868,6 +882,31 @@ describe('HippotherapyPageContent', () => {
                 name: 'Translate research-general',
             });
             expect(generalTranslateButton).toBeDisabled();
+        });
+
+        it('keeps the general research translation action enabled when localization contains only empty rich-text markup', async () => {
+            const contentWithEmptyMarkup: HippotherapyPageContentModel = {
+                ...buildContent(),
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1 as any,
+                        scientificReferencesSection: {
+                            title: '<p><br></p>',
+                            description: '<p><br></p>',
+                            scientificReferences: [],
+                        },
+                    },
+                ],
+            };
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEmptyMarkup);
+
+            render(<HippotherapyPageContent />);
+
+            const generalTranslateButton = await screen.findByRole('button', {
+                name: 'Translate research-general',
+            });
+            expect(generalTranslateButton).toBeEnabled();
         });
 
         it('disables the research reference item translation action when an English translation already exists for that item', async () => {

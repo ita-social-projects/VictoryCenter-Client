@@ -6,15 +6,7 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
 import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
 
-jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
-    LocalizationStatuses: ({ languages, localizedEntity }: any) => (
-        <div
-            data-testid="localization-statuses"
-            data-languages-count={languages?.length ?? 0}
-            data-localizations-count={localizedEntity?.localizations?.length ?? 0}
-        />
-    ),
-}));
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 

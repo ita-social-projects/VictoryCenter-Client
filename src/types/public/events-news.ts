@@ -32,8 +32,8 @@ export interface EventsNews {
     date: string;
     tag?: Tag;
     tags?: Tag[];
-    previewImage: Image | string | { url?: string } | null;
-    backgroundImage: Image | string | null;
+    previewImage: Image | string | { url?: string } | null; // string для моків, Image для реальних даних
+    backgroundImage: Image | string | null; // string для моків, Image для реальних даних
     slug: string;
     localizations?: PublishedEventNewsLocalizationDto[];
 }

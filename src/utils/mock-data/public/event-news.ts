@@ -1,10 +1,91 @@
 import { EventsNewsPageData, EventsNews } from '@/types/public/events-news';
+import { HippotherapyProgramSectionContentDto, HippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
+import { ContentType } from '@/types/common/section-contents';
 import girlAndWhiteHorse from '@/assets/images/girl-and-white-horse.webp';
 import oldManHorse from '@/assets/images/old-man-horse.webp';
 import supportChildren from '@/assets/images/support-children.webp';
 import peopleCircle from '@/assets/images/people-circle.webp';
 import team from '@/assets/images/team.webp';
 import hutirka from '@/assets/images/hutirka.webp';
+
+const toMockImage = (url: string) => ({ id: null, url, mimeType: 'image/webp' });
+
+const createContent = (
+    content: Omit<HippotherapyProgramSectionContentDto, 'localizations'>,
+): HippotherapyProgramSectionContentDto => ({
+    ...content,
+    localizations: [],
+});
+
+const quadImagesBottomSections: HippotherapyProgramSectionDto[] = [
+    {
+        id: 1,
+        template: SectionTemplate.QuadImagesBottom,
+        order: 0,
+        contents: [
+            createContent({
+                contentType: ContentType.Title,
+                order: 0,
+                title: 'Як минула подія',
+            }),
+            createContent({
+                contentType: ContentType.Description,
+                order: 1,
+                description:
+                    'Учасники поділилися враженнями про заняття з конями, а організатори розповіли про подальші плани розвитку програми.',
+            }),
+            createContent({ contentType: ContentType.Image, order: 2, image: toMockImage(girlAndWhiteHorse) }),
+            createContent({ contentType: ContentType.Image, order: 3, image: toMockImage(supportChildren) }),
+            createContent({ contentType: ContentType.Image, order: 4, image: toMockImage(peopleCircle) }),
+            createContent({ contentType: ContentType.Image, order: 5, image: toMockImage(oldManHorse) }),
+        ],
+    },
+];
+
+const dualImagesBottomSections: HippotherapyProgramSectionDto[] = [
+    {
+        id: 2,
+        template: SectionTemplate.DualImagesBottom,
+        order: 0,
+        contents: [
+            createContent({
+                contentType: ContentType.Title,
+                order: 0,
+                title: 'Кадри з заходу',
+            }),
+            createContent({
+                contentType: ContentType.Description,
+                order: 1,
+                description:
+                    'Фоторепортаж із події, що демонструє атмосферу довіри й підтримки між учасниками та конями.',
+            }),
+            createContent({ contentType: ContentType.Image, order: 2, image: toMockImage(team) }),
+            createContent({ contentType: ContentType.Image, order: 3, image: toMockImage(hutirka) }),
+        ],
+    },
+];
+
+const textOnlySections: HippotherapyProgramSectionDto[] = [
+    {
+        id: 3,
+        template: SectionTemplate.TextOnly,
+        order: 0,
+        contents: [
+            createContent({
+                contentType: ContentType.Title,
+                order: 0,
+                title: 'Деталі публікації',
+            }),
+            createContent({
+                contentType: ContentType.Description,
+                order: 1,
+                description:
+                    'Повна версія матеріалу доступна за посиланням на ресурс-партнер. Тут наведено короткий виклад ключових тез.',
+            }),
+        ],
+    },
+];
 
 const tags = [
     { id: '1', name: 'Новини', localizations: [] },

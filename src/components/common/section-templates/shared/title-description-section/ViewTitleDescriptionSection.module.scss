@@ -23,13 +23,15 @@
 
 .title-section {
     @media (min-width: 1024px) {
-        flex: 0 0 50%;
+        flex: 1;
+        min-width: 0;
     }
 }
 
 .description-section {
     @media (min-width: 1024px) {
-        flex: 0 0 50%;
+        flex: 1;
+        min-width: 0;
     }
 }
 

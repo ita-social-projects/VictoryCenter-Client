@@ -7,6 +7,7 @@ import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './TextCardSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface TextCardSectionProps {
     value: HippotherapyTextCardContent;
@@ -40,6 +41,8 @@ const TextCardSectionComponent = ({
         onChange: (description) => onChange({ ...value, description }),
     });
 
+    const isReadOnly = useHippotherapyReadOnly();
+
     return (
         <div className="hippotherapy-text-card-section">
             <SectionTranslationHeader
@@ -61,6 +64,7 @@ const TextCardSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE}
                     error={title.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -73,6 +77,7 @@ const TextCardSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION}
                     error={description.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
             </div>
         </div>

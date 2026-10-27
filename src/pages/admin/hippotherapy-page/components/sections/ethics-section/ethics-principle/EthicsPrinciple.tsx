@@ -3,6 +3,7 @@ import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-in
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS } from '@/const/admin/hippotherapy-page';
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface EthicsPrincipleProps {
     value: string;
@@ -13,7 +14,7 @@ export interface EthicsPrincipleProps {
 
 const EthicsPrincipleComponent = ({ value, fieldId, onChange, disabled }: EthicsPrincipleProps) => {
     const principle = useValidatedRichTextField({ value, onChange });
-
+    const isReadOnly = useHippotherapyReadOnly();
     return (
         <div className="hippotherapy-ethics-section-principle">
             <RichTextInputGroup
@@ -27,6 +28,7 @@ const EthicsPrincipleComponent = ({ value, fieldId, onChange, disabled }: Ethics
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE}
                 error={principle.error}
                 disabled={disabled}
+                hideToolbar={isReadOnly}
             />
         </div>
     );

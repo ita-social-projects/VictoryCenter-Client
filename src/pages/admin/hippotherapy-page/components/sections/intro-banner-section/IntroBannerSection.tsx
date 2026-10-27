@@ -14,6 +14,7 @@ import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './IntroBannerSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface IntroBannerSectionProps {
     value: HippotherapyIntroSectionContent;
@@ -41,6 +42,7 @@ const IntroBannerSectionComponent = ({
         onChange,
         onImageError,
     });
+    const isReadOnly = useHippotherapyReadOnly();
 
     const title = useValidatedRichTextField({
         value: value.title,
@@ -95,6 +97,7 @@ const IntroBannerSectionComponent = ({
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE}
                         error={title.error}
                         disabled={disabled}
+                        hideToolbar={isReadOnly}
                     />
                     <RichTextInputGroup
                         label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -107,6 +110,7 @@ const IntroBannerSectionComponent = ({
                         maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION}
                         error={description.error}
                         disabled={disabled}
+                        hideToolbar={isReadOnly}
                     />
                 </div>
             </div>

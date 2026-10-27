@@ -9,6 +9,7 @@ import { GalleryCard } from './gallery-card/GalleryCard';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './GallerySection.scss';
 import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface GallerySectionProps {
     value: HippotherapyGallerySectionContent;
@@ -36,6 +37,7 @@ const GallerySectionComponent = ({
     localizations,
 }: GallerySectionProps) => {
     const [cardImageErrors, setCardImageErrors] = useState<Record<number, string | null>>({});
+    const isReadOnly = useHippotherapyReadOnly();
 
     const title = useValidatedRichTextField({
         value: value.title,
@@ -78,6 +80,7 @@ const GallerySectionComponent = ({
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE}
                 error={title.error}
                 disabled={disabled}
+                hideToolbar={isReadOnly}
             />
             <div className="hippotherapy-gallery-section-cards">
                 {value.cards.map((card, index) => (

@@ -34,6 +34,10 @@ import {
 } from '../translate-section-modal/TranslateHippotherapySectionModal';
 import './HippotherapyPageContent.scss';
 import { EntityLocalization } from '@/types/common/language';
+import { LanguageToolkit } from '@/components/admin/language-toolkit/LanguageToolkit';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { applyHippotherapyLocalization } from '@/utils/functions/hippotherapy-page/apply-localization';
+import { HippotherapyReadOnlyContext } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 interface TranslationTarget {
     block: HippotherapyPageLocalizationBlock;
@@ -200,7 +204,11 @@ export const HippotherapyPageContent = () => {
         [addToast],
     );
 
-    const { translationLanguages } = useLocalizationToolkit({ setErrorState: setLanguagesErrorState });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange } = useLocalizationToolkit({
+        setErrorState: setLanguagesErrorState,
+    });
+
+    const isReadOnlyLanguage = !!selectedLanguage && selectedLanguage.code !== DEFAULT_LOCALE;
 
     const englishLanguage = useMemo(
         () => translationLanguages.find((lang) => lang.code === 'en'),
@@ -213,6 +221,23 @@ export const HippotherapyPageContent = () => {
                 (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
             ) ?? null,
         [fetchedContent, englishLanguage],
+    );
+
+    const selectedLocalization = useMemo(() => {
+        if (!isReadOnlyLanguage || !selectedLanguage) return null;
+        return (
+            fetchedContent?.localizations?.find(
+                (loc) => loc.language?.id === selectedLanguage.id || loc.language?.code === selectedLanguage.code,
+            ) ?? null
+        );
+    }, [fetchedContent, isReadOnlyLanguage, selectedLanguage]);
+
+    const displayContent = useMemo(
+        () =>
+            draftContent && isReadOnlyLanguage
+                ? applyHippotherapyLocalization(draftContent, selectedLocalization)
+                : draftContent,
+        [draftContent, isReadOnlyLanguage, selectedLocalization],
     );
 
     const localizationsByBlock = useMemo(() => {
@@ -283,9 +308,10 @@ export const HippotherapyPageContent = () => {
 
     const handleSectionChange = useCallback(
         <K extends keyof HippotherapyPageContentModel>(key: K, value: HippotherapyPageContentModel[K]) => {
+            if (isReadOnlyLanguage) return;
             setDraftContent((prev) => (prev ? { ...prev, [key]: value } : prev));
         },
-        [],
+        [isReadOnlyLanguage],
     );
 
     const sectionHandlers = useMemo(
@@ -362,10 +388,10 @@ export const HippotherapyPageContent = () => {
         }
     }, [client, draftContent, addToast]);
 
-    const isDisabled = isPublishing;
+    const isDisabled = isPublishing || isReadOnlyLanguage;
     const isNotFound = isNotFoundError(error);
     const isNeverPublished = isNotFound && !hasPublished;
-    const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
+    const isTranslateDisabled = isPublishing || isPublishButtonActive || isNeverPublished;
 
     const canTranslate = translationLanguages.length > 0;
 
@@ -419,7 +445,7 @@ export const HippotherapyPageContent = () => {
             );
         }
 
-        if (!draftContent) {
+        if (!displayContent) {
             return (
                 <div className="hippotherapy-page-loader">
                     <InlineLoader size={3} />
@@ -433,7 +459,7 @@ export const HippotherapyPageContent = () => {
                     <p className="hippotherapy-page-empty-notice">{HIPPOTHERAPY_PAGE_TEXT.EMPTY_STATE_NOTICE}</p>
                 )}
                 <IntroBannerSection
-                    value={draftContent.introSection}
+                    value={displayContent.introSection}
                     onChange={sectionHandlers.introSection}
                     onImageError={imageErrorHandlers.introSection}
                     disabled={isDisabled}
@@ -443,7 +469,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <TextCardSection
-                    value={draftContent.descriptionSection}
+                    value={displayContent.descriptionSection}
                     onChange={sectionHandlers.descriptionSection}
                     fieldIdPrefix="hippotherapy-description"
                     disabled={isDisabled}
@@ -453,7 +479,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <HippotherapyQuoteSection
-                    value={draftContent.quoteSection}
+                    value={displayContent.quoteSection}
                     onChange={sectionHandlers.quoteSection}
                     fieldIdPrefix="hippotherapy-quote"
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.QUOTE}
@@ -466,7 +492,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <TextCardSection
-                    value={draftContent.hippoventionSection}
+                    value={displayContent.hippoventionSection}
                     onChange={sectionHandlers.hippoventionSection}
                     fieldIdPrefix="hippotherapy-hippovention"
                     disabled={isDisabled}
@@ -476,7 +502,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <HippoventionCenterSection
-                    value={draftContent.hippoventionCenterSection}
+                    value={displayContent.hippoventionCenterSection}
                     onChange={sectionHandlers.hippoventionCenterSection}
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
@@ -486,7 +512,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <GallerySection
-                    value={draftContent.advantagesSection}
+                    value={displayContent.advantagesSection}
                     onChange={sectionHandlers.advantagesSection}
                     fieldIdPrefix="hippotherapy-advantages"
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ADVANTAGES_CARDS}
@@ -498,7 +524,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <TextCardSection
-                    value={draftContent.analysisSection}
+                    value={displayContent.analysisSection}
                     onChange={sectionHandlers.analysisSection}
                     fieldIdPrefix="hippotherapy-analysis"
                     disabled={isDisabled}
@@ -508,7 +534,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <ScientificReferencesSection
-                    value={draftContent.scientificReferencesSection}
+                    value={displayContent.scientificReferencesSection}
                     onChange={sectionHandlers.scientificReferencesSection}
                     disabled={isDisabled}
                     onTranslateGeneralClick={canTranslate ? translationHandlers.scientificGeneral : undefined}
@@ -522,7 +548,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <HippotherapyQuoteSection
-                    value={draftContent.anotherQuoteSection}
+                    value={displayContent.anotherQuoteSection}
                     onChange={sectionHandlers.anotherQuoteSection}
                     fieldIdPrefix="hippotherapy-another-quote"
                     defaultImageStyle={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ANOTHER_QUOTE}
@@ -535,7 +561,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <GallerySection
-                    value={draftContent.participantsSection}
+                    value={displayContent.participantsSection}
                     onChange={sectionHandlers.participantsSection}
                     fieldIdPrefix="hippotherapy-participants"
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.PARTICIPANTS_CARDS}
@@ -547,7 +573,7 @@ export const HippotherapyPageContent = () => {
                 />
                 <hr />
                 <EthicsSection
-                    value={draftContent.ethicsSection}
+                    value={displayContent.ethicsSection}
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
@@ -555,23 +581,32 @@ export const HippotherapyPageContent = () => {
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Ethics)}
                 />
-                <div className="hippotherapy-page-publish">
-                    <Button
-                        buttonStyle="primary"
-                        type="button"
-                        onClick={() => setConfirmationModalOpen(true)}
-                        disabled={!isPublishButtonActive || !isFormValid || hasImageErrors || isPublishing}
-                    >
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                    </Button>
-                </div>
+                {!isReadOnlyLanguage && (
+                    <div className="hippotherapy-page-publish">
+                        <Button
+                            buttonStyle="primary"
+                            type="button"
+                            onClick={() => setConfirmationModalOpen(true)}
+                            disabled={!isPublishButtonActive || !isFormValid || hasImageErrors || isPublishing}
+                        >
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                        </Button>
+                    </div>
+                )}
             </div>
         );
     };
 
     return (
         <>
-            <div className="hippotherapy-page-container">{renderContent()}</div>
+            <HippotherapyReadOnlyContext.Provider value={isReadOnlyLanguage}>
+                <div className="hippotherapy-page-container">
+                    <div className="hippotherapy-page-toolbar">
+                        <LanguageToolkit languages={allLanguages} onLanguageChange={onLanguageChange} />
+                    </div>
+                    {renderContent()}
+                </div>
+            </HippotherapyReadOnlyContext.Provider>
             <ConfirmationModal
                 isOpen={isConfirmationModalOpen}
                 onClose={() => setConfirmationModalOpen(false)}

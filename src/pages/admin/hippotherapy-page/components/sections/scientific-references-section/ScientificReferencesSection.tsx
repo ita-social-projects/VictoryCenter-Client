@@ -15,6 +15,7 @@ import { SectionTranslationHeader } from '../../section-translation-header/Secti
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
@@ -68,6 +69,7 @@ const ScientificReferencesSectionComponent = ({
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
     const [referenceToDeleteLocalId, setReferenceToDeleteLocalId] = useState<string | null>(null);
+    const isReadOnly = useHippotherapyReadOnly();
 
     const areAllReferencesValid = useMemo(
         () =>
@@ -203,6 +205,7 @@ const ScientificReferencesSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE}
                     error={title.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -215,6 +218,7 @@ const ScientificReferencesSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION}
                     error={description.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
             </div>
             <div className="scientific-references-section-list">

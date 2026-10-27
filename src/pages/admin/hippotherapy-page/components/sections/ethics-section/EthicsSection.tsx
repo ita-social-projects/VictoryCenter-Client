@@ -15,6 +15,7 @@ import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-pag
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './EthicsSection.scss';
 import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface EthicsSectionProps {
     value: HippotherapyEthicsSectionContent;
@@ -42,6 +43,8 @@ const EthicsSectionComponent = ({
         onChange,
         onImageError,
     });
+
+    const isReadOnly = useHippotherapyReadOnly();
 
     const title = useValidatedRichTextField({
         value: value.title,
@@ -100,6 +103,7 @@ const EthicsSectionComponent = ({
                                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_TITLE}
                                 error={title.error}
                                 disabled={disabled}
+                                hideToolbar={isReadOnly}
                             />
                             <RichTextInputGroup
                                 label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -112,6 +116,7 @@ const EthicsSectionComponent = ({
                                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_DESCRIPTION}
                                 error={description.error}
                                 disabled={disabled}
+                                hideToolbar={isReadOnly}
                             />
                         </div>
                         <div className="hippotherapy-ethics-section-principles">

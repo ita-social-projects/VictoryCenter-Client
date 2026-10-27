@@ -17,6 +17,7 @@ import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -182,9 +183,9 @@ const hasScientificReferenceTranslation = (
 
 const hasEthicsTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(
-        localization?.ethicsSection?.title?.trim() ||
-            localization?.ethicsSection?.description?.trim() ||
-            localization?.ethicsSection?.principles?.some((principle) => principle?.trim()),
+        getPlainTextFromHtml(localization?.ethicsSection?.title ?? '').trim() ||
+            getPlainTextFromHtml(localization?.ethicsSection?.description ?? '').trim() ||
+            localization?.ethicsSection?.principles?.some((principle) => getPlainTextFromHtml(principle ?? '').trim()),
     );
 
 export const HippotherapyPageContent = () => {

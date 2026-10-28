@@ -765,7 +765,7 @@ describe('HippotherapyPageContent', () => {
             ['hippotherapy-analysis', HippotherapyPageLocalizationBlock.Analysis],
             ['hippotherapy-another-quote', HippotherapyPageLocalizationBlock.AnotherQuote],
             ['hippovention-center', HippotherapyPageLocalizationBlock.HippoventionCenter],
-        ])('opens the translation modal scoped to the %s section', async (fieldIdPrefix, block) => {
+        ])('opens the translation modal scoped to the $fieldIdPrefix section', async (fieldIdPrefix, block) => {
             await renderLoaded();
 
             clickButton(`Translate ${fieldIdPrefix}`);
@@ -850,7 +850,7 @@ describe('HippotherapyPageContent', () => {
                 'hippotherapy-quote',
             ],
         ])(
-            'disables the %s translation icon when an English translation already exists',
+            'disables the $fieldIdPrefix translation icon when an English translation already exists',
             async (fieldIdPrefix, sectionKey, sectionContent, otherFieldIdPrefix) => {
                 await renderLoaded(withEnglishLocalization({ [sectionKey]: sectionContent }));
 
@@ -871,7 +871,7 @@ describe('HippotherapyPageContent', () => {
                 { title: '<p><br></p>', description: '<p><br></p>', pros: '<p><br></p>' },
             ],
         ])(
-            'keeps the %s translation icon enabled when localization contains only empty rich-text markup',
+            'keeps the $fieldIdPrefix translation icon enabled when localization contains only empty rich-text markup',
             async (fieldIdPrefix, sectionKey, sectionContent) => {
                 await renderLoaded(withEnglishLocalization({ [sectionKey]: sectionContent }));
 

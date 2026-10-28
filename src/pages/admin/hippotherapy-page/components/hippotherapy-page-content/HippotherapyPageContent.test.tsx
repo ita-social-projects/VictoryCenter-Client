@@ -601,13 +601,28 @@ describe('HippotherapyPageContent', () => {
 
     describe('section translation', () => {
         const LOCALIZABLE_SECTIONS = [
-            { prefix: 'hippotherapy-quote', block: HippotherapyPageLocalizationBlock.Quote },
-            { prefix: 'hippotherapy-another-quote', block: HippotherapyPageLocalizationBlock.AnotherQuote },
-            { prefix: 'hippovention-center', block: HippotherapyPageLocalizationBlock.HippoventionCenter },
+            {
+                prefix: 'hippotherapy-quote',
+                block: HippotherapyPageLocalizationBlock.Quote,
+                sectionKey: 'quoteSection',
+                mockTranslation: { quoteText: 'English quote', authorName: 'English author' },
+            },
+            {
+                prefix: 'hippotherapy-another-quote',
+                block: HippotherapyPageLocalizationBlock.AnotherQuote,
+                sectionKey: 'anotherQuoteSection',
+                mockTranslation: { quoteText: 'English another quote', authorName: 'English another author' },
+            },
+            {
+                prefix: 'hippovention-center',
+                block: HippotherapyPageLocalizationBlock.HippoventionCenter,
+                sectionKey: 'hippoventionCenterSection',
+                mockTranslation: { title: 'English title', description: 'English description', pros: 'English pros' },
+            },
         ];
 
         it.each(LOCALIZABLE_SECTIONS)(
-            'opens the translation modal scoped to the %s section',
+            'opens the translation modal scoped to the $prefix section',
             async ({ prefix, block }) => {
                 mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
 
@@ -641,19 +656,16 @@ describe('HippotherapyPageContent', () => {
             },
         );
 
-        it.each([
-            ['hippotherapy-quote', 'quoteSection', 'hippotherapy-another-quote'],
-            ['hippotherapy-another-quote', 'anotherQuoteSection', 'hippotherapy-quote'],
-        ])(
-            'disables the %s translation icon when an English translation already exists',
-            async (fieldIdPrefix, sectionKey, otherFieldIdPrefix) => {
+        it.each(LOCALIZABLE_SECTIONS)(
+            'disables the $prefix translation icon when an English translation already exists',
+            async ({ prefix, sectionKey, mockTranslation }) => {
                 const contentWithTranslation: HippotherapyPageContentModel = {
                     ...buildContent(),
                     localizations: [
                         {
                             language: { id: 2, code: 'en' },
                             translationStatus: 1 as any,
-                            [sectionKey]: { quoteText: 'English quote', authorName: 'English author' },
+                            [sectionKey]: mockTranslation,
                         } as any,
                     ],
                 };
@@ -661,8 +673,11 @@ describe('HippotherapyPageContent', () => {
 
                 render(<HippotherapyPageContent />);
 
-                expect(await screen.findByRole('button', { name: `Translate ${fieldIdPrefix}` })).toBeDisabled();
-                expect(screen.getByRole('button', { name: `Translate ${otherFieldIdPrefix}` })).toBeEnabled();
+                expect(await screen.findByRole('button', { name: `Translate ${prefix}` })).toBeDisabled();
+                const otherSections = LOCALIZABLE_SECTIONS.filter((s) => s.prefix !== prefix);
+                otherSections.forEach(({ prefix: otherPrefix }) => {
+                    expect(screen.getByRole('button', { name: `Translate ${otherPrefix}` })).toBeEnabled();
+                });
             },
         );
 

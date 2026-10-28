@@ -2,6 +2,15 @@ import { HippotherapyPageContentModel, HippotherapyPageLocalization } from '@/ty
 
 const pick = (translated: string | null | undefined, base: string): string => (translated?.trim() ? translated : base);
 
+const mapCards = <T extends { description: string }>(
+    baseCards: T[],
+    translated: { cardId: number; description: string }[] | undefined,
+): T[] =>
+    baseCards.map((card, index) => ({
+        ...card,
+        description: pick(translated?.[index]?.description, card.description),
+    }));
+
 export const applyHippotherapyLocalization = (
     content: HippotherapyPageContentModel,
     localization: HippotherapyPageLocalization | null,
@@ -21,11 +30,6 @@ export const applyHippotherapyLocalization = (
         participantsSection,
         ethicsSection,
     } = localization;
-
-    const mapCards = (
-        base: HippotherapyPageContentModel['advantagesSection'],
-        translated?: { description: string }[],
-    ) => base.cards.map((card, i) => ({ ...card, description: pick(translated?.[i]?.description, card.description) }));
 
     return {
         ...content,
@@ -55,7 +59,7 @@ export const applyHippotherapyLocalization = (
         },
         advantagesSection: {
             title: pick(advantagesSection?.title, content.advantagesSection.title),
-            cards: mapCards(content.advantagesSection, advantagesSection?.cards),
+            cards: mapCards(content.advantagesSection.cards, advantagesSection?.cards),
         },
         analysisSection: {
             title: pick(analysisSection?.title, content.analysisSection.title),
@@ -82,14 +86,14 @@ export const applyHippotherapyLocalization = (
         },
         participantsSection: {
             title: pick(participantsSection?.title, content.participantsSection.title),
-            cards: mapCards(content.participantsSection, participantsSection?.cards),
+            cards: mapCards(content.participantsSection.cards, participantsSection?.cards),
         },
         ethicsSection: {
             ...content.ethicsSection,
             title: pick(ethicsSection?.title, content.ethicsSection.title),
             description: pick(ethicsSection?.description, content.ethicsSection.description),
-            principles: content.ethicsSection.principles.map((principle, i) =>
-                pick(ethicsSection?.principles?.[i], principle),
+            principles: content.ethicsSection.principles.map((principle, index) =>
+                pick(ethicsSection?.principles?.[index]?.text, principle),
             ),
         },
     };

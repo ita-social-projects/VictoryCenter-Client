@@ -169,6 +169,7 @@ describe('AddVideoReviewModal', () => {
 
         it('rejects a non-http(s) link', () => {
             renderOpen();
+            // eslint-disable-next-line no-script-url
             fireEvent.change(getLinkInput(), { target: { value: 'javascript:alert(1)' } });
             fireEvent.blur(getLinkInput());
             expect(screen.getByText(VIDEO_REVIEW_VALIDATION.link.getFormatError())).toBeInTheDocument();

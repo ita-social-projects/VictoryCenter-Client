@@ -1,11 +1,13 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EventsNews } from '@/types/public/events-news';
-
 import { RecommendedArticles } from './RecommendedArticles';
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
+}));
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'en' }),
 }));
 
 const mockUseDataPaginationFetch = jest.fn();
@@ -48,7 +50,7 @@ const mockArticle = (id: string): EventsNews => ({
     backgroundImage: null,
     tag: { id: '1', name: 'Media' },
     slug: `article-${id}`,
-    sections: [],
+    localizations: [],
 });
 
 describe('RecommendedArticles', () => {

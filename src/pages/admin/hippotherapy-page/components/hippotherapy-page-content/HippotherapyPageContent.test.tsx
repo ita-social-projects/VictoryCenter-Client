@@ -333,12 +333,6 @@ const expectTranslationDisabledFor = (testIds: string[], isDisabled: boolean) =>
 const expectTranslationDisabledForEverySection = (isDisabled: boolean) =>
     expectTranslationDisabledFor(SECTION_TEST_IDS, isDisabled);
 
-const expectTranslationDisabledForEveryOtherSection = (isDisabled: boolean) =>
-    expectTranslationDisabledFor(
-        SECTION_TEST_IDS.filter((testId) => testId !== 'section-hippotherapy-advantages'),
-        isDisabled,
-    );
-
 const renderLoaded = async (content: HippotherapyPageContentModel = buildContent()) => {
     mockedHippotherapyPageApi.get.mockResolvedValue(content);
     render(<HippotherapyPageContent />);
@@ -516,15 +510,14 @@ describe('HippotherapyPageContent', () => {
         expectTranslationDisabledForEverySection(false);
     });
 
-    it('shows a failure toast and keeps published Advantages translation available when publishing fails elsewhere', async () => {
+    it('shows a failure toast and keeps translation disabled for every section when publishing fails', async () => {
         mockedHippotherapyPageApi.update.mockRejectedValue(new Error('publish failed'));
         await renderLoaded();
 
         editIntroAndPublish();
 
         await expectToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
-        expectTranslationDisabledForEveryOtherSection(true);
-        expect(translateButton('hippotherapy-advantages')).toBeEnabled();
+        expectTranslationDisabledForEverySection(true);
     });
 
     it('updates every non-intro section when its edit control is used', async () => {
@@ -607,13 +600,12 @@ describe('HippotherapyPageContent', () => {
         expectTranslationDisabledForEverySection(false);
     });
 
-    it('disables other translations but keeps published Advantages available when another section has unpublished changes', async () => {
+    it('disables translation for every section once any section has unpublished changes', async () => {
         await renderLoaded();
 
         clickButton('Edit ethics');
 
-        expectTranslationDisabledForEveryOtherSection(true);
-        expect(translateButton('hippotherapy-advantages')).toBeEnabled();
+        expectTranslationDisabledForEverySection(true);
     });
 
     describe('review section translation', () => {
@@ -650,21 +642,12 @@ describe('HippotherapyPageContent', () => {
             expect(translateButton('hippotherapy-advantages')).toBeEnabled();
         });
 
-        it('keeps Advantages translation enabled when an unrelated section has unpublished changes', async () => {
+        it('disables translation for every section once any section has unpublished changes', async () => {
             await renderLoaded();
 
             clickButton('Edit ethics');
 
-            expect(translateButton('hippotherapy-advantages')).toBeEnabled();
-        });
-
-        it('disables Advantages translation when that section has unpublished changes', async () => {
-            await renderLoaded();
-
-            const advantagesTranslateButton = translateButton('hippotherapy-advantages');
-            clickButton('Edit hippotherapy-advantages');
-
-            expect(advantagesTranslateButton).toBeDisabled();
+            expectTranslationDisabledForEverySection(true);
         });
 
         it.each([

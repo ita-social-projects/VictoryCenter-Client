@@ -34,6 +34,8 @@ export const HIPPOTHERAPY_PAGE_TEXT = {
     },
 };
 
+export const HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT = 4;
+
 export const HIPPOTHERAPY_PAGE_CHAR_LIMITS = {
     INTRO_TITLE: 50,
     INTRO_DESCRIPTION: 300,
@@ -129,7 +131,7 @@ const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig
         isRequired: true,
         type: 'text',
     },
-    ...Array.from({ length: 4 }, (_, imageIndex) => ({
+    ...Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, imageIndex) => ({
         name: `description${imageIndex + 1}`,
         label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
@@ -232,6 +234,10 @@ const advantagesDefaultImages = [
     advantageDefaultImage2,
     advantageDefaultImage3,
 ];
+
+if (advantagesDefaultImages.length !== HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT) {
+    throw new Error('Advantages default images must match HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT');
+}
 
 const defaultGalleryCardStyles = advantagesDefaultImages.map(createCardImageStyle);
 

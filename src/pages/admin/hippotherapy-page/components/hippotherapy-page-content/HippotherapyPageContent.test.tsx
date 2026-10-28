@@ -201,7 +201,15 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
 }));
 
 jest.mock('../sections/ethics-section/EthicsSection', () => ({
-    EthicsSection: ({ value, onChange, onImageError, disabled, onTranslateClick, isTranslateDisabled, localizations }: any) => (
+    EthicsSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        onTranslateClick,
+        isTranslateDisabled,
+        localizations,
+    }: any) => (
         <div
             data-testid="section-ethics"
             data-translate-disabled={String(Boolean(isTranslateDisabled))}
@@ -904,6 +912,8 @@ describe('HippotherapyPageContent', () => {
                 translationStatus: 1 as any,
                 ethicsSection: { title: '', description: '', principles: ['Translated principle'] },
             }));
+    });
+
     describe('translation statuses mapping by block', () => {
         it('passes localizations to the corresponding sections and ignores null translationStatus', async () => {
             const contentWithStatuses: HippotherapyPageContentModel = {

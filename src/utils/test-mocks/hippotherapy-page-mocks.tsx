@@ -1,4 +1,14 @@
-export const MockRichTextInputGroup = ({ label, onChange, onBlur, value, id, disabled, error, maxLength }: any) => (
+export const MockRichTextInputGroup = ({
+    label,
+    onChange,
+    onBlur,
+    value,
+    id,
+    disabled,
+    error,
+    maxLength,
+    hideToolbar,
+}: any) => (
     <div>
         <label htmlFor={id}>{label}</label>
         <input
@@ -9,6 +19,7 @@ export const MockRichTextInputGroup = ({ label, onChange, onBlur, value, id, dis
             maxLength={maxLength}
             id={id}
             disabled={disabled}
+            data-hide-toolbar={String(Boolean(hideToolbar))}
         />
         {error && <span>{error}</span>}
     </div>

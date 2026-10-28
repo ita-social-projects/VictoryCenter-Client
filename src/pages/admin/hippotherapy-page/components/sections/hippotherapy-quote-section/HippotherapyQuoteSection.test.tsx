@@ -4,7 +4,10 @@ import { HippotherapyQuoteSection, HippotherapyQuoteSectionProps } from './Hippo
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
-import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    itHidesToolbarWhenReadOnly,
+    itRendersTranslationStatuses,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
     getValidateTextMock,
     itDisablesInputsWhenDisabled,
@@ -14,6 +17,7 @@ import {
     itUpdatesFieldsOnChange,
     setupValidateTextMock,
 } from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
@@ -33,14 +37,17 @@ describe('HippotherapyQuoteSection', () => {
         imageId: null,
     };
 
-    const renderComponent = (props: Partial<HippotherapyQuoteSectionProps> = {}) =>
+    const renderComponent = (props: Partial<HippotherapyQuoteSectionProps> = {}, isReadOnly = false) =>
         render(
-            <HippotherapyQuoteSection
-                value={defaultValue}
-                onChange={jest.fn()}
-                fieldIdPrefix="test-quote"
-                {...props}
-            />,
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <HippotherapyQuoteSection
+                    value={defaultValue}
+                    onChange={jest.fn()}
+                    fieldIdPrefix="test-quote"
+                    {...props}
+                />
+                ,
+            </HippotherapyReadOnlyContext.Provider>,
         );
 
     it('renders the quote text and author name fields', () => {
@@ -76,5 +83,12 @@ describe('HippotherapyQuoteSection', () => {
 
     describe('translation statuses', () => {
         itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            ['mock-rich-input-test-quote-quote-text', 'mock-rich-input-test-quote-quote-author'],
+        );
     });
 });

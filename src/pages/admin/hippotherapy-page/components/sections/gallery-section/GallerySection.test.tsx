@@ -3,7 +3,10 @@ import '@testing-library/jest-dom';
 import { GallerySection, GallerySectionProps } from './GallerySection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippotherapyGallerySectionContent } from '@/types/admin/hippotherapy-page';
-import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    itHidesToolbarWhenReadOnly,
+    itRendersTranslationStatuses,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
     getValidateTextMock,
     itDisablesInputsWhenDisabled,
@@ -12,6 +15,7 @@ import {
     itUpdatesFieldsOnChange,
     setupValidateTextMock,
 } from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
@@ -32,8 +36,12 @@ describe('GallerySection', () => {
         ],
     };
 
-    const renderComponent = (props: Partial<GallerySectionProps> = {}) =>
-        render(<GallerySection value={defaultValue} onChange={jest.fn()} fieldIdPrefix="test-gallery" {...props} />);
+    const renderComponent = (props: Partial<GallerySectionProps> = {}, isReadOnly = false) =>
+        render(
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <GallerySection value={defaultValue} onChange={jest.fn()} fieldIdPrefix="test-gallery" {...props} />
+            </HippotherapyReadOnlyContext.Provider>,
+        );
 
     it('renders the title and one image/description pair per card', () => {
         renderComponent();
@@ -107,5 +115,16 @@ describe('GallerySection', () => {
 
     describe('translation statuses', () => {
         itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            [
+                'mock-rich-input-test-gallery-title',
+                'mock-rich-input-test-gallery-card-0-description',
+                'mock-rich-input-test-gallery-card-1-description',
+            ],
+        );
     });
 });

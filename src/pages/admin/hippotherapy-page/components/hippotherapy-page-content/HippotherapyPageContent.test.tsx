@@ -11,8 +11,8 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { ToastType } from '@/types/admin/toast';
 import { HippotherapyPageContentModel, HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { TranslationStatus } from '@/types/common/language';
-import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID, DEFAULT_LOCALE, DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
@@ -235,7 +235,27 @@ jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => 
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
 const mockedUseLocalizationToolkit = useLocalizationToolkit as jest.Mock;
-const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
+
+const ukrainianLanguage: LocalizationLanguage = {
+    id: DEFAULT_UKRAINIAN_LANGUAGE_ID,
+    code: DEFAULT_LOCALE,
+    name: 'Українська',
+};
+const englishLanguage: LocalizationLanguage = {
+    id: DEFAULT_ENGLISH_LANGUAGE_ID,
+    code: 'en',
+    name: 'Англійська',
+};
+
+// LanguageToolkit (rendered by the page) reads `allLanguages.length` in an effect,
+// so every test must get a complete toolkit result, not just `translationLanguages`.
+const createToolkitMock = (overrides: Record<string, unknown> = {}) => ({
+    allLanguages: [ukrainianLanguage, englishLanguage],
+    translationLanguages: [englishLanguage],
+    selectedLanguage: ukrainianLanguage,
+    onLanguageChange: jest.fn(),
+    ...overrides,
+});
 
 jest.mock('@/services/api/admin/hippotherapy-page/hippotherapy-page-api');
 const mockedHippotherapyPageApi = HippotherapyPageApi as jest.Mocked<typeof HippotherapyPageApi>;
@@ -325,7 +345,7 @@ describe('HippotherapyPageContent', () => {
         mockedUseAdminClient.mockReturnValue(mockClient);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
         mockedIsContentValid.mockReturnValue(true);
-        mockedUseLocalizationToolkit.mockReturnValue({ translationLanguages: [englishLanguage] });
+        mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock());
 
         if (!(global as any).crypto) {
             Object.defineProperty(global, 'crypto', { value: {}, configurable: true, writable: true });
@@ -679,8 +699,8 @@ describe('HippotherapyPageContent', () => {
                     ...buildContent(),
                     localizations: [
                         {
-                            language: { id: 2, code: 'en' },
-                            translationStatus: 1 as any,
+                            language: { id: englishLanguage.id, code: englishLanguage.code },
+                            translationStatus: TranslationStatus.Relevant,
                             [sectionKey]: { quoteText: 'English quote', authorName: 'English author' },
                         } as any,
                     ],
@@ -710,7 +730,7 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('hides the translation icons while no translation languages are available', async () => {
-            mockedUseLocalizationToolkit.mockReturnValue({ translationLanguages: [] });
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ translationLanguages: [] }));
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
 
             render(<HippotherapyPageContent />);
@@ -799,8 +819,8 @@ describe('HippotherapyPageContent', () => {
                 ...buildContent(),
                 localizations: [
                     {
-                        language: { id: 2, code: 'en' },
-                        translationStatus: 1 as any,
+                        language: { id: englishLanguage.id, code: englishLanguage.code },
+                        translationStatus: TranslationStatus.Relevant,
                         scientificReferencesSection: {
                             title: 'English Title',
                             description: 'English Description',
@@ -824,8 +844,8 @@ describe('HippotherapyPageContent', () => {
                 ...buildContent(),
                 localizations: [
                     {
-                        language: { id: 2, code: 'en' },
-                        translationStatus: 1 as any,
+                        language: { id: englishLanguage.id, code: englishLanguage.code },
+                        translationStatus: TranslationStatus.Relevant,
                         scientificReferencesSection: {
                             title: '',
                             description: '',
@@ -880,6 +900,65 @@ describe('HippotherapyPageContent', () => {
 
             const ethicsSection = screen.getByTestId('section-ethics');
             expect(ethicsSection).toHaveAttribute('data-localizations-count', '0');
+        });
+    });
+
+    describe('read-only language mode (non-default locale)', () => {
+        const contentWithEnglish = (): HippotherapyPageContentModel => ({
+            ...buildContent(),
+            localizations: [
+                {
+                    language: englishLanguage,
+                    translationStatus: TranslationStatus.Relevant,
+                    introSection: { title: 'English Intro Title', description: 'English Intro Description' },
+                    descriptionSection: { title: 'English Desc Title', description: 'English Desc Text' },
+                } as any,
+            ],
+        });
+
+        it('displays translated content and hides the publish button when non-default language is active', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('English Intro Title');
+
+            const descSection = screen.getByTestId('section-hippotherapy-description');
+            expect(descSection).toHaveTextContent('English Desc Title');
+
+            // Кнопка публікації не повинна рендеритися взагалі
+            expect(
+                screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+            ).not.toBeInTheDocument();
+        });
+
+        it('disables section editing controls when in read-only language mode', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            const editButton = await screen.findByRole('button', { name: 'Edit intro' });
+            expect(editButton).toBeDisabled();
+        });
+
+        it('switches back to Ukrainian base editable content when returning to default locale', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('Intro title');
+
+            const editButton = screen.getByRole('button', { name: 'Edit intro' });
+            expect(editButton).toBeEnabled();
+
+            expect(
+                screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+            ).toBeInTheDocument();
         });
     });
 });

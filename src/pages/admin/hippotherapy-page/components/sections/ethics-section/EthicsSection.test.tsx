@@ -2,30 +2,28 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
-    runsSectionImageInputTests,
-    runsSectionFieldUpdateTests,
-    runsSectionFieldValidationErrorTest,
-    runsSectionDisablesInputsTest,
-    runsSectionTranslationHeaderTests,
-} from '../test-utils/sectionTestHelpers';
+    itDisablesInputsWhenDisabled,
+    itHandlesImageField,
+    itShowsValidationErrorOnBlur,
+    itSupportsTranslateButton,
+    itUpdatesFieldsOnChange,
+    setupValidateTextMock,
+} from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
 
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
-
 jest.mock('@/components/admin/image-input/ImageInput');
-
-jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
-    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
-        validateText: jest.fn(() => undefined),
-    },
-}));
+jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema');
 
 describe('EthicsSection', () => {
-    let mockOnChange: jest.Mock;
+    setupValidateTextMock();
 
-    const validateTextMock = () => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
+    const TITLE_ID = 'mock-rich-input-hippotherapy-ethics-title';
+    const DESCRIPTION_ID = 'mock-rich-input-hippotherapy-ethics-description';
+    const principleId = (index: number) => `mock-rich-input-hippotherapy-ethics-principle-${index}`;
 
     const defaultValue: HippotherapyEthicsSectionContent = {
         title: 'Initial title',
@@ -36,74 +34,42 @@ describe('EthicsSection', () => {
     };
 
     const renderComponent = (props: Partial<EthicsSectionProps> = {}) =>
-        render(<EthicsSection value={defaultValue} onChange={mockOnChange} {...props} />);
-
-    beforeEach(() => {
-        mockOnChange = jest.fn();
-        validateTextMock().mockReset();
-        validateTextMock().mockReturnValue(undefined);
-    });
+        render(<EthicsSection value={defaultValue} onChange={jest.fn()} {...props} />);
 
     it('renders title, image, description, and one field per principle', () => {
         renderComponent();
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBeInTheDocument();
         expect(screen.getAllByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toHaveLength(3);
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-0')).toHaveValue('Principle one');
+        expect(screen.getByTestId(principleId(0))).toHaveValue('Principle one');
     });
 
-    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
-
-    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
-        {
-            testId: 'mock-rich-input-hippotherapy-ethics-title',
-            fieldName: 'title',
-            label: 'title',
-            newValue: 'New title',
-        },
-        {
-            testId: 'mock-rich-input-hippotherapy-ethics-description',
-            fieldName: 'description',
-            label: 'description',
-            newValue: 'New description',
-        },
+    itHandlesImageField(renderComponent, defaultValue);
+    itUpdatesFieldsOnChange(renderComponent, defaultValue, [
+        { testId: TITLE_ID, field: 'title', value: 'New title' },
+        { testId: DESCRIPTION_ID, field: 'description', value: 'New description' },
     ]);
 
     it('updates only the targeted principle, leaving others intact', () => {
-        renderComponent();
+        const onChange = jest.fn();
+        renderComponent({ onChange });
 
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-ethics-principle-1'), {
-            target: { value: 'Updated principle two' },
-        });
+        fireEvent.change(screen.getByTestId(principleId(1)), { target: { value: 'Updated principle two' } });
 
-        expect(mockOnChange).toHaveBeenCalledWith({
+        expect(onChange).toHaveBeenCalledWith({
             ...defaultValue,
             principles: ['Principle one', 'Updated principle two'],
         });
     });
 
-    runsSectionFieldValidationErrorTest(
-        renderComponent,
-        validateTextMock,
-        'mock-rich-input-hippotherapy-ethics-principle-0',
-        'shows a per-principle validation error',
-        { newValue: 'x' },
-    );
+    itShowsValidationErrorOnBlur(renderComponent, principleId(0), 'x');
+    itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, DESCRIPTION_ID, principleId(0)]);
 
-    runsSectionDisablesInputsTest(
-        renderComponent,
-        [
-            'mock-image-input-file',
-            'mock-rich-input-hippotherapy-ethics-title',
-            'mock-rich-input-hippotherapy-ethics-description',
-            'mock-rich-input-hippotherapy-ethics-principle-0',
-        ],
-        'disables every input when disabled is true',
-    );
+    describe('translate button', () => {
+        itSupportsTranslateButton(renderComponent);
+    });
 
-    runsSectionTranslationHeaderTests(
-        renderComponent,
-        (onTranslateClick) => ({ onTranslateClick }),
-        (onTranslateClick) => ({ onTranslateClick, isTranslateDisabled: true }),
-    );
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
+    });
 });

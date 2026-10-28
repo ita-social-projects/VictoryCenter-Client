@@ -14,6 +14,7 @@ import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './EthicsSection.scss';
+import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
 
 export interface EthicsSectionProps {
     value: HippotherapyEthicsSectionContent;
@@ -22,6 +23,8 @@ export interface EthicsSectionProps {
     disabled?: boolean;
     onTranslateClick?: () => void;
     isTranslateDisabled?: boolean;
+    translationLanguages?: LocalizationLanguage[];
+    localizations?: EntityLocalization[];
 }
 
 const EthicsSectionComponent = ({
@@ -31,6 +34,8 @@ const EthicsSectionComponent = ({
     disabled,
     onTranslateClick,
     isTranslateDisabled,
+    translationLanguages,
+    localizations,
 }: EthicsSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -56,12 +61,13 @@ const EthicsSectionComponent = ({
 
     return (
         <div className="hippotherapy-ethics-section">
-            {onTranslateClick && (
-                <SectionTranslationHeader
-                    onTranslateClick={onTranslateClick}
-                    isTranslateDisabled={isTranslateDisabled}
-                />
-            )}
+            <SectionTranslationHeader
+                onTranslateClick={onTranslateClick}
+                isTranslateDisabled={isTranslateDisabled}
+                languages={translationLanguages}
+                localizations={localizations}
+            />
+
             <div className="hippotherapy-ethics-section-image-container">
                 <div className="hippotherapy-ethics-section-image">
                     <ImageInput

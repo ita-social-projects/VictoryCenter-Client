@@ -1,5 +1,5 @@
 import { currencyToString, stringToCurrency } from './donate';
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 
 describe('currencyToString', () => {
     it('returns "UAH" for Currency.UAH', () => {

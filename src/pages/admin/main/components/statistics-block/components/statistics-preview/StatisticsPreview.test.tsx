@@ -52,6 +52,21 @@ describe('StatisticsPreview', () => {
         expect(screen.queryByText(uaText)).not.toBeInTheDocument();
     });
 
+    it('shows the UAH amount with грн on the EN tab when there is no English amount', () => {
+        const raisedMetric: Metric = { ...metricRaised, value: 1234600, localizations: [] };
+
+        render(
+            <StatisticsPreview
+                language="EN"
+                onLanguageChange={() => {}}
+                metrics={[raisedMetric]}
+                hiddenMetricIds={[]}
+            />,
+        );
+
+        expect(screen.getByText('1 234 600 грн')).toBeInTheDocument();
+    });
+
     it('switches language when tab is clicked', () => {
         const onLanguageChange = jest.fn();
         render(

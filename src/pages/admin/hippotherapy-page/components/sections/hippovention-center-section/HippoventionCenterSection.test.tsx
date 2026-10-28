@@ -3,29 +3,28 @@ import '@testing-library/jest-dom';
 import { HippoventionCenterSection, HippoventionCenterSectionProps } from './HippoventionCenterSection';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
-    runsSectionImageInputTests,
-    runsSectionFieldUpdateTests,
-    runsSectionFieldValidationErrorTest,
-    runsSectionDisablesInputsTest,
-} from '../test-utils/sectionTestHelpers';
+    itDisablesInputsWhenDisabled,
+    itHandlesImageField,
+    itShowsValidationErrorOnBlur,
+    itSupportsTranslateButton,
+    itUpdatesFieldsOnChange,
+    setupValidateTextMock,
+} from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
 
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
-
 jest.mock('@/components/admin/image-input/ImageInput');
-
-jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
-    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
-        validateText: jest.fn(() => undefined),
-    },
-}));
+jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema');
 
 describe('HippoventionCenterSection', () => {
-    let mockOnChange: jest.Mock;
+    setupValidateTextMock();
 
-    const validateTextMock = () => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
+    const TITLE_ID = 'mock-rich-input-hippovention-center-title';
+    const PROS_ID = 'mock-rich-input-hippovention-center-pros';
+    const DESCRIPTION_ID = 'mock-rich-input-hippovention-center-description';
 
     const defaultValue: HippoventionCenterSectionContent = {
         title: 'Initial title',
@@ -36,13 +35,7 @@ describe('HippoventionCenterSection', () => {
     };
 
     const renderComponent = (props: Partial<HippoventionCenterSectionProps> = {}) =>
-        render(<HippoventionCenterSection value={defaultValue} onChange={mockOnChange} {...props} />);
-
-    beforeEach(() => {
-        mockOnChange = jest.fn();
-        validateTextMock().mockReset();
-        validateTextMock().mockReturnValue(undefined);
-    });
+        render(<HippoventionCenterSection value={defaultValue} onChange={jest.fn()} {...props} />);
 
     it('renders title, image, pros, and description', () => {
         renderComponent();
@@ -50,44 +43,23 @@ describe('HippoventionCenterSection', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
         expect(screen.getByText(HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION)).toBeInTheDocument();
-        expect(screen.getByTestId('mock-rich-input-hippovention-center-pros')).toHaveValue('Initial pros');
+        expect(screen.getByTestId(PROS_ID)).toHaveValue('Initial pros');
     });
 
-    runsSectionImageInputTests(renderComponent, defaultValue, () => mockOnChange);
-
-    runsSectionFieldUpdateTests(renderComponent, defaultValue, () => mockOnChange, [
-        {
-            testId: 'mock-rich-input-hippovention-center-title',
-            fieldName: 'title',
-            label: 'title',
-            newValue: 'New title',
-        },
-        {
-            testId: 'mock-rich-input-hippovention-center-pros',
-            fieldName: 'pros',
-            label: 'pros text',
-            newValue: 'Updated pros',
-        },
-        {
-            testId: 'mock-rich-input-hippovention-center-description',
-            fieldName: 'description',
-            label: 'description',
-            newValue: 'New description',
-        },
+    itHandlesImageField(renderComponent, defaultValue);
+    itUpdatesFieldsOnChange(renderComponent, defaultValue, [
+        { testId: TITLE_ID, field: 'title', value: 'New title' },
+        { testId: PROS_ID, field: 'pros', value: 'Updated pros' },
+        { testId: DESCRIPTION_ID, field: 'description', value: 'New description' },
     ]);
+    itShowsValidationErrorOnBlur(renderComponent, PROS_ID, 'x');
+    itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, PROS_ID, DESCRIPTION_ID]);
 
-    runsSectionFieldValidationErrorTest(
-        renderComponent,
-        validateTextMock,
-        'mock-rich-input-hippovention-center-pros',
-        'shows a validation error when the pros text is invalid',
-        { newValue: 'x' },
-    );
+    describe('translate button', () => {
+        itSupportsTranslateButton(renderComponent);
+    });
 
-    runsSectionDisablesInputsTest(renderComponent, [
-        'mock-image-input-file',
-        'mock-rich-input-hippovention-center-title',
-        'mock-rich-input-hippovention-center-pros',
-        'mock-rich-input-hippovention-center-description',
-    ]);
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
+    });
 });

@@ -4,7 +4,7 @@ import { CardContent } from '../../card-content/CardContent';
 import './CardsSection.scss';
 import { Button } from '@/components/admin/button/Button';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getRichTextContentFromHtml } from '@/utils/functions/rich-text-content/rich-text-content';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { ContentType } from '@/types/common/about-us';
 import { LocalizationLanguage } from '@/types/common/language';
@@ -79,7 +79,7 @@ export const CardsSection = ({
 
         cardContents.forEach((card) => {
             const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(
-                getPlainTextFromHtml(card.description ?? ''),
+                getRichTextContentFromHtml(card.description ?? ''),
             );
 
             updatedErrors[card.id] = {
@@ -102,7 +102,7 @@ export const CardsSection = ({
 
     const isPublishDisabled =
         cardContents.some((card) =>
-            Boolean(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(getPlainTextFromHtml(card.description ?? ''))),
+            Boolean(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(getRichTextContentFromHtml(card.description ?? ''))),
         ) ||
         cardContents.some((card) => errors[card.id]?.image != null) ||
         !isPublishButtonActive ||

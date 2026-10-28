@@ -35,10 +35,12 @@ describe('EventsApi', () => {
 
     describe('updateEventsIntroSection', () => {
         const introSection = {
+            id: 1,
             eventsBlockTitle: '<p>Title</p>',
             pageDescription: '<p>Description</p>',
             isEventsBlockTitleHidden: false,
             isPageDescriptionHidden: false,
+            localizations: [],
         } satisfies EventsIntroSectionDto;
 
         it('updates only the page description through its dedicated endpoint', async () => {
@@ -68,10 +70,12 @@ describe('EventsApi', () => {
         it('calls the EventsPage endpoint and returns both intro fields', async () => {
             const mockResponse = {
                 data: {
+                    id: 1,
                     eventsBlockTitle: '<p>Title</p>',
                     pageDescription: '<p>Description</p>',
                     isEventsBlockTitleHidden: false,
                     isPageDescriptionHidden: false,
+                    localizations: [],
                 } satisfies EventsIntroSectionDto,
             };
             mockGet.mockResolvedValueOnce(mockResponse);

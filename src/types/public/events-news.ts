@@ -78,5 +78,14 @@ export interface PublishedEventNewsDto {
 export interface PublicEventsPageDto {
     eventsBlockTitle?: string | null;
     pageDescription?: string | null;
+    isEventsBlockTitleHidden?: boolean;
+    isPageDescriptionHidden?: boolean;
+    localizations?: PublicEventsIntroSectionLocalizationDto[] | null;
     categories?: EventNewsCategoryDto[] | null;
+}
+
+export interface PublicEventsIntroSectionLocalizationDto {
+    language: LocalizationLanguageDto;
+    eventsBlockTitle?: string | null;
+    pageDescription?: string | null;
 }

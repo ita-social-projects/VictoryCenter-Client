@@ -4,6 +4,9 @@ import { ScientificReferencesSection, ScientificReferencesSectionProps } from '.
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -409,5 +412,9 @@ describe('ScientificReferencesSection', () => {
 
         fireEvent.click(translateRef1);
         expect(mockOnTranslateReferenceClick).toHaveBeenCalledWith('ref-1');
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

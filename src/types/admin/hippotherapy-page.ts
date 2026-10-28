@@ -6,6 +6,7 @@ import {
     EntityWithTranslationStatuses,
     LocalizationInfo,
     TranslationStatus,
+    TranslationStatusInfo,
 } from '@/types/common/language';
 
 import { Image, ImageValues } from '@/types/common/image';
@@ -165,10 +166,15 @@ export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue
     principles: string[];
 }
 
+export type HippotherapyPageTranslationStatusInfo = TranslationStatusInfo & {
+    block: HippotherapyPageLocalizationBlock;
+};
+
 export interface HippotherapyPageContentModel
     extends EntityWithLocalizations<HippotherapyPageLocalization>,
         EntityWithTranslationStatuses {
     id?: number;
+    translationStatuses: HippotherapyPageTranslationStatusInfo[];
     introSection: HippotherapyIntroSectionContent;
     descriptionSection: HippotherapyTextCardContent;
     quoteSection: HippotherapyQuoteContent;
@@ -183,8 +189,9 @@ export interface HippotherapyPageContentModel
 }
 
 export interface HippotherapyPageContentDto
-    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations'>,
+    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations' | 'translationStatuses'>,
         EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
+    translationStatuses?: HippotherapyPageTranslationStatusDto[];
     scientificReferencesSection: {
         title: string;
         description: string;

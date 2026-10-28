@@ -11,6 +11,8 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { ToastType } from '@/types/admin/toast';
 import { HippotherapyPageContentModel, HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
 
 function mockDisabledAttr(isDisabled: unknown) {
     return String(Boolean(isDisabled));
@@ -33,8 +35,12 @@ function mockTranslateButton({
 }
 
 function mockImageSection(testId: string, label: string, editedTitle: string) {
-    return ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
-        <div data-testid={testId} data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}>
+    return ({ value, onChange, onImageError, disabled, isTranslateDisabled, localizations }: any) => (
+        <div
+            data-testid={testId}
+            data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: editedTitle })}>
                 Edit {label}
@@ -82,8 +88,12 @@ jest.mock('../sections/ethics-section/EthicsSection', () => ({
 }));
 
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
-    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled, isTranslateDisabled }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}>
+    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled, isTranslateDisabled, localizations }: any) => (
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited text card title' })}>
                 Edit {fieldIdPrefix}
@@ -101,8 +111,13 @@ jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () 
         disabled,
         onTranslateClick,
         isTranslateDisabled,
+        localizations,
     }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}>
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.quoteText}</span>
             {mockTranslateButton({ onClick: onTranslateClick, disabled: isTranslateDisabled, label: fieldIdPrefix })}
             <button disabled={disabled} onClick={() => onChange({ ...value, quoteText: 'Edited quote' })}>
@@ -123,8 +138,13 @@ jest.mock('../sections/gallery-section/GallerySection', () => ({
         disabled,
         onTranslateClick,
         isTranslateDisabled,
+        localizations,
     }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}>
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             {mockTranslateButton({ onClick: onTranslateClick, disabled: isTranslateDisabled, label: fieldIdPrefix })}
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited gallery title' })}>
@@ -147,8 +167,13 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
         isTranslateGeneralDisabled,
         onTranslateReferenceClick,
         isTranslateReferenceDisabled,
+        localizations,
     }: any) => (
-        <div data-testid="section-research" data-translate-disabled={mockDisabledAttr(isTranslateGeneralDisabled)}>
+        <div
+            data-testid="section-research"
+            data-translate-disabled={mockDisabledAttr(isTranslateGeneralDisabled)}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited research title' })}>
                 Edit research
@@ -782,5 +807,43 @@ describe('HippotherapyPageContent', () => {
                 expect(getButton(translateName)).toBeDisabled();
             },
         );
+    });
+
+    describe('translation statuses mapping by block', () => {
+        it('passes localizations to the corresponding sections and ignores null translationStatus', async () => {
+            const contentWithStatuses: HippotherapyPageContentModel = {
+                ...buildContent(),
+                translationStatuses: [
+                    {
+                        block: HippotherapyPageLocalizationBlock.Intro,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: TranslationStatus.Relevant,
+                    },
+                    {
+                        block: HippotherapyPageLocalizationBlock.Intro,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: null as any,
+                    },
+                    {
+                        block: HippotherapyPageLocalizationBlock.Quote,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: TranslationStatus.Outdated,
+                    },
+                ],
+            };
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithStatuses);
+
+            render(<HippotherapyPageContent />);
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveAttribute('data-localizations-count', '1');
+
+            const quoteSection = screen.getByTestId('section-hippotherapy-quote');
+            expect(quoteSection).toHaveAttribute('data-localizations-count', '1');
+
+            const ethicsSection = screen.getByTestId('section-ethics');
+            expect(ethicsSection).toHaveAttribute('data-localizations-count', '0');
+        });
     });
 });

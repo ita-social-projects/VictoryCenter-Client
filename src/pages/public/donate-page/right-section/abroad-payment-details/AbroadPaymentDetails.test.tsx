@@ -2,11 +2,8 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { AbroadPaymentDetails } from './AbroadPaymentDetails';
-import {
-    Currency,
-    PublishedForeignBankDetailsDto,
-    PublishedCorrespondentBankDetailsDto,
-} from '@/types/public/donate-page';
+import { PublishedForeignBankDetailsDto, PublishedCorrespondentBankDetailsDto } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 
 jest.mock('@/const/public/donate-page', () => ({
     ABROAD_PAYMENT_DETAILS: {

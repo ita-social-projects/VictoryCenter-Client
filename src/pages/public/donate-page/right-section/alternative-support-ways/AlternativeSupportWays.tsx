@@ -1,6 +1,7 @@
 import './AlternativeSupportWays.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { PublishedSupportOptionsDto, Currency } from '@/types/public/donate-page';
+import { PublishedSupportOptionsDto } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { useTranslation } from 'react-i18next';
 
 interface AlternativeSupportWaysProps {

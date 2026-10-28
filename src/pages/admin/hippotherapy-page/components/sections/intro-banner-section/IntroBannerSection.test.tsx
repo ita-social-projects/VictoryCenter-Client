@@ -1,24 +1,28 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroBannerSection, IntroBannerSectionProps } from './IntroBannerSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    itDisablesInputsWhenDisabled,
+    itHandlesImageField,
+    itShowsValidationErrorOnBlur,
+    itSupportsTranslateButton,
+    itUpdatesFieldsOnChange,
+    setupValidateTextMock,
+} from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
 
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
-
 jest.mock('@/components/admin/image-input/ImageInput');
-
-jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema', () => ({
-    HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS: {
-        validateText: jest.fn(() => undefined),
-    },
-}));
+jest.mock('@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema');
 
 describe('IntroBannerSection', () => {
-    let mockOnChange: jest.Mock;
+    setupValidateTextMock();
 
-    const validateTextMock = () => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
+    const TITLE_ID = 'mock-rich-input-hippotherapy-intro-title';
+    const DESCRIPTION_ID = 'mock-rich-input-hippotherapy-intro-description';
 
     const defaultValue: HippotherapyIntroSectionContent = {
         title: 'Initial title',
@@ -28,86 +32,30 @@ describe('IntroBannerSection', () => {
     };
 
     const renderComponent = (props: Partial<IntroBannerSectionProps> = {}) =>
-        render(<IntroBannerSection value={defaultValue} onChange={mockOnChange} {...props} />);
-
-    beforeEach(() => {
-        mockOnChange = jest.fn();
-        validateTextMock().mockReset();
-        validateTextMock().mockReturnValue(undefined);
-    });
+        render(<IntroBannerSection value={defaultValue} onChange={jest.fn()} {...props} />);
 
     it('renders the initial title and description', () => {
         renderComponent();
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-title')).toHaveValue('Initial title');
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toHaveValue('Initial description');
+        expect(screen.getByTestId(TITLE_ID)).toHaveValue('Initial title');
+        expect(screen.getByTestId(DESCRIPTION_ID)).toHaveValue('Initial description');
     });
 
-    it('calls onChange with the updated image', () => {
-        renderComponent();
+    itHandlesImageField(renderComponent, defaultValue);
+    itUpdatesFieldsOnChange(renderComponent, defaultValue, [
+        { testId: TITLE_ID, field: 'title', value: 'New title' },
+        { testId: DESCRIPTION_ID, field: 'description', value: 'New description' },
+    ]);
+    itShowsValidationErrorOnBlur(renderComponent, TITLE_ID, 'x');
+    itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, DESCRIPTION_ID]);
 
-        const file = new File(['dummy'], 'test.png', { type: 'image/png' });
-        fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, image: file });
+    describe('translate button', () => {
+        itSupportsTranslateButton(renderComponent);
     });
 
-    it('calls onChange with the updated title', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'New title' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, title: 'New title' });
-    });
-
-    it('calls onChange with the updated description', () => {
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-description'), {
-            target: { value: 'New description' },
-        });
-
-        expect(mockOnChange).toHaveBeenCalledWith({ ...defaultValue, description: 'New description' });
-    });
-
-    it('shows an error message reported by ImageInput', () => {
-        renderComponent();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(screen.getByText('image size error')).toBeInTheDocument();
-    });
-
-    it('reports the image error to the parent via onImageError', () => {
-        const onImageError = jest.fn();
-        renderComponent({ onImageError });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
-
-        expect(onImageError).toHaveBeenCalledWith('image size error');
-    });
-
-    it('shows a title validation error when validation fails', () => {
-        validateTextMock().mockReturnValueOnce('Title is too short');
-        renderComponent();
-
-        fireEvent.change(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'), {
-            target: { value: 'x' },
-        });
-        fireEvent.blur(screen.getByTestId('mock-rich-input-hippotherapy-intro-title'));
-
-        expect(screen.getByText('Title is too short')).toBeInTheDocument();
-    });
-
-    it('disables inputs when disabled is true', () => {
-        renderComponent({ disabled: true });
-
-        expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-title')).toBeDisabled();
-        expect(screen.getByTestId('mock-rich-input-hippotherapy-intro-description')).toBeDisabled();
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

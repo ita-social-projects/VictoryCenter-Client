@@ -42,7 +42,7 @@ const createImageConfig = (
         backgroundSize: 'cover',
         backgroundPosition,
     },
-    subText: `${cropWidth}x${cropHeight}`,
+    subText: `Розмір: ${cropWidth}x${cropHeight}`,
     cropWidth,
     cropHeight,
     minWidth,

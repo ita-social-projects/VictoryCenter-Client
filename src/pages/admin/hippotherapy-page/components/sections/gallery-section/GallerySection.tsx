@@ -8,6 +8,7 @@ import { ImageValues } from '@/types/common/image';
 import { GalleryCard } from './gallery-card/GalleryCard';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './GallerySection.scss';
+import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
 
 export interface GallerySectionProps {
     value: HippotherapyGallerySectionContent;
@@ -18,6 +19,8 @@ export interface GallerySectionProps {
     disabled?: boolean;
     onTranslateClick?: () => void;
     isTranslateDisabled?: boolean;
+    translationLanguages?: LocalizationLanguage[];
+    localizations?: EntityLocalization[];
 }
 
 const GallerySectionComponent = ({
@@ -29,6 +32,8 @@ const GallerySectionComponent = ({
     disabled,
     onTranslateClick,
     isTranslateDisabled,
+    translationLanguages,
+    localizations,
 }: GallerySectionProps) => {
     const [cardImageErrors, setCardImageErrors] = useState<Record<number, string | null>>({});
 
@@ -55,12 +60,13 @@ const GallerySectionComponent = ({
 
     return (
         <div className="hippotherapy-gallery-section">
-            {onTranslateClick && (
-                <SectionTranslationHeader
-                    onTranslateClick={onTranslateClick}
-                    isTranslateDisabled={isTranslateDisabled}
-                />
-            )}
+            <SectionTranslationHeader
+                onTranslateClick={onTranslateClick}
+                isTranslateDisabled={isTranslateDisabled}
+                languages={translationLanguages}
+                localizations={localizations}
+            />
+
             <RichTextInputGroup
                 label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                 isRequired

@@ -13,37 +13,39 @@
         padding: 64px 64px;
     }
 
-    @media (min-width: 1440px) {
+    @media (min-width: 1024px) {
         flex-direction: row;
-        padding: 80px 0px;
-        gap: 16px;
+        padding: 80px 32px;
+        gap: 32px;
         justify-content: center;
     }
 }
 
 .title-section {
-    @media (min-width: 1440px) {
-        width: 659px;
+    @media (min-width: 1024px) {
+        flex: 1;
+        min-width: 0;
     }
 }
 
 .description-section {
-    @media (min-width: 1440px) {
-        width: 432px;
+    @media (min-width: 1024px) {
+        flex: 1;
+        min-width: 0;
     }
 }
 
 .title {
-    @include type.h3-bold-uppercase;
-
+    @include type.h4-bold-uppercase;
     overflow-wrap: anywhere;
     word-break: normal;
 }
 
 .description {
-    @include type.body-1-medium;
-
+    @include type.small-text-regular;
     overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;
+    margin: 0;
+    padding: 0;
 }

@@ -5,105 +5,121 @@
 .container {
     @extend %section-container;
     background-color: #fff;
-    aspect-ratio: 1440 / 736;
-    max-height: fit-content;
     width: 100%;
     display: flex;
-    flex-direction: row;
-    gap: 60px;
+    flex-direction: column;
+    gap: 32px;
+    padding: 32px 16px;
     font-family: t.$font-family-base;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        gap: 60px;
+        padding: 40px;
+    }
 }
 
 .left-section {
     display: flex;
-    flex: 0 0 50%;
+    flex: 1;
     min-width: 0;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    padding-left: 100px;
-    gap: 5%;
+    gap: 32px;
+
+    @media (min-width: 1024px) {
+        flex: 0 0 50%;
+        padding-left: 32px;
+    }
 }
 
-.title-section {
+.title-section,
+.description-section {
     display: flex;
     min-width: 0;
     align-items: start;
     width: 100%;
+
     > div {
         flex: 1;
+        width: 100%;
     }
 }
 
 .title-input {
     textarea {
-        @include type.h3-semibold-uppercase;
+        @include type.h4-bold-uppercase;
         height: 110px;
         width: 100%;
-    }
-}
 
-.title {
-    font-size: t.$h4-size;
-    line-height: t.$h4-height;
-    font-weight: bold;
-    overflow-wrap: anywhere;
-    word-break: normal;
-    white-space: pre-wrap;
-}
-
-.description-section {
-    width: 100%;
-    display: flex;
-    min-width: 0;
-    align-items: start;
-    > div {
-        flex: 1;
-        width: 100%;
-
-        textarea {
-            overflow-wrap: anywhere;
-            word-break: normal;
-            white-space: pre-wrap;
+        @media (max-width: 1200px) {
+            @include type.subtitle-1-bold;
+            text-transform: uppercase;
         }
     }
 }
 
-.description {
-    font-size: t.$body2-size;
-    line-height: t.$small-height;
+.title {
+    @include type.h4-bold-uppercase;
     overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;
+    margin: 0;
+
+    @media (max-width: 1200px) {
+        @include type.subtitle-1-bold;
+        text-transform: uppercase;
+    }
+}
+
+.description {
+    @include type.small-text-regular;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: pre-wrap;
+    margin: 0;
+    padding: 0;
 }
 
 .right-section {
-    flex: 0 0 50%;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px 0px;
+
+    @media (min-width: 1024px) {
+        flex: 0 0 50%;
+    }
 }
 
 .image-wrapper {
+    width: 100%;
     height: 100%;
 }
 
 .image {
     height: 100%;
-    width: auto;
+    width: 100%;
     object-fit: cover;
     aspect-ratio: 700 / 600;
 }
 
 .template {
-    .title {
-        font-size: t.$h4-size;
-        line-height: t.$h4-height;
+    padding: 4%;
+    gap: 16px;
+
+    .left-section {
+        padding-left: 0;
+        gap: 16px;
     }
+
+    .title {
+        @include type.subtitle-1-bold;
+        text-transform: uppercase;
+    }
+
     .description {
-        font-size: clamp(3px, 0.9vw, 1.5vmin);
-        line-height: 1.4;
+        @include type.small-text-regular;
     }
 }
 
@@ -114,23 +130,8 @@
     justify-content: space-between;
 
     .left-section {
-        justify-content: flex-start;
-        flex: 0 0 41%;
         padding-top: 30px;
         padding-bottom: 30px;
-        gap: 5%;
-    }
-
-    .title-section {
-        width: 100%;
-    }
-
-    .description-section {
-        width: 100%;
-    }
-
-    .right-section {
-        height: auto;
     }
 
     .image-wrapper {

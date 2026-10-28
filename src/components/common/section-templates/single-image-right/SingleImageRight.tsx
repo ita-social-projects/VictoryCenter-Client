@@ -140,7 +140,7 @@ export const SingleImageRight = ({
                             <h2 className={baseStyles.title}>{title}</h2>
                         </div>
                         <div className={baseStyles['description-section']}>
-                            <p className={baseStyles.description}>{description}</p>
+                            <p className={baseStyles.description}>{description.trim()}</p>
                         </div>
                     </div>
                     <div className={baseStyles['right-section']}>

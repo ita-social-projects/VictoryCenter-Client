@@ -7,12 +7,17 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/components/public/cta', () => ({
-    CtaSection: ({ title, description, mediaUrl, buttons }: any) => (
+    CtaSection: ({
+        title,
+        description,
+        mediaUrl,
+        buttons,
+    }: React.ComponentProps<typeof import('@/components/public/cta').CtaSection>) => (
         <section data-testid="cta-section" data-media-url={mediaUrl}>
             <h2>{title}</h2>
             <p>{description}</p>
-            {buttons.map((btn: any) => (
-                <a key={btn.href} href={btn.href}>
+            {buttons.map((btn) => (
+                <a key={btn.href} href={btn.href} target={btn.target} rel={btn.rel}>
                     {btn.label}
                 </a>
             ))}
@@ -30,5 +35,7 @@ describe('DonateSection', () => {
         const donateLink = screen.getByRole('link', { name: 'DONATE.SUBMIT_BUTTON' });
 
         expect(donateLink).toHaveAttribute('href', PUBLIC_ROUTES.DONATE.FULL);
+        expect(donateLink).toHaveAttribute('target', '_blank');
+        expect(donateLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
 });

@@ -37,11 +37,11 @@ export const HippotherapyPage = () => {
                     <HippoventionCenter {...data.hippoventionCenterSection} />
                     <SwipedGallery title={data.advantagesSection.title} cards={data.advantagesSection.advantages} />
                     <TextCard {...data.analysisSection} />
+                    <ResearchSection {...data.researchSection} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
                     />
-                    <ResearchSection {...data.researchSection} />
                     <SwipedGallery
                         title={data.participantsSection.title}
                         cards={data.participantsSection.participants}

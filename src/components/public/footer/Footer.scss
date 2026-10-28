@@ -534,6 +534,14 @@
     }
 }
 
+@media (max-width: 559px) {
+    .footer-content .main-block {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: 'menu' 'about' 'hippotherapy';
+    }
+}
+
 @media (max-width: 368px) {
     .footer-content {
         margin-top: 2rem;

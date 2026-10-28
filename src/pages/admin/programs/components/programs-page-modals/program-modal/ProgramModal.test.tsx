@@ -129,11 +129,13 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
         title,
         onConfirm,
         onCancel,
+        onClose,
     }: {
         isOpen: boolean;
         title: string;
         onConfirm: () => void;
         onCancel: () => void;
+        onClose: () => void;
     }) =>
         isOpen ? (
             <div data-testid="question-modal">
@@ -143,6 +145,9 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
                 </button>
                 <button data-testid="question-cancel" onClick={onCancel}>
                     No
+                </button>
+                <button data-testid="question-dismiss" onClick={onClose}>
+                    Dismiss
                 </button>
             </div>
         ) : null,
@@ -244,6 +249,22 @@ describe('ProgramModal', () => {
         act(() => {
             capturedFormProps.onSubmit(mockFormData, status);
         });
+    };
+
+    const expectSubmissionAbortedWithModalOpen = () => {
+        expect(getQuestionModal()).not.toBeInTheDocument();
+        expect(mockOnClose).not.toHaveBeenCalled();
+        expect(mockedProgramsApi.addProgram).not.toHaveBeenCalled();
+        expect(mockedProgramsApi.editProgram).not.toHaveBeenCalled();
+        expect(mockOnAddProgram).not.toHaveBeenCalled();
+        expect(mockOnEditProgram).not.toHaveBeenCalled();
+    };
+
+    const submitAndAnswer = (status: VisibilityStatus, answerTestId: string) => {
+        simulateFormBecomesValid();
+        fireEvent.click(status === VisibilityStatus.Draft ? getDraftButton() : getPublishButton());
+        simulateFormSubmit(status);
+        fireEvent.click(screen.getByTestId(answerTestId));
     };
 
     beforeEach(() => {
@@ -757,6 +778,58 @@ describe('ProgramModal', () => {
             });
             expect(mockOnEditProgram).not.toHaveBeenCalled();
             expect(mockOnClose).not.toHaveBeenCalled();
+        });
+
+        describe('Cancelling or dismissing the save confirmation keeps the modal open', () => {
+            const programWithStatus = (status: VisibilityStatus) => ({ ...mockProgram, status });
+
+            const cases: Array<[string, ProgramModalProps, VisibilityStatus]> = [
+                ['Add mode', addModeProps, VisibilityStatus.Draft],
+                ['Add mode', addModeProps, VisibilityStatus.Published],
+                ['Edit mode (draft program)', editModeProps, VisibilityStatus.Draft],
+                ['Edit mode (draft program)', editModeProps, VisibilityStatus.Published],
+                [
+                    'Edit mode (published program)',
+                    {
+                        ...editModeProps,
+                        programToEdit: programWithStatus(VisibilityStatus.Published),
+                    } as ProgramModalProps,
+                    VisibilityStatus.Draft,
+                ],
+            ];
+
+            it.each(cases)(
+                '%s: "No" after submitting as status %s does not close the modal',
+                (_name, props, status) => {
+                    render(<ProgramModal {...props} />);
+
+                    submitAndAnswer(status, 'question-cancel');
+
+                    expectSubmissionAbortedWithModalOpen();
+                },
+            );
+
+            it.each(cases)(
+                '%s: dismiss after submitting as status %s does not close the modal',
+                (_name, props, status) => {
+                    render(<ProgramModal {...props} />);
+
+                    submitAndAnswer(status, 'question-dismiss');
+
+                    expectSubmissionAbortedWithModalOpen();
+                },
+            );
+
+            it('keeps the form usable after "No" on a draft: it can be submitted again', async () => {
+                render(<ProgramModal {...addModeProps} />);
+
+                submitAndAnswer(VisibilityStatus.Draft, 'question-cancel');
+                simulateFormSubmit(VisibilityStatus.Draft);
+                fireEvent.click(getQuestionConfirmButton());
+
+                await waitFor(() => expect(mockedProgramsApi.addProgram).toHaveBeenCalledTimes(1));
+                expect(mockOnClose).toHaveBeenCalledTimes(1);
+            });
         });
     });
 

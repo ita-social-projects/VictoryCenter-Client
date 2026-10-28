@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useGenericModal, GenericFormRef, ButtonValidationState } from './useGenericModal';
+import { useGenericModal, GenericFormRef, ButtonValidationState, UseGenericModalConfig } from './useGenericModal';
 import { VisibilityStatus, ModalMode } from '@/types/admin/common';
 
 describe('useGenericModal', () => {
@@ -24,6 +24,8 @@ describe('useGenericModal', () => {
         transformFormData,
     };
 
+    type TestConfig = UseGenericModalConfig<any, any>;
+
     const makeFormRef = (overrides: Partial<GenericFormRef> = {}): GenericFormRef => ({
         submit: jest.fn(),
         isDirty: jest.fn(() => false),
@@ -31,299 +33,333 @@ describe('useGenericModal', () => {
         ...overrides,
     });
 
+    const renderModal = (overrides: Partial<TestConfig> = {}) =>
+        renderHook(() => useGenericModal({ ...defaultConfig, ...overrides } as TestConfig));
+
+    type ModalResult = ReturnType<typeof renderModal>['result'];
+
+    const setFormRef = (result: ModalResult, overrides: Partial<GenericFormRef> = {}) => {
+        result.current.formRef.current = makeFormRef(overrides);
+    };
+
+    const submitAs = (result: ModalResult, status: VisibilityStatus, data: Record<string, unknown> = { a: 1 }) => {
+        setFormRef(result);
+        act(() => {
+            result.current.handleFormSubmit(data, status);
+        });
+    };
+
+    const confirmAction = async (result: ModalResult) => {
+        await act(async () => {
+            await result.current.handleConfirmAction();
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('resets state on isOpen change', () => {
-        const { rerender, result } = renderHook((props) => useGenericModal(props), {
-            initialProps: { ...defaultConfig, isOpen: false },
-        });
-        rerender({ ...defaultConfig, isOpen: true });
-        expect(result.current.error).toBe('');
-        expect(result.current.showFormConfirmModal).toBe(false);
-        expect(result.current.isFormValid).toBe(false);
-    });
+    describe('state reset', () => {
+        it('resets state on isOpen change', () => {
+            const { rerender, result } = renderHook((props) => useGenericModal(props), {
+                initialProps: { ...defaultConfig, isOpen: false },
+            });
+            rerender({ ...defaultConfig, isOpen: true });
 
-    it('does not reset state when modal is closed', () => {
-        const { rerender, result } = renderHook((props) => useGenericModal(props), {
-            initialProps: { ...defaultConfig, isOpen: true },
+            expect(result.current.error).toBe('');
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(result.current.isFormValid).toBe(false);
         });
 
-        act(() => result.current.handleFormValidationChange(true));
-        expect(result.current.isFormValid).toBe(true);
+        it('does not reset state when modal is closed', () => {
+            const { rerender, result } = renderHook((props) => useGenericModal(props), {
+                initialProps: { ...defaultConfig, isOpen: true },
+            });
 
-        rerender({ ...defaultConfig, isOpen: false });
-        expect(result.current.isFormValid).toBe(true);
-    });
+            act(() => result.current.handleFormValidationChange(true));
+            expect(result.current.isFormValid).toBe(true);
 
-    it('calls updateButtonStates when form validation changes', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-
-        const mockIsValid = jest.fn((isPublishing) => !isPublishing);
-        result.current.formRef.current = makeFormRef({ isValid: mockIsValid });
-
-        act(() => result.current.handleFormValidationChange(true));
-
-        expect(mockIsValid).toHaveBeenCalledWith(false);
-        expect(mockIsValid).toHaveBeenCalledWith(true);
-        expect(result.current.buttonStates.isDraftValid).toBe(true);
-        expect(result.current.buttonStates.isPublishValid).toBe(false);
-    });
-
-    it('updateButtonStates respects different isValid results for draft vs publish', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-
-        result.current.formRef.current = makeFormRef({
-            isValid: jest.fn((isPublishing) => !isPublishing),
-        });
-
-        act(() => result.current.handleFormValidationChange(false));
-
-        expect(result.current.buttonStates).toEqual<ButtonValidationState>({
-            isDraftValid: true,
-            isPublishValid: false,
+            rerender({ ...defaultConfig, isOpen: false });
+            expect(result.current.isFormValid).toBe(true);
         });
     });
 
-    it('handles form validation change', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        act(() => result.current.handleFormValidationChange(true));
-        expect(result.current.isFormValid).toBe(true);
-    });
+    describe('validation and button states', () => {
+        it('calls updateButtonStates when form validation changes', () => {
+            const { result } = renderModal();
+            const mockIsValid = jest.fn((isPublishing) => !isPublishing);
+            setFormRef(result, { isValid: mockIsValid });
 
-    it('handleFormSubmit does nothing if form is invalid', () => {
-        const { result } = renderHook(() =>
-            useGenericModal({
-                ...defaultConfig,
-            }),
-        );
-        result.current.formRef.current = makeFormRef({ isValid: () => false });
-        act(() => {
-            result.current.handleFormSubmit({ field: 'value' }, VisibilityStatus.Draft);
-        });
-        expect(result.current.showFormConfirmModal).toBe(false);
-    });
+            act(() => result.current.handleFormValidationChange(true));
 
-    it('handleFormSubmit sets pending state if valid', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        result.current.formRef.current = makeFormRef({ isValid: () => true });
-        act(() => {
-            result.current.handleFormSubmit({ field: 'value' }, VisibilityStatus.Published);
-        });
-        expect(result.current.showFormConfirmModal).toBe(true);
-    });
-
-    it('handleCancelConfirmation hides the action confirmation and resets pending state', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        act(() => result.current.handleCancelConfirmation());
-        expect(result.current.showFormConfirmModal).toBe(false);
-        expect(result.current.isSubmitting).toBe(false);
-    });
-
-    it('handleCancelConfirmation does NOT close the parent modal (regression: "НІ" must keep edit modal open)', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        act(() => result.current.handleCancelConfirmation());
-        expect(onClose).not.toHaveBeenCalled();
-    });
-
-    it('handleDismissConfirmation hides the action confirmation and resets pending state without closing the modal', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-
-        result.current.formRef.current = makeFormRef({ isValid: () => true });
-        act(() => {
-            result.current.handleFormSubmit({ field: 'value' }, VisibilityStatus.Published);
-        });
-        expect(result.current.showFormConfirmModal).toBe(true);
-
-        act(() => {
-            result.current.handleDismissConfirmation();
+            expect(mockIsValid).toHaveBeenCalledWith(false);
+            expect(mockIsValid).toHaveBeenCalledWith(true);
+            expect(result.current.buttonStates.isDraftValid).toBe(true);
+            expect(result.current.buttonStates.isPublishValid).toBe(false);
         });
 
-        expect(result.current.showFormConfirmModal).toBe(false);
-        expect(result.current.isSubmitting).toBe(false);
-        expect(onClose).not.toHaveBeenCalled();
-    });
+        it('updateButtonStates respects different isValid results for draft vs publish', () => {
+            const { result } = renderModal();
+            setFormRef(result, { isValid: jest.fn((isPublishing) => !isPublishing) });
 
-    it('handleConfirmAction does nothing if no pending data', async () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        await act(async () => {
-            await result.current.handleConfirmAction();
-        });
-        expect(apiCall).not.toHaveBeenCalled();
-    });
+            act(() => result.current.handleFormValidationChange(false));
 
-    it('handleConfirmAction sets error and resets submitting on API failure', async () => {
-        const localApiCall = jest.fn().mockRejectedValueOnce(new Error('boom'));
-        const mockGetErrorMessage = jest.fn().mockReturnValue('boom'); // Mock to return 'boom'
-
-        const { result } = renderHook(() =>
-            useGenericModal({
-                ...defaultConfig,
-                apiCall: localApiCall,
-                getErrorMessage: mockGetErrorMessage, // Use the mocked function
-            }),
-        );
-
-        result.current.formRef.current = makeFormRef({ isValid: () => true, isDirty: () => false });
-
-        act(() => {
-            result.current.handleFormSubmit({ a: 1 } as any, VisibilityStatus.Published);
+            expect(result.current.buttonStates).toEqual<ButtonValidationState>({
+                isDraftValid: true,
+                isPublishValid: false,
+            });
         });
 
-        // Call handleConfirmAction and wait for state updates
-        await act(async () => {
-            await result.current.handleConfirmAction();
+        it('handles form validation change', () => {
+            const { result } = renderModal();
+
+            act(() => result.current.handleFormValidationChange(true));
+
+            expect(result.current.isFormValid).toBe(true);
         });
 
-        expect(localApiCall).toHaveBeenCalled();
-        expect(onSuccess).not.toHaveBeenCalled();
-        expect(mockGetErrorMessage).toHaveBeenCalledWith(ModalMode.Add); // or ModalMode.Edit depending on your defaultConfig.mode
-        expect(result.current.error).toBe('boom');
-        expect(result.current.isSubmitting).toBe(false);
-    });
+        it('buttonStates should reflect form validation state correctly', () => {
+            const { result } = renderModal();
+            setFormRef(result, { isValid: jest.fn((isPublishing) => !isPublishing) });
 
-    it('handleConfirmAction success path', async () => {
-        apiCall.mockResolvedValue({ id: 2 });
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
+            expect(result.current.buttonStates.isDraftValid).toBe(false);
+            expect(result.current.buttonStates.isPublishValid).toBe(false);
 
-        // Mock formRef before calling handleFormSubmit
-        result.current.formRef.current = {
-            submit: jest.fn(),
-            isValid: () => true,
-            isDirty: () => false,
-        };
+            act(() => result.current.handleFormValidationChange(true));
 
-        act(() => {
-            result.current.handleFormSubmit({ a: 1 } as any, VisibilityStatus.Published);
+            expect(result.current.buttonStates.isDraftValid).toBe(true);
+            expect(result.current.buttonStates.isPublishValid).toBe(false);
         });
 
-        await act(async () => {
-            await result.current.handleConfirmAction();
-        });
+        it('buttonStates should work without form api', () => {
+            const { result } = renderModal();
+            result.current.formRef.current = null;
 
-        expect(apiCall).toHaveBeenCalled();
-        expect(onSuccess).toHaveBeenCalledWith({ id: 2 });
-        expect(onClose).toHaveBeenCalled();
-    });
+            act(() => result.current.handleFormValidationChange(true));
 
-    it('handleClose shows close confirm if dirty', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        result.current.formRef.current = makeFormRef({ isDirty: () => true });
-        act(() => {
-            result.current.handleClose();
-        });
-        expect(result.current.showCloseConfirmModal).toBe(true);
-    });
-
-    it('handleClose calls onClose if not dirty and not submitting', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        result.current.formRef.current = makeFormRef({ isDirty: () => false });
-        act(() => {
-            result.current.handleClose();
-        });
-        expect(onClose).toHaveBeenCalled();
-    });
-
-    it('handleCancelClose hides modal', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        act(() => {
-            result.current.handleCancelClose();
-        });
-        expect(result.current.showCloseConfirmModal).toBe(false);
-    });
-
-    it('handleConfirmClose hides modal and calls onClose', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        act(() => {
-            result.current.handleConfirmClose();
-        });
-        expect(onClose).toHaveBeenCalled();
-    });
-
-    it('handlePublishSubmit calls submit', () => {
-        const submit = jest.fn();
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        result.current.formRef.current = makeFormRef({ submit });
-        act(() => {
-            result.current.handlePublishSubmit();
-        });
-        expect(submit).toHaveBeenCalledWith(VisibilityStatus.Published);
-    });
-
-    it('transforms form data before API call and passes status/entity to transformer', async () => {
-        const localApiCall = jest.fn().mockResolvedValue({ id: 99 });
-        const transformer = jest.fn((data, status, entity) => ({
-            ...data,
-            status,
-            entityId: entity.id,
-            transformed: true,
-        }));
-        const entity = { id: 123 };
-        const { result } = renderHook(() =>
-            useGenericModal({
-                ...defaultConfig,
-                entity,
-                apiCall: localApiCall,
-                transformFormData: transformer,
-            }),
-        );
-
-        result.current.formRef.current = makeFormRef({ isValid: () => true });
-        act(() => {
-            result.current.handleFormSubmit({ foo: 'bar' } as any, VisibilityStatus.Draft);
-        });
-        await act(async () => {
-            await result.current.handleConfirmAction();
-        });
-
-        expect(transformer).toHaveBeenCalledWith({ foo: 'bar' }, VisibilityStatus.Draft, entity);
-        expect(localApiCall).toHaveBeenCalledWith({
-            foo: 'bar',
-            status: VisibilityStatus.Draft,
-            entityId: 123,
-            transformed: true,
+            expect(result.current.buttonStates.isDraftValid).toBe(true);
+            expect(result.current.buttonStates.isPublishValid).toBe(true);
         });
     });
 
-    it('handleDraftSubmit calls submit', () => {
-        const submit = jest.fn();
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-        result.current.formRef.current = makeFormRef({ submit });
-        act(() => {
-            result.current.handleDraftSubmit();
+    describe('handleFormSubmit', () => {
+        it('does nothing if form is invalid', () => {
+            const { result } = renderModal();
+            setFormRef(result, { isValid: () => false });
+
+            act(() => {
+                result.current.handleFormSubmit({ field: 'value' }, VisibilityStatus.Draft);
+            });
+
+            expect(result.current.showFormConfirmModal).toBe(false);
         });
-        expect(submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
+
+        it('sets pending state if valid', () => {
+            const { result } = renderModal();
+
+            submitAs(result, VisibilityStatus.Published);
+
+            expect(result.current.showFormConfirmModal).toBe(true);
+        });
     });
 
-    it('buttonStates should reflect form validation state correctly', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
+    describe('handleCancelConfirmation', () => {
+        it('hides the action confirmation, resets pending state and does NOT close the parent modal', () => {
+            const { result } = renderModal();
+            submitAs(result, VisibilityStatus.Published);
 
-        result.current.formRef.current = makeFormRef({
-            isValid: jest.fn((isPublishing) => !isPublishing),
+            act(() => result.current.handleCancelConfirmation());
+
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(result.current.isSubmitting).toBe(false);
+            expect(onClose).not.toHaveBeenCalled();
         });
 
-        expect(result.current.buttonStates.isDraftValid).toBe(false);
-        expect(result.current.buttonStates.isPublishValid).toBe(false);
+        describe('with closeOnDraftCancel', () => {
+            it('closes the modal without calling the API when the pending action is Draft', () => {
+                const { result } = renderModal({ closeOnDraftCancel: true });
+                submitAs(result, VisibilityStatus.Draft);
+                expect(result.current.showFormConfirmModal).toBe(true);
 
-        act(() => {
-            result.current.handleFormValidationChange(true);
+                act(() => result.current.handleCancelConfirmation());
+
+                expect(result.current.showFormConfirmModal).toBe(false);
+                expect(result.current.isSubmitting).toBe(false);
+                expect(onClose).toHaveBeenCalledTimes(1);
+                expect(apiCall).not.toHaveBeenCalled();
+                expect(onSuccess).not.toHaveBeenCalled();
+            });
+
+            it('keeps the modal open when the pending action is Publish', () => {
+                const { result } = renderModal({ closeOnDraftCancel: true });
+                submitAs(result, VisibilityStatus.Published);
+
+                act(() => result.current.handleCancelConfirmation());
+
+                expect(result.current.showFormConfirmModal).toBe(false);
+                expect(onClose).not.toHaveBeenCalled();
+            });
+
+            it.each([
+                ['not set', undefined],
+                ['false', false],
+            ])('keeps the modal open for Draft when closeOnDraftCancel is %s', (_name, flag) => {
+                const { result } = renderModal({ closeOnDraftCancel: flag });
+                submitAs(result, VisibilityStatus.Draft);
+
+                act(() => result.current.handleCancelConfirmation());
+
+                expect(result.current.showFormConfirmModal).toBe(false);
+                expect(onClose).not.toHaveBeenCalled();
+            });
+
+            it('resets pending state so a later confirm does not call the API', async () => {
+                const { result } = renderModal({ closeOnDraftCancel: true });
+                submitAs(result, VisibilityStatus.Draft);
+
+                act(() => result.current.handleCancelConfirmation());
+                await confirmAction(result);
+
+                expect(apiCall).not.toHaveBeenCalled();
+            });
         });
-
-        expect(result.current.buttonStates.isDraftValid).toBe(true);
-        expect(result.current.buttonStates.isPublishValid).toBe(false);
     });
 
-    it('buttonStates should work without form api', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
+    describe('handleDismissConfirmation', () => {
+        it.each([
+            ['without closeOnDraftCancel', false, VisibilityStatus.Published],
+            ['with closeOnDraftCancel and Draft (Esc / overlay / X)', true, VisibilityStatus.Draft],
+        ])('hides the confirmation, resets pending state and never closes the modal %s', (_name, flag, status) => {
+            const { result } = renderModal({ closeOnDraftCancel: flag });
+            submitAs(result, status);
+            expect(result.current.showFormConfirmModal).toBe(true);
 
-        result.current.formRef.current = null;
+            act(() => result.current.handleDismissConfirmation());
 
-        act(() => {
-            result.current.handleFormValidationChange(true);
+            expect(result.current.showFormConfirmModal).toBe(false);
+            expect(result.current.isSubmitting).toBe(false);
+            expect(onClose).not.toHaveBeenCalled();
         });
 
-        expect(result.current.buttonStates.isDraftValid).toBe(true);
-        expect(result.current.buttonStates.isPublishValid).toBe(true);
+        it('resets pending state so a later confirm does not call the API', async () => {
+            const { result } = renderModal({ closeOnDraftCancel: true });
+            submitAs(result, VisibilityStatus.Draft);
+
+            act(() => result.current.handleDismissConfirmation());
+            await confirmAction(result);
+
+            expect(apiCall).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleConfirmAction', () => {
+        it('does nothing if no pending data', async () => {
+            const { result } = renderModal();
+
+            await confirmAction(result);
+
+            expect(apiCall).not.toHaveBeenCalled();
+        });
+
+        it('sets error and resets submitting on API failure', async () => {
+            const localApiCall = jest.fn().mockRejectedValueOnce(new Error('boom'));
+            const mockGetErrorMessage = jest.fn().mockReturnValue('boom');
+            const { result } = renderModal({ apiCall: localApiCall, getErrorMessage: mockGetErrorMessage });
+
+            submitAs(result, VisibilityStatus.Published);
+            await confirmAction(result);
+
+            expect(localApiCall).toHaveBeenCalled();
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(mockGetErrorMessage).toHaveBeenCalledWith(ModalMode.Add);
+            expect(result.current.error).toBe('boom');
+            expect(result.current.isSubmitting).toBe(false);
+        });
+
+        it('success path calls onSuccess and onClose', async () => {
+            apiCall.mockResolvedValue({ id: 2 });
+            const { result } = renderModal();
+
+            submitAs(result, VisibilityStatus.Published);
+            await confirmAction(result);
+
+            expect(apiCall).toHaveBeenCalled();
+            expect(onSuccess).toHaveBeenCalledWith({ id: 2 });
+            expect(onClose).toHaveBeenCalled();
+        });
+
+        it('transforms form data before API call and passes status/entity to transformer', async () => {
+            const localApiCall = jest.fn().mockResolvedValue({ id: 99 });
+            const transformer = jest.fn((data, status, entity) => ({
+                ...data,
+                status,
+                entityId: entity.id,
+                transformed: true,
+            }));
+            const entity = { id: 123 };
+            const { result } = renderModal({ entity, apiCall: localApiCall, transformFormData: transformer });
+
+            submitAs(result, VisibilityStatus.Draft, { foo: 'bar' });
+            await confirmAction(result);
+
+            expect(transformer).toHaveBeenCalledWith({ foo: 'bar' }, VisibilityStatus.Draft, entity);
+            expect(localApiCall).toHaveBeenCalledWith({
+                foo: 'bar',
+                status: VisibilityStatus.Draft,
+                entityId: 123,
+                transformed: true,
+            });
+        });
+    });
+
+    describe('closing the modal', () => {
+        it('handleClose shows close confirm if dirty', () => {
+            const { result } = renderModal();
+            setFormRef(result, { isDirty: () => true });
+
+            act(() => result.current.handleClose());
+
+            expect(result.current.showCloseConfirmModal).toBe(true);
+        });
+
+        it('handleClose calls onClose if not dirty and not submitting', () => {
+            const { result } = renderModal();
+            setFormRef(result, { isDirty: () => false });
+
+            act(() => result.current.handleClose());
+
+            expect(onClose).toHaveBeenCalled();
+        });
+
+        it('handleCancelClose hides modal', () => {
+            const { result } = renderModal();
+
+            act(() => result.current.handleCancelClose());
+
+            expect(result.current.showCloseConfirmModal).toBe(false);
+        });
+
+        it('handleConfirmClose hides modal and calls onClose', () => {
+            const { result } = renderModal();
+
+            act(() => result.current.handleConfirmClose());
+
+            expect(onClose).toHaveBeenCalled();
+        });
+    });
+
+    describe('submit triggers', () => {
+        it.each([
+            ['handlePublishSubmit', 'handlePublishSubmit', VisibilityStatus.Published],
+            ['handleDraftSubmit', 'handleDraftSubmit', VisibilityStatus.Draft],
+        ] as const)('%s calls submit with the matching status', (_name, handler, status) => {
+            const submit = jest.fn();
+            const { result } = renderModal();
+            setFormRef(result, { submit });
+
+            act(() => result.current[handler]());
+
+            expect(submit).toHaveBeenCalledWith(status);
+        });
     });
 });

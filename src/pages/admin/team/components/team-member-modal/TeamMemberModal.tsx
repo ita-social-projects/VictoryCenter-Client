@@ -81,7 +81,6 @@ export const TeamMemberModal = ({
                 status: status,
                 imageId: formData.imageId,
             }),
-            closeOnDraftCancel: true,
         }),
         [mode, isOpen, onClose, memberToEdit, onSuccess, client, isEditMode],
     );

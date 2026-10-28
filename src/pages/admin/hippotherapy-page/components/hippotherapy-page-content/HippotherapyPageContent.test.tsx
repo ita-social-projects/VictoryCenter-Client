@@ -11,6 +11,8 @@ import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { ToastType } from '@/types/admin/toast';
 import { HippotherapyPageContentModel, HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
@@ -33,8 +35,20 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 }));
 
 jest.mock('../sections/intro-banner-section/IntroBannerSection', () => ({
-    IntroBannerSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled, onTranslateClick }: any) => (
-        <div data-testid="section-intro" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    IntroBannerSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        isTranslateDisabled,
+        onTranslateClick,
+        localizations,
+    }: any) => (
+        <div
+            data-testid="section-intro"
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             {onTranslateClick && (
                 <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
@@ -51,8 +65,20 @@ jest.mock('../sections/intro-banner-section/IntroBannerSection', () => ({
 }));
 
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
-    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled, isTranslateDisabled, onTranslateClick }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    TextCardSection: ({
+        value,
+        onChange,
+        fieldIdPrefix,
+        disabled,
+        isTranslateDisabled,
+        onTranslateClick,
+        localizations,
+    }: any) => (
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             {onTranslateClick && (
                 <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
@@ -75,8 +101,13 @@ jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () 
         disabled,
         onTranslateClick,
         isTranslateDisabled,
+        localizations,
     }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.quoteText}</span>
             {onTranslateClick && (
                 <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
@@ -93,8 +124,19 @@ jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () 
 }));
 
 jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', () => ({
-    HippoventionCenterSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
-        <div data-testid="section-hippovention-center" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    HippoventionCenterSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        isTranslateDisabled,
+        localizations,
+    }: any) => (
+        <div
+            data-testid="section-hippovention-center"
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited hippovention center' })}>
                 Edit hippovention center
@@ -106,8 +148,20 @@ jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', (
 }));
 
 jest.mock('../sections/gallery-section/GallerySection', () => ({
-    GallerySection: ({ value, onChange, onCardImageError, fieldIdPrefix, disabled, isTranslateDisabled }: any) => (
-        <div data-testid={`section-${fieldIdPrefix}`} data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    GallerySection: ({
+        value,
+        onChange,
+        onCardImageError,
+        fieldIdPrefix,
+        disabled,
+        isTranslateDisabled,
+        localizations,
+    }: any) => (
+        <div
+            data-testid={`section-${fieldIdPrefix}`}
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited gallery title' })}>
                 Edit {fieldIdPrefix}
@@ -129,8 +183,13 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
         isTranslateGeneralDisabled,
         onTranslateReferenceClick,
         isTranslateReferenceDisabled,
+        localizations,
     }: any) => (
-        <div data-testid="section-research" data-translate-disabled={String(Boolean(isTranslateGeneralDisabled))}>
+        <div
+            data-testid="section-research"
+            data-translate-disabled={String(Boolean(isTranslateGeneralDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited research title' })}>
                 Edit research
@@ -164,8 +223,12 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
 }));
 
 jest.mock('../sections/ethics-section/EthicsSection', () => ({
-    EthicsSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled }: any) => (
-        <div data-testid="section-ethics" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+    EthicsSection: ({ value, onChange, onImageError, disabled, isTranslateDisabled, localizations }: any) => (
+        <div
+            data-testid="section-ethics"
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
             <span>{value.title}</span>
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
                 Edit ethics
@@ -932,6 +995,44 @@ describe('HippotherapyPageContent', () => {
                 name: 'Translate research-item',
             });
             expect(itemTranslateButton).toBeDisabled();
+        });
+    });
+
+    describe('translation statuses mapping by block', () => {
+        it('passes localizations to the corresponding sections and ignores null translationStatus', async () => {
+            const contentWithStatuses: HippotherapyPageContentModel = {
+                ...buildContent(),
+                translationStatuses: [
+                    {
+                        block: HippotherapyPageLocalizationBlock.Intro,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: TranslationStatus.Relevant,
+                    },
+                    {
+                        block: HippotherapyPageLocalizationBlock.Intro,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: null as any,
+                    },
+                    {
+                        block: HippotherapyPageLocalizationBlock.Quote,
+                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                        translationStatus: TranslationStatus.Outdated,
+                    },
+                ],
+            };
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithStatuses);
+
+            render(<HippotherapyPageContent />);
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveAttribute('data-localizations-count', '1');
+
+            const quoteSection = screen.getByTestId('section-hippotherapy-quote');
+            expect(quoteSection).toHaveAttribute('data-localizations-count', '1');
+
+            const ethicsSection = screen.getByTestId('section-ethics');
+            expect(ethicsSection).toHaveAttribute('data-localizations-count', '0');
         });
     });
 });

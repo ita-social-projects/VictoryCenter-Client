@@ -1,12 +1,10 @@
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { forwardRef, useRef } from 'react';
 import styles from './TranslateWhoWeAreMultipleDescriptionsForm.module.scss';
 import cn from 'classnames';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { GeneralFormProps, GeneralFormRef } from '../../strategies/who-we-are-modal-strategy';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import {
     getWhoWeAreTextValidationError,
     useDirtyChangeEffect,
@@ -37,12 +35,9 @@ const validateForm = (
     formState: TranslateWhoWeAreMultipleDescriptionsFormValues,
     _isPublishing: boolean,
 ): TranslateWhoWeAreMultipleDescriptionsFormErrorState => {
-    const rowErrors = formState.rows.map((row) => {
-        const plainDescription = getPlainTextFromHtml(row.description ?? '').trim();
-        return {
-            description: WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainDescription),
-        };
-    });
+    const rowErrors = formState.rows.map((row) => ({
+        description: getWhoWeAreTextValidationError(row.description ?? ''),
+    }));
     const hasAnyError = rowErrors.some((row) => row.description !== undefined);
     return {
         rows: hasAnyError ? rowErrors : undefined,

@@ -9,6 +9,9 @@ import {
     EventLocalization,
     EventLocalizationDto,
     EventsIntroSectionDto,
+    EventsIntroSectionLocalization,
+    EventsIntroSectionLocalizationDto,
+    EventsIntroSectionResponseDto,
     EventsIntroSectionUpdateField,
 } from '@/types/admin/events';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -18,6 +21,13 @@ import { Image, ImageValues } from '@/types/common/image';
 
 const mapEvent = (item: EventItemResponseDto): EventItemDto =>
     mapEntityWithLocalizations<EventItemResponseDto, EventLocalizationDto, EventLocalization>(item);
+
+const mapIntroSection = (section: EventsIntroSectionResponseDto): EventsIntroSectionDto =>
+    mapEntityWithLocalizations<
+        EventsIntroSectionResponseDto,
+        EventsIntroSectionLocalizationDto,
+        EventsIntroSectionLocalization
+    >(section);
 
 interface EventSaveData {
     request: EventCreateUpdateRequest;
@@ -84,8 +94,8 @@ const saveEvent = async (
 
 export const EventsApi = {
     getEventsIntroSection: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
-        const response = await client.get<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.BASE);
-        return response.data;
+        const response = await client.get<EventsIntroSectionResponseDto>(API_ROUTES.EVENTS_PAGE.BASE);
+        return mapIntroSection(response.data);
     },
     updateEventsIntroSection: async (
         client: AxiosInstance,
@@ -93,24 +103,26 @@ export const EventsApi = {
         section: EventsIntroSectionDto,
     ): Promise<EventsIntroSectionDto> => {
         const isDescription = field === 'pageDescription';
-        const response = await client.put<EventsIntroSectionDto>(
+        const response = await client.put<EventsIntroSectionResponseDto>(
             isDescription ? API_ROUTES.EVENTS_PAGE.DESCRIPTION : API_ROUTES.EVENTS_PAGE.EVENTS_BLOCK_TITLE,
             isDescription
                 ? { pageDescription: section.pageDescription }
                 : { eventsBlockTitle: section.eventsBlockTitle },
         );
 
-        return response.data;
+        return mapIntroSection(response.data);
     },
     toggleEventsTitleVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
-        const response = await client.post<EventsIntroSectionDto>(
+        const response = await client.post<EventsIntroSectionResponseDto>(
             API_ROUTES.EVENTS_PAGE.TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY,
         );
-        return response.data;
+        return mapIntroSection(response.data);
     },
     toggleEventsDescriptionVisibility: async (client: AxiosInstance): Promise<EventsIntroSectionDto> => {
-        const response = await client.post<EventsIntroSectionDto>(API_ROUTES.EVENTS_PAGE.TOGGLE_DESCRIPTION_VISIBILITY);
-        return response.data;
+        const response = await client.post<EventsIntroSectionResponseDto>(
+            API_ROUTES.EVENTS_PAGE.TOGGLE_DESCRIPTION_VISIBILITY,
+        );
+        return mapIntroSection(response.data);
     },
     fetchEvents: async (
         client: AxiosInstance,

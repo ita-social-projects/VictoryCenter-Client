@@ -34,6 +34,7 @@ import {
     TranslateHippotherapySectionModal,
 } from '../translate-section-modal/TranslateHippotherapySectionModal';
 import './HippotherapyPageContent.scss';
+import { EntityLocalization } from '@/types/common/language';
 
 interface TranslationTarget {
     block: HippotherapyPageLocalizationBlock;
@@ -156,6 +157,7 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
 });
 
 const isNotFoundError = (error: unknown): boolean => axios.isAxiosError(error) && error.response?.status === 404;
+const EMPTY_LOCALIZATIONS: EntityLocalization[] = [];
 
 const hasRichTextContent = (value?: string | null): boolean => Boolean(value && getPlainTextFromHtml(value).trim());
 
@@ -226,6 +228,29 @@ export const HippotherapyPageContent = () => {
                 (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
             ) ?? null,
         [fetchedContent, englishLanguage],
+    );
+
+    const localizationsByBlock = useMemo(() => {
+        const result = new Map<HippotherapyPageLocalizationBlock, EntityLocalization[]>();
+
+        (fetchedContent?.translationStatuses ?? []).forEach(({ block, languageId, translationStatus }) => {
+            if (translationStatus === null) return;
+
+            const language = translationLanguages.find((lang) => lang.id === languageId);
+            if (!language) return;
+
+            const items = result.get(block) ?? [];
+            items.push({ language, translationStatus } as EntityLocalization);
+            result.set(block, items);
+        });
+
+        return result;
+    }, [fetchedContent, translationLanguages]);
+
+    const getLocalizations = useCallback(
+        (block: HippotherapyPageLocalizationBlock): EntityLocalization[] =>
+            localizationsByBlock.get(block) ?? EMPTY_LOCALIZATIONS,
+        [localizationsByBlock],
     );
 
     const getContent = useCallback(async () => HippotherapyPageApi.get(client), [client]);
@@ -433,6 +458,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.introSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasIntroTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Intro)}
                 />
                 <hr />
                 <TextCardSection
@@ -442,6 +469,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.descriptionSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasDescriptionTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Description)}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -453,6 +482,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.quoteSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasQuoteTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Quote)}
                 />
                 <hr />
                 <TextCardSection
@@ -462,6 +493,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.hippoventionSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasHippoventionTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Hippovention)}
                 />
                 <hr />
                 <HippoventionCenterSection
@@ -470,6 +503,8 @@ export const HippotherapyPageContent = () => {
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
                     isTranslateDisabled={isTranslateDisabled}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.HippoventionCenter)}
                 />
                 <hr />
                 <GallerySection
@@ -480,6 +515,8 @@ export const HippotherapyPageContent = () => {
                     onCardImageError={imageErrorHandlers.advantagesSection}
                     disabled={isDisabled}
                     isTranslateDisabled={isTranslateDisabled}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Advantages)}
                 />
                 <hr />
                 <TextCardSection
@@ -489,6 +526,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.analysisSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasAnalysisTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Analysis)}
                 />
                 <hr />
                 <ScientificReferencesSection
@@ -501,6 +540,8 @@ export const HippotherapyPageContent = () => {
                     }
                     onTranslateReferenceClick={canTranslate ? translationHandlers.scientificReference : undefined}
                     isTranslateReferenceDisabled={isTranslateReferenceDisabled}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.ScientificReferences)}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -512,6 +553,8 @@ export const HippotherapyPageContent = () => {
                     disabled={isDisabled}
                     onTranslateClick={canTranslate ? translationHandlers.anotherQuoteSection : undefined}
                     isTranslateDisabled={isTranslateDisabled || hasAnotherQuoteTranslation(targetLocalization)}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.AnotherQuote)}
                 />
                 <hr />
                 <GallerySection
@@ -522,6 +565,8 @@ export const HippotherapyPageContent = () => {
                     onCardImageError={imageErrorHandlers.participantsSection}
                     disabled={isDisabled}
                     isTranslateDisabled={isTranslateDisabled}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Participants)}
                 />
                 <hr />
                 <EthicsSection
@@ -530,6 +575,8 @@ export const HippotherapyPageContent = () => {
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
                     isTranslateDisabled={isTranslateDisabled}
+                    translationLanguages={translationLanguages}
+                    localizations={getLocalizations(HippotherapyPageLocalizationBlock.Ethics)}
                 />
                 <div className="hippotherapy-page-publish">
                     <Button

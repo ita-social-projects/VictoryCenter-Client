@@ -14,6 +14,7 @@ import {
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
+import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
 
 export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
@@ -25,6 +26,8 @@ export interface ScientificReferencesSectionProps {
     isTranslateGeneralDisabled?: boolean;
     onTranslateReferenceClick?: (localId: string) => void;
     isTranslateReferenceDisabled?: (localId: string) => boolean;
+    translationLanguages?: LocalizationLanguage[];
+    localizations?: EntityLocalization[];
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
@@ -46,6 +49,8 @@ const ScientificReferencesSectionComponent = ({
     isTranslateGeneralDisabled,
     onTranslateReferenceClick,
     isTranslateReferenceDisabled,
+    translationLanguages,
+    localizations,
 }: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
@@ -180,12 +185,13 @@ const ScientificReferencesSectionComponent = ({
     return (
         <div className="scientific-references-section">
             <div className="scientific-references-section-summary">
-                {generalTranslateClick && (
-                    <SectionTranslationHeader
-                        onTranslateClick={generalTranslateClick}
-                        isTranslateDisabled={generalTranslateDisabled}
-                    />
-                )}
+                <SectionTranslationHeader
+                    onTranslateClick={generalTranslateClick}
+                    isTranslateDisabled={generalTranslateDisabled}
+                    languages={translationLanguages}
+                    localizations={localizations}
+                />
+
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                     isRequired

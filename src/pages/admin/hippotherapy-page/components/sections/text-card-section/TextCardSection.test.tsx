@@ -4,6 +4,9 @@ import { TextCardSection, TextCardSectionProps } from './TextCardSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
+import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -74,5 +77,9 @@ describe('TextCardSection', () => {
 
         expect(screen.getByTestId('mock-rich-input-test-card-title')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-card-description')).toBeDisabled();
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
     });
 });

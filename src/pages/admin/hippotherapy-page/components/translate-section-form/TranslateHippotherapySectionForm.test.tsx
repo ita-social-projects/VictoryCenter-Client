@@ -189,4 +189,30 @@ describe('TranslateHippotherapySectionForm', () => {
         fireEvent.change(input, { target: { value: 'Valid title' } });
         expect(input).toHaveValue('Valid title');
     });
+
+    it('renders four read-only description images beside fields configured with image indexes', () => {
+        const fields: HippotherapyTranslationFieldConfig[] = Array.from({ length: 4 }, (_, imageIndex) => ({
+            name: `description${imageIndex + 1}`,
+            label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+            maxLength: 300,
+            minLength: 10,
+            isRequired: true,
+            imageIndex,
+        }));
+        const images = ['image-1.webp', 'image-2.webp', 'image-3.webp', 'image-4.webp'];
+
+        const { container } = render(
+            <TranslateHippotherapySectionForm
+                fields={fields}
+                fieldIdPrefix="advantages"
+                descriptionImages={images}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const renderedImages = container.querySelectorAll('img');
+        expect(renderedImages).toHaveLength(4);
+        expect(Array.from(renderedImages).map((image) => image.getAttribute('src'))).toEqual(images);
+        expect(screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toHaveLength(4);
+    });
 });

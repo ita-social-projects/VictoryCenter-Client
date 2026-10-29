@@ -147,6 +147,9 @@ export const createEthicsTranslationFields = (): HippotherapyTranslationFieldCon
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
         isRequired: true,
+    })),
+];
+
 const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',

@@ -199,19 +199,6 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
                 disabled: isTranslateReferenceDisabled?.('local-1'),
                 label: 'research-item',
             })}
-            {onTranslateGeneralClick && (
-                <button disabled={isTranslateGeneralDisabled} onClick={onTranslateGeneralClick}>
-                    Translate research-general
-                </button>
-            )}
-            {onTranslateReferenceClick && (
-                <button
-                    disabled={isTranslateReferenceDisabled?.('local-1')}
-                    onClick={() => onTranslateReferenceClick('local-1')}
-                >
-                    Translate research-item
-                </button>
-            )}
         </div>
     ),
 }));

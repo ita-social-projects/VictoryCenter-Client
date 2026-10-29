@@ -21,6 +21,7 @@ export interface TranslateHippotherapySectionModalProps {
     isOpen: boolean;
     onClose: () => void;
     block: HippotherapyPageLocalizationBlock | null;
+    descriptionImages?: string[];
     subBlock?: HippotherapyTranslationSubBlock | null;
     targetResearchLocalId?: string | null;
     translatedLanguages: LocalizationLanguage[];
@@ -41,6 +42,7 @@ export const TranslateHippotherapySectionModal = ({
     isOpen,
     onClose,
     block,
+    descriptionImages,
     subBlock,
     targetResearchLocalId,
     translatedLanguages,
@@ -133,6 +135,7 @@ export const TranslateHippotherapySectionModal = ({
                     ref={formRef}
                     fields={sectionConfig.fields}
                     fieldIdPrefix={`hippotherapy-translation-${sectionConfig.sectionKey}`}
+                    descriptionImages={descriptionImages}
                     onSubmit={handleSubmit}
                     onValidationChange={setIsFormValid}
                     onDirtyChange={setIsDirty}

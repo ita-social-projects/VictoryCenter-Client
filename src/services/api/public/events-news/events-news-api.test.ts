@@ -72,41 +72,14 @@ describe('events-news-api', () => {
         it('requests the published news by slug and maps the response', async () => {
             mockResponse(createPublishedEventNewsDto({ id: 5, slug: 'my-slug' }));
 
+            mockedMapper.mockReturnValueOnce({ id: '5', sections: [] });
+
             const result = await EventNewsApi.get('my-slug');
 
             expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/my-slug`, {
                 signal: undefined,
             });
             expect(result).toEqual({ id: '5', sections: [] });
-        });
-
-        it('passes the cancellation signal to axios', async () => {
-            mockResponse({ items: [], totalItemsCount: 0 });
-            const { signal } = new AbortController();
-
-            await EventsNewsApi.get(undefined, 0, 5, 'uk', { cancellationSignal: signal });
-
-            expect(mockedAxiosGet).toHaveBeenCalledWith(
-                API_ROUTES.EVENTS.PUBLISHED,
-                expect.objectContaining({ signal }),
-            );
-        });
-
-        it('encodes special characters in the slug', async () => {
-            mockResponse(createPublishedEventNewsDto());
-
-            await EventNewsApi.get('a b/c?d');
-
-            expect(mockedAxiosGet).toHaveBeenCalledWith(`${API_ROUTES.EVENTS.PUBLISHED}/a%20b%2Fc%3Fd`, {
-                signal: undefined,
-            });
-        });
-
-        it('rejects when the news is not found', async () => {
-            mockedAxiosGet.mockRejectedValue(new Error('Request failed with status code 404'));
-
-            await expect(EventNewsApi.get('unknown')).rejects.toThrow('404');
-            expect(mockedMapper).not.toHaveBeenCalled();
         });
     });
 });

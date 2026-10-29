@@ -81,6 +81,29 @@ describe('TranslateHippotherapySectionModal', () => {
         );
     });
 
+    it('opens Advantages with exactly one title and four empty, required image-backed descriptions', () => {
+        const descriptionImages = ['advantage-1.webp', 'advantage-2.webp', 'advantage-3.webp', 'advantage-4.webp'];
+        renderModal({
+            block: HippotherapyPageLocalizationBlock.Advantages,
+            descriptionImages,
+        });
+
+        const titleInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE, { exact: false });
+        const descriptionInputs = screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
+
+        expect(titleInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE));
+        expect(titleInput).toHaveValue('');
+        expect(screen.getByText('0/50')).toBeInTheDocument();
+        expect(descriptionInputs).toHaveLength(4);
+        descriptionInputs.forEach((input) => {
+            expect(input).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION));
+            expect(input).toHaveValue('');
+        });
+        expect(screen.getAllByRole('img')).toHaveLength(4);
+        expect(screen.getAllByRole('img').map((image) => image.getAttribute('src'))).toEqual(descriptionImages);
+        expect(saveButton()).toBeDisabled();
+    });
+
     it('selects English by default and keeps the save button disabled on open', () => {
         renderModal();
 

@@ -9,7 +9,11 @@ import { isHippotherapyPageContentValid } from '@/validation/admin/hippotherapy-
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { ToastType } from '@/types/admin/toast';
-import { HippotherapyPageContentModel, HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
+import {
+    HippotherapyPageContentModel,
+    HippotherapyPageLocalization,
+    HippotherapyPageLocalizationBlock,
+} from '@/types/admin/hippotherapy-page';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { TranslationStatus } from '@/types/common/language';
 import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
@@ -81,10 +85,6 @@ jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', (
         'hippovention center',
         'Edited hippovention center',
     ),
-}));
-
-jest.mock('../sections/ethics-section/EthicsSection', () => ({
-    EthicsSection: mockImageSection('section-ethics', 'ethics', 'Edited ethics title'),
 }));
 
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
@@ -203,6 +203,42 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
     ),
 }));
 
+jest.mock('../sections/ethics-section/EthicsSection', () => ({
+    EthicsSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        onTranslateClick,
+        isTranslateDisabled,
+        localizations,
+    }: any) => (
+        <div
+            data-testid="section-ethics"
+            data-translate-disabled={String(Boolean(isTranslateDisabled))}
+            data-localizations-count={localizations?.length ?? 0}
+        >
+            <span>{value.title}</span>
+            <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
+                Edit ethics
+            </button>
+            <button
+                disabled={disabled}
+                onClick={() => onChange({ ...value, principles: ['Edited principle', ...value.principles.slice(1)] })}
+            >
+                Edit ethics principle
+            </button>
+            <button onClick={() => onImageError?.('image size error')}>Set ethics image error</button>
+            <button onClick={() => onImageError?.(null)}>Clear ethics image error</button>
+            {onTranslateClick && (
+                <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
+                    Translate ethics
+                </button>
+            )}
+        </div>
+    ),
+}));
+
 jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => ({
     TranslateHippotherapySectionModal: ({
         isOpen,
@@ -291,6 +327,47 @@ const buildContent = (): HippotherapyPageContentModel => ({
         imageId: savedImage.id,
     },
 });
+
+const expectOpensGeneralTranslationModalAndDisablesOnEdit = async (
+    translateButtonLabel: string,
+    expectedBlock: HippotherapyPageLocalizationBlock,
+    editButtonLabel: string,
+    expectedSubBlock: string | null = 'general',
+) => {
+    mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+    render(<HippotherapyPageContent />);
+
+    const generalTranslateButton = await screen.findByRole('button', { name: translateButtonLabel });
+    expect(generalTranslateButton).toBeEnabled();
+
+    fireEvent.click(generalTranslateButton);
+
+    expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(String(expectedBlock));
+    expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent(expectedSubBlock ?? '');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close translation' }));
+    expect(screen.queryByTestId('translate-section-modal')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: editButtonLabel }));
+    expect(generalTranslateButton).toBeDisabled();
+};
+
+const expectGeneralTranslationDisabledWhenTranslationExists = async (
+    translateButtonLabel: string,
+    localization: HippotherapyPageLocalization,
+) => {
+    const contentWithTranslation: HippotherapyPageContentModel = {
+        ...buildContent(),
+        localizations: [localization],
+    };
+    mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
+
+    render(<HippotherapyPageContent />);
+
+    const generalTranslateButton = await screen.findByRole('button', { name: translateButtonLabel });
+    expect(generalTranslateButton).toBeDisabled();
+};
 
 const withEnglishLocalization = (localization: Record<string, unknown>): HippotherapyPageContentModel => ({
     ...buildContent(),
@@ -790,6 +867,42 @@ describe('HippotherapyPageContent', () => {
                 expect(getButton(translateName)).toBeDisabled();
             },
         );
+    });
+
+    describe('ethics section translation', () => {
+        it('opens the translation modal for the ethics block and disables when edited', () =>
+            expectOpensGeneralTranslationModalAndDisablesOnEdit(
+                'Translate ethics',
+                HippotherapyPageLocalizationBlock.Ethics,
+                'Edit ethics',
+                null,
+            ));
+
+        it('disables the translation action when a principle is edited but not published', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            const translateButton = await screen.findByRole('button', { name: 'Translate ethics' });
+            expect(translateButton).toBeEnabled();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit ethics principle' }));
+            expect(translateButton).toBeDisabled();
+        });
+
+        it('disables the ethics translation action when an English translation already exists', () =>
+            expectGeneralTranslationDisabledWhenTranslationExists('Translate ethics', {
+                language: { id: 2, code: 'en' },
+                translationStatus: 1 as any,
+                ethicsSection: { title: 'English Title', description: 'English Description', principles: [] },
+            }));
+
+        it('disables the ethics translation action when only a principle already has an English translation', () =>
+            expectGeneralTranslationDisabledWhenTranslationExists('Translate ethics', {
+                language: { id: 2, code: 'en' },
+                translationStatus: 1 as any,
+                ethicsSection: { title: '', description: '', principles: ['Translated principle'] },
+            }));
     });
 
     describe('translation statuses mapping by block', () => {

@@ -71,6 +71,8 @@ export const TranslateHippotherapySectionModal = ({
 
     // Saving the translation is delivered by the "Apply translation for the section" story (#2781).
     const handleSubmit = async (_data: TranslateHippotherapySectionFormValues) => {};
+    // Keep Save disabled until #2781 wires it up, so it doesn't look clickable while it's a no-op.
+    const isSaveImplemented = false;
 
     const checkIsDirty = () => formRef.current?.isDirty() ?? false;
 
@@ -110,7 +112,7 @@ export const TranslateHippotherapySectionModal = ({
                 title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
                 onSave={handleSaveClick}
                 isSubmitting={false}
-                isFormValid={isFormValid}
+                isFormValid={isFormValid && isSaveImplemented}
                 checkIsDirty={checkIsDirty}
                 isDirty={isDirty}
             >

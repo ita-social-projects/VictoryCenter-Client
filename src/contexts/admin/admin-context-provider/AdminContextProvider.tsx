@@ -43,9 +43,13 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
-    const logout = useCallback(async () => {
-        await logoutRequest(tokenRef.current);
+    const logout = useCallback(() => {
+        const currentToken = tokenRef.current;
         updateToken('');
+
+        if (currentToken) {
+            void logoutRequest(currentToken).catch(() => {});
+        }
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {

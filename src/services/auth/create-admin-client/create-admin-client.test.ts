@@ -5,6 +5,10 @@ import { CreateAdminClient } from './create-admin-client';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+type RetriableRequestConfig = InternalAxiosRequestConfig & {
+    _authRetry?: boolean;
+};
+
 describe('CreateAdminClient', () => {
     let fakeClient: jest.Mocked<AxiosInstance>;
     let requestUse: jest.Mock;
@@ -29,7 +33,7 @@ describe('CreateAdminClient', () => {
             options: jest.fn(),
             patch: jest.fn(),
             request: jest.fn(),
-            defaults: {} as any,
+            defaults: {} as AxiosInstance['defaults'],
             interceptors: {
                 request: { use: requestUse },
                 response: { use: responseUse },
@@ -99,7 +103,8 @@ describe('CreateAdminClient', () => {
     });
 
     describe('response interceptor', () => {
-        let successHandler: any, errorHandler: any;
+        let successHandler: (response: unknown) => unknown;
+        let errorHandler: (error: AxiosError & { config?: RetriableRequestConfig }) => Promise<unknown>;
 
         beforeEach(() => {
             CreateAdminClient(
@@ -118,12 +123,12 @@ describe('CreateAdminClient', () => {
             expect(successHandler(resp)).toBe(resp);
         });
 
-        it('on 401, refreshes then retries via client()', async () => {
-            const cfg = { headers: {} } as InternalAxiosRequestConfig;
+        it('on the first 401, marks the request, refreshes once, and retries via client.request once', async () => {
+            const cfg = { headers: {} } as RetriableRequestConfig;
             const err = {
                 response: { status: 401 },
                 config: cfg,
-            } as AxiosError & { config: InternalAxiosRequestConfig };
+            } as AxiosError & { config: RetriableRequestConfig };
 
             handlerMock.mockResolvedValueOnce({
                 ...cfg,
@@ -132,7 +137,10 @@ describe('CreateAdminClient', () => {
 
             const retry = errorHandler(err);
             await retry;
-            expect(handlerMock).toHaveBeenCalledWith(cfg);
+            expect(handlerMock).toHaveBeenCalledTimes(1);
+            expect(handlerMock).toHaveBeenCalledWith(expect.objectContaining({ _authRetry: true }));
+            expect(cfg._authRetry).toBe(true);
+            expect(fakeClient.request).toHaveBeenCalledTimes(1);
             expect(fakeClient.request).toHaveBeenCalledWith(
                 expect.objectContaining({
                     headers: { Authorization: `Bearer ${newToken}` },
@@ -140,15 +148,52 @@ describe('CreateAdminClient', () => {
             );
         });
 
+        it('on a second 401 for a retried request, logs out without refreshing or retrying', async () => {
+            const logoutMock = jest.fn<void, [string]>();
+            CreateAdminClient(
+                baseURL,
+                () => false,
+                () => token,
+                async () => {},
+                logoutMock,
+                handlerMock,
+            );
+            const [, terminalErrorHandler] = responseUse.mock.calls[1] as [
+                (response: unknown) => unknown,
+                (error: AxiosError & { config?: RetriableRequestConfig }) => Promise<unknown>,
+            ];
+            const cfg = { headers: {}, _authRetry: true } as RetriableRequestConfig;
+            const err = {
+                response: { status: 401 },
+                config: cfg,
+            } as AxiosError & { config: RetriableRequestConfig };
+
+            await expect(terminalErrorHandler(err)).rejects.toBe(err);
+
+            expect(handlerMock).not.toHaveBeenCalled();
+            expect(fakeClient.request).not.toHaveBeenCalled();
+            expect(logoutMock).toHaveBeenCalledWith(token);
+        });
+
+        it('on a 401 without request config, rejects without refreshing or retrying', async () => {
+            const err = { response: { status: 401 } } as AxiosError;
+
+            await expect(errorHandler(err)).rejects.toBe(err);
+
+            expect(handlerMock).not.toHaveBeenCalled();
+            expect(fakeClient.request).not.toHaveBeenCalled();
+        });
+
         it('on non-401, rejects with original error', async () => {
-            const cfg = { headers: {} } as InternalAxiosRequestConfig;
+            const cfg = { headers: {} } as RetriableRequestConfig;
             const err = {
                 response: { status: 403 },
                 config: cfg,
-            } as AxiosError & { config: InternalAxiosRequestConfig };
+            } as AxiosError & { config: RetriableRequestConfig };
 
             await expect(errorHandler(err)).rejects.toBe(err);
             expect(handlerMock).not.toHaveBeenCalled();
+            expect(fakeClient.request).not.toHaveBeenCalled();
         });
     });
 });

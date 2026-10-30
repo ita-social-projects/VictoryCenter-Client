@@ -1,9 +1,11 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { AxiosInstance } from 'axios';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
 import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
+import { Credentials } from '@/types/admin/auth';
 
 jest.mock('@/services/api/admin/login/login-api', () => ({
     loginRequest: jest.fn(),
@@ -20,11 +22,12 @@ jest.mock('@/const/common/api-routes/main-api', () => ({
     API_ROUTES: { BASE: '/base' },
 }));
 
-const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [any]>;
-const logoutRequestMock = logoutRequest as unknown as jest.Mock<Promise<void>, [string]>;
+const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [Credentials]>;
+const logoutRequestMock = logoutRequest as jest.MockedFunction<typeof logoutRequest>;
 const tokenRefreshMock = tokenRefreshRequest as jest.Mock<Promise<string>, []>;
 const isValidMock = isAccessTokenValid as jest.Mock<boolean, [string]>;
-const CreateAdminClientMock = CreateAdminClient as jest.Mock<any, any>;
+const CreateAdminClientMock = CreateAdminClient as jest.MockedFunction<typeof CreateAdminClient>;
+const fakeClient = {} as AxiosInstance;
 
 const Consumer = () => {
     const { isLoading, isAuthenticated, client, login, logout, refreshAccessToken } = useAdminContext();
@@ -33,7 +36,7 @@ const Consumer = () => {
         <div>
             <span data-testid="loading">{String(isLoading)}</span>
             <span data-testid="auth">{String(isAuthenticated)}</span>
-            <span data-testid="client-marker">{(client as any)?.marker}</span>
+            <span data-testid="client-marker">{String(client === fakeClient)}</span>
 
             <button data-testid="login-btn" onClick={() => login({ email: 'e', password: 'p' })}>
                 login
@@ -58,11 +61,11 @@ describe('<AdminContextProvider />', () => {
         });
 
         loginRequestMock.mockResolvedValue('login_token');
-        logoutRequestMock.mockResolvedValue(undefined);
+        logoutRequestMock.mockResolvedValue({} as Awaited<ReturnType<typeof logoutRequest>>);
         tokenRefreshMock.mockResolvedValue('initial_token');
 
         isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');
-        CreateAdminClientMock.mockReturnValue({ marker: 'FAKE_CLIENT' });
+        CreateAdminClientMock.mockReturnValue(fakeClient);
     });
 
     it('on silent-refresh on mount: loading toggles, auth=true, client.marker set', async () => {
@@ -78,7 +81,7 @@ describe('<AdminContextProvider />', () => {
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
 
         expect(screen.getByTestId('auth')).toHaveTextContent('true');
-        expect(screen.getByTestId('client-marker')).toHaveTextContent('FAKE_CLIENT');
+        expect(screen.getByTestId('client-marker')).toHaveTextContent('true');
 
         const [, isAuthChecker, getTokenFn] = CreateAdminClientMock.mock.calls[0];
 
@@ -146,5 +149,37 @@ describe('<AdminContextProvider />', () => {
         const [, isAuthCheckerFail, getTokenFnFail] = CreateAdminClientMock.mock.calls[0];
         expect(getTokenFnFail()).toBe('');
         expect(isAuthCheckerFail()).toBe(false);
+    });
+
+    it('clears local authentication state when the logout request rejects', async () => {
+        logoutRequestMock.mockRejectedValueOnce(new Error('logout failed'));
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+
+        fireEvent.click(screen.getByTestId('logout-btn'));
+
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+        await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledWith('initial_token'));
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+    });
+
+    it('does not send another logout request after local authentication state is cleared', async () => {
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+
+        fireEvent.click(screen.getByTestId('logout-btn'));
+        fireEvent.click(screen.getByTestId('logout-btn'));
+
+        await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledTimes(1));
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
     });
 });

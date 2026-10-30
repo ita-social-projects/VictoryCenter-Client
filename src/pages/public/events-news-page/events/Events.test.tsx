@@ -8,6 +8,18 @@ import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+            resolvedLanguage: 'uk',
+        },
+    }),
+}));
+
+jest.mock('react-router-dom', () => ({
+    useNavigate: () => jest.fn(),
+    useLocation: () => ({
+        pathname: '/',
+        search: '',
     }),
 }));
 
@@ -100,7 +112,6 @@ describe('Events component', () => {
             useDataPaginationFetch.mockImplementation(() => ({ ...mockHookImplementation, data: secondPage }));
             rerender(<Events {...mockData} />);
 
-            // Компонент не накопичує дані сам: накопичення відбувається в хуку
             expect(screen.getAllByTestId('single-event-news')).toHaveLength(secondPage.length);
         });
 
@@ -246,7 +257,7 @@ describe('Events component', () => {
 
         it.each(LOCALES)('should refetch when the language changes from "%s"', (from) => {
             const to = LOCALES.find((locale) => locale !== from);
-            if (!to) return; // підтримується лише одна мова, перемикати нема на що
+            if (!to) return;
 
             mockCurrentLanguage = from;
             const { rerender } = render(<Events {...mockData} />);

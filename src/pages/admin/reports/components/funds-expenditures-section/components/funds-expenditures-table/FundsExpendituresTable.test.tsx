@@ -240,7 +240,7 @@ describe('FundsExpendituresTable', () => {
         renderTable({ records: [], isEditing: true });
 
         expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.NO_RECORDS)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
@@ -248,7 +248,7 @@ describe('FundsExpendituresTable', () => {
         renderTable({ records: [], isEditing: false });
 
         expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.NO_RECORDS)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
@@ -886,5 +886,26 @@ describe('FundsExpendituresTable program aggregate row', () => {
         });
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON)).toBeDisabled();
+    });
+
+    it('should show filtered empty state when no records match the filters', () => {
+        renderTable({
+            records: [],
+            allRecordsForTypeInference: MOCK_RECORDS,
+        });
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.getByTestId('not-found')).toBeInTheDocument();
+    });
+
+    it('should show default empty state when no records exist', () => {
+        renderTable({
+            records: [],
+            allRecordsForTypeInference: [],
+        });
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.NO_RECORDS)).toBeInTheDocument();
+        expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).not.toBeInTheDocument();
     });
 });

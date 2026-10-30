@@ -14,6 +14,7 @@ import { DonationSection } from './danatation-section/DonationSection';
 import styles from './MainPage.module.scss';
 import { AboutUsSection } from './about-us/AboutUsSection';
 import { NewsEventsSection } from './event-news/NewsEventsSection';
+import { StoriesOfVictorySection } from './stories-of-victory-section/StoriesOfVictorySection';
 
 const getFilledText = (...values: Array<string | null | undefined>): string => {
     return values.find((value) => value?.trim())?.trim() ?? '';
@@ -70,6 +71,7 @@ export const MainPage = () => {
             <AboutUsSection mainAboutUs={mainPageData?.mainAboutUs} />
             <MainProgramsSection />
             <MainStatisticsSection impactStatistics={mainPageData?.impactStatistics} />
+            <StoriesOfVictorySection />
             <DonationSection donationData={mainPageData?.mainDonations} />
             <NewsEventsSection />
         </div>

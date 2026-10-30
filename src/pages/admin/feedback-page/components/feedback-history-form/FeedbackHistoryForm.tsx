@@ -94,7 +94,7 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired
                                 maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.story.getMaxError()}
-                                rows={5}
+                                rows={4}
                                 error={errors.story?.message}
                                 disabled={formDisabled}
                                 normalizeValue={getNormalizedInputTextWhileTyping}

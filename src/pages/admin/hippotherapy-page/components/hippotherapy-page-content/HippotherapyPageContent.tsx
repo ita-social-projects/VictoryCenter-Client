@@ -13,10 +13,16 @@ import {
     HippotherapyPageLocalizationBlock,
 } from '@/types/admin/hippotherapy-page';
 import { isHippotherapyPageContentValid } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
-import { HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
+import {
+    HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT,
+    HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES,
+    HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
+    HIPPOTHERAPY_PAGE_TEXT,
+} from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
@@ -134,7 +140,11 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
     },
     advantagesSection: {
         title: '',
-        cards: Array.from({ length: 4 }, () => ({ description: '', image: null, imageId: null })),
+        cards: Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, () => ({
+            description: '',
+            image: null,
+            imageId: null,
+        })),
     },
     analysisSection: { title: '', description: '' },
     scientificReferencesSection: {
@@ -185,6 +195,12 @@ const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization |
 const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     hasTextCardTranslation(localization?.scientificReferencesSection);
 
+const hasAdvantagesTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        getPlainTextFromHtml(localization?.advantagesSection?.title ?? '').trim() ||
+            localization?.advantagesSection?.cards?.some((card) => getPlainTextFromHtml(card.description ?? '').trim()),
+    );
+
 const hasScientificReferenceTranslation = (
     localization: HippotherapyPageLocalization | null,
     referenceId: number | null,
@@ -196,6 +212,13 @@ const hasScientificReferenceTranslation = (
         (ref) => ref.id === referenceId && Boolean(ref.name?.trim()),
     );
 };
+
+const hasEthicsTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        getPlainTextFromHtml(localization?.ethicsSection?.title ?? '').trim() ||
+            getPlainTextFromHtml(localization?.ethicsSection?.description ?? '').trim() ||
+            localization?.ethicsSection?.principles?.some((principle) => getPlainTextFromHtml(principle ?? '').trim()),
+    );
 
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
@@ -228,6 +251,15 @@ export const HippotherapyPageContent = () => {
                 (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
             ) ?? null,
         [fetchedContent, englishLanguage],
+    );
+
+    const advantageDescriptionImages = useMemo(
+        () =>
+            Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, index) => {
+                const cardImage = fetchedContent?.advantagesSection.cards[index]?.image;
+                return getImageSrc(cardImage) || HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES[index];
+            }),
+        [fetchedContent],
     );
 
     const localizationsByBlock = useMemo(() => {
@@ -392,6 +424,7 @@ export const HippotherapyPageContent = () => {
             hippoventionSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Hippovention }),
             analysisSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Analysis }),
             anotherQuoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.AnotherQuote }),
+            advantagesSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Advantages }),
             scientificGeneral: () =>
                 setTranslationTarget({
                     block: HippotherapyPageLocalizationBlock.ScientificReferences,
@@ -403,6 +436,7 @@ export const HippotherapyPageContent = () => {
                     subBlock: 'research',
                     targetResearchLocalId: localId,
                 }),
+            ethicsSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Ethics }),
         }),
         [],
     );
@@ -514,7 +548,8 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.ADVANTAGES_CARDS}
                     onCardImageError={imageErrorHandlers.advantagesSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.advantagesSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasAdvantagesTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Advantages)}
                 />
@@ -574,7 +609,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.ethicsSection}
                     onImageError={imageErrorHandlers.ethicsSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.ethicsSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasEthicsTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Ethics)}
                 />
@@ -607,6 +643,7 @@ export const HippotherapyPageContent = () => {
                 isOpen={translationTarget != null}
                 onClose={() => setTranslationTarget(null)}
                 block={translationTarget?.block ?? null}
+                descriptionImages={advantageDescriptionImages}
                 subBlock={translationTarget?.subBlock}
                 targetResearchLocalId={translationTarget?.targetResearchLocalId}
                 translatedLanguages={translationLanguages}

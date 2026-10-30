@@ -1,5 +1,9 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { resolveWithNewTokenConcurrent } from '../resolve-with-new-token/resolve-with-new-token';
+
+type RetriableRequestConfig = InternalAxiosRequestConfig & {
+    _authRetry?: boolean;
+};
 
 export function CreateAdminClient(
     baseURL: string,
@@ -28,14 +32,20 @@ export function CreateAdminClient(
 
     client.interceptors.response.use(
         (response) => response,
-        (error: AxiosError & { config: AxiosRequestConfig }) => {
+        (error: AxiosError & { config?: RetriableRequestConfig }) => {
             const { response, config } = error;
 
-            if (response?.status === 401) {
-                return refreshHandler(config).then((newConfig) => client.request(newConfig));
+            if (response?.status !== 401 || !config) {
+                return Promise.reject(error);
             }
 
-            return Promise.reject(error);
+            if (config._authRetry) {
+                logout(getAccessToken());
+                return Promise.reject(error);
+            }
+
+            config._authRetry = true;
+            return refreshHandler(config).then((newConfig) => client.request(newConfig));
         },
     );
 

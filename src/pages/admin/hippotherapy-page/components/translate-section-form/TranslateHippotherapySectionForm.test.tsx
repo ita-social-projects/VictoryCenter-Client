@@ -142,6 +142,29 @@ describe('TranslateHippotherapySectionForm', () => {
         expect(quoteInput()).toBeDisabled();
         expect(authorInput()).toBeDisabled();
     });
+    it('uses custom minLength when configured on the field', () => {
+        const customFields: HippotherapyTranslationFieldConfig[] = [
+            { name: 'title', label: 'Заголовок', maxLength: 50, minLength: 5, isRequired: true },
+        ];
+        render(
+            <TranslateHippotherapySectionForm
+                fields={customFields}
+                fieldIdPrefix="test-custom"
+                onSubmit={jest.fn()}
+                onValidationChange={jest.fn()}
+                onDirtyChange={jest.fn()}
+            />,
+        );
+
+        const titleInput = screen.getByTestId('mock-rich-input-test-custom-title');
+        fireEvent.change(titleInput, { target: { value: '1234' } });
+        fireEvent.blur(titleInput);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5))).toBeInTheDocument();
+
+        fireEvent.change(titleInput, { target: { value: '12345' } });
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5))).not.toBeInTheDocument();
+    });
+
     it('renders a character-limited textarea when field type is textarea', () => {
         const textareaField: HippotherapyTranslationFieldConfig = {
             name: 'name',

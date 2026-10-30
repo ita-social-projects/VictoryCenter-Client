@@ -29,6 +29,10 @@ const quoteInput = (sectionKey = 'quoteSection') =>
     screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-quoteText`);
 const authorInput = (sectionKey = 'quoteSection') =>
     screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-authorName`);
+const titleInput = (sectionKey: string) =>
+    screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-title`);
+const descriptionInput = (sectionKey: string) =>
+    screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-description`);
 const saveButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
 const closeButton = () => screen.getByLabelText('Close modal');
 const confirmationTitle = () => screen.getByTestId('confirmation-title').textContent;
@@ -56,7 +60,7 @@ describe('TranslateHippotherapySectionModal', () => {
     });
 
     it('renders nothing for a section without translation fields', () => {
-        renderModal({ block: HippotherapyPageLocalizationBlock.Intro });
+        renderModal({ block: HippotherapyPageLocalizationBlock.HippoventionCenter });
 
         expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
     });
@@ -79,6 +83,62 @@ describe('TranslateHippotherapySectionModal', () => {
             'maxLength',
             String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR),
         );
+    });
+
+    it.each([
+        [
+            'Intro',
+            HippotherapyPageLocalizationBlock.Intro,
+            'introSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION,
+        ],
+        [
+            'Description',
+            HippotherapyPageLocalizationBlock.Description,
+            'descriptionSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+        [
+            'Hippovention',
+            HippotherapyPageLocalizationBlock.Hippovention,
+            'hippoventionSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+        [
+            'Analysis',
+            HippotherapyPageLocalizationBlock.Analysis,
+            'analysisSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+    ])(
+        'opens "Додати переклад" with empty fields and correct limits for %s section (Set #1)',
+        (_name, block, sectionKey, titleLimit, descLimit) => {
+            renderModal({ block });
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+            expect(screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBe(titleInput(sectionKey));
+            expect(screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBe(descriptionInput(sectionKey));
+            expect(titleInput(sectionKey)).toHaveValue('');
+            expect(descriptionInput(sectionKey)).toHaveValue('');
+            expect(titleInput(sectionKey)).toHaveAttribute('maxLength', String(titleLimit));
+            expect(descriptionInput(sectionKey)).toHaveAttribute('maxLength', String(descLimit));
+            expect(saveButton()).toBeDisabled();
+            expect(closeButton()).toBeEnabled();
+        },
+    );
+
+    it('keeps the save button disabled for Set #1 section even when both title and description are valid', () => {
+        renderModal({ block: HippotherapyPageLocalizationBlock.Intro });
+
+        fireEvent.change(titleInput('introSection'), { target: { value: 'Valid Title' } });
+        expect(saveButton()).toBeDisabled();
+
+        fireEvent.change(descriptionInput('introSection'), { target: { value: 'Valid translation description' } });
+        expect(saveButton()).toBeDisabled();
     });
 
     it('opens Advantages with exactly one title and four empty, required image-backed descriptions', () => {

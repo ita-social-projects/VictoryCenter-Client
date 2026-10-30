@@ -42,7 +42,8 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
         const form = useForm<FeedbackHistoryFormValues>({
             resolver: yupResolver(FeedbackHistoryValidationSchema),
             defaultValues: initialData ?? DEFAULT_FORM_STATE,
-            mode: 'onChange',
+            mode: 'onBlur',
+            reValidateMode: 'onBlur',
         });
         const {
             control,
@@ -116,6 +117,7 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 onChange={(img) => {
                                     field.onChange(img);
                                     clearErrors('image');
+                                    field.onBlur();
                                 }}
                                 setError={(err) => {
                                     const mapped = mapImageInputError(err);

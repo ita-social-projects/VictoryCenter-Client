@@ -52,6 +52,13 @@ export const PublicFeedbackApi = {
         });
         return response.data.map(mapHistory);
     },
+    fetchLatestHistories: async (options: RequestOptions = {}): Promise<StoriesOfVictoryReviewArticle[]> => {
+        const response = await axiosInstance.get<FeedbackHistoryPublicDto[]>(
+            API_ROUTES.FEEDBACK_HISTORIES.LATEST_PUBLISHED,
+            { signal: options.cancellationSignal },
+        );
+        return response.data.map(mapHistory);
+    },
     fetchReviews: async (options: RequestOptions = {}): Promise<StoriesOfVictoryReview[]> => {
         const response = await axiosInstance.get<FeedbackReviewPublicDto[]>(API_ROUTES.FEEDBACK_REVIEWS.PUBLISHED, {
             signal: options.cancellationSignal,

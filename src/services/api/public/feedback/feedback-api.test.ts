@@ -111,6 +111,7 @@ describe('PublicFeedbackApi', () => {
 
     it.each([
         ['fetchHistories', API_ROUTES.FEEDBACK_HISTORIES.PUBLISHED],
+        ['fetchLatestHistories', API_ROUTES.FEEDBACK_HISTORIES.LATEST_PUBLISHED],
         ['fetchReviews', API_ROUTES.FEEDBACK_REVIEWS.PUBLISHED],
         ['fetchVideos', API_ROUTES.VIDEO_REVIEWS.PUBLISHED],
     ] as const)('%s forwards the cancellation signal', async (method, url) => {
@@ -122,7 +123,7 @@ describe('PublicFeedbackApi', () => {
         expect(axiosInstance.get).toHaveBeenCalledWith(url, { signal: controller.signal });
     });
 
-    it.each(['fetchHistories', 'fetchReviews', 'fetchVideos'] as const)(
+    it.each(['fetchHistories', 'fetchLatestHistories', 'fetchReviews', 'fetchVideos'] as const)(
         '%s propagates request errors so the section can show its error state',
         async (method) => {
             (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('network'));

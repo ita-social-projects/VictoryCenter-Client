@@ -12,7 +12,7 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
 }));
 
 jest.mock('@/services/api/public/feedback/feedback-api', () => ({
-    PublicFeedbackApi: { fetchHistories: jest.fn(), fetchVideos: jest.fn() },
+    PublicFeedbackApi: { fetchLatestHistories: jest.fn(), fetchVideos: jest.fn() },
 }));
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
@@ -78,15 +78,14 @@ describe('StoriesOfVictorySection', () => {
         expect(container.querySelector('section')).toBeNull();
     });
 
-    it('renders the last 4 stories in the same order as the public stories page', () => {
-        mockFetches([article(1), article(5), article(3), article(4), article(2)]);
+    it('renders stories in the order returned by the backend', () => {
+        mockFetches([article(5), article(3), article(4), article(2)]);
         const { container } = renderSection();
 
         expect(screen.getByText('SUCCESS_STORIES.TITLE')).toBeInTheDocument();
         expect(screen.getAllByRole('img')).toHaveLength(4);
         const images = Array.from(container.querySelectorAll('img'));
         expect(images.map((image) => image.alt)).toEqual(['title-5', 'title-3', 'title-4', 'title-2']);
-        expect(screen.queryByAltText('title-1')).not.toBeInTheDocument();
         expect(screen.queryByText('title-5')).not.toBeInTheDocument();
     });
 

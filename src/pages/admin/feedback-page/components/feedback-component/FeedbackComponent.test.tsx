@@ -1,6 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { FeedbackComponent, FeedbackComponentProps } from './FeedbackComponent';
+import {
+    FeedbackComponent,
+    FeedbackComponentProps,
+} from '@/pages/admin/feedback-page/components/feedback-component/FeedbackComponent';
 import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
@@ -76,6 +79,19 @@ describe('FeedbackComponent', () => {
 
         expect(screen.getByText('Олена Петренко')).toBeInTheDocument();
         expect(screen.getByText('Чудовий центр реабілітації!')).toBeInTheDocument();
+    });
+
+    it('uses single-line truncation for long review names and preserves the full name and review', () => {
+        const authorName = 'QA3466 temporary review '.repeat(9).slice(0, 200);
+        const text = 'This is a synthetic QA review. '.repeat(17).slice(0, 500);
+
+        renderComponent({ item: { ...mockReviewItem, authorName, text } });
+
+        const name = screen.getByTitle(authorName);
+        expect(name).toHaveTextContent(authorName);
+        expect(name.parentElement).toHaveClass('feedback-truncate');
+        expect(screen.getByTitle(text)).toHaveTextContent(text);
+        expect(screen.getByTitle(text).parentElement).not.toHaveClass('feedback-truncate');
     });
 
     it('renders video item title and a clickable link that opens in a new tab', () => {

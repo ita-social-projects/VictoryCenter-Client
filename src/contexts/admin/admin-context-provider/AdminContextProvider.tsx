@@ -48,7 +48,9 @@ export const AdminContextProvider = ({ children }: Props) => {
         updateToken('');
 
         if (currentToken) {
-            void logoutRequest(currentToken).catch(() => {});
+            void logoutRequest(currentToken).catch((error: unknown) => {
+                console.error('Server-side logout failed:', error);
+            });
         }
     }, [updateToken]);
 

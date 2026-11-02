@@ -152,20 +152,29 @@ describe('<AdminContextProvider />', () => {
     });
 
     it('clears local authentication state when the logout request rejects', async () => {
-        logoutRequestMock.mockRejectedValueOnce(new Error('logout failed'));
+        const logoutError = new Error('logout failed');
+        const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+        logoutRequestMock.mockRejectedValueOnce(logoutError);
 
-        render(
-            <AdminContextProvider>
-                <Consumer />
-            </AdminContextProvider>,
-        );
-        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        try {
+            render(
+                <AdminContextProvider>
+                    <Consumer />
+                </AdminContextProvider>,
+            );
+            await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
 
-        fireEvent.click(screen.getByTestId('logout-btn'));
+            fireEvent.click(screen.getByTestId('logout-btn'));
 
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
-        await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledWith('initial_token'));
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+            expect(screen.getByTestId('auth')).toHaveTextContent('false');
+            await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledWith('initial_token'));
+            await waitFor(() =>
+                expect(consoleErrorMock).toHaveBeenCalledWith('Server-side logout failed:', logoutError),
+            );
+            expect(screen.getByTestId('loading')).toHaveTextContent('false');
+        } finally {
+            consoleErrorMock.mockRestore();
+        }
     });
 
     it('does not send another logout request after local authentication state is cleared', async () => {

@@ -58,17 +58,21 @@ export const AdminContextProvider = ({ children }: Props) => {
         }
 
         try {
-            await logoutRequest(currentToken);
+            const logoutToken = isAccessTokenValid(currentToken) ? currentToken : await tokenRefreshRequest();
+            await logoutRequest(logoutToken);
         } catch {}
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
         const logoutCount = logoutCountRef.current;
-        const newToken = await tokenRefreshRequest();
+        const [refresh] = await Promise.allSettled([tokenRefreshRequest()]);
         if (logoutCount !== logoutCountRef.current) {
             throw new CanceledError('Session ended during token refresh');
         }
-        updateToken(newToken);
+        if (refresh.status === 'rejected') {
+            throw refresh.reason;
+        }
+        updateToken(refresh.value);
     }, [updateToken]);
 
     // silent refresh on mount

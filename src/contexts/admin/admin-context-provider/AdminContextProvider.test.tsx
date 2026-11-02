@@ -57,10 +57,12 @@ const Capture = () => {
 
 const deferred = <T,>() => {
     let resolve!: (value: T) => void;
-    const promise = new Promise<T>((res) => {
+    let reject!: (reason: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
         resolve = res;
+        reject = rej;
     });
-    return { promise, resolve };
+    return { promise, resolve, reject };
 };
 
 const renderWithCapture = () =>
@@ -81,6 +83,12 @@ const getClientToken = () => CreateAdminClientMock.mock.calls[0][2]();
 const expectSignedOut = () => {
     expect(screen.getByTestId('auth')).toHaveTextContent('false');
     expect(getClientToken()).toBe('');
+};
+
+const startPendingRefresh = () => {
+    const refresh = deferred<string>();
+    tokenRefreshMock.mockReturnValueOnce(refresh.promise);
+    return { refresh, refreshPromise: ctx.refreshAccessToken() };
 };
 
 describe('<AdminContextProvider />', () => {
@@ -209,12 +217,36 @@ describe('<AdminContextProvider />', () => {
         expectSignedOut();
     });
 
+    it('logout() with an expired access token refreshes it before calling logoutRequest', async () => {
+        await renderSignedIn();
+        isValidMock.mockReturnValue(false);
+        tokenRefreshMock.mockResolvedValueOnce('fresh_token');
+
+        await act(async () => {
+            await ctx.logout();
+        });
+
+        expect(tokenRefreshMock).toHaveBeenCalledTimes(2);
+        expect(logoutRequestMock).toHaveBeenCalledWith('fresh_token');
+        expectSignedOut();
+    });
+
+    it('logout() with an expired access token signs out locally when the refresh fails', async () => {
+        await renderSignedIn();
+        isValidMock.mockReturnValue(false);
+        tokenRefreshMock.mockRejectedValueOnce(new Error('refresh failed'));
+
+        await act(async () => {
+            await expect(ctx.logout()).resolves.toBeUndefined();
+        });
+
+        expect(logoutRequestMock).not.toHaveBeenCalled();
+        expectSignedOut();
+    });
+
     it('refresh that resolves after logout() rejects and does not restore the session', async () => {
         await renderSignedIn();
-
-        const refresh = deferred<string>();
-        tokenRefreshMock.mockReturnValueOnce(refresh.promise);
-        const refreshPromise = ctx.refreshAccessToken();
+        const { refresh, refreshPromise } = startPendingRefresh();
 
         await act(async () => {
             await ctx.logout();
@@ -227,14 +259,41 @@ describe('<AdminContextProvider />', () => {
         expectSignedOut();
     });
 
+    it('refresh that fails after logout() and a new login rejects as cancelled and keeps the new session', async () => {
+        await renderSignedIn();
+        const { refresh, refreshPromise } = startPendingRefresh();
+
+        await act(async () => {
+            await ctx.logout();
+            await ctx.login({ email: 'e', password: 'p' });
+        });
+        await act(async () => {
+            refresh.reject(new Error('refresh failed'));
+            await expect(refreshPromise).rejects.toThrow(CanceledError);
+        });
+
+        expect(screen.getByTestId('auth')).toHaveTextContent('true');
+        expect(getClientToken()).toBe('login_token');
+    });
+
+    it('refresh that fails without a logout rejects with the original error', async () => {
+        await renderSignedIn();
+        const error = new Error('refresh failed');
+        tokenRefreshMock.mockRejectedValueOnce(error);
+
+        await act(async () => {
+            await expect(ctx.refreshAccessToken()).rejects.toBe(error);
+        });
+
+        expect(getClientToken()).toBe('initial_token');
+    });
+
     it('refresh that resolves while logoutRequest is pending does not restore the session', async () => {
         await renderSignedIn();
 
-        const refresh = deferred<string>();
         const logoutResponse = deferred<void>();
-        tokenRefreshMock.mockReturnValueOnce(refresh.promise);
         logoutRequestMock.mockReturnValueOnce(logoutResponse.promise);
-        const refreshPromise = ctx.refreshAccessToken();
+        const { refresh, refreshPromise } = startPendingRefresh();
 
         await act(async () => {
             const logoutPromise = ctx.logout();

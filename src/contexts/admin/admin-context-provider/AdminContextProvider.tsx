@@ -29,6 +29,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const isAuthenticated = isAccessTokenValid(token);
 
     const tokenRef = useRef<string>(token);
+    const logoutCountRef = useRef<number>(0);
 
     const updateToken = useCallback((newToken: string) => {
         tokenRef.current = newToken;
@@ -37,14 +38,18 @@ export const AdminContextProvider = ({ children }: Props) => {
 
     const login = useCallback(
         async (creds: Credentials) => {
+            const logoutCount = logoutCountRef.current;
             const newToken = await loginRequest(creds);
-            updateToken(newToken);
+            if (logoutCount === logoutCountRef.current) {
+                updateToken(newToken);
+            }
         },
         [updateToken],
     );
 
     // never rejects: local sign-out always happens, server-side logout is best effort
     const logout = useCallback(async () => {
+        logoutCountRef.current += 1;
         const currentToken = tokenRef.current;
         updateToken('');
 
@@ -58,7 +63,11 @@ export const AdminContextProvider = ({ children }: Props) => {
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
+        const logoutCount = logoutCountRef.current;
         const newToken = await tokenRefreshRequest();
+        if (logoutCount !== logoutCountRef.current) {
+            throw new Error('Session ended during token refresh');
+        }
         updateToken(newToken);
     }, [updateToken]);
 

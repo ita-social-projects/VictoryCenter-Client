@@ -16,7 +16,7 @@ type ContextType = {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: Credentials) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     refreshAccessToken: () => Promise<void>;
 };
 
@@ -43,9 +43,18 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
+    // never rejects: local sign-out always happens, server-side logout is best effort
     const logout = useCallback(async () => {
-        await logoutRequest(tokenRef.current);
+        const currentToken = tokenRef.current;
         updateToken('');
+
+        if (!currentToken) {
+            return;
+        }
+
+        try {
+            await logoutRequest(currentToken);
+        } catch {}
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
@@ -60,7 +69,7 @@ export const AdminContextProvider = ({ children }: Props) => {
                 try {
                     await refreshAccessToken();
                 } catch {
-                    logout();
+                    updateToken('');
                 } finally {
                     setIsLoading(false);
                 }

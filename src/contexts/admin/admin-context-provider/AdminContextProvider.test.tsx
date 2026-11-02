@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { act, render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
 import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
@@ -106,6 +106,7 @@ describe('<AdminContextProvider />', () => {
 
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
         expect(screen.getByTestId('auth')).toHaveTextContent('false');
+        expect(logoutRequestMock).not.toHaveBeenCalled();
     });
 
     it('login() calls loginRequest and flips auth to true', async () => {
@@ -146,5 +147,52 @@ describe('<AdminContextProvider />', () => {
         const [, isAuthCheckerFail, getTokenFnFail] = CreateAdminClientMock.mock.calls[0];
         expect(getTokenFnFail()).toBe('');
         expect(isAuthCheckerFail()).toBe(false);
+    });
+
+    it('logout() does not call logoutRequest when there is no access token', async () => {
+        tokenRefreshMock.mockRejectedValueOnce(new Error('fail'));
+        isValidMock.mockReturnValue(false);
+        let logoutFn: () => Promise<void> = async () => {};
+        const Capture = () => {
+            logoutFn = useAdminContext().logout;
+            return null;
+        };
+
+        render(
+            <AdminContextProvider>
+                <Capture />
+                <Consumer />
+            </AdminContextProvider>,
+        );
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+
+        await expect(logoutFn()).resolves.toBeUndefined();
+        expect(logoutRequestMock).not.toHaveBeenCalled();
+    });
+
+    it('logout() clears the session without rejecting when logoutRequest fails', async () => {
+        logoutRequestMock.mockRejectedValueOnce(new Error('logout failed'));
+        let logoutFn: () => Promise<void> = async () => {};
+        const Capture = () => {
+            logoutFn = useAdminContext().logout;
+            return null;
+        };
+
+        render(
+            <AdminContextProvider>
+                <Capture />
+                <Consumer />
+            </AdminContextProvider>,
+        );
+        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+
+        await act(async () => {
+            await expect(logoutFn()).resolves.toBeUndefined();
+        });
+
+        expect(logoutRequestMock).toHaveBeenCalledWith('initial_token');
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+        const [, , getTokenFn] = CreateAdminClientMock.mock.calls[0];
+        expect(getTokenFn()).toBe('');
     });
 });

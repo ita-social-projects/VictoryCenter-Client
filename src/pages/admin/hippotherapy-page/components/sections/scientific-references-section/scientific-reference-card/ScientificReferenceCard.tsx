@@ -78,7 +78,7 @@ export const ScientificReferenceCard = ({
                         aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
                         DefaultIcon={ACTION_ICONS.translate.default}
                         onClick={onTranslateClick}
-                        disabled={disabled || isTranslateDisabled}
+                        disabled={isTranslateDisabled}
                     />
                 )}
                 {canDelete && (

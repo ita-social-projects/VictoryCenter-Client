@@ -26,6 +26,7 @@ export interface EthicsSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const EthicsSectionComponent = ({
@@ -37,6 +38,7 @@ const EthicsSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: EthicsSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -50,11 +52,13 @@ const EthicsSectionComponent = ({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
 
     const handlePrincipleChange = (index: number, principle: string) => {

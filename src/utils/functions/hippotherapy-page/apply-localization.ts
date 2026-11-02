@@ -12,10 +12,10 @@ const mapCards = <T extends { description: string }>(
     }));
 
 export const applyHippotherapyLocalization = (
-    content: HippotherapyPageContentModel,
+    content: HippotherapyPageContentModel | null,
     localization: HippotherapyPageLocalization | null,
-): HippotherapyPageContentModel => {
-    if (!localization) return content;
+): HippotherapyPageContentModel | null => {
+    if (!content || !localization) return content;
 
     const {
         introSection,

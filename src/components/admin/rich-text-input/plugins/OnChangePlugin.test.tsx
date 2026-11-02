@@ -17,7 +17,7 @@ jest.mock('@lexical/html', () => ({
     $generateHtmlFromNodes: (...args: any[]) => mockGenerateHtmlFromNodes(...args),
 }));
 
-const triggerUserChange = (mockHtml: string) => {
+const triggerUserChange = (mockHtml: string, tags: Set<string> = new Set()) => {
     const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
     const mockEditorState = {
         read: jest.fn((callback) => callback()),
@@ -27,6 +27,7 @@ const triggerUserChange = (mockHtml: string) => {
         editorState: mockEditorState,
         dirtyElements: new Map(),
         dirtyLeaves: new Set(),
+        tags: new Set(),
     });
 
     mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
@@ -35,12 +36,18 @@ const triggerUserChange = (mockHtml: string) => {
         editorState: mockEditorState,
         dirtyElements: new Map([['key', true]]),
         dirtyLeaves: new Set(),
+        tags,
     });
 };
 
-const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
+const testOnChangeCallback = (
+    onChange: jest.Mock,
+    mockHtml: string,
+    expectedOutput: string,
+    tags: Set<string> = new Set(),
+) => {
     render(<OnChangePlugin onChange={onChange} />);
-    triggerUserChange(mockHtml);
+    triggerUserChange(mockHtml, tags);
     expect(onChange).toHaveBeenCalledWith(expectedOutput);
 };
 
@@ -74,6 +81,7 @@ describe('OnChangePlugin', () => {
             editorState: mockEditorState,
             dirtyElements: new Map(),
             dirtyLeaves: new Set(),
+            tags: new Set(),
         });
 
         expect(onChange).not.toHaveBeenCalled();
@@ -86,9 +94,35 @@ describe('OnChangePlugin', () => {
         const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
         const mockEditorState = { read: jest.fn((cb) => cb()) };
 
-        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
+        listenerCallback({
+            editorState: mockEditorState,
+            dirtyElements: new Map(),
+            dirtyLeaves: new Set(),
+            tags: new Set(),
+        });
+        listenerCallback({
+            editorState: mockEditorState,
+            dirtyElements: new Map(),
+            dirtyLeaves: new Set(),
+            tags: new Set(),
+        });
 
-        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
+        expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not call onChange when update has external-value tag', () => {
+        const onChange = jest.fn();
+        render(<OnChangePlugin onChange={onChange} />);
+
+        const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
+        const mockEditorState = { read: jest.fn((cb) => cb()) };
+
+        listenerCallback({
+            editorState: mockEditorState,
+            dirtyElements: new Map([['key', true]]),
+            dirtyLeaves: new Set(),
+            tags: new Set(['external-value']),
+        });
 
         expect(onChange).not.toHaveBeenCalled();
     });

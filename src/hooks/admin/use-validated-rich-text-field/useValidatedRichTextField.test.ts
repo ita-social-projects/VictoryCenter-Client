@@ -96,4 +96,17 @@ describe('useValidatedRichTextField', () => {
 
         expect(result.current.error).toBeUndefined();
     });
+
+    it('re-validates when languageCode changes', () => {
+        const { result, rerender } = renderHook(
+            ({ lang }) => useValidatedRichTextField({ value: 'short', onChange, languageCode: lang }),
+            { initialProps: { lang: '' } },
+        );
+
+        expect(result.current.error).toBeDefined();
+
+        rerender({ lang: 'en' });
+
+        expect(result.current.error).toBeDefined();
+    });
 });

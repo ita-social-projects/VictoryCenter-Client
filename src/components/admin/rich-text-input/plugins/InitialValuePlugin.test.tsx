@@ -68,7 +68,7 @@ describe('InitialValuePlugin', () => {
         expect(mockUpdate).not.toHaveBeenCalled();
     });
 
-    it('updates editor when value prop changes to different content', () => {
+    it('updates editor with external-value tag when value prop changes to different content', () => {
         const { rerender } = render(<InitialValuePlugin value="<p>First</p>" />);
 
         expect(mockUpdate).not.toHaveBeenCalled();
@@ -78,9 +78,11 @@ describe('InitialValuePlugin', () => {
         rerender(<InitialValuePlugin value="<p>Second</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
+        // Verify the tag is passed correctly
+        expect(mockUpdate).toHaveBeenCalledWith(expect.any(Function), { tag: 'external-value' });
     });
 
-    it('updates editor for consecutive external value changes', () => {
+    it('updates editor for consecutive external value changes with correct tag', () => {
         const { rerender } = render(<InitialValuePlugin value="<p>First</p>" />);
 
         mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p>');
@@ -90,6 +92,8 @@ describe('InitialValuePlugin', () => {
         rerender(<InitialValuePlugin value="<p>Third</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(2);
+        expect(mockUpdate).toHaveBeenNthCalledWith(1, expect.any(Function), { tag: 'external-value' });
+        expect(mockUpdate).toHaveBeenNthCalledWith(2, expect.any(Function), { tag: 'external-value' });
     });
 
     it('does not update when value remains the same', () => {
@@ -105,7 +109,7 @@ describe('InitialValuePlugin', () => {
         expect(mockUpdate).not.toHaveBeenCalled();
     });
 
-    it('resets to new value after external change', () => {
+    it('resets to new value after external change with correct tag', () => {
         const { rerender } = render(<InitialValuePlugin value="<p>Original</p>" />);
 
         mockGenerateHtmlFromNodes.mockReturnValue('<p>Original</p>');
@@ -113,6 +117,7 @@ describe('InitialValuePlugin', () => {
         rerender(<InitialValuePlugin value="<p>Updated externally</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
+        expect(mockUpdate).toHaveBeenCalledWith(expect.any(Function), { tag: 'external-value' });
 
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
@@ -145,7 +150,7 @@ describe('InitialValuePlugin', () => {
         expect(mockUpdate).not.toHaveBeenCalled();
     });
 
-    it('parses a fallback paragraph when sanitized next HTML is empty', () => {
+    it('parses a fallback paragraph when sanitized next HTML is empty with correct tag', () => {
         mockSanitizeHtml.mockImplementation((html: string) => (html.includes('<script>') ? '' : html));
 
         const { rerender } = render(<InitialValuePlugin value="<p>Original</p>" />);
@@ -155,6 +160,7 @@ describe('InitialValuePlugin', () => {
         rerender(<InitialValuePlugin value="<script>alert(1)</script>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
+        expect(mockUpdate).toHaveBeenCalledWith(expect.any(Function), { tag: 'external-value' });
 
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();

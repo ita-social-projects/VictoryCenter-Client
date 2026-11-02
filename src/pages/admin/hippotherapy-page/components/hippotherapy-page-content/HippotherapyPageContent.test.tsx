@@ -961,4 +961,87 @@ describe('HippotherapyPageContent', () => {
             ).toBeInTheDocument();
         });
     });
+
+    describe('language switching and validation', () => {
+        const contentWithEnglish = (): HippotherapyPageContentModel => ({
+            ...buildContent(),
+            localizations: [
+                {
+                    language: englishLanguage,
+                    translationStatus: TranslationStatus.Relevant,
+                    introSection: { title: 'English Intro Title', description: 'English Intro Description' },
+                } as any,
+            ],
+        });
+
+        it('uses fetchedContent (not draftContent) for read-only language preview', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('English Intro Title');
+            expect(introSection).not.toHaveTextContent('Intro title');
+        });
+
+        it('keeps Ukrainian draft intact when switching to English and back', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-intro');
+            fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+
+            onLanguageChange(englishLanguage);
+            onLanguageChange(ukrainianLanguage);
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('re-validates fields when language changes to prevent stale errors', async () => {
+            mockedIsContentValid.mockReturnValue(false);
+
+            const shortContent: HippotherapyPageContentModel = {
+                ...buildContent(),
+                introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
+            };
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(shortContent);
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-intro');
+
+            onLanguageChange(englishLanguage);
+
+            expect(onLanguageChange).toHaveBeenCalledWith(englishLanguage);
+        });
+    });
+
+    describe('external-value tag prevents draft overwrite', () => {
+        it('does not overwrite draftContent when switching languages (OnChangePlugin blocked)', async () => {
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
+
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-intro');
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+
+            onLanguageChange(englishLanguage);
+            onLanguageChange(ukrainianLanguage);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+            expect(screen.getByTestId('section-intro')).toHaveTextContent('Edited intro title');
+        });
+    });
 });

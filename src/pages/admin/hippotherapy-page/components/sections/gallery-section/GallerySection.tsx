@@ -22,6 +22,7 @@ export interface GallerySectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const GallerySectionComponent = ({
@@ -35,6 +36,7 @@ const GallerySectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: GallerySectionProps) => {
     const [cardImageErrors, setCardImageErrors] = useState<Record<number, string | null>>({});
     const isReadOnly = useHippotherapyReadOnly();
@@ -43,6 +45,7 @@ const GallerySectionComponent = ({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const handleCardImageChange = (index: number, image: ImageValues | null) => {

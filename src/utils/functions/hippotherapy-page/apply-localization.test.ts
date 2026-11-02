@@ -1,170 +1,263 @@
 import { applyHippotherapyLocalization } from './apply-localization';
 import { HippotherapyPageContentModel, HippotherapyPageLocalization } from '@/types/admin/hippotherapy-page';
+import { TranslationStatus } from '@/types/common/language';
+
+const text = (title: string, description: string) => ({ title, description });
+const quote = (quoteText: string, authorName: string) => ({ quoteText, authorName, image: null, imageId: null });
+const card = (description: string) => ({ description, image: null, imageId: null });
+const reference = (id: number, name: string) => ({ localId: `l-${id}`, id, name, url: `https://ref${id}.com` });
 
 const createBaseContent = (): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: 'Укр Інтро', description: 'Опис Інтро', image: null, imageId: null },
-    descriptionSection: { title: 'Укр Опис', description: 'Текст Опису' },
-    quoteSection: { quoteText: 'Укр Цитата', authorName: 'Автор', image: null, imageId: null },
-    hippoventionSection: { title: 'Укр Гіпповенція', description: 'Опис Гіпповенції' },
+    introSection: { ...text('Укр Інтро', 'Опис Інтро'), image: null, imageId: null },
+    descriptionSection: text('Укр Опис', 'Текст Опису'),
+    quoteSection: quote('Укр Цитата', 'Автор'),
+    hippoventionSection: text('Укр Гіпповенція', 'Опис Гіпповенції'),
     hippoventionCenterSection: {
-        title: 'Укр Центр',
-        description: 'Опис Центру',
+        ...text('Укр Центр', 'Опис Центру'),
         pros: 'Плюси',
         image: null,
         imageId: null,
     },
-    advantagesSection: {
-        title: 'Укр Переваги',
-        cards: [
-            { description: 'Картка 1 Укр', image: null, imageId: null },
-            { description: 'Картка 2 Укр', image: null, imageId: null },
-        ],
-    },
-    analysisSection: { title: 'Укр Аналіз', description: 'Опис Аналізу' },
+    advantagesSection: { title: 'Укр Переваги', cards: [card('Картка 1 Укр'), card('Картка 2 Укр')] },
+    analysisSection: text('Укр Аналіз', 'Опис Аналізу'),
     scientificReferencesSection: {
-        title: 'Укр Джерела',
-        description: 'Опис Джерел',
-        scientificReferences: [
-            { localId: 'l-1', id: 10, name: 'Джерело 10 Укр', url: 'https://ref1.com' },
-            { localId: 'l-2', id: 20, name: 'Джерело 20 Укр', url: 'https://ref2.com' },
-        ],
+        ...text('Укр Джерела', 'Опис Джерел'),
+        scientificReferences: [reference(10, 'Джерело 10 Укр'), reference(20, 'Джерело 20 Укр')],
     },
-    anotherQuoteSection: { quoteText: 'Укр Ще Цитата', authorName: 'Ще Автор', image: null, imageId: null },
-    participantsSection: {
-        title: 'Укр Учасники',
-        cards: [
-            { description: 'Учасник 1 Укр', image: null, imageId: null },
-            { description: 'Учасник 2 Укр', image: null, imageId: null },
-        ],
-    },
+    anotherQuoteSection: quote('Укр Ще Цитата', 'Ще Автор'),
+    participantsSection: { title: 'Укр Учасники', cards: [card('Учасник 1 Укр'), card('Учасник 2 Укр')] },
     ethicsSection: {
-        title: 'Укр Етика',
-        description: 'Опис Етики',
+        ...text('Укр Етика', 'Опис Етики'),
         principles: ['Принцип 1', 'Принцип 2'],
         image: null,
         imageId: null,
     },
 });
 
+const createLocalization = (sections: Partial<HippotherapyPageLocalization>): HippotherapyPageLocalization => ({
+    language: { id: 2, code: 'en' },
+    translationStatus: TranslationStatus.Relevant,
+    ...sections,
+});
+
+const apply = (sections: Partial<HippotherapyPageLocalization>) =>
+    applyHippotherapyLocalization(createBaseContent(), createLocalization(sections));
+
 describe('applyHippotherapyLocalization', () => {
     it('returns original content as is when localization is null', () => {
         const base = createBaseContent();
+
         expect(applyHippotherapyLocalization(base, null)).toEqual(base);
     });
 
-    it('applies translated values for all sections when localization is fully populated', () => {
+    it('does not mutate the base content', () => {
         const base = createBaseContent();
-        const localization: HippotherapyPageLocalization = {
-            language: { id: 2, code: 'en' },
-            translationStatus: 1 as any,
-            introSection: { title: 'EN Intro', description: 'EN Intro Desc' },
-            descriptionSection: { title: 'EN Desc', description: 'EN Desc Text' },
-            quoteSection: { quoteText: 'EN Quote', authorName: 'EN Author' },
-            hippoventionSection: { title: 'EN Hippovention', description: 'EN Hippovention Desc' },
+        const snapshot = JSON.parse(JSON.stringify(base));
+
+        applyHippotherapyLocalization(base, createLocalization({ introSection: text('EN', 'EN') }));
+
+        expect(base).toEqual(snapshot);
+    });
+
+    describe('simple sections', () => {
+        const sections = [
+            ['introSection', 'EN Intro', 'EN Intro Desc'],
+            ['descriptionSection', 'EN Desc', 'EN Desc Text'],
+            ['hippoventionSection', 'EN Hippovention', 'EN Hippovention Desc'],
+            ['analysisSection', 'EN Analysis', 'EN Analysis Desc'],
+        ] as const;
+
+        it.each(sections)('applies translated title and description for %s', (key, title, description) => {
+            const result = apply({ [key]: text(title, description) });
+
+            expect(result[key].title).toBe(title);
+            expect(result[key].description).toBe(description);
+        });
+
+        it.each(sections)('falls back to base for empty or whitespace values in %s', (key) => {
+            const base = createBaseContent();
+            const result = apply({ [key]: text('   ', '') });
+
+            expect(result[key].title).toBe(base[key].title);
+            expect(result[key].description).toBe(base[key].description);
+        });
+    });
+
+    describe('quote sections', () => {
+        it.each(['quoteSection', 'anotherQuoteSection'] as const)('applies quote and author for %s', (key) => {
+            const result = apply({ [key]: { quoteText: 'EN Quote', authorName: 'EN Author' } });
+
+            expect(result[key].quoteText).toBe('EN Quote');
+            expect(result[key].authorName).toBe('EN Author');
+        });
+
+        it('falls back per field: translated quote with blank author keeps base author', () => {
+            const result = apply({ quoteSection: { quoteText: 'EN Quote', authorName: '   ' } });
+
+            expect(result.quoteSection.quoteText).toBe('EN Quote');
+            expect(result.quoteSection.authorName).toBe('Автор');
+        });
+
+        it('keeps base author when translated author is null', () => {
+            const result = apply({ quoteSection: { quoteText: 'EN Quote', authorName: null } });
+
+            expect(result.quoteSection.authorName).toBe('Автор');
+        });
+    });
+
+    it('applies translated hippovention center fields', () => {
+        const result = apply({
             hippoventionCenterSection: { title: 'EN Center', description: 'EN Center Desc', pros: 'EN Pros' },
-            advantagesSection: {
-                title: 'EN Advantages',
-                cards: [
-                    { cardId: 1, description: 'EN Card 1' },
-                    { cardId: 2, description: 'EN Card 2' },
-                ],
-            },
-            analysisSection: { title: 'EN Analysis', description: 'EN Analysis Desc' },
-            scientificReferencesSection: {
-                title: 'EN References',
-                description: 'EN Ref Desc',
-                scientificReferences: [
-                    { id: 10, name: 'EN Ref 10' },
-                    { id: 20, name: 'EN Ref 20' },
-                ],
-            },
-            anotherQuoteSection: { quoteText: 'EN Another Quote', authorName: 'EN Another Author' },
-            participantsSection: {
-                title: 'EN Participants',
-                cards: [
-                    { cardId: 1, description: 'EN Part 1' },
-                    { cardId: 2, description: 'EN Part 2' },
-                ],
-            },
-            ethicsSection: {
-                title: 'EN Ethics',
-                description: 'EN Ethics Desc',
-                principles: [
-                    { principleId: 1, text: 'EN Principle 1' },
-                    { principleId: 2, text: 'EN Principle 2' },
-                ],
-            },
-        };
+        });
 
-        const result = applyHippotherapyLocalization(base, localization);
-
-        expect(result.introSection.title).toBe('EN Intro');
-        expect(result.introSection.description).toBe('EN Intro Desc');
-        expect(result.descriptionSection.title).toBe('EN Desc');
-        expect(result.quoteSection.quoteText).toBe('EN Quote');
-        expect(result.hippoventionCenterSection.pros).toBe('EN Pros');
-        expect(result.advantagesSection.cards[0].description).toBe('EN Card 1');
-        expect(result.participantsSection.cards[0].description).toBe('EN Part 1');
-        expect(result.scientificReferencesSection.scientificReferences[0].name).toBe('EN Ref 10');
-        expect(result.ethicsSection.principles).toEqual(['EN Principle 1', 'EN Principle 2']);
+        expect(result.hippoventionCenterSection).toMatchObject({
+            title: 'EN Center',
+            description: 'EN Center Desc',
+            pros: 'EN Pros',
+        });
     });
 
-    it('falls back to base content if translated value is empty or whitespace-only', () => {
-        const base = createBaseContent();
-        const localization: HippotherapyPageLocalization = {
-            language: { id: 2, code: 'en' },
-            translationStatus: 1 as any,
-            introSection: { title: '   ', description: '' },
-            quoteSection: { quoteText: 'EN Quote', authorName: '   ' },
-            advantagesSection: {
-                title: '   ',
-                cards: [{ cardId: 1, description: '   ' }],
-            },
-            scientificReferencesSection: {
-                title: '',
-                description: '   ',
-                scientificReferences: [{ id: 10, name: '   ' }],
-            },
-            ethicsSection: {
-                title: '',
-                description: '',
-                principles: [{ principleId: 1, text: '   ' }],
-            },
-        };
+    describe('gallery sections', () => {
+        it.each([
+            ['advantagesSection', 'EN Advantages'],
+            ['participantsSection', 'EN Participants'],
+        ] as const)('applies title and cards for %s', (key, title) => {
+            const result = apply({
+                [key]: {
+                    title,
+                    cards: [
+                        { cardId: 1, description: 'EN Card 1' },
+                        { cardId: 2, description: 'EN Card 2' },
+                    ],
+                },
+            });
 
-        const result = applyHippotherapyLocalization(base, localization);
+            expect(result[key].title).toBe(title);
+            expect(result[key].cards.map((c) => c.description)).toEqual(['EN Card 1', 'EN Card 2']);
+        });
 
-        expect(result.introSection.title).toBe('Укр Інтро');
-        expect(result.introSection.description).toBe('Опис Інтро');
-        expect(result.quoteSection.quoteText).toBe('EN Quote');
-        expect(result.quoteSection.authorName).toBe('Автор');
-        expect(result.advantagesSection.cards[0].description).toBe('Картка 1 Укр');
-        expect(result.scientificReferencesSection.scientificReferences[0].name).toBe('Джерело 10 Укр');
-        expect(result.ethicsSection.principles[0]).toBe('Принцип 1');
+        it.each(['advantagesSection', 'participantsSection'] as const)(
+            'keeps base card text for blank and missing translations in %s',
+            (key) => {
+                const base = createBaseContent();
+                const result = apply({ [key]: { title: '   ', cards: [{ cardId: 1, description: '   ' }] } });
+
+                expect(result[key].title).toBe(base[key].title);
+                expect(result[key].cards.map((c) => c.description)).toEqual(base[key].cards.map((c) => c.description));
+            },
+        );
+
+        it('does not touch card images', () => {
+            const result = apply({ advantagesSection: { title: 'EN', cards: [{ cardId: 1, description: 'EN 1' }] } });
+
+            expect(result.advantagesSection.cards[0]).toMatchObject({ image: null, imageId: null });
+        });
     });
 
-    it('matches scientific references by persistent id rather than array order', () => {
+    describe('scientific references', () => {
+        it('applies title, description and names', () => {
+            const result = apply({
+                scientificReferencesSection: {
+                    title: 'EN References',
+                    description: 'EN Ref Desc',
+                    scientificReferences: [
+                        { id: 10, name: 'EN Ref 10' },
+                        { id: 20, name: 'EN Ref 20' },
+                    ],
+                },
+            });
+
+            expect(result.scientificReferencesSection.title).toBe('EN References');
+            expect(result.scientificReferencesSection.scientificReferences.map((r) => r.name)).toEqual([
+                'EN Ref 10',
+                'EN Ref 20',
+            ]);
+        });
+
+        it('matches by persistent id rather than array order', () => {
+            const result = apply({
+                scientificReferencesSection: {
+                    title: 'EN',
+                    description: 'EN',
+                    scientificReferences: [
+                        { id: 20, name: 'EN Ref 20' },
+                        { id: 10, name: 'EN Ref 10' },
+                    ],
+                },
+            });
+
+            expect(
+                result.scientificReferencesSection.scientificReferences.map(({ id, name }) => ({ id, name })),
+            ).toEqual([
+                { id: 10, name: 'EN Ref 10' },
+                { id: 20, name: 'EN Ref 20' },
+            ]);
+        });
+
+        it('keeps base name for blank translation and for references without translation', () => {
+            const result = apply({
+                scientificReferencesSection: {
+                    title: '',
+                    description: '   ',
+                    scientificReferences: [{ id: 10, name: '   ' }],
+                },
+            });
+
+            expect(result.scientificReferencesSection.scientificReferences.map((r) => r.name)).toEqual([
+                'Джерело 10 Укр',
+                'Джерело 20 Укр',
+            ]);
+        });
+
+        it('keeps urls and local ids untouched', () => {
+            const result = apply({
+                scientificReferencesSection: {
+                    title: 'EN',
+                    description: 'EN',
+                    scientificReferences: [{ id: 10, name: 'EN' }],
+                },
+            });
+
+            expect(result.scientificReferencesSection.scientificReferences[0]).toMatchObject({
+                localId: 'l-10',
+                url: 'https://ref10.com',
+            });
+        });
+    });
+
+    describe('ethics', () => {
+        it('applies title, description and principles', () => {
+            const result = apply({
+                ethicsSection: {
+                    title: 'EN Ethics',
+                    description: 'EN Ethics Desc',
+                    principles: [
+                        { principleId: 1, text: 'EN Principle 1' },
+                        { principleId: 2, text: 'EN Principle 2' },
+                    ],
+                },
+            });
+
+            expect(result.ethicsSection.title).toBe('EN Ethics');
+            expect(result.ethicsSection.principles).toEqual(['EN Principle 1', 'EN Principle 2']);
+        });
+
+        it('keeps base principle for blank or missing translation', () => {
+            const result = apply({
+                ethicsSection: { title: '', description: '', principles: [{ principleId: 1, text: '   ' }] },
+            });
+
+            expect(result.ethicsSection.principles).toEqual(['Принцип 1', 'Принцип 2']);
+        });
+    });
+
+    it('translates only the provided sections and leaves the others in Ukrainian', () => {
         const base = createBaseContent();
-        const localization: HippotherapyPageLocalization = {
-            language: { id: 2, code: 'en' },
-            translationStatus: 1 as any,
-            scientificReferencesSection: {
-                title: 'EN Sci',
-                description: 'Desc',
-                scientificReferences: [
-                    { id: 20, name: 'EN Ref 20' }, // зворотний порядок
-                    { id: 10, name: 'EN Ref 10' },
-                ],
-            },
-        };
+        const result = apply({ introSection: text('EN Intro', 'EN Intro Desc') });
 
-        const result = applyHippotherapyLocalization(base, localization);
-
-        expect(result.scientificReferencesSection.scientificReferences[0].id).toBe(10);
-        expect(result.scientificReferencesSection.scientificReferences[0].name).toBe('EN Ref 10');
-        expect(result.scientificReferencesSection.scientificReferences[1].id).toBe(20);
-        expect(result.scientificReferencesSection.scientificReferences[1].name).toBe('EN Ref 20');
+        expect(result.descriptionSection).toEqual(base.descriptionSection);
+        expect(result.ethicsSection).toEqual(base.ethicsSection);
     });
 });

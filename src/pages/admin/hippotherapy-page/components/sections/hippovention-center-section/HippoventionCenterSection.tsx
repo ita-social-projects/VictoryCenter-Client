@@ -25,6 +25,7 @@ export interface HippoventionCenterSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const HippoventionCenterSectionComponent = ({
@@ -36,6 +37,7 @@ const HippoventionCenterSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: HippoventionCenterSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -48,17 +50,20 @@ const HippoventionCenterSectionComponent = ({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const pros = useValidatedRichTextField({
         value: value.pros,
         onChange: (pros) => onChange({ ...value, pros }),
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
         isOptional: true,
+        languageCode,
     });
 
     return (

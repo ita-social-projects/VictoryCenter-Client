@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -8,6 +8,7 @@ export interface UseValidatedRichTextFieldParams {
     onChange: (value: string) => void;
     minLength?: number;
     isOptional?: boolean;
+    languageCode?: string;
 }
 
 export const useValidatedRichTextField = ({
@@ -15,6 +16,7 @@ export const useValidatedRichTextField = ({
     onChange,
     minLength = HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
     isOptional = false,
+    languageCode,
 }: UseValidatedRichTextFieldParams) => {
     const [error, setError] = useState<string | undefined>();
 
@@ -39,6 +41,11 @@ export const useValidatedRichTextField = ({
     const handleBlur = () => {
         setError(validate(value));
     };
+    useEffect(() => {
+        if (languageCode !== undefined) {
+            setError(validate(value));
+        }
+    }, [languageCode]);
 
     return { error, handleChange, handleBlur };
 };

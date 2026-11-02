@@ -25,6 +25,7 @@ export interface IntroBannerSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const IntroBannerSectionComponent = ({
@@ -36,6 +37,7 @@ const IntroBannerSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: IntroBannerSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -48,11 +50,13 @@ const IntroBannerSectionComponent = ({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
 
     return (

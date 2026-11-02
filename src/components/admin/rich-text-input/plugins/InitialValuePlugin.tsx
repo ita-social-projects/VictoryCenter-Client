@@ -40,16 +40,19 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
 
         lastValue.current = value;
 
-        editor.update(() => {
-            const root = $getRoot();
+        editor.update(
+            () => {
+                const root = $getRoot();
 
-            const parser = new DOMParser();
-            const dom = parser.parseFromString(nextHtml || '<p></p>', 'text/html');
-            const nodes = $generateNodesFromDOM(editor, dom);
+                const parser = new DOMParser();
+                const dom = parser.parseFromString(nextHtml || '<p></p>', 'text/html');
+                const nodes = $generateNodesFromDOM(editor, dom);
 
-            root.clear();
-            $insertNodes(nodes);
-        });
+                root.clear();
+                $insertNodes(nodes);
+            },
+            { tag: 'external-value' },
+        );
     }, [editor, value]);
 
     return null;

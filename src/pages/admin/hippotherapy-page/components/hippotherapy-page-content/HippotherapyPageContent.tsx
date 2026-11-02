@@ -45,6 +45,17 @@ interface TranslationTarget {
     targetResearchLocalId?: string | null;
 }
 
+const findLocalization = (
+    content: HippotherapyPageContentModel | null,
+    language: { code: string; id: number } | null | undefined,
+): HippotherapyPageLocalization | null => {
+    if (!content?.localizations || !language) return null;
+    return (
+        content.localizations.find((loc) => loc.language?.code === language.code || loc.language?.id === language.id) ??
+        null
+    );
+};
+
 const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
@@ -216,28 +227,21 @@ export const HippotherapyPageContent = () => {
     );
 
     const targetLocalization = useMemo(
-        () =>
-            fetchedContent?.localizations?.find(
-                (loc) => loc.language?.code === 'en' || (englishLanguage && loc.language?.id === englishLanguage.id),
-            ) ?? null,
+        () => findLocalization(fetchedContent, englishLanguage),
         [fetchedContent, englishLanguage],
     );
 
     const selectedLocalization = useMemo(() => {
-        if (!isReadOnlyLanguage || !selectedLanguage) return null;
-        return (
-            fetchedContent?.localizations?.find(
-                (loc) => loc.language?.id === selectedLanguage.id || loc.language?.code === selectedLanguage.code,
-            ) ?? null
-        );
+        if (!isReadOnlyLanguage) return null;
+        return findLocalization(fetchedContent, selectedLanguage);
     }, [fetchedContent, isReadOnlyLanguage, selectedLanguage]);
 
     const displayContent = useMemo(
         () =>
-            draftContent && isReadOnlyLanguage
-                ? applyHippotherapyLocalization(draftContent, selectedLocalization)
+            isReadOnlyLanguage
+                ? applyHippotherapyLocalization(fetchedContent ?? draftContent, selectedLocalization)
                 : draftContent,
-        [draftContent, isReadOnlyLanguage, selectedLocalization],
+        [fetchedContent, draftContent, isReadOnlyLanguage, selectedLocalization],
     );
 
     const localizationsByBlock = useMemo(() => {
@@ -308,10 +312,9 @@ export const HippotherapyPageContent = () => {
 
     const handleSectionChange = useCallback(
         <K extends keyof HippotherapyPageContentModel>(key: K, value: HippotherapyPageContentModel[K]) => {
-            if (isReadOnlyLanguage) return;
             setDraftContent((prev) => (prev ? { ...prev, [key]: value } : prev));
         },
-        [isReadOnlyLanguage],
+        [],
     );
 
     const sectionHandlers = useMemo(
@@ -466,6 +469,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Intro)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <TextCardSection
@@ -476,6 +480,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Description)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -489,6 +494,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled || hasQuoteTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Quote)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <TextCardSection
@@ -499,6 +505,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Hippovention)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <HippoventionCenterSection
@@ -509,6 +516,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.HippoventionCenter)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <GallerySection
@@ -521,6 +529,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Advantages)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <TextCardSection
@@ -531,6 +540,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Analysis)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <ScientificReferencesSection
@@ -545,6 +555,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateReferenceDisabled={isTranslateReferenceDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.ScientificReferences)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <HippotherapyQuoteSection
@@ -558,6 +569,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled || hasAnotherQuoteTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.AnotherQuote)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <GallerySection
@@ -570,6 +582,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Participants)}
+                    languageCode={selectedLanguage?.code}
                 />
                 <hr />
                 <EthicsSection
@@ -580,6 +593,7 @@ export const HippotherapyPageContent = () => {
                     isTranslateDisabled={isTranslateDisabled}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Ethics)}
+                    languageCode={selectedLanguage?.code}
                 />
                 {!isReadOnlyLanguage && (
                     <div className="hippotherapy-page-publish">

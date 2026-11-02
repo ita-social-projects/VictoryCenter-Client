@@ -26,6 +26,7 @@ export interface HippotherapyQuoteSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const HippotherapyQuoteSectionComponent = ({
@@ -39,6 +40,7 @@ const HippotherapyQuoteSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: HippotherapyQuoteSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
@@ -50,12 +52,14 @@ const HippotherapyQuoteSectionComponent = ({
     const quoteText = useValidatedRichTextField({
         value: value.quoteText,
         onChange: (quoteText) => onChange({ ...value, quoteText }),
+        languageCode,
     });
 
     const authorName = useValidatedRichTextField({
         value: value.authorName,
         onChange: (authorName) => onChange({ ...value, authorName }),
         isOptional: true,
+        languageCode,
     });
 
     return (

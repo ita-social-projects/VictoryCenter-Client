@@ -18,6 +18,7 @@ export interface TextCardSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const TextCardSectionComponent = ({
@@ -29,16 +30,19 @@ const TextCardSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: TextCardSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
 
     const isReadOnly = useHippotherapyReadOnly();

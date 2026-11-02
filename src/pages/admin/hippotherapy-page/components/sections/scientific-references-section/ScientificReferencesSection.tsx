@@ -29,6 +29,7 @@ export interface ScientificReferencesSectionProps {
     isTranslateReferenceDisabled?: (localId: string) => boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
@@ -52,6 +53,7 @@ const ScientificReferencesSectionComponent = ({
     isTranslateReferenceDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
@@ -62,6 +64,7 @@ const ScientificReferencesSectionComponent = ({
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
 
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});

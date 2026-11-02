@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import cn from 'classnames';
 import './Modal.scss';
 
@@ -111,7 +112,7 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
         }
     };
 
-    return (
+    return createPortal(
         <div
             data-testid="modal-overlay"
             className="modal-overlay"
@@ -151,7 +152,8 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
                 <div className="modal-body">{content}</div>
                 <div className="modal-footer">{actions}</div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 };
 

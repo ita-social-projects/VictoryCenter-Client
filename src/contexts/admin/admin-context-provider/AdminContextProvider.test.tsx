@@ -62,6 +62,26 @@ const deferred = <T,>() => {
     return { promise, resolve };
 };
 
+const renderWithCapture = () =>
+    render(
+        <AdminContextProvider>
+            <Capture />
+            <Consumer />
+        </AdminContextProvider>,
+    );
+
+const renderSignedIn = async () => {
+    renderWithCapture();
+    await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+};
+
+const getClientToken = () => CreateAdminClientMock.mock.calls[0][2]();
+
+const expectSignedOut = () => {
+    expect(screen.getByTestId('auth')).toHaveTextContent('false');
+    expect(getClientToken()).toBe('');
+};
+
 describe('<AdminContextProvider />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -167,12 +187,7 @@ describe('<AdminContextProvider />', () => {
         tokenRefreshMock.mockRejectedValueOnce(new Error('fail'));
         isValidMock.mockReturnValue(false);
 
-        render(
-            <AdminContextProvider>
-                <Capture />
-                <Consumer />
-            </AdminContextProvider>,
-        );
+        renderWithCapture();
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
 
         await act(async () => {
@@ -183,33 +198,18 @@ describe('<AdminContextProvider />', () => {
 
     it('logout() clears the session without rejecting when logoutRequest fails', async () => {
         logoutRequestMock.mockRejectedValueOnce(new Error('logout failed'));
-
-        render(
-            <AdminContextProvider>
-                <Capture />
-                <Consumer />
-            </AdminContextProvider>,
-        );
-        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        await renderSignedIn();
 
         await act(async () => {
             await expect(ctx.logout()).resolves.toBeUndefined();
         });
 
         expect(logoutRequestMock).toHaveBeenCalledWith('initial_token');
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
-        const [, , getTokenFn] = CreateAdminClientMock.mock.calls[0];
-        expect(getTokenFn()).toBe('');
+        expectSignedOut();
     });
 
     it('refresh that resolves after logout() rejects and does not restore the session', async () => {
-        render(
-            <AdminContextProvider>
-                <Capture />
-                <Consumer />
-            </AdminContextProvider>,
-        );
-        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        await renderSignedIn();
 
         const refresh = deferred<string>();
         tokenRefreshMock.mockReturnValueOnce(refresh.promise);
@@ -223,25 +223,16 @@ describe('<AdminContextProvider />', () => {
             await expect(refreshPromise).rejects.toThrow('Session ended during token refresh');
         });
 
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
-        const [, , getTokenFn] = CreateAdminClientMock.mock.calls[0];
-        expect(getTokenFn()).toBe('');
+        expectSignedOut();
     });
 
     it('refresh that resolves while logoutRequest is pending does not restore the session', async () => {
-        render(
-            <AdminContextProvider>
-                <Capture />
-                <Consumer />
-            </AdminContextProvider>,
-        );
-        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        await renderSignedIn();
 
         const refresh = deferred<string>();
         const logoutResponse = deferred<void>();
         tokenRefreshMock.mockReturnValueOnce(refresh.promise);
         logoutRequestMock.mockReturnValueOnce(logoutResponse.promise);
-        const [, , getTokenFn] = CreateAdminClientMock.mock.calls[0];
         const refreshPromise = ctx.refreshAccessToken();
 
         await act(async () => {
@@ -249,24 +240,17 @@ describe('<AdminContextProvider />', () => {
 
             refresh.resolve('initial_token');
             await expect(refreshPromise).rejects.toThrow('Session ended during token refresh');
-            expect(getTokenFn()).toBe('');
+            expect(getClientToken()).toBe('');
 
             logoutResponse.resolve();
             await logoutPromise;
         });
 
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
-        expect(getTokenFn()).toBe('');
+        expectSignedOut();
     });
 
     it('login that resolves after logout() does not restore the session', async () => {
-        render(
-            <AdminContextProvider>
-                <Capture />
-                <Consumer />
-            </AdminContextProvider>,
-        );
-        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        await renderSignedIn();
 
         const loginResponse = deferred<string>();
         loginRequestMock.mockReturnValueOnce(loginResponse.promise);
@@ -278,8 +262,6 @@ describe('<AdminContextProvider />', () => {
             await loginPromise;
         });
 
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
-        const [, , getTokenFn] = CreateAdminClientMock.mock.calls[0];
-        expect(getTokenFn()).toBe('');
+        expectSignedOut();
     });
 });

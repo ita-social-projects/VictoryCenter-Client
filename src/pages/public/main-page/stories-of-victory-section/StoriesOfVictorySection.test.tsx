@@ -12,7 +12,7 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
 }));
 
 jest.mock('@/services/api/public/feedback/feedback-api', () => ({
-    PublicFeedbackApi: { fetchLatestHistories: jest.fn(), fetchVideos: jest.fn() },
+    PublicFeedbackApi: { fetchLatestHistories: jest.fn()},
 }));
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({

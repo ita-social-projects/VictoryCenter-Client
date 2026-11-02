@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { CanceledError } from 'axios';
 import { act, render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
@@ -220,7 +221,7 @@ describe('<AdminContextProvider />', () => {
         });
         await act(async () => {
             refresh.resolve('initial_token');
-            await expect(refreshPromise).rejects.toThrow('Session ended during token refresh');
+            await expect(refreshPromise).rejects.toThrow(CanceledError);
         });
 
         expectSignedOut();
@@ -239,7 +240,7 @@ describe('<AdminContextProvider />', () => {
             const logoutPromise = ctx.logout();
 
             refresh.resolve('initial_token');
-            await expect(refreshPromise).rejects.toThrow('Session ended during token refresh');
+            await expect(refreshPromise).rejects.toThrow(CanceledError);
             expect(getClientToken()).toBe('');
 
             logoutResponse.resolve();

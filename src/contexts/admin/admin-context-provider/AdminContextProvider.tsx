@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, CanceledError } from 'axios';
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -66,7 +66,7 @@ export const AdminContextProvider = ({ children }: Props) => {
         const logoutCount = logoutCountRef.current;
         const newToken = await tokenRefreshRequest();
         if (logoutCount !== logoutCountRef.current) {
-            throw new Error('Session ended during token refresh');
+            throw new CanceledError('Session ended during token refresh');
         }
         updateToken(newToken);
     }, [updateToken]);

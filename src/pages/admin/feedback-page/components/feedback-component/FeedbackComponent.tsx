@@ -88,7 +88,7 @@ export const FeedbackComponent = ({
                     ) : (
                         <img src={imageUrl} alt={title} onError={() => setImgError(true)} />
                     ))}
-                <div className={`feedback-profile-data${isVideo ? ' feedback-truncate' : ''}`}>
+                <div className={`feedback-profile-data${isVideo || 'authorName' in item ? ' feedback-truncate' : ''}`}>
                     <p title={title}>{title}</p>
                     <LocalizationStatuses<EntityLocalization> languages={translationLanguages} localizedEntity={item} />
                 </div>

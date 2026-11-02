@@ -39,13 +39,14 @@ function mockTranslateButton({
 }
 
 function mockImageSection(testId: string, label: string, editedTitle: string) {
-    return ({ value, onChange, onImageError, disabled, isTranslateDisabled, localizations }: any) => (
+    return ({ value, onChange, onImageError, disabled, isTranslateDisabled, onTranslateClick, localizations }: any) => (
         <div
             data-testid={testId}
             data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
             data-localizations-count={localizations?.length ?? 0}
         >
             <span>{value.title}</span>
+            {mockTranslateButton({ onClick: onTranslateClick, disabled: isTranslateDisabled, label })}
             <button disabled={disabled} onClick={() => onChange({ ...value, title: editedTitle })}>
                 Edit {label}
             </button>
@@ -88,13 +89,26 @@ jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', (
 }));
 
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
-    TextCardSection: ({ value, onChange, fieldIdPrefix, disabled, isTranslateDisabled, localizations }: any) => (
+    TextCardSection: ({
+        value,
+        onChange,
+        fieldIdPrefix,
+        disabled,
+        isTranslateDisabled,
+        onTranslateClick,
+        localizations,
+    }: any) => (
         <div
             data-testid={`section-${fieldIdPrefix}`}
             data-translate-disabled={mockDisabledAttr(isTranslateDisabled)}
             data-localizations-count={localizations?.length ?? 0}
         >
             <span>{value.title}</span>
+            {onTranslateClick && (
+                <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
+                    Translate {fieldIdPrefix}
+                </button>
+            )}
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited text card title' })}>
                 Edit {fieldIdPrefix}
             </button>
@@ -684,8 +698,7 @@ describe('HippotherapyPageContent', () => {
 
         expectTranslationDisabledForEverySection(true);
     });
-
-    describe('review section translation', () => {
+    describe('section translation', () => {
         it('opens the Advantages translation modal with the four source images', async () => {
             await renderLoaded();
 
@@ -719,16 +732,12 @@ describe('HippotherapyPageContent', () => {
             expect(translateButton('hippotherapy-advantages')).toBeEnabled();
         });
 
-        it('disables translation for every section once any section has unpublished changes', async () => {
-            await renderLoaded();
-
-            clickButton('Edit ethics');
-
-            expectTranslationDisabledForEverySection(true);
-        });
-
         it.each([
+            ['intro', HippotherapyPageLocalizationBlock.Intro],
+            ['hippotherapy-description', HippotherapyPageLocalizationBlock.Description],
             ['hippotherapy-quote', HippotherapyPageLocalizationBlock.Quote],
+            ['hippotherapy-hippovention', HippotherapyPageLocalizationBlock.Hippovention],
+            ['hippotherapy-analysis', HippotherapyPageLocalizationBlock.Analysis],
             ['hippotherapy-another-quote', HippotherapyPageLocalizationBlock.AnotherQuote],
         ])('opens the translation modal scoped to the %s section', async (fieldIdPrefix, block) => {
             await renderLoaded();
@@ -741,34 +750,92 @@ describe('HippotherapyPageContent', () => {
             closeTranslationModal();
         });
 
-        it('disables the translation icons of both review sections when another section has unpublished changes', async () => {
+        it('disables the translation icons when another section has unpublished changes', async () => {
             await renderLoaded();
 
+            const introTranslateButton = translateButton('intro');
+            const descriptionTranslateButton = translateButton('hippotherapy-description');
             const quoteTranslateButton = translateButton('hippotherapy-quote');
+            const hippoventionTranslateButton = translateButton('hippotherapy-hippovention');
+            const analysisTranslateButton = translateButton('hippotherapy-analysis');
             const anotherQuoteTranslateButton = translateButton('hippotherapy-another-quote');
+
+            expect(introTranslateButton).toBeEnabled();
+            expect(descriptionTranslateButton).toBeEnabled();
             expect(quoteTranslateButton).toBeEnabled();
+            expect(hippoventionTranslateButton).toBeEnabled();
+            expect(analysisTranslateButton).toBeEnabled();
             expect(anotherQuoteTranslateButton).toBeEnabled();
 
             editIntro();
 
+            expect(introTranslateButton).toBeDisabled();
+            expect(descriptionTranslateButton).toBeDisabled();
             expect(quoteTranslateButton).toBeDisabled();
+            expect(hippoventionTranslateButton).toBeDisabled();
+            expect(analysisTranslateButton).toBeDisabled();
             expect(anotherQuoteTranslateButton).toBeDisabled();
         });
 
         it.each([
-            ['hippotherapy-quote', 'quoteSection', 'hippotherapy-another-quote'],
-            ['hippotherapy-another-quote', 'anotherQuoteSection', 'hippotherapy-quote'],
+            [
+                'intro',
+                'introSection',
+                { title: 'English Title', description: 'English Description' },
+                'hippotherapy-description',
+            ],
+            [
+                'hippotherapy-description',
+                'descriptionSection',
+                { title: 'English Title', description: 'English Description' },
+                'intro',
+            ],
+            [
+                'hippotherapy-quote',
+                'quoteSection',
+                { quoteText: 'English quote', authorName: 'English author' },
+                'hippotherapy-another-quote',
+            ],
+            [
+                'hippotherapy-hippovention',
+                'hippoventionSection',
+                { title: 'English Title', description: 'English Description' },
+                'hippotherapy-analysis',
+            ],
+            [
+                'hippotherapy-analysis',
+                'analysisSection',
+                { title: 'English Title', description: 'English Description' },
+                'hippotherapy-hippovention',
+            ],
+            [
+                'hippotherapy-another-quote',
+                'anotherQuoteSection',
+                { quoteText: 'English quote', authorName: 'English author' },
+                'hippotherapy-quote',
+            ],
         ])(
             'disables the %s translation icon when an English translation already exists',
-            async (fieldIdPrefix, sectionKey, otherFieldIdPrefix) => {
-                await renderLoaded(
-                    withEnglishLocalization({
-                        [sectionKey]: { quoteText: 'English quote', authorName: 'English author' },
-                    }),
-                );
+            async (fieldIdPrefix, sectionKey, sectionContent, otherFieldIdPrefix) => {
+                await renderLoaded(withEnglishLocalization({ [sectionKey]: sectionContent }));
 
                 expect(translateButton(fieldIdPrefix)).toBeDisabled();
                 expect(translateButton(otherFieldIdPrefix)).toBeEnabled();
+            },
+        );
+        it.each([
+            ['intro', 'introSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-description', 'descriptionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-quote', 'quoteSection', { quoteText: '<p><br></p>', authorName: '' }],
+            ['hippotherapy-hippovention', 'hippoventionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-analysis', 'analysisSection', { title: '<p><br></p>', description: '<p><br></p>' }],
+            ['hippotherapy-another-quote', 'anotherQuoteSection', { quoteText: '<p><br></p>', authorName: '' }],
+        ])(
+            'keeps the %s translation icon enabled when localization contains only empty rich-text markup',
+            async (fieldIdPrefix, sectionKey, sectionContent) => {
+                await renderLoaded(withEnglishLocalization({ [sectionKey]: sectionContent }));
+
+                expect(translateButton(fieldIdPrefix)).toBeEnabled();
             },
         );
 
@@ -791,14 +858,30 @@ describe('HippotherapyPageContent', () => {
             expect(screen.queryByRole('button', { name: /^Translate / })).not.toBeInTheDocument();
         });
 
+        it('hides the translation icons when English is not among the translation languages', async () => {
+            mockedUseLocalizationToolkit.mockReturnValue({
+                translationLanguages: [{ id: 3, code: 'pl', name: 'Польська' }],
+            });
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-hippotherapy-quote');
+            expect(screen.queryByRole('button', { name: /^Translate / })).not.toBeInTheDocument();
+        });
+
         it('disables the translation icons when the page has not been created yet', async () => {
             mockPageNotFound();
 
             render(<HippotherapyPageContent />);
 
-            expect(await screen.findByRole('button', { name: 'Translate hippotherapy-quote' })).toBeDisabled();
-            expect(translateButton('hippotherapy-another-quote')).toBeDisabled();
+            expect(await screen.findByRole('button', { name: 'Translate intro' })).toBeDisabled();
+            expect(translateButton('hippotherapy-description')).toBeDisabled();
+            expect(translateButton('hippotherapy-quote')).toBeDisabled();
+            expect(translateButton('hippotherapy-hippovention')).toBeDisabled();
             expect(translateButton('hippotherapy-advantages')).toBeDisabled();
+            expect(translateButton('hippotherapy-analysis')).toBeDisabled();
+            expect(translateButton('hippotherapy-another-quote')).toBeDisabled();
         });
 
         it('shows an error toast when the translation languages fail to load', async () => {
@@ -867,6 +950,20 @@ describe('HippotherapyPageContent', () => {
                 expect(getButton(translateName)).toBeDisabled();
             },
         );
+
+        it('keeps the general research translation action enabled when localization contains only empty rich-text markup', async () => {
+            await renderLoaded(
+                withEnglishLocalization({
+                    scientificReferencesSection: {
+                        title: '<p><br></p>',
+                        description: '<p><br></p>',
+                        scientificReferences: [],
+                    },
+                }),
+            );
+
+            expect(getButton('Translate research-general')).toBeEnabled();
+        });
     });
 
     describe('ethics section translation', () => {

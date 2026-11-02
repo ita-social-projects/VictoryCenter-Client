@@ -169,17 +169,31 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
 const isNotFoundError = (error: unknown): boolean => axios.isAxiosError(error) && error.response?.status === 404;
 const EMPTY_LOCALIZATIONS: EntityLocalization[] = [];
 
+const hasRichTextContent = (value?: string | null): boolean => Boolean(value && getPlainTextFromHtml(value).trim());
+
+const hasTextCardTranslation = (section?: { title?: string | null; description?: string | null } | null): boolean =>
+    hasRichTextContent(section?.title) || hasRichTextContent(section?.description);
+
+const hasIntroTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    hasTextCardTranslation(localization?.introSection);
+
+const hasDescriptionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    hasTextCardTranslation(localization?.descriptionSection);
+
 const hasQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.quoteSection?.quoteText?.trim());
+    hasRichTextContent(localization?.quoteSection?.quoteText);
+
+const hasHippoventionTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    hasTextCardTranslation(localization?.hippoventionSection);
+
+const hasAnalysisTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    hasTextCardTranslation(localization?.analysisSection);
 
 const hasAnotherQuoteTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(localization?.anotherQuoteSection?.quoteText?.trim());
+    hasRichTextContent(localization?.anotherQuoteSection?.quoteText);
 
 const hasScientificGeneralTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
-    Boolean(
-        localization?.scientificReferencesSection?.title?.trim() ||
-            localization?.scientificReferencesSection?.description?.trim(),
-    );
+    hasTextCardTranslation(localization?.scientificReferencesSection);
 
 const hasAdvantagesTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
     Boolean(
@@ -400,11 +414,15 @@ export const HippotherapyPageContent = () => {
     const isNeverPublished = isNotFound && !hasPublished;
     const isTranslateDisabled = isDisabled || isPublishButtonActive || isNeverPublished;
 
-    const canTranslate = translationLanguages.length > 0;
+    const canTranslate = Boolean(englishLanguage);
 
     const translationHandlers = useMemo(
         () => ({
+            introSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Intro }),
+            descriptionSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Description }),
             quoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Quote }),
+            hippoventionSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Hippovention }),
+            analysisSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Analysis }),
             anotherQuoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.AnotherQuote }),
             advantagesSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Advantages }),
             scientificGeneral: () =>
@@ -472,7 +490,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.introSection}
                     onImageError={imageErrorHandlers.introSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.introSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasIntroTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Intro)}
                 />
@@ -482,7 +501,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.descriptionSection}
                     fieldIdPrefix="hippotherapy-description"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.descriptionSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasDescriptionTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Description)}
                 />
@@ -505,7 +525,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionSection}
                     fieldIdPrefix="hippotherapy-hippovention"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.hippoventionSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasHippoventionTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Hippovention)}
                 />
@@ -538,7 +559,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.analysisSection}
                     fieldIdPrefix="hippotherapy-analysis"
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.analysisSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasAnalysisTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Analysis)}
                 />

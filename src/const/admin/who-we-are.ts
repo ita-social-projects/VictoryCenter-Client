@@ -27,7 +27,7 @@ export const WHO_WE_ARE_TEXT = {
         },
         VALIDATION: {
             TITLE_REQUIRED: "Заголовок обов'язковий",
-            DESCRIPTION_REQUIRED: "Опис обов'язковий",
+            DESCRIPTION_REQUIRED: "Поле обов'язкове",
         },
     },
 

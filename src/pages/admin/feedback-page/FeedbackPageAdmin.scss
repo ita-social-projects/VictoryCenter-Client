@@ -27,6 +27,18 @@
         .infinite-scroll-list-container {
             margin-bottom: 102px;
         }
+
+        .btn-add {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            max-width: 427px;
+        }
+
+        .plus-icon path {
+            stroke: colors.$blue-500;
+        }
     }
 
     &-error-container {

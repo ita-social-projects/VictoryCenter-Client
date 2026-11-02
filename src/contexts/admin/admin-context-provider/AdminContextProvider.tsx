@@ -49,6 +49,7 @@ export const AdminContextProvider = ({ children }: Props) => {
 
         if (currentToken) {
             void logoutRequest(currentToken).catch((error: unknown) => {
+                // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
                 console.error('Server-side logout failed:', error);
             });
         }

@@ -66,7 +66,12 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={(event) => {
+                                    field.onChange(event);
+                                    if (event.target.value === '') {
+                                        clearErrors(field.name);
+                                    }
+                                }}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
                                 isRequired
@@ -90,7 +95,12 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={(event) => {
+                                    field.onChange(event);
+                                    if (event.target.value === '') {
+                                        clearErrors(field.name);
+                                    }
+                                }}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired

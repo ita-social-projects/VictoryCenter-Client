@@ -80,14 +80,6 @@ jest.mock('../sections/intro-banner-section/IntroBannerSection', () => ({
     IntroBannerSection: mockImageSection('section-intro', 'intro', 'Edited intro title'),
 }));
 
-jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', () => ({
-    HippoventionCenterSection: mockImageSection(
-        'section-hippovention-center',
-        'hippovention center',
-        'Edited hippovention center',
-    ),
-}));
-
 jest.mock('../sections/text-card-section/TextCardSection', () => ({
     TextCardSection: ({
         value,
@@ -139,6 +131,31 @@ jest.mock('../sections/hippotherapy-quote-section/HippotherapyQuoteSection', () 
             </button>
             <button onClick={() => onImageError?.('image size error')}>Set {fieldIdPrefix} image error</button>
             <button onClick={() => onImageError?.(null)}>Clear {fieldIdPrefix} image error</button>
+        </div>
+    ),
+}));
+
+jest.mock('../sections/hippovention-center-section/HippoventionCenterSection', () => ({
+    HippoventionCenterSection: ({
+        value,
+        onChange,
+        onImageError,
+        disabled,
+        onTranslateClick,
+        isTranslateDisabled,
+    }: any) => (
+        <div data-testid="section-hippovention-center" data-translate-disabled={String(Boolean(isTranslateDisabled))}>
+            <span>{value.title}</span>
+            {onTranslateClick && (
+                <button disabled={isTranslateDisabled} onClick={onTranslateClick}>
+                    Translate hippovention-center
+                </button>
+            )}
+            <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited hippovention center' })}>
+                Edit hippovention-center
+            </button>
+            <button onClick={() => onImageError?.('image size error')}>Set hippovention center image error</button>
+            <button onClick={() => onImageError?.(null)}>Clear hippovention center image error</button>
         </div>
     ),
 }));
@@ -619,7 +636,7 @@ describe('HippotherapyPageContent', () => {
             'Edit hippotherapy-description',
             'Edit hippotherapy-quote',
             'Edit hippotherapy-hippovention',
-            'Edit hippovention center',
+            'Edit hippovention-center',
             'Edit hippotherapy-advantages',
             'Edit hippotherapy-analysis',
             'Edit research',
@@ -739,6 +756,7 @@ describe('HippotherapyPageContent', () => {
             ['hippotherapy-hippovention', HippotherapyPageLocalizationBlock.Hippovention],
             ['hippotherapy-analysis', HippotherapyPageLocalizationBlock.Analysis],
             ['hippotherapy-another-quote', HippotherapyPageLocalizationBlock.AnotherQuote],
+            ['hippovention-center', HippotherapyPageLocalizationBlock.HippoventionCenter],
         ])('opens the translation modal scoped to the %s section', async (fieldIdPrefix, block) => {
             await renderLoaded();
 
@@ -759,6 +777,7 @@ describe('HippotherapyPageContent', () => {
             const hippoventionTranslateButton = translateButton('hippotherapy-hippovention');
             const analysisTranslateButton = translateButton('hippotherapy-analysis');
             const anotherQuoteTranslateButton = translateButton('hippotherapy-another-quote');
+            const hippoventionCenterTranslateButton = translateButton('hippovention-center');
 
             expect(introTranslateButton).toBeEnabled();
             expect(descriptionTranslateButton).toBeEnabled();
@@ -766,6 +785,7 @@ describe('HippotherapyPageContent', () => {
             expect(hippoventionTranslateButton).toBeEnabled();
             expect(analysisTranslateButton).toBeEnabled();
             expect(anotherQuoteTranslateButton).toBeEnabled();
+            expect(hippoventionCenterTranslateButton).toBeEnabled();
 
             editIntro();
 
@@ -775,6 +795,7 @@ describe('HippotherapyPageContent', () => {
             expect(hippoventionTranslateButton).toBeDisabled();
             expect(analysisTranslateButton).toBeDisabled();
             expect(anotherQuoteTranslateButton).toBeDisabled();
+            expect(hippoventionCenterTranslateButton).toBeDisabled();
         });
 
         it.each([
@@ -814,6 +835,12 @@ describe('HippotherapyPageContent', () => {
                 { quoteText: 'English quote', authorName: 'English author' },
                 'hippotherapy-quote',
             ],
+            [
+                'hippovention-center',
+                'hippoventionCenterSection',
+                { title: 'English title', description: 'English description', pros: 'English pros' },
+                'hippotherapy-quote',
+            ],
         ])(
             'disables the %s translation icon when an English translation already exists',
             async (fieldIdPrefix, sectionKey, sectionContent, otherFieldIdPrefix) => {
@@ -830,6 +857,11 @@ describe('HippotherapyPageContent', () => {
             ['hippotherapy-hippovention', 'hippoventionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
             ['hippotherapy-analysis', 'analysisSection', { title: '<p><br></p>', description: '<p><br></p>' }],
             ['hippotherapy-another-quote', 'anotherQuoteSection', { quoteText: '<p><br></p>', authorName: '' }],
+            [
+                'hippovention-center',
+                'hippoventionCenterSection',
+                { title: '<p><br></p>', description: '<p><br></p>', pros: '<p><br></p>' },
+            ],
         ])(
             'keeps the %s translation icon enabled when localization contains only empty rich-text markup',
             async (fieldIdPrefix, sectionKey, sectionContent) => {
@@ -839,7 +871,7 @@ describe('HippotherapyPageContent', () => {
             },
         );
 
-        it.each(['hippotherapy-quote', 'hippotherapy-advantages'])(
+        it.each(['hippotherapy-quote', 'hippotherapy-advantages', 'hippovention-center'])(
             'keeps the %s translation icon disabled while the page is being published',
             async (fieldIdPrefix) => {
                 mockedHippotherapyPageApi.update.mockReturnValue(new Promise(() => {}));

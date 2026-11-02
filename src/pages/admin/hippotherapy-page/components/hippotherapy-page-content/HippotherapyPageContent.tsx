@@ -220,6 +220,13 @@ const hasEthicsTranslation = (localization: HippotherapyPageLocalization | null)
             localization?.ethicsSection?.principles?.some((principle) => getPlainTextFromHtml(principle ?? '').trim()),
     );
 
+const hasHippoventionCenterTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        hasRichTextContent(localization?.hippoventionCenterSection?.title) ||
+            hasRichTextContent(localization?.hippoventionCenterSection?.pros) ||
+            hasRichTextContent(localization?.hippoventionCenterSection?.description),
+    );
+
 export const HippotherapyPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -437,6 +444,8 @@ export const HippotherapyPageContent = () => {
                     targetResearchLocalId: localId,
                 }),
             ethicsSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Ethics }),
+            hippoventionCenterSection: () =>
+                setTranslationTarget({ block: HippotherapyPageLocalizationBlock.HippoventionCenter }),
         }),
         [],
     );
@@ -536,7 +545,8 @@ export const HippotherapyPageContent = () => {
                     onChange={sectionHandlers.hippoventionCenterSection}
                     onImageError={imageErrorHandlers.hippoventionCenterSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.hippoventionCenterSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasHippoventionCenterTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.HippoventionCenter)}
                 />

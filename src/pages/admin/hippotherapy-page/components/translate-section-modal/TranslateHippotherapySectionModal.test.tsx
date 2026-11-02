@@ -59,12 +59,6 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
     });
 
-    it('renders nothing for a section without translation fields', () => {
-        renderModal({ block: HippotherapyPageLocalizationBlock.HippoventionCenter });
-
-        expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
-    });
-
     it.each([
         ['Quote', HippotherapyPageLocalizationBlock.Quote, 'quoteSection'],
         ['AnotherQuote', HippotherapyPageLocalizationBlock.AnotherQuote, 'anotherQuoteSection'],

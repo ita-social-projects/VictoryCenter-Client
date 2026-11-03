@@ -1263,7 +1263,11 @@ describe('FeedbackPageAdmin', () => {
             const emptyState = await screen.findByTestId('empty-state');
             expect(emptyState).toHaveTextContent(FEEDBACK_TEXT.LIST.NO_MATERIALS);
 
-            fireEvent.click(within(emptyState).getByText(FEEDBACK_TEXT.BUTTON.ADD_MATERIAL));
+            const addButton = within(emptyState).getByRole('button', { name: FEEDBACK_TEXT.BUTTON.ADD_MATERIAL });
+            expect(addButton).toHaveClass('btn-add');
+            expect(addButton.querySelector('svg.plus-icon')).toBeInTheDocument();
+
+            fireEvent.click(addButton);
 
             expect(screen.getByTestId('add-video-review-modal')).toBeInTheDocument();
             expect(mockAddToast).not.toHaveBeenCalledWith('Функція не реалізована', ToastType.Info);

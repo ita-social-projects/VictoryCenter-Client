@@ -1272,58 +1272,37 @@ describe('FundsExpenditureSection', () => {
         });
     });
 
-    describe('delete category modal', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+    describe('reserved "Програмні"-like categories', () => {
+        beforeEach(() => {
             setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
-            render(<FundsExpenditureSection isDeleteCategoryModalOpen onDeleteCategoryModalClose={jest.fn()} />);
+        });
 
-            fireEvent.click(
-                screen.getByRole('button', {
-                    name: FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
-                }),
-            );
+        it.each<[string, Partial<FundsExpenditureSectionProps>, string]>([
+            [
+                'delete category',
+                { isDeleteCategoryModalOpen: true, onDeleteCategoryModalClose: jest.fn() },
+                FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
+            ],
+            [
+                'edit category',
+                { isEditCategoryModalOpen: true, onEditCategoryModalClose: jest.fn() },
+                FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
+            ],
+        ])('are excluded from the %s dropdown', (_, props, placeholder) => {
+            render(<FundsExpenditureSection {...props} />);
 
-            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            fireEvent.click(screen.getByRole('button', { name: placeholder }));
+
+            ['ПРОГРАМНІ', 'програмні тест', 'Програмні тест 2'].forEach((name) => {
+                expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
+            });
             expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
         });
-    });
 
-    describe('edit category modal', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
-            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
-            render(<FundsExpenditureSection isEditCategoryModalOpen onEditCategoryModalClose={jest.fn()} />);
-
-            fireEvent.click(
-                screen.getByRole('button', {
-                    name: FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
-                }),
-            );
-
-            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
-        });
-    });
-
-    describe('category filter', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the toolbar category filter', () => {
-            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+        it('are excluded from the toolbar category filter and the add record modal', () => {
             render(<FundsExpenditureSection />);
 
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '1');
-        });
-    });
-
-    describe('add record modal', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the record category options', () => {
-            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
-            render(<FundsExpenditureSection />);
-
-            fireEvent.click(screen.getByTestId('open-add-expense'));
-
             expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-category-count', '1');
         });
     });

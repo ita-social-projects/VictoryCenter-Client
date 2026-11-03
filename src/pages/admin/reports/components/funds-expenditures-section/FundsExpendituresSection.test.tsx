@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection, FundsExpenditureSectionProps } from './FundsExpendituresSection';
 import {
@@ -958,6 +958,72 @@ describe('FundsExpenditureSection', () => {
             rerender(<FundsExpenditureSection isEditing={false} />);
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
+        });
+    });
+
+    describe('summary cards', () => {
+        const getCard = (title: string) => {
+            const card = screen.getAllByTestId('summary-card').find((c) => c.getAttribute('data-title') === title);
+            expect(card).toBeDefined();
+            return within(card!);
+        };
+
+        const expectAmounts = (title: string, uah: number, usd: number) => {
+            expect(getCard(title).getByTestId('uah')).toHaveTextContent(String(uah));
+            expect(getCard(title).getByTestId('usd')).toHaveTextContent(String(usd));
+        };
+
+        const expectCount = (title: string, count: number) => {
+            expect(getCard(title).getByTestId('count')).toHaveTextContent(String(count));
+        };
+
+        it('shows the server summary in view mode', () => {
+            setupMockDataFetch(undefined, undefined, undefined, {
+                totalCollectedUah: 1,
+                totalCollectedUsd: 2,
+                totalSpentUah: 3,
+                totalSpentUsd: 4,
+                incomeCategories: 5,
+                expenseCategories: 6,
+            });
+            render(<FundsExpenditureSection />);
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 1, 2);
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT, 3, 4);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 5);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES, 6);
+        });
+
+        it('calculates the cards from the current records in edit mode', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 15465, 8950);
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT, 14250, 8260);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 3);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES, 4);
+        });
+
+        it('recalculates the cards right after a record is added, before publishing', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 16465, 8975);
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
+        });
+
+        it('recalculates the cards right after a record is deleted, before publishing', async () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 8200, 4750);
+            });
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 2);
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
         });
     });
 

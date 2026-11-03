@@ -10,7 +10,7 @@ export function CreateAdminClient(
     checkIsAuthenticated: () => boolean,
     getAccessToken: () => string,
     refreshAccessToken: () => Promise<void>,
-    logout: (token: string) => void,
+    logout: () => void,
     refreshHandler = resolveWithNewTokenConcurrent(refreshAccessToken, getAccessToken, logout),
 ): AxiosInstance {
     const client = axios.create({
@@ -40,7 +40,7 @@ export function CreateAdminClient(
             }
 
             if (config._authRetry) {
-                logout(getAccessToken());
+                logout();
                 return Promise.reject(error);
             }
 

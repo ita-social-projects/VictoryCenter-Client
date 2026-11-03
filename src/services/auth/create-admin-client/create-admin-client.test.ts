@@ -149,7 +149,7 @@ describe('CreateAdminClient', () => {
         });
 
         it('on a second 401 for a retried request, logs out without refreshing or retrying', async () => {
-            const logoutMock = jest.fn<void, [string]>();
+            const logoutMock = jest.fn<void, []>();
             CreateAdminClient(
                 baseURL,
                 () => false,
@@ -172,7 +172,23 @@ describe('CreateAdminClient', () => {
 
             expect(handlerMock).not.toHaveBeenCalled();
             expect(fakeClient.request).not.toHaveBeenCalled();
-            expect(logoutMock).toHaveBeenCalledWith(token);
+            expect(logoutMock).toHaveBeenCalledWith();
+        });
+
+        it('when refreshHandler rejects after the first 401, rejects without retrying the request', async () => {
+            const refreshError = new Error('Refresh failed');
+            const cfg = { headers: {} } as RetriableRequestConfig;
+            const err = {
+                response: { status: 401 },
+                config: cfg,
+            } as AxiosError & { config: RetriableRequestConfig };
+            handlerMock.mockRejectedValueOnce(refreshError);
+
+            await expect(errorHandler(err)).rejects.toBe(refreshError);
+
+            expect(cfg._authRetry).toBe(true);
+            expect(handlerMock).toHaveBeenCalledTimes(1);
+            expect(fakeClient.request).not.toHaveBeenCalled();
         });
 
         it('on a 401 without request config, rejects without refreshing or retrying', async () => {

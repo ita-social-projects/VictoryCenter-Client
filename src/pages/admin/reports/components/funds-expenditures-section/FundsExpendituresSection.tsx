@@ -927,7 +927,7 @@ export const FundsExpenditureSection = ({
             </div>
 
             <FundsExpendituresToolbar
-                categories={filteredCategories}
+                categories={manageableCategories}
                 selectedType={selectedType}
                 selectedCategoryId={selectedCategoryId}
                 exchangeRate={currentExchangeRate}
@@ -968,7 +968,7 @@ export const FundsExpenditureSection = ({
                 isOpen={activeRecordModalType !== null}
                 onClose={handleCloseAddIncomeModal}
                 transactionType={activeRecordModalType ?? 'income'}
-                categories={categories}
+                categories={manageableCategories}
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}

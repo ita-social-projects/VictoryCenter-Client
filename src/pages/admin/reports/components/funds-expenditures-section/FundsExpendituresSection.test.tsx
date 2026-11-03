@@ -317,11 +317,13 @@ jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpen
         isOpen,
         onClose,
         transactionType,
+        categories,
         onSubmit,
     }: {
         isOpen: boolean;
         onClose: () => void;
         transactionType: 'income' | 'expense';
+        categories: { id: number; name: string }[];
         onSubmit: (data: {
             categoryId: number;
             reportingYear: string;
@@ -330,7 +332,12 @@ jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpen
             type: 'income' | 'expense';
         }) => Promise<boolean>;
     }) => (
-        <div data-testid="add-record-modal" data-open={String(isOpen)} data-type={transactionType}>
+        <div
+            data-testid="add-record-modal"
+            data-open={String(isOpen)}
+            data-type={transactionType}
+            data-category-count={categories.length}
+        >
             <button data-testid="add-record-close" onClick={onClose}>
                 Close add record
             </button>
@@ -652,26 +659,26 @@ describe('FundsExpenditureSection', () => {
         expect(screen.getByTestId('selected-category-id')).toHaveTextContent('none');
     });
 
-    it('should pass all categories to toolbar when income type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when income type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-income'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
-    it('should pass all categories to toolbar when expense type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when expense type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-expense'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
-    it('should pass all categories to toolbar when no type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when no type is selected', () => {
         render(<FundsExpenditureSection />);
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
     describe('edit mode', () => {
@@ -1232,6 +1239,26 @@ describe('FundsExpenditureSection', () => {
             expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
             expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
+        });
+    });
+
+    describe('category filter', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the toolbar category filter', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '1');
+        });
+    });
+
+    describe('add record modal', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the record category options', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByTestId('open-add-expense'));
+
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-category-count', '1');
         });
     });
 });

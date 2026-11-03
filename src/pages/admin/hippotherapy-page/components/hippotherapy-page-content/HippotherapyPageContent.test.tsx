@@ -247,8 +247,6 @@ const englishLanguage: LocalizationLanguage = {
     name: 'Англійська',
 };
 
-// LanguageToolkit (rendered by the page) reads `allLanguages.length` in an effect,
-// so every test must get a complete toolkit result, not just `translationLanguages`.
 const createToolkitMock = (overrides: Record<string, unknown> = {}) => ({
     allLanguages: [ukrainianLanguage, englishLanguage],
     translationLanguages: [englishLanguage],
@@ -273,7 +271,7 @@ const mockedIsContentValid = isHippotherapyPageContentValid as jest.Mock;
 
 const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'image/webp' };
 
-const buildContent = (): HippotherapyPageContentModel => ({
+const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
     introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
@@ -314,6 +312,7 @@ const buildContent = (): HippotherapyPageContentModel => ({
         image: savedImage,
         imageId: savedImage.id,
     },
+    ...overrides,
 });
 
 const SECTION_TEST_IDS = [
@@ -336,6 +335,38 @@ const expectTranslationDisabledForEverySection = (isDisabled: boolean) => {
     );
 };
 
+const setup = (
+    options: {
+        content?: HippotherapyPageContentModel;
+        apiError?: any;
+        toolkitOverrides?: Record<string, unknown>;
+        isValid?: boolean;
+    } = {},
+) => {
+    if (options.isValid !== undefined) {
+        mockedIsContentValid.mockReturnValue(options.isValid);
+    }
+    if (options.apiError) {
+        mockedHippotherapyPageApi.get.mockRejectedValue(options.apiError);
+    } else {
+        mockedHippotherapyPageApi.get.mockResolvedValue(options.content ?? buildContent());
+    }
+    mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock(options.toolkitOverrides));
+    return render(<HippotherapyPageContent />);
+};
+
+const contentWithEnglish = (): HippotherapyPageContentModel =>
+    buildContent({
+        localizations: [
+            {
+                language: englishLanguage,
+                translationStatus: TranslationStatus.Relevant,
+                introSection: { title: 'English Intro Title', description: 'English Intro Description' },
+                descriptionSection: { title: 'English Desc Title', description: 'English Desc Text' },
+            } as any,
+        ],
+    });
+
 describe('HippotherapyPageContent', () => {
     const mockClient = { get: jest.fn(), put: jest.fn() };
     const mockAddToast = jest.fn();
@@ -345,7 +376,6 @@ describe('HippotherapyPageContent', () => {
         mockedUseAdminClient.mockReturnValue(mockClient);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
         mockedIsContentValid.mockReturnValue(true);
-        mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock());
 
         if (!(global as any).crypto) {
             Object.defineProperty(global, 'crypto', { value: {}, configurable: true, writable: true });
@@ -359,17 +389,12 @@ describe('HippotherapyPageContent', () => {
 
     it('shows a loader while fetching', () => {
         mockedHippotherapyPageApi.get.mockReturnValue(new Promise(() => {}));
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
     });
 
     it('shows an error state with a retry action when the fetch fails', async () => {
-        mockedHippotherapyPageApi.get.mockRejectedValue(new Error('network error'));
-
-        render(<HippotherapyPageContent />);
-
+        setup({ apiError: new Error('network error') });
         expect(await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.FAIL_TO_FETCH)).toBeInTheDocument();
 
         mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
@@ -381,9 +406,7 @@ describe('HippotherapyPageContent', () => {
 
     it('falls back to a blank, editable form with an empty-state notice when the page has not been created yet (404)', async () => {
         jest.spyOn(axios, 'isAxiosError').mockImplementation((error: unknown) => Boolean((error as any)?.response));
-        mockedHippotherapyPageApi.get.mockRejectedValue({ response: { status: 404 } });
-
-        render(<HippotherapyPageContent />);
+        setup({ apiError: { response: { status: 404 } } });
 
         expect(await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.EMPTY_STATE_NOTICE)).toBeInTheDocument();
         expect(screen.queryByText(HIPPOTHERAPY_PAGE_TEXT.FAIL_TO_FETCH)).not.toBeInTheDocument();
@@ -394,13 +417,13 @@ describe('HippotherapyPageContent', () => {
 
     it('lets the admin fill in and publish a page that did not exist yet, enabling translation afterwards', async () => {
         jest.spyOn(axios, 'isAxiosError').mockImplementation((error: unknown) => Boolean((error as any)?.response));
-        mockedHippotherapyPageApi.get.mockRejectedValue({ response: { status: 404 } });
-        const created = { ...buildContent(), introSection: { ...buildContent().introSection, title: 'Created title' } };
+        const created = buildContent({
+            introSection: { title: 'Created title', description: 'Intro description', image: null, imageId: null },
+        });
+        setup({ apiError: { response: { status: 404 } } });
         mockedHippotherapyPageApi.update.mockResolvedValue(created);
 
-        render(<HippotherapyPageContent />);
-
-        await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.EMPTY_STATE_NOTICE);
+        expect(await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.EMPTY_STATE_NOTICE)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
@@ -419,41 +442,21 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('renders every section once loaded and keeps the publish button disabled until something changes', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         expect(await screen.findByTestId('section-intro')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-description')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-quote')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-hippovention')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippovention-center')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-advantages')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-analysis')).toBeInTheDocument();
-        expect(screen.getByTestId('section-research')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-another-quote')).toBeInTheDocument();
-        expect(screen.getByTestId('section-hippotherapy-participants')).toBeInTheDocument();
-        expect(screen.getByTestId('section-ethics')).toBeInTheDocument();
-
+        SECTION_TEST_IDS.forEach((testId) => expect(screen.getByTestId(testId)).toBeInTheDocument());
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('enables the publish button once a section is edited', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
-
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 
     it('disables the publish button while a section reports an image error, even if the content is otherwise valid and dirty', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
@@ -466,38 +469,30 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('keeps the publish button enabled when an image error comes from an empty slot', async () => {
-        const content = buildContent();
-        content.introSection = { ...content.introSection, image: null, imageId: null };
-        mockedHippotherapyPageApi.get.mockResolvedValue(content);
-
-        render(<HippotherapyPageContent />);
-
+        setup({
+            content: buildContent({
+                introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+            }),
+        });
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         fireEvent.click(screen.getByRole('button', { name: 'Set intro image error' }));
-
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 
     it('keeps the publish button disabled when the content is invalid', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-        mockedIsContentValid.mockReturnValue(false);
-
-        render(<HippotherapyPageContent />);
-
+        setup({ isValid: false });
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
-
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('publishes changes, shows a success toast, resets the dirty state, and enables translation again on confirm', async () => {
-        const content = buildContent();
-        mockedHippotherapyPageApi.get.mockResolvedValue(content);
-        const publishedContent = { ...content, introSection: { ...content.introSection, title: 'Edited intro title' } };
+        const publishedContent = buildContent({
+            introSection: { title: 'Edited intro title', description: 'Intro description', image: null, imageId: null },
+        });
+        setup();
         mockedHippotherapyPageApi.update.mockResolvedValue(publishedContent);
-
-        render(<HippotherapyPageContent />);
 
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
@@ -523,10 +518,8 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('shows a failure toast and keeps translation disabled when publishing fails', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+        setup();
         mockedHippotherapyPageApi.update.mockRejectedValue(new Error('publish failed'));
-
-        render(<HippotherapyPageContent />);
 
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
@@ -543,10 +536,8 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('updates every non-intro section when its edit control is used', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+        setup();
         mockedHippotherapyPageApi.update.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
 
         await screen.findByTestId('section-intro');
 
@@ -585,10 +576,7 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('disables the publish button when any non-intro section reports an image error', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
@@ -605,7 +593,6 @@ describe('HippotherapyPageContent', () => {
         sections.forEach((section) => {
             fireEvent.click(screen.getByRole('button', { name: `Set ${section} image error` }));
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
-
             fireEvent.click(screen.getByRole('button', { name: `Clear ${section} image error` }));
         });
 
@@ -613,10 +600,7 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('closes the confirmation modal without publishing when cancel or close is triggered', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
@@ -635,33 +619,24 @@ describe('HippotherapyPageContent', () => {
     });
 
     it('keeps translation enabled for every section while there are no unpublished changes', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         expectTranslationDisabledForEverySection(false);
     });
 
     it('disables translation for every section once any section has unpublished changes', async () => {
-        mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         await screen.findByTestId('section-intro');
         fireEvent.click(screen.getByRole('button', { name: 'Edit ethics' }));
-
         expectTranslationDisabledForEverySection(true);
     });
+
     describe('review section translation', () => {
         it.each([
             ['hippotherapy-quote', HippotherapyPageLocalizationBlock.Quote],
             ['hippotherapy-another-quote', HippotherapyPageLocalizationBlock.AnotherQuote],
         ])('opens the translation modal scoped to the %s section', async (fieldIdPrefix, block) => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
-
+            setup();
             fireEvent.click(await screen.findByRole('button', { name: `Translate ${fieldIdPrefix}` }));
 
             expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(String(block));
@@ -672,14 +647,12 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('disables the translation icons of both review sections when another section has unpublished changes', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
-
+            setup();
             const quoteTranslateButton = await screen.findByRole('button', { name: 'Translate hippotherapy-quote' });
             const anotherQuoteTranslateButton = screen.getByRole('button', {
                 name: 'Translate hippotherapy-another-quote',
             });
+
             expect(quoteTranslateButton).toBeEnabled();
             expect(anotherQuoteTranslateButton).toBeEnabled();
 
@@ -695,29 +668,26 @@ describe('HippotherapyPageContent', () => {
         ])(
             'disables the %s translation icon when an English translation already exists',
             async (fieldIdPrefix, sectionKey, otherFieldIdPrefix) => {
-                const contentWithTranslation: HippotherapyPageContentModel = {
-                    ...buildContent(),
-                    localizations: [
-                        {
-                            language: { id: englishLanguage.id, code: englishLanguage.code },
-                            translationStatus: TranslationStatus.Relevant,
-                            [sectionKey]: { quoteText: 'English quote', authorName: 'English author' },
-                        } as any,
-                    ],
-                };
-                mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
-
-                render(<HippotherapyPageContent />);
+                setup({
+                    content: buildContent({
+                        localizations: [
+                            {
+                                language: { id: englishLanguage.id, code: englishLanguage.code },
+                                translationStatus: TranslationStatus.Relevant,
+                                [sectionKey]: { quoteText: 'English quote', authorName: 'English author' },
+                            } as any,
+                        ],
+                    }),
+                });
 
                 expect(await screen.findByRole('button', { name: `Translate ${fieldIdPrefix}` })).toBeDisabled();
                 expect(screen.getByRole('button', { name: `Translate ${otherFieldIdPrefix}` })).toBeEnabled();
             },
         );
-        it('disables the translation icon while the page is being published', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-            mockedHippotherapyPageApi.update.mockReturnValue(new Promise(() => {}));
 
-            render(<HippotherapyPageContent />);
+        it('disables the translation icon while the page is being published', async () => {
+            setup();
+            mockedHippotherapyPageApi.update.mockReturnValue(new Promise(() => {}));
 
             await screen.findByTestId('section-intro');
             fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
@@ -730,29 +700,21 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('hides the translation icons while no translation languages are available', async () => {
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ translationLanguages: [] }));
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
-
+            setup({ toolkitOverrides: { translationLanguages: [] } });
             await screen.findByTestId('section-hippotherapy-quote');
             expect(screen.queryByRole('button', { name: /^Translate / })).not.toBeInTheDocument();
         });
 
         it('disables the translation icons when the page has not been created yet', async () => {
             jest.spyOn(axios, 'isAxiosError').mockImplementation((error: unknown) => Boolean((error as any)?.response));
-            mockedHippotherapyPageApi.get.mockRejectedValue({ response: { status: 404 } });
-
-            render(<HippotherapyPageContent />);
+            setup({ apiError: { response: { status: 404 } } });
 
             expect(await screen.findByRole('button', { name: 'Translate hippotherapy-quote' })).toBeDisabled();
             expect(screen.getByRole('button', { name: 'Translate hippotherapy-another-quote' })).toBeDisabled();
         });
 
         it('shows an error toast when the translation languages fail to load', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
+            setup();
             await screen.findByTestId('section-intro');
 
             const { setErrorState } = mockedUseLocalizationToolkit.mock.calls[0][0];
@@ -764,19 +726,14 @@ describe('HippotherapyPageContent', () => {
             );
         });
     });
+
     describe('scientific references section translation', () => {
         it('opens the translation modal for the general research block and disables when edited', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
-
-            const generalTranslateButton = await screen.findByRole('button', {
-                name: 'Translate research-general',
-            });
+            setup();
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate research-general' });
             expect(generalTranslateButton).toBeEnabled();
 
             fireEvent.click(generalTranslateButton);
-
             expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(
                 String(HippotherapyPageLocalizationBlock.ScientificReferences),
             );
@@ -790,17 +747,11 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('opens the translation modal for a specific research reference item and disables when edited', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
-            render(<HippotherapyPageContent />);
-
-            const itemTranslateButton = await screen.findByRole('button', {
-                name: 'Translate research-item',
-            });
+            setup();
+            const itemTranslateButton = await screen.findByRole('button', { name: 'Translate research-item' });
             expect(itemTranslateButton).toBeEnabled();
 
             fireEvent.click(itemTranslateButton);
-
             expect(screen.getByTestId('translate-section-modal-block')).toHaveTextContent(
                 String(HippotherapyPageLocalizationBlock.ScientificReferences),
             );
@@ -815,82 +766,71 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('disables the general research translation action when an English translation already exists', async () => {
-            const contentWithTranslation: HippotherapyPageContentModel = {
-                ...buildContent(),
-                localizations: [
-                    {
-                        language: { id: englishLanguage.id, code: englishLanguage.code },
-                        translationStatus: TranslationStatus.Relevant,
-                        scientificReferencesSection: {
-                            title: 'English Title',
-                            description: 'English Description',
-                            scientificReferences: [],
+            setup({
+                content: buildContent({
+                    localizations: [
+                        {
+                            language: { id: englishLanguage.id, code: englishLanguage.code },
+                            translationStatus: TranslationStatus.Relevant,
+                            scientificReferencesSection: {
+                                title: 'English Title',
+                                description: 'English Description',
+                                scientificReferences: [],
+                            },
                         },
-                    },
-                ],
-            };
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
-
-            render(<HippotherapyPageContent />);
-
-            const generalTranslateButton = await screen.findByRole('button', {
-                name: 'Translate research-general',
+                    ],
+                }),
             });
+
+            const generalTranslateButton = await screen.findByRole('button', { name: 'Translate research-general' });
             expect(generalTranslateButton).toBeDisabled();
         });
 
         it('disables the research reference item translation action when an English translation already exists for that item', async () => {
-            const contentWithTranslation: HippotherapyPageContentModel = {
-                ...buildContent(),
-                localizations: [
-                    {
-                        language: { id: englishLanguage.id, code: englishLanguage.code },
-                        translationStatus: TranslationStatus.Relevant,
-                        scientificReferencesSection: {
-                            title: '',
-                            description: '',
-                            scientificReferences: [{ id: 1, name: 'Translated citation' }],
+            setup({
+                content: buildContent({
+                    localizations: [
+                        {
+                            language: { id: englishLanguage.id, code: englishLanguage.code },
+                            translationStatus: TranslationStatus.Relevant,
+                            scientificReferencesSection: {
+                                title: '',
+                                description: '',
+                                scientificReferences: [{ id: 1, name: 'Translated citation' }],
+                            },
                         },
-                    },
-                ],
-            };
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
-
-            render(<HippotherapyPageContent />);
-
-            const itemTranslateButton = await screen.findByRole('button', {
-                name: 'Translate research-item',
+                    ],
+                }),
             });
+
+            const itemTranslateButton = await screen.findByRole('button', { name: 'Translate research-item' });
             expect(itemTranslateButton).toBeDisabled();
         });
     });
 
     describe('translation statuses mapping by block', () => {
         it('passes localizations to the corresponding sections and ignores null translationStatus', async () => {
-            const contentWithStatuses: HippotherapyPageContentModel = {
-                ...buildContent(),
-                translationStatuses: [
-                    {
-                        block: HippotherapyPageLocalizationBlock.Intro,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: TranslationStatus.Relevant,
-                    },
-                    {
-                        block: HippotherapyPageLocalizationBlock.Intro,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: null as any,
-                    },
-                    {
-                        block: HippotherapyPageLocalizationBlock.Quote,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: TranslationStatus.Outdated,
-                    },
-                ],
-            };
-
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithStatuses);
-
-            render(<HippotherapyPageContent />);
+            setup({
+                content: buildContent({
+                    translationStatuses: [
+                        {
+                            block: HippotherapyPageLocalizationBlock.Intro,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: TranslationStatus.Relevant,
+                        },
+                        {
+                            block: HippotherapyPageLocalizationBlock.Intro,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: null as any,
+                        },
+                        {
+                            block: HippotherapyPageLocalizationBlock.Quote,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: TranslationStatus.Outdated,
+                        },
+                    ],
+                }),
+            });
 
             const introSection = await screen.findByTestId('section-intro');
             expect(introSection).toHaveAttribute('data-localizations-count', '1');
@@ -904,23 +844,8 @@ describe('HippotherapyPageContent', () => {
     });
 
     describe('read-only language mode (non-default locale)', () => {
-        const contentWithEnglish = (): HippotherapyPageContentModel => ({
-            ...buildContent(),
-            localizations: [
-                {
-                    language: englishLanguage,
-                    translationStatus: TranslationStatus.Relevant,
-                    introSection: { title: 'English Intro Title', description: 'English Intro Description' },
-                    descriptionSection: { title: 'English Desc Title', description: 'English Desc Text' },
-                } as any,
-            ],
-        });
-
         it('displays translated content and hides the publish button when non-default language is active', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
 
             const introSection = await screen.findByTestId('section-intro');
             expect(introSection).toHaveTextContent('English Intro Title');
@@ -928,27 +853,20 @@ describe('HippotherapyPageContent', () => {
             const descSection = screen.getByTestId('section-hippotherapy-description');
             expect(descSection).toHaveTextContent('English Desc Title');
 
-            // Кнопка публікації не повинна рендеритися взагалі
             expect(
                 screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
             ).not.toBeInTheDocument();
         });
 
         it('disables section editing controls when in read-only language mode', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
 
             const editButton = await screen.findByRole('button', { name: 'Edit intro' });
             expect(editButton).toBeDisabled();
         });
 
         it('switches back to Ukrainian base editable content when returning to default locale', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: ukrainianLanguage } });
 
             const introSection = await screen.findByTestId('section-intro');
             expect(introSection).toHaveTextContent('Intro title');
@@ -963,22 +881,8 @@ describe('HippotherapyPageContent', () => {
     });
 
     describe('language switching and validation', () => {
-        const contentWithEnglish = (): HippotherapyPageContentModel => ({
-            ...buildContent(),
-            localizations: [
-                {
-                    language: englishLanguage,
-                    translationStatus: TranslationStatus.Relevant,
-                    introSection: { title: 'English Intro Title', description: 'English Intro Description' },
-                } as any,
-            ],
-        });
-
         it('uses fetchedContent (not draftContent) for read-only language preview', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: englishLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
 
             const introSection = await screen.findByTestId('section-intro');
             expect(introSection).toHaveTextContent('English Intro Title');
@@ -986,11 +890,8 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('keeps Ukrainian draft intact when switching to English and back', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
             const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
 
             await screen.findByTestId('section-intro');
             fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
@@ -999,25 +900,21 @@ describe('HippotherapyPageContent', () => {
 
             onLanguageChange(englishLanguage);
             onLanguageChange(ukrainianLanguage);
+
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
         });
 
         it('re-validates fields when language changes to prevent stale errors', async () => {
-            mockedIsContentValid.mockReturnValue(false);
-
-            const shortContent: HippotherapyPageContentModel = {
-                ...buildContent(),
-                introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
-            };
-
-            mockedHippotherapyPageApi.get.mockResolvedValue(shortContent);
             const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({
+                isValid: false,
+                content: buildContent({
+                    introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
+                }),
+                toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange },
+            });
 
             await screen.findByTestId('section-intro');
-
             onLanguageChange(englishLanguage);
 
             expect(onLanguageChange).toHaveBeenCalledWith(englishLanguage);
@@ -1026,11 +923,8 @@ describe('HippotherapyPageContent', () => {
 
     describe('external-value tag prevents draft overwrite', () => {
         it('does not overwrite draftContent when switching languages (OnChangePlugin blocked)', async () => {
-            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
             const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
-            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ selectedLanguage: ukrainianLanguage }));
-
-            render(<HippotherapyPageContent />);
+            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
 
             await screen.findByTestId('section-intro');
 

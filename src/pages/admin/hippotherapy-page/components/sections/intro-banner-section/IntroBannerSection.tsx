@@ -6,15 +6,12 @@ import {
     HIPPOTHERAPY_PAGE_CHAR_LIMITS,
     HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
     HIPPOTHERAPY_PAGE_IMAGE_CONFIGS,
-    HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
-import { useHippotherapyImageField } from '@/hooks/admin/use-hippotherapy-image-field/useHippotherapyImageField';
-import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyIntroSectionContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './IntroBannerSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
-import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
+import { useSectionFields } from '@/hooks/admin/use-section-hippotherapy-fields/use-section-hippotherapy-fields';
 
 export interface IntroBannerSectionProps {
     value: HippotherapyIntroSectionContent;
@@ -39,23 +36,10 @@ const IntroBannerSectionComponent = ({
     localizations,
     languageCode,
 }: IntroBannerSectionProps) => {
-    const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
+    const { imageError, handleImageErrorChange, handleImageChange, isReadOnly, title, description } = useSectionFields({
         value,
         onChange,
         onImageError,
-    });
-    const isReadOnly = useHippotherapyReadOnly();
-
-    const title = useValidatedRichTextField({
-        value: value.title,
-        onChange: (title) => onChange({ ...value, title }),
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-        languageCode,
-    });
-
-    const description = useValidatedRichTextField({
-        value: value.description,
-        onChange: (description) => onChange({ ...value, description }),
         languageCode,
     });
 

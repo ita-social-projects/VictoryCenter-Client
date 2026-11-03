@@ -80,6 +80,10 @@ export const ImageSection = ({
         });
     };
 
+    const handleImageError = (error: string | null) => {
+        setImageError(error === IMAGE_VALIDATION.getFormatError() ? WHO_WE_ARE_TEXT.IMAGE.FORMAT_ERROR : error);
+    };
+
     const handleTitleChange = (value: string) => {
         setTitleError(null);
 
@@ -146,7 +150,7 @@ export const ImageSection = ({
         <div className="image-section">
             <div className="image-wrapper">
                 <ImageInput
-                    setError={setImageError}
+                    setError={handleImageError}
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
                     variant="whoWeAre"

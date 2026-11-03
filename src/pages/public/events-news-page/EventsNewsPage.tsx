@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { EventsNewsIntro } from './event-news-intro/EventsNewsIntro';
@@ -13,10 +13,7 @@ import CHOOSE_PROGRAM_IMAGE from '@/assets/images/horse-and-girl.webp';
 export const EventsNewsPage = () => {
     const { currentLanguage } = useLocale();
     const { t } = useTranslation('eventsNewsPage');
-    const fetchPageData = useCallback(
-        (options?: RequestOptions) => EventsNewsPageApi.get(currentLanguage, options),
-        [currentLanguage],
-    );
+    const fetchPageData = useCallback((options?: RequestOptions) => EventsNewsPageApi.get(options), []);
 
     const { data, isLoading, error } = useDataFetch<EventsNewsPageData | null>({
         initialData: null,

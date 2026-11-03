@@ -51,6 +51,7 @@ export const TranslateEventsIntroModal = ({
         [introSection.localizations, selectedLanguage?.code],
     );
     const initialValue = existingLocalization?.[field] ?? '';
+    const hasActiveFieldTranslation = Boolean(initialValue.trim());
 
     useEffect(() => {
         if (isOpen) {
@@ -127,7 +128,11 @@ export const TranslateEventsIntroModal = ({
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
-            title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+            title={
+                hasActiveFieldTranslation
+                    ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
+                    : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION
+            }
             onSave={handleSave}
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}

@@ -484,6 +484,8 @@ export const FundsExpendituresTable = ({
         headerCheckboxRef.current.indeterminate = !allEligibleSelected && someEligibleSelected;
     }, [allEligibleSelected, someEligibleSelected]);
 
+    const isFilteredEmpty = records.length === 0 && (allRecordsForTypeInference?.length ?? 0) > 0;
+
     return (
         <div className={styles['table-container']}>
             <div
@@ -602,7 +604,9 @@ export const FundsExpendituresTable = ({
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
                                         <p className={styles['empty-state-message']}>
-                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                            {isFilteredEmpty
+                                                ? FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE
+                                                : FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.NO_RECORDS}
                                         </p>
                                     </div>
                                 </td>

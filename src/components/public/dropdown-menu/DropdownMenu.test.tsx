@@ -16,10 +16,10 @@ describe('DropdownMenu', () => {
         { text: 'Profile', navigateTo: '/profile', isDisabled: true },
     ];
 
-    const renderDropdown = () =>
+    const renderDropdown = (props?: Partial<React.ComponentProps<typeof DropdownMenu>>) =>
         render(
             <MemoryRouter>
-                <DropdownMenu mainText="Menu" links={links} />
+                <DropdownMenu mainText="Menu" links={links} {...props} />
             </MemoryRouter>,
         );
 
@@ -73,5 +73,41 @@ describe('DropdownMenu', () => {
 
         const disabledLink = screen.getByText('Profile');
         expect(disabledLink).toHaveClass('disable');
+    });
+
+    it('toggles menu open and closed on button click when trigger is click', () => {
+        renderDropdown({ trigger: 'click' });
+
+        const button = screen.getByRole('button', { name: /menu/i });
+        expect(screen.queryByText('Home')).not.toBeInTheDocument();
+
+        fireEvent.click(button);
+        expect(screen.getByText('Home')).toBeInTheDocument();
+
+        fireEvent.click(button);
+        expect(screen.queryByText('Home')).not.toBeInTheDocument();
+    });
+
+    it('does not open menu on mouse enter when trigger is click', () => {
+        renderDropdown({ trigger: 'click' });
+
+        const dropdown = screen.getByRole('button', { name: /menu/i }).parentElement!;
+        fireEvent.mouseEnter(dropdown);
+
+        expect(screen.queryByText('Home')).not.toBeInTheDocument();
+    });
+
+    it('calls onLinkClick callback when a link is clicked', () => {
+        const onLinkClick = jest.fn();
+        renderDropdown({ trigger: 'click', onLinkClick });
+
+        const button = screen.getByRole('button', { name: /menu/i });
+        fireEvent.click(button);
+
+        const link = screen.getByText('Home');
+        fireEvent.click(link);
+
+        expect(onLinkClick).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText('Home')).not.toBeInTheDocument();
     });
 });

@@ -19,6 +19,7 @@ export type TranslateHippotherapySectionFormRef = FormManagerRef<TranslateHippot
 interface TranslateHippotherapySectionFormProps {
     fields: HippotherapyTranslationFieldConfig[];
     fieldIdPrefix: string;
+    descriptionImages?: string[];
     initialData?: TranslateHippotherapySectionFormValues | null;
     onSubmit: (data: TranslateHippotherapySectionFormValues) => void | Promise<void>;
     onValidationChange?: (isValid: boolean) => void;
@@ -48,6 +49,7 @@ export const TranslateHippotherapySectionForm = forwardRef<
         {
             fields,
             fieldIdPrefix,
+            descriptionImages = [],
             initialData = null,
             onSubmit,
             onValidationChange,
@@ -122,9 +124,10 @@ export const TranslateHippotherapySectionForm = forwardRef<
                     const value = formState[field.name] ?? '';
                     const error = touchedFields[field.name] ? errors[field.name] : undefined;
                     const disabled = isSubmitting || formDisabled;
+                    const image = field.imageIndex === undefined ? null : descriptionImages[field.imageIndex];
 
-                    if (field.type === 'textarea') {
-                        return (
+                    const input =
+                        field.type === 'textarea' ? (
                             <TextAreaWithCharacterLimitGroup
                                 key={field.name}
                                 id={fieldId}
@@ -142,11 +145,7 @@ export const TranslateHippotherapySectionForm = forwardRef<
                                 maxRows={6}
                                 normalizeValue={getNormalizedInputTextWhileTyping}
                             />
-                        );
-                    }
-
-                    if (field.type === 'text') {
-                        return (
+                        ) : field.type === 'text' ? (
                             <InputWithCharacterLimitGroup
                                 key={field.name}
                                 id={fieldId}
@@ -161,23 +160,33 @@ export const TranslateHippotherapySectionForm = forwardRef<
                                 onBlur={() => handleBlur(field)}
                                 normalizeValue={getNormalizedInputTextWhileTyping}
                             />
+                        ) : (
+                            <RichTextInputGroup
+                                key={field.name}
+                                id={fieldId}
+                                name={field.name}
+                                label={field.label}
+                                isRequired={field.isRequired}
+                                value={value}
+                                onChange={(val) => handleChange(field, val)}
+                                onBlur={() => handleBlur(field)}
+                                error={error}
+                                maxLength={field.maxLength}
+                                disabled={disabled}
+                            />
                         );
-                    }
+
+                    if (!image) return input;
 
                     return (
-                        <RichTextInputGroup
-                            key={field.name}
-                            id={fieldId}
-                            name={field.name}
-                            label={field.label}
-                            isRequired={field.isRequired}
-                            value={value}
-                            onChange={(val) => handleChange(field, val)}
-                            onBlur={() => handleBlur(field)}
-                            error={error}
-                            maxLength={field.maxLength}
-                            disabled={disabled}
-                        />
+                        <div className="translate-hippotherapy-section-form-field-with-image" key={field.name}>
+                            <img
+                                src={image}
+                                alt={`${field.label} ${(field.imageIndex ?? 0) + 1}`}
+                                className="translate-hippotherapy-section-form-description-image"
+                            />
+                            {input}
+                        </div>
                     );
                 })}
             </form>

@@ -90,6 +90,7 @@ describe('TranslateEventsIntroModal', () => {
     it('renders the events block title translation modal with an empty textarea', () => {
         render(<TranslationModalHarness field="eventsBlockTitle" />);
 
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
         const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE);
 
         expect(field).toBeInstanceOf(HTMLTextAreaElement);
@@ -364,6 +365,7 @@ describe('TranslateEventsIntroModal', () => {
 
         const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE);
 
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
         expect(field).toHaveValue('Existing English text');
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
 
@@ -371,14 +373,66 @@ describe('TranslateEventsIntroModal', () => {
         await user.type(field, 'Updated English text');
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
 
-        expect(mockedLocalizationsApi.update).toHaveBeenCalledWith(
-            {},
-            1,
-            2,
-            expect.objectContaining({ pageDescription: 'Updated English text' }),
-        );
+        expect(mockedLocalizationsApi.update).toHaveBeenCalledWith({}, 1, 2, {
+            pageDescription: 'Updated English text',
+        });
+        expect(mockedLocalizationsApi.create).not.toHaveBeenCalled();
         expect(onSaveSuccess).toHaveBeenCalledWith(savedLocalization);
     });
+
+    it.each([
+        [
+            'eventsBlockTitle',
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE,
+            'pageDescription',
+            'Existing English description',
+            'New English title',
+        ],
+        [
+            'pageDescription',
+            EVENTS_TEXT.PAGE_CONTENT.SECTION.PAGE_DESCRIPTION.TITLE,
+            'eventsBlockTitle',
+            'Existing English title',
+            'New English description',
+        ],
+    ] as const)(
+        'uses add UX but PUT when only the other field is translated: %s',
+        async (field, label, existingField, existingValue, newValue) => {
+            const user = userEvent.setup();
+            const existingTranslation = {
+                entityId: 1,
+                language: { id: 2, code: 'en' },
+                translationStatus: 1,
+                pageDescription: existingField === 'pageDescription' ? existingValue : null,
+                eventsBlockTitle: existingField === 'eventsBlockTitle' ? existingValue : null,
+            };
+            mockedLocalizationsApi.update.mockResolvedValueOnce({} as never);
+
+            render(
+                <TranslateEventsIntroModal
+                    isOpen
+                    field={field}
+                    introSection={
+                        { ...introSection, localizations: [existingTranslation] } as unknown as EventsIntroSectionDto
+                    }
+                    translationLanguages={translationLanguages}
+                    onClose={jest.fn()}
+                    onSaveSuccess={onSaveSuccess}
+                />,
+            );
+
+            const input = getTranslationField(label);
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+            expect(input).toHaveValue('');
+
+            await user.type(input, newValue);
+            await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+            expect(mockedLocalizationsApi.update).toHaveBeenCalledWith({}, 1, 2, { [field]: newValue });
+            expect(mockedLocalizationsApi.create).not.toHaveBeenCalled();
+        },
+    );
 
     it('saves the events block title independently from the page description', async () => {
         const user = userEvent.setup();
@@ -443,6 +497,41 @@ describe('TranslateEventsIntroModal', () => {
         await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
 
         expect(field).toHaveValue('English text');
+        expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN)).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+    });
+
+    it('keeps the value in the modal when updating a partial translation fails', async () => {
+        const user = userEvent.setup();
+        const existingTranslation = {
+            entityId: 1,
+            language: { id: 2, code: 'en' },
+            translationStatus: 1,
+            pageDescription: 'Existing English description',
+            eventsBlockTitle: null,
+        };
+        mockedLocalizationsApi.update.mockRejectedValueOnce(new Error('Request failed'));
+
+        render(
+            <TranslateEventsIntroModal
+                isOpen
+                field="eventsBlockTitle"
+                introSection={
+                    { ...introSection, localizations: [existingTranslation] } as unknown as EventsIntroSectionDto
+                }
+                translationLanguages={translationLanguages}
+                onClose={jest.fn()}
+                onSaveSuccess={onSaveSuccess}
+            />,
+        );
+
+        const field = getTranslationField(EVENTS_TEXT.PAGE_CONTENT.SECTION.EVENTS_BLOCK_TITLE.TITLE);
+
+        await user.type(field, 'English title');
+        await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        expect(mockedLocalizationsApi.update).toHaveBeenCalledWith({}, 1, 2, { eventsBlockTitle: 'English title' });
+        expect(field).toHaveValue('English title');
         expect(screen.getByText(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
     });

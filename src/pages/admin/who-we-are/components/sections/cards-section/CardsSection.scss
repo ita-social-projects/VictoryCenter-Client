@@ -12,12 +12,20 @@
         letter-spacing: -0.04rem;
         align-self: flex-start;
         width: 27rem;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
     }
 
     &-cards {
         display: flex;
         justify-content: space-between;
         gap: 1rem;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
     }
 
     &-buttons {
@@ -41,4 +49,8 @@
     justify-content: center;
     flex-direction: column;
     margin: 0 auto;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 }

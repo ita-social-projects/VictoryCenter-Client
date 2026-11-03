@@ -142,6 +142,29 @@ describe('TranslateHippotherapySectionForm', () => {
         expect(quoteInput()).toBeDisabled();
         expect(authorInput()).toBeDisabled();
     });
+    it('uses custom minLength when configured on the field', () => {
+        const customFields: HippotherapyTranslationFieldConfig[] = [
+            { name: 'title', label: 'Заголовок', maxLength: 50, minLength: 5, isRequired: true },
+        ];
+        render(
+            <TranslateHippotherapySectionForm
+                fields={customFields}
+                fieldIdPrefix="test-custom"
+                onSubmit={jest.fn()}
+                onValidationChange={jest.fn()}
+                onDirtyChange={jest.fn()}
+            />,
+        );
+
+        const titleInput = screen.getByTestId('mock-rich-input-test-custom-title');
+        fireEvent.change(titleInput, { target: { value: '1234' } });
+        fireEvent.blur(titleInput);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5))).toBeInTheDocument();
+
+        fireEvent.change(titleInput, { target: { value: '12345' } });
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5))).not.toBeInTheDocument();
+    });
+
     it('renders a character-limited textarea when field type is textarea', () => {
         const textareaField: HippotherapyTranslationFieldConfig = {
             name: 'name',
@@ -188,5 +211,31 @@ describe('TranslateHippotherapySectionForm', () => {
 
         fireEvent.change(input, { target: { value: 'Valid title' } });
         expect(input).toHaveValue('Valid title');
+    });
+
+    it('renders four read-only description images beside fields configured with image indexes', () => {
+        const fields: HippotherapyTranslationFieldConfig[] = Array.from({ length: 4 }, (_, imageIndex) => ({
+            name: `description${imageIndex + 1}`,
+            label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+            maxLength: 300,
+            minLength: 10,
+            isRequired: true,
+            imageIndex,
+        }));
+        const images = ['image-1.webp', 'image-2.webp', 'image-3.webp', 'image-4.webp'];
+
+        const { container } = render(
+            <TranslateHippotherapySectionForm
+                fields={fields}
+                fieldIdPrefix="advantages"
+                descriptionImages={images}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const renderedImages = container.querySelectorAll('img');
+        expect(renderedImages).toHaveLength(4);
+        expect(Array.from(renderedImages).map((image) => image.getAttribute('src'))).toEqual(images);
+        expect(screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toHaveLength(4);
     });
 });

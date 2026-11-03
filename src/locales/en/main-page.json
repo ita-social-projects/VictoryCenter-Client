@@ -5,6 +5,11 @@
         "BUTTON": "View programs"
     },
     "DOWNLOAD_ERROR": "Failed to load main page data. Please try again later.",
+    "SUCCESS_STORIES": {
+        "TITLE": "Success stories",
+        "ALL_STORIES": "View all stories",
+        "LOADING_ERROR": "Failed to load success stories"
+    },
     "LINK_TO_MORE": "Learn more",
     "VIEW": "View details"
 }

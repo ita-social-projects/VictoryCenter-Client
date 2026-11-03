@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
-import { EntityLocalization } from '@/types/common/language';
 
-export const useGetLocalization = <T extends object>(
-    localizations: EntityLocalization[] | undefined,
+export const useGetLocalization = <T extends object, L extends { language: { code: string } }>(
+    localizations: L[] | undefined,
     fallback: T,
 ): T => {
     const { currentLanguage } = useLocale();
@@ -15,7 +14,7 @@ export const useGetLocalization = <T extends object>(
             return fallback;
         }
 
-        const { language: _language, translationStatus: _translationStatus, ...localizableFields } = activeLoc;
+        const { language: _language, translationStatus: _translationStatus, ...localizableFields } = activeLoc as any;
 
         return {
             ...fallback,

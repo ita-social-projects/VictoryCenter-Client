@@ -41,10 +41,6 @@ export const EventNewsApi = {
             throw new Error(`Failed to load event news: empty response for slug "${slug}"`);
         }
 
-        const mapped = mapToEventsNews(data, languageCode);
-        return {
-            ...mapped,
-            sections: Array.isArray((data as any).sections) ? (data as any).sections : [],
-        };
+        return mapToEventsNews(data, languageCode);
     },
 };

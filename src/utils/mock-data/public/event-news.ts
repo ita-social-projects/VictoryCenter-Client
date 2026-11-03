@@ -116,7 +116,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: girlAndWhiteHorse,
         backgroundImage: girlAndWhiteHorse,
         slug: 'victory-center-realizes-ipovencziya-program-details',
-        sections: quadImagesBottomSections,
     },
     {
         id: '2',
@@ -129,7 +128,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: supportChildren,
         backgroundImage: supportChildren,
         slug: 'how-horses-help-children-and-veterans',
-        sections: dualImagesBottomSections,
     },
     {
         id: '3',
@@ -141,7 +139,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: peopleCircle,
         backgroundImage: peopleCircle,
         slug: 'therapeutic-role-of-horses-in-rehabilitation-of-children-and-military',
-        sections: textOnlySections,
     },
     {
         id: '4',
@@ -154,11 +151,10 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: oldManHorse,
         backgroundImage: oldManHorse,
         slug: 'recovery-stories-how-horses-change-the-lives-of-veterans',
-        sections: textOnlySections,
     },
     {
         id: '5',
-        name: 'Як проходять реабілітаційні заняття на ранчо під Києвом — репортаж NV',
+        name: 'Як проходять реабілітаційні заняття на ранчо під Києвом — репортаж NV',
         description:
             'Репортери побували на сесіях іпотерапії та переконалися в унікальності методу. Атмосфера довіри й спокою, які коні створюють навколо себе, стають фундаментом для відновлення.',
         date: '16/02/2025',
@@ -167,7 +163,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: team,
         backgroundImage: team,
         slug: 'how-rehabilitation-sessions-go-at-the-ranch-near-kyiv-nv-report',
-        sections: textOnlySections,
     },
     {
         id: '6',
@@ -180,7 +175,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: hutirka,
         backgroundImage: hutirka,
         slug: 'hutirka-2-nastya-popandopulos',
-        sections: textOnlySections,
     },
     {
         id: '7',
@@ -193,7 +187,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: girlAndWhiteHorse,
         backgroundImage: girlAndWhiteHorse,
         slug: 'victory-center-announces-new-ipovencziya-program',
-        sections: textOnlySections,
     },
     {
         id: '8',
@@ -206,7 +199,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: supportChildren,
         backgroundImage: supportChildren,
         slug: 'the-power-of-human-animal-interaction-horsemanship-as-a-path-to-recovery',
-        sections: textOnlySections,
     },
     {
         id: '9',
@@ -218,6 +210,5 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: peopleCircle,
         backgroundImage: peopleCircle,
         slug: 'how-horses-support-children-and-veterans',
-        sections: textOnlySections,
     },
 ];

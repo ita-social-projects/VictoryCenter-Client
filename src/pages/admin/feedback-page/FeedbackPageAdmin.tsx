@@ -1,4 +1,5 @@
 import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -526,8 +527,9 @@ export const FeedbackPageAdmin = () => {
                     }
                     emptyStateAction={
                         !isFilteredView ? (
-                            <Button buttonStyle="secondary" onClick={handleAddItemClick}>
+                            <Button className="btn-add" buttonStyle="secondary" onClick={handleAddItemClick}>
                                 {FEEDBACK_TEXT.BUTTON.ADD_MATERIAL}
+                                <PlusIcon className="plus-icon" aria-hidden="true" />
                             </Button>
                         ) : undefined
                     }

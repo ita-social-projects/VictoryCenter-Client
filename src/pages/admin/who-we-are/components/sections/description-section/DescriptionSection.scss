@@ -5,6 +5,12 @@
     margin-top: 154px;
     gap: 5rem;
 
+    @media (max-width: 768px) {
+        flex-direction: column;
+        margin-top: 2rem;
+        gap: 2rem;
+    }
+
     .error {
         color: colors.$error;
         font-size: 0.875rem;
@@ -16,6 +22,10 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
 
         &-text {
             font-size: 1.125rem;
@@ -37,6 +47,10 @@
         display: flex;
         flex-direction: column;
         gap: 0.38rem;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
 
         &-label {
             font-size: 1rem;
@@ -73,13 +87,27 @@
         padding: 0;
         gap: 110px;
 
+        @media (max-width: 768px) {
+            flex-direction: column;
+            width: 100%;
+            gap: 1.5rem;
+        }
+
         > h2 {
             white-space: nowrap;
+
+            @media (max-width: 768px) {
+                white-space: normal;
+            }
         }
 
         > div {
             flex-shrink: 0;
             width: 413px;
+
+            @media (max-width: 768px) {
+                width: 100%;
+            }
         }
     }
 }

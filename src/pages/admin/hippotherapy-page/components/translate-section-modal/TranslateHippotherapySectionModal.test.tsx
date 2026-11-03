@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -29,6 +29,10 @@ const quoteInput = (sectionKey = 'quoteSection') =>
     screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-quoteText`);
 const authorInput = (sectionKey = 'quoteSection') =>
     screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-authorName`);
+const titleInput = (sectionKey: string) =>
+    screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-title`);
+const descriptionInput = (sectionKey: string) =>
+    screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-description`);
 const saveButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION });
 const closeButton = () => screen.getByLabelText('Close modal');
 const confirmationTitle = () => screen.getByTestId('confirmation-title').textContent;
@@ -55,12 +59,6 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
     });
 
-    it('renders nothing for a section without translation fields', () => {
-        renderModal({ block: HippotherapyPageLocalizationBlock.Intro });
-
-        expect(screen.queryByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).not.toBeInTheDocument();
-    });
-
     it.each([
         ['Quote', HippotherapyPageLocalizationBlock.Quote, 'quoteSection'],
         ['AnotherQuote', HippotherapyPageLocalizationBlock.AnotherQuote, 'anotherQuoteSection'],
@@ -81,6 +79,85 @@ describe('TranslateHippotherapySectionModal', () => {
         );
     });
 
+    it.each([
+        [
+            'Intro',
+            HippotherapyPageLocalizationBlock.Intro,
+            'introSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.INTRO_DESCRIPTION,
+        ],
+        [
+            'Description',
+            HippotherapyPageLocalizationBlock.Description,
+            'descriptionSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+        [
+            'Hippovention',
+            HippotherapyPageLocalizationBlock.Hippovention,
+            'hippoventionSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+        [
+            'Analysis',
+            HippotherapyPageLocalizationBlock.Analysis,
+            'analysisSection',
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE,
+            HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION,
+        ],
+    ])(
+        'opens "Додати переклад" with empty fields and correct limits for %s section (Set #1)',
+        (_name, block, sectionKey, titleLimit, descLimit) => {
+            renderModal({ block });
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+            expect(screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBe(titleInput(sectionKey));
+            expect(screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBe(descriptionInput(sectionKey));
+            expect(titleInput(sectionKey)).toHaveValue('');
+            expect(descriptionInput(sectionKey)).toHaveValue('');
+            expect(titleInput(sectionKey)).toHaveAttribute('maxLength', String(titleLimit));
+            expect(descriptionInput(sectionKey)).toHaveAttribute('maxLength', String(descLimit));
+            expect(saveButton()).toBeDisabled();
+            expect(closeButton()).toBeEnabled();
+        },
+    );
+
+    it('keeps the save button disabled for Set #1 section even when both title and description are valid', () => {
+        renderModal({ block: HippotherapyPageLocalizationBlock.Intro });
+
+        fireEvent.change(titleInput('introSection'), { target: { value: 'Valid Title' } });
+        expect(saveButton()).toBeDisabled();
+
+        fireEvent.change(descriptionInput('introSection'), { target: { value: 'Valid translation description' } });
+        expect(saveButton()).toBeDisabled();
+    });
+
+    it('opens Advantages with exactly one title and four empty, required image-backed descriptions', () => {
+        const descriptionImages = ['advantage-1.webp', 'advantage-2.webp', 'advantage-3.webp', 'advantage-4.webp'];
+        renderModal({
+            block: HippotherapyPageLocalizationBlock.Advantages,
+            descriptionImages,
+        });
+
+        const titleInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE, { exact: false });
+        const descriptionInputs = screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
+
+        expect(titleInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE));
+        expect(titleInput).toHaveValue('');
+        expect(screen.getByText('0/50')).toBeInTheDocument();
+        expect(descriptionInputs).toHaveLength(4);
+        descriptionInputs.forEach((input) => {
+            expect(input).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION));
+            expect(input).toHaveValue('');
+        });
+        expect(screen.getAllByRole('img')).toHaveLength(4);
+        expect(screen.getAllByRole('img').map((image) => image.getAttribute('src'))).toEqual(descriptionImages);
+        expect(saveButton()).toBeDisabled();
+    });
+
     it('selects English by default and keeps the save button disabled on open', () => {
         renderModal();
 
@@ -89,15 +166,12 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(closeButton()).toBeEnabled();
     });
 
-    it('enables the save button once the required field is valid', async () => {
+    it('keeps the save button disabled even once the required field is valid, since saving is not implemented yet', () => {
         renderModal();
 
         fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
 
-        expect(saveButton()).toBeEnabled();
-        fireEvent.click(saveButton());
-
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
         expect(quoteInput()).toHaveValue(VALID_TEXT);
     });
 
@@ -175,7 +249,8 @@ describe('TranslateHippotherapySectionModal', () => {
 
         expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
-    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', async () => {
+
+    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'general',
@@ -197,10 +272,10 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(descriptionInput, { target: { value: 'Valid scientific description' } });
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
     });
 
-    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', async () => {
+    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'research',
@@ -214,6 +289,6 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(nameInput, { target: { value: 'Valid research item citation name' } });
-        await waitFor(() => expect(saveButton()).toBeEnabled());
+        expect(saveButton()).toBeDisabled();
     });
 });

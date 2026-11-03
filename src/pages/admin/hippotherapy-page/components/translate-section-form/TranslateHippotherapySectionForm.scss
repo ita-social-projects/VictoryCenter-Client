@@ -3,3 +3,17 @@
     flex-direction: column;
     gap: 18px;
 }
+
+.translate-hippotherapy-section-form-field-with-image {
+    display: grid;
+    grid-template-columns: 116px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+}
+
+.translate-hippotherapy-section-form-description-image {
+    width: 116px;
+    height: 111px;
+    margin-top: 26px;
+    object-fit: cover;
+}

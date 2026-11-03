@@ -1,6 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { AddFeedbackHistoryModal, AddFeedbackHistoryModalProps } from './AddFeedbackHistoryModal';
-import { FEEDBACK_TEXT } from '@/const/admin/feedback';
+import userEvent from '@testing-library/user-event';
+import {
+    AddFeedbackHistoryModal,
+    AddFeedbackHistoryModalProps,
+} from '@/pages/admin/feedback-page/components/add-feedback-history-modal/AddFeedbackHistoryModal';
+import { FEEDBACK_HISTORY_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 import { ModalMode, VisibilityStatus } from '@/types/admin/common';
@@ -161,36 +165,77 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
-    it('validates text fields in real-time during typing (onChange)', async () => {
-        renderModal();
+    describe.each(['title', 'story'] as const)('%s validation timing', (fieldName) => {
+        const label = () =>
+            fieldName === 'title'
+                ? FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE
+                : FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY;
+        const requiredError = () => FEEDBACK_HISTORY_VALIDATION[fieldName].getRequiredError();
+        const minError = () => FEEDBACK_HISTORY_VALIDATION[fieldName].getMinError();
 
-        const titleInput = screen.getByRole('textbox', { name: /заголовок/i });
+        it('shows required validation only after leaving an empty field', async () => {
+            const user = userEvent.setup();
+            renderModal();
+            const input = screen.getByRole('textbox', { name: new RegExp(label()) });
 
-        fireEvent.change(titleInput, { target: { value: 'Коротко' } });
-        await waitFor(() => {
-            expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
+            await user.click(input);
+            expect(input).toHaveAttribute('aria-invalid', 'false');
+            expect(screen.queryByText(requiredError())).not.toBeInTheDocument();
+
+            await user.tab();
+            await waitFor(() => {
+                expect(input).toHaveAttribute('aria-invalid', 'true');
+                expect(screen.getByText(requiredError())).toBeInTheDocument();
+            });
         });
 
-        fireEvent.change(titleInput, { target: { value: 'Достатня назва' } });
-        await waitFor(() => {
-            expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+        it('checks minimum length on blur and updates the error on the next blur', async () => {
+            const user = userEvent.setup();
+            renderModal();
+            const input = screen.getByRole('textbox', { name: new RegExp(label()) });
+
+            await user.type(input, 'a');
+            expect(screen.queryByText(minError())).not.toBeInTheDocument();
+            expect(input).toHaveAttribute('aria-invalid', 'false');
+
+            // The first Tab moves to the clear button, leaving the text field.
+            await user.tab();
+            expect(await screen.findByText(minError())).toBeInTheDocument();
+
+            await user.click(input);
+            await user.type(input, ' valid story');
+            await user.tab();
+            await waitFor(() => {
+                expect(screen.queryByText(minError())).not.toBeInTheDocument();
+                expect(input).toHaveAttribute('aria-invalid', 'false');
+            });
         });
 
-        fireEvent.change(titleInput, { target: { value: '' } });
-        await waitFor(() => {
-            expect(screen.getByText("Поле обов'язкове")).toBeInTheDocument();
-        });
+        it('keeps focus and defers required validation when clearing a valid field', async () => {
+            const user = userEvent.setup();
+            renderModal();
+            const input = screen.getByRole('textbox', { name: new RegExp(label()) });
 
-        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+            await user.type(input, 'A valid story');
+            await user.tab();
+            await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'false'));
+            await user.click(input);
+            await user.click(
+                screen
+                    .getAllByRole('button', { name: 'Clear input' })
+                    .filter((button) => !button.hasAttribute('disabled'))[0],
+            );
 
-        fireEvent.change(storyTextarea, { target: { value: 'Опис' } });
-        await waitFor(() => {
-            expect(screen.getByText('Не менше 10 символів')).toBeInTheDocument();
-        });
+            expect(input).toHaveFocus();
+            expect(input).toHaveValue('');
+            expect(screen.queryByText(requiredError())).not.toBeInTheDocument();
+            expect(input).toHaveAttribute('aria-invalid', 'false');
 
-        fireEvent.change(storyTextarea, { target: { value: 'Достатньо довгий опис історії' } });
-        await waitFor(() => {
-            expect(screen.queryByText('Не менше 10 символів')).not.toBeInTheDocument();
+            await user.tab();
+            await waitFor(() => {
+                expect(screen.getByText(requiredError())).toBeInTheDocument();
+                expect(input).toHaveAttribute('aria-invalid', 'true');
+            });
         });
     });
 

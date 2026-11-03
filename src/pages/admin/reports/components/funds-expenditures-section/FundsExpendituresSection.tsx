@@ -446,6 +446,9 @@ export const FundsExpenditureSection = ({
         onSelectionChange?.(hasSelectedRecords);
     }, [hasSelectedRecords, onSelectionChange]);
 
+    useEffect(() => {
+        setSelectedRecordIds((prev) => (prev.length === 0 ? prev : []));
+    }, [selectedType, selectedCategoryId]);
     // Counted from local records (not summary) so unpublished additions hit the limit too; one record per category.
     const usedCategoryCounts = useMemo(() => {
         const countByType = (type: FundsExpendituresTransactionType) =>
@@ -726,6 +729,7 @@ export const FundsExpenditureSection = ({
         if (!recordToDelete) return;
 
         setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
+        setSelectedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
 
         if (!isTempId(recordToDelete.id)) {
             setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));

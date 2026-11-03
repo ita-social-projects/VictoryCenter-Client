@@ -13,6 +13,7 @@ const historyDto = {
     story: 'Текст історії',
     image: { id: 5, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' },
     priority: 0,
+    publishedAt: '2025-02-15T00:00:00+02:00',
     localizations: [
         {
             entityId: 1,
@@ -64,6 +65,7 @@ describe('PublicFeedbackApi', () => {
                 title: 'Історія',
                 story: 'Текст історії',
                 image: 'https://example.com/a.jpg',
+                publishedAt: '2025-02-15T00:00:00+02:00',
                 localizations: [
                     {
                         entityId: 1,
@@ -75,6 +77,26 @@ describe('PublicFeedbackApi', () => {
                 ],
             },
         ]);
+    });
+
+    it('fetches latest published histories and maps their publication dates', async () => {
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: [historyDto] });
+
+        const [history] = await PublicFeedbackApi.fetchLatestHistories();
+
+        expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.FEEDBACK_HISTORIES.LATEST_PUBLISHED, {
+            signal: undefined,
+        });
+        expect(history.publishedAt).toBe('2025-02-15T00:00:00+02:00');
+    });
+
+    it('maps published histories when publication dates are absent', async () => {
+        const { publishedAt: _publishedAt, ...historyWithoutPublicationDate } = historyDto;
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: [historyWithoutPublicationDate] });
+
+        const [history] = await PublicFeedbackApi.fetchHistories();
+
+        expect(history).not.toHaveProperty('publishedAt');
     });
 
     it('maps a missing history image to null', async () => {

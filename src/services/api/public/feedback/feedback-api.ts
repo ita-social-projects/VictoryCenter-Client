@@ -4,6 +4,7 @@ import {
     FeedbackHistoryPublicDto,
     FeedbackReviewPublicDto,
     FeedbackVideoPublicDto,
+    LatestFeedbackHistoryPublicDto,
     StoriesOfVictoryReview,
     StoriesOfVictoryReviewArticle,
     StoriesOfVictoryReviewVideo,
@@ -22,6 +23,7 @@ const mapHistory = (dto: FeedbackHistoryPublicDto): StoriesOfVictoryReviewArticl
     title: dto.title,
     story: dto.story,
     image: getImageSrc(dto.image) || null,
+    ...(dto.publishedAt !== undefined ? { publishedAt: dto.publishedAt } : {}),
     localizations: dto.localizations?.map((loc) =>
         mapLocalizationDtoToModel<typeof loc, FeedbackHistoryLocalization>(loc),
     ),
@@ -53,7 +55,7 @@ export const PublicFeedbackApi = {
         return response.data.map(mapHistory);
     },
     fetchLatestHistories: async (options: RequestOptions = {}): Promise<StoriesOfVictoryReviewArticle[]> => {
-        const response = await axiosInstance.get<FeedbackHistoryPublicDto[]>(
+        const response = await axiosInstance.get<LatestFeedbackHistoryPublicDto[]>(
             API_ROUTES.FEEDBACK_HISTORIES.LATEST_PUBLISHED,
             { signal: options.cancellationSignal },
         );

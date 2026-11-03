@@ -10,6 +10,8 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { localizePath } from '@/utils/functions/localize-path/localize-path';
 import styles from './StoriesOfVictorySection.module.scss';
 
+const MAX_STORIES_COUNT = 4;
+
 export const StoriesOfVictorySection: React.FC = () => {
     const { t } = useTranslation('mainPage');
     const { currentLanguage } = useLocale();
@@ -19,7 +21,10 @@ export const StoriesOfVictorySection: React.FC = () => {
         fetchHandler: PublicFeedbackApi.fetchLatestHistories,
     });
 
-    const articles = useMemo(() => histories.data.filter((article) => Boolean(article.image)), [histories.data]);
+    const articles = useMemo(
+        () => histories.data.filter((article) => Boolean(article.image)).slice(0, MAX_STORIES_COUNT),
+        [histories.data],
+    );
 
     if (histories.isLoading) {
         return null;

@@ -17,6 +17,7 @@ export interface GalleryCardProps {
     onImageError: (error: string | null) => void;
     imageError?: string | null;
     disabled?: boolean;
+    languageCode?: string;
 }
 
 const GalleryCardComponent = ({
@@ -28,10 +29,12 @@ const GalleryCardComponent = ({
     onImageError,
     imageError,
     disabled,
+    languageCode,
 }: GalleryCardProps) => {
     const description = useValidatedRichTextField({
         value: card.description,
         onChange: onDescriptionChange,
+        languageCode,
     });
     const isReadOnly = useHippotherapyReadOnly();
 

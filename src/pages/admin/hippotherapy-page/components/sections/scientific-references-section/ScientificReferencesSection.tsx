@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -59,6 +59,7 @@ const ScientificReferencesSectionComponent = ({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
@@ -73,6 +74,13 @@ const ScientificReferencesSectionComponent = ({
     const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
     const [referenceToDeleteLocalId, setReferenceToDeleteLocalId] = useState<string | null>(null);
     const isReadOnly = useHippotherapyReadOnly();
+
+    useEffect(() => {
+        if (languageCode !== undefined) {
+            setNameErrors({});
+            setUrlErrors({});
+        }
+    }, [languageCode]);
 
     const areAllReferencesValid = useMemo(
         () =>

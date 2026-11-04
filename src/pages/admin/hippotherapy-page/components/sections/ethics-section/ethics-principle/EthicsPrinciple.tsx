@@ -10,10 +10,11 @@ export interface EthicsPrincipleProps {
     fieldId: string;
     onChange: (value: string) => void;
     disabled?: boolean;
+    languageCode?: string;
 }
 
-const EthicsPrincipleComponent = ({ value, fieldId, onChange, disabled }: EthicsPrincipleProps) => {
-    const principle = useValidatedRichTextField({ value, onChange });
+const EthicsPrincipleComponent = ({ value, fieldId, onChange, disabled, languageCode }: EthicsPrincipleProps) => {
+    const principle = useValidatedRichTextField({ value, onChange, languageCode });
     const isReadOnly = useHippotherapyReadOnly();
     return (
         <div className="hippotherapy-ethics-section-principle">

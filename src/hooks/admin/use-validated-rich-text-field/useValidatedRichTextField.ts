@@ -45,6 +45,7 @@ export const useValidatedRichTextField = ({
         if (languageCode !== undefined) {
             setError(validate(value));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [languageCode]);
 
     return { error, handleChange, handleBlur };

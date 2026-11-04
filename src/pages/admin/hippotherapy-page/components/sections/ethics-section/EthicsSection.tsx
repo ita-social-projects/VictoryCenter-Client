@@ -114,6 +114,7 @@ const EthicsSectionComponent = ({
                                     fieldId={`hippotherapy-ethics-principle-${index}`}
                                     onChange={(nextValue) => handlePrincipleChange(index, nextValue)}
                                     disabled={disabled}
+                                    languageCode={languageCode}
                                 />
                             ))}
                         </div>

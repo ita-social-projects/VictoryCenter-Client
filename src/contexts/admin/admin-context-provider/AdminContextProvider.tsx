@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, CanceledError } from 'axios';
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -16,7 +16,7 @@ type ContextType = {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: Credentials) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     refreshAccessToken: () => Promise<void>;
 };
 
@@ -29,6 +29,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const isAuthenticated = isAccessTokenValid(token);
 
     const tokenRef = useRef<string>(token);
+    const logoutCountRef = useRef<number>(0);
 
     const updateToken = useCallback((newToken: string) => {
         tokenRef.current = newToken;
@@ -37,20 +38,41 @@ export const AdminContextProvider = ({ children }: Props) => {
 
     const login = useCallback(
         async (creds: Credentials) => {
+            const logoutCount = logoutCountRef.current;
             const newToken = await loginRequest(creds);
-            updateToken(newToken);
+            if (logoutCount === logoutCountRef.current) {
+                updateToken(newToken);
+            }
         },
         [updateToken],
     );
 
+    // never rejects: local sign-out always happens, server-side logout is best effort
     const logout = useCallback(async () => {
-        await logoutRequest(tokenRef.current);
+        logoutCountRef.current += 1;
+        const currentToken = tokenRef.current;
         updateToken('');
+
+        if (!currentToken) {
+            return;
+        }
+
+        try {
+            const logoutToken = isAccessTokenValid(currentToken) ? currentToken : await tokenRefreshRequest();
+            await logoutRequest(logoutToken);
+        } catch {}
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
-        const newToken = await tokenRefreshRequest();
-        updateToken(newToken);
+        const logoutCount = logoutCountRef.current;
+        const [refresh] = await Promise.allSettled([tokenRefreshRequest()]);
+        if (logoutCount !== logoutCountRef.current) {
+            throw new CanceledError('Session ended during token refresh');
+        }
+        if (refresh.status === 'rejected') {
+            throw refresh.reason;
+        }
+        updateToken(refresh.value);
     }, [updateToken]);
 
     // silent refresh on mount
@@ -60,7 +82,7 @@ export const AdminContextProvider = ({ children }: Props) => {
                 try {
                     await refreshAccessToken();
                 } catch {
-                    logout();
+                    updateToken('');
                 } finally {
                     setIsLoading(false);
                 }

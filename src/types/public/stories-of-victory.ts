@@ -33,6 +33,7 @@ export type StoriesOfVictoryReviewArticle = {
     title: string;
     story: string;
     image: string | null;
+    publishedAt?: string;
     localizations?: FeedbackHistoryLocalization[];
 };
 
@@ -42,7 +43,12 @@ export interface FeedbackHistoryPublicDto {
     story: string;
     image: Image | null;
     priority: number;
+    publishedAt?: string;
     localizations?: FeedbackHistoryLocalizationDto[];
+}
+
+export interface LatestFeedbackHistoryPublicDto extends FeedbackHistoryPublicDto {
+    publishedAt: string;
 }
 
 export interface FeedbackReviewPublicDto {

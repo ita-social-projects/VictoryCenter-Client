@@ -3,7 +3,7 @@ import { FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto } from '@/types/admin/feedback';
 import { FeedbackHistoryFormValues } from '@/validation/admin/feedback-history-schema/feedback-history-schema';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { getNormalizedInputText, getNormalizedMultilineInputText } from '@/utils/functions/formatters/text-formatters';
 import { FeedbackHistoryForm } from '../feedback-history-form/FeedbackHistoryForm';
 import { FeedbackFormModal, FeedbackModalProps } from '../feedback-form-modal/FeedbackFormModal';
 import styles from './AddFeedbackHistoryModal.module.scss';
@@ -21,7 +21,7 @@ export interface AddFeedbackHistoryModalProps extends FeedbackModalProps<Feedbac
 
 const toHistoryPayload = (formData: FeedbackHistoryFormValues, status: VisibilityStatus): FeedbackHistoryPayload => ({
     title: getNormalizedInputText(formData.title),
-    story: getNormalizedInputText(formData.story),
+    story: getNormalizedMultilineInputText(formData.story),
     image: formData.image,
     status,
 });

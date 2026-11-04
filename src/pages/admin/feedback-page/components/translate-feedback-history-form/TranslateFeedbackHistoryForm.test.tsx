@@ -68,6 +68,15 @@ describe('TranslateFeedbackHistoryForm', () => {
         expect(screen.getByLabelText(/Історія/)).toHaveValue('Line one\nLine two');
     });
 
+    it('keeps line breaks inside the story on blur and trims them at the edges', () => {
+        renderForm();
+
+        fireEvent.change(screen.getByLabelText(/Історія/), { target: { value: '\nLine one\nLine two\n' } });
+        fireEvent.blur(screen.getByLabelText(/Історія/));
+
+        expect(screen.getByLabelText(/Історія/)).toHaveValue('Line one\nLine two');
+    });
+
     it('collapses multiple spaces while typing without stripping the whole value', () => {
         renderForm();
 

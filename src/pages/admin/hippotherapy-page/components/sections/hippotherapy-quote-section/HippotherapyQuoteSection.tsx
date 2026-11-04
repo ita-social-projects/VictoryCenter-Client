@@ -13,6 +13,7 @@ import { HippotherapyQuoteContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './HippotherapyQuoteSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface HippotherapyQuoteSectionProps {
     value: HippotherapyQuoteContent;
@@ -25,6 +26,7 @@ export interface HippotherapyQuoteSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const HippotherapyQuoteSectionComponent = ({
@@ -38,22 +40,26 @@ const HippotherapyQuoteSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: HippotherapyQuoteSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
         onChange,
         onImageError,
     });
+    const isReadOnly = useHippotherapyReadOnly();
 
     const quoteText = useValidatedRichTextField({
         value: value.quoteText,
         onChange: (quoteText) => onChange({ ...value, quoteText }),
+        languageCode,
     });
 
     const authorName = useValidatedRichTextField({
         value: value.authorName,
         onChange: (authorName) => onChange({ ...value, authorName }),
         isOptional: true,
+        languageCode,
     });
 
     return (
@@ -99,6 +105,7 @@ const HippotherapyQuoteSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_TEXT}
                     error={quoteText.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
                 <RichTextInputGroup
                     label={HIPPOTHERAPY_PAGE_TEXT.LABEL.ADDITIONAL_DESCRIPTION}
@@ -110,6 +117,7 @@ const HippotherapyQuoteSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.QUOTE_AUTHOR}
                     error={authorName.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
             </div>
         </div>

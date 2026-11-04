@@ -3,7 +3,10 @@ import '@testing-library/jest-dom';
 import { EthicsSection, EthicsSectionProps } from './EthicsSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippotherapyEthicsSectionContent } from '@/types/admin/hippotherapy-page';
-import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    itHidesToolbarWhenReadOnly,
+    itRendersTranslationStatuses,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
     itDisablesInputsWhenDisabled,
     itHandlesImageField,
@@ -12,6 +15,7 @@ import {
     itUpdatesFieldsOnChange,
     setupValidateTextMock,
 } from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
@@ -33,8 +37,12 @@ describe('EthicsSection', () => {
         imageId: null,
     };
 
-    const renderComponent = (props: Partial<EthicsSectionProps> = {}) =>
-        render(<EthicsSection value={defaultValue} onChange={jest.fn()} {...props} />);
+    const renderComponent = (props: Partial<EthicsSectionProps> = {}, isReadOnly = false) =>
+        render(
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <EthicsSection value={defaultValue} onChange={jest.fn()} {...props} />
+            </HippotherapyReadOnlyContext.Provider>,
+        );
 
     it('renders title, image, description, and one field per principle', () => {
         renderComponent();
@@ -71,5 +79,17 @@ describe('EthicsSection', () => {
 
     describe('translation statuses', () => {
         itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            [
+                'mock-rich-input-hippotherapy-ethics-title',
+                'mock-rich-input-hippotherapy-ethics-description',
+                'mock-rich-input-hippotherapy-ethics-principle-0',
+                'mock-rich-input-hippotherapy-ethics-principle-1',
+            ],
+        );
     });
 });

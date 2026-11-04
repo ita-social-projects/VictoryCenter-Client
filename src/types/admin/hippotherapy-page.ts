@@ -31,11 +31,11 @@ export interface HippotherapyTextCardLocalizedContent {
 }
 export interface HippotherapyQuoteLocalizedContent {
     quoteText: string;
-    authorName: string;
+    authorName: string | null;
 }
 export interface HippotherapyGalleryLocalizedContent {
     title: string;
-    cards: { description: string }[];
+    cards: { cardId: number; description: string }[];
 }
 export interface HippoventionCenterLocalizedContent {
     title: string;
@@ -50,7 +50,7 @@ export interface HippotherapyScientificReferencesLocalizedContent {
 export interface HippotherapyEthicsLocalizedContent {
     title: string;
     description: string;
-    principles: string[];
+    principles: { principleId: number; text: string }[];
 }
 
 export interface HippotherapyPageLocalizedContent {

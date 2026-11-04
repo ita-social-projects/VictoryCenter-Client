@@ -90,7 +90,12 @@ export const FeedbackComponent = ({
                     ))}
                 <div className={`feedback-profile-data${isVideo || 'authorName' in item ? ' feedback-truncate' : ''}`}>
                     <p title={title}>{title}</p>
-                    <LocalizationStatuses<EntityLocalization> languages={translationLanguages} localizedEntity={item} />
+                    <div className="feedback-profile-statuses">
+                        <LocalizationStatuses<EntityLocalization>
+                            languages={translationLanguages}
+                            localizedEntity={item}
+                        />
+                    </div>
                 </div>
             </div>
 

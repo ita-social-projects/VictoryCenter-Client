@@ -178,6 +178,25 @@ const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig
     })),
 ];
 
+const createParticipantsTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+    {
+        name: 'title',
+        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        isRequired: true,
+        type: 'text',
+    },
+    ...Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, imageIndex) => ({
+        name: `description${imageIndex + 1}`,
+        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
+        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
+        isRequired: true,
+        imageIndex,
+    })),
+];
+
 const createHippoventionCenterTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
@@ -244,6 +263,10 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     [HippotherapyPageLocalizationBlock.Advantages]: {
         sectionKey: 'advantagesSection',
         fields: createAdvantagesTranslationFields(),
+    },
+    [HippotherapyPageLocalizationBlock.Participants]: {
+        sectionKey: 'participantsSection',
+        fields: createParticipantsTranslationFields(),
     },
     [HippotherapyPageLocalizationBlock.HippoventionCenter]: {
         sectionKey: 'hippoventionCenterSection',

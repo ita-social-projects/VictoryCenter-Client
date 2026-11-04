@@ -158,6 +158,28 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
     });
 
+    it('opens Participants with exactly one title and four empty, required image-backed descriptions', () => {
+        const descriptionImages = ['participant-1.webp', 'participant-2.webp', 'participant-3.webp', 'participant-4.webp'];
+        renderModal({
+            block: HippotherapyPageLocalizationBlock.Participants,
+            descriptionImages,
+        });
+
+        const titleInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE, { exact: false });
+        const descriptionInputs = screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
+
+        expect(titleInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE));
+        expect(titleInput).toHaveValue('');
+        expect(descriptionInputs).toHaveLength(4);
+        descriptionInputs.forEach((input) => {
+            expect(input).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION));
+            expect(input).toHaveValue('');
+        });
+        expect(screen.getAllByRole('img')).toHaveLength(4);
+        expect(screen.getAllByRole('img').map((image) => image.getAttribute('src'))).toEqual(descriptionImages);
+        expect(saveButton()).toBeDisabled();
+    });
+
     it('selects English by default and keeps the save button disabled on open', () => {
         renderModal();
 

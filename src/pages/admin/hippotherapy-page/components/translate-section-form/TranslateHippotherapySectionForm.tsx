@@ -173,6 +173,8 @@ export const TranslateHippotherapySectionForm = forwardRef<
                                 error={error}
                                 maxLength={field.maxLength}
                                 disabled={disabled}
+                                trimOnBlur
+                                normalizeSpaces
                             />
                         );
 

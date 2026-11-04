@@ -17,7 +17,7 @@ export const getNormalizedMultilineInputText = (text: string): string =>
     text
         .trim()
         .replace(/[^\S\n]+/g, ' ')
-        .replace(/ *\n */g, '\n');
+        .replace(/ ?\n ?/g, '\n');
 
 export const getTrimmedInputText = (text: string, prefix = ''): string => text.slice(prefix.length).trim();
 

@@ -5,18 +5,79 @@ import {
     MetricPrefix,
     MetricType,
 } from '@/types/admin/main-page';
+import { TranslationStatus } from '@/types/common/language';
 import type { LocalizationLanguage } from '@/types/common/language';
 import {
     mapEntityWithLocalizations,
     mapLocalizationDtoToModel,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
-import { mapFormValuesToMainPagePatch, mapMainPageToFormValues } from './main-page-mappers';
+import {
+    mapFormValuesToMainPagePatch,
+    mapMainPageToFormValues,
+} from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 
 describe('main-page-mappers', () => {
     const languages: LocalizationLanguage[] = [
         { id: 1, code: 'uk', name: 'Українська' },
         { id: 2, code: 'en', name: 'English' },
     ];
+
+    it.each([false, true])(
+        'preserves hidden metric IDs and translations in publish payloads (edited metrics: %s)',
+        (edited) => {
+            const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
+                (type, index) => ({
+                    id: index + 1,
+                    name: 'Metric name',
+                    value: 123,
+                    type,
+                    isHidden: type === MetricType.Programs,
+                    priority: index,
+                    isAutoSynced: false,
+                    localizations: [
+                        {
+                            language: { id: 2, code: 'en' },
+                            translationStatus: TranslationStatus.Relevant,
+                            name: 'English metric',
+                            value: '123 translated',
+                        },
+                    ],
+                }),
+            );
+            const page: MainPage = {
+                id: 1,
+                title: 'Main title',
+                description: 'Main description',
+                image: null,
+                mainAboutUs: null,
+                mainDonations: null,
+                mainPartners: null,
+                localizations: [],
+                impactStatistics: { id: 2, title: 'Statistics title', localizations: [], metrics },
+            };
+            const currentMetrics = edited ? [...metrics].reverse() : undefined;
+
+            const patch = mapFormValuesToMainPagePatch(
+                { ...MAIN_PAGE_FORM_DEFAULTS, statisticsTitleUa: 'Updated statistics title' },
+                page,
+                languages,
+                currentMetrics,
+            );
+
+            expect(patch.impactStatistics!.metrics.map((metric) => metric.id)).toEqual(
+                (currentMetrics ?? metrics).map((metric) => metric.id),
+            );
+            expect(patch.impactStatistics!.metrics).toHaveLength(4);
+            expect(patch.impactStatistics!.metrics.find((metric) => metric.id === 2)).toEqual(
+                expect.objectContaining({
+                    id: 2,
+                    type: MetricType.Programs,
+                    value: 123,
+                    localization: { entityId: 2, languageId: 2, name: 'English metric', value: '123 translated' },
+                }),
+            );
+        },
+    );
 
     describe('Localization Utilities', () => {
         it('mapLocalizationDtoToModel maps localizationInfoDto to language', () => {

@@ -8,7 +8,7 @@ import {
     UpdateMetricVisibilityDto,
 } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
-import { MainPageApi } from './main-page-api';
+import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 
 describe('MainPageApi (Admin)', () => {
     let mockClient: any;
@@ -98,14 +98,14 @@ describe('MainPageApi (Admin)', () => {
     describe('get()', () => {
         it('should fetch main page and languages, and map all nested entities correctly', async () => {
             mockClient.get.mockImplementation((url: string) => {
-                if (url === API_ROUTES.MAIN_PAGE.BASE) return Promise.resolve({ data: fullMainPageDto });
+                if (url === API_ROUTES.MAIN_PAGE.ADMIN) return Promise.resolve({ data: fullMainPageDto });
                 if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) return Promise.resolve({ data: mockLanguages });
                 throw new Error(`Unexpected url ${url}`);
             });
 
             const result = await MainPageApi.get(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.BASE);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.ADMIN);
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
 
             expect(result.page.title).toBe('Main Title');
@@ -124,6 +124,40 @@ describe('MainPageApi (Admin)', () => {
             expect(result.languages).toEqual(mockLanguages);
         });
 
+        it('preserves all four metrics, hidden state, priority order and localizations from the admin response', async () => {
+            const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
+                (type, index) => ({
+                    ...fullMainPageDto.impactStatistics!.metrics![0],
+                    id: index + 10,
+                    type,
+                    priority: index,
+                    isHidden: type === MetricType.Programs,
+                }),
+            );
+            const dto = {
+                ...fullMainPageDto,
+                impactStatistics: { ...fullMainPageDto.impactStatistics!, metrics },
+            };
+            mockClient.get.mockImplementation((url: string) =>
+                Promise.resolve({ data: url === API_ROUTES.MAIN_PAGE.ADMIN ? dto : mockLanguages }),
+            );
+
+            const { page } = await MainPageApi.get(mockClient);
+
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.ADMIN);
+            expect(mockClient.get).not.toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.PUBLIC);
+            expect(
+                page.impactStatistics!.metrics.map(({ id, priority, isHidden }) => ({ id, priority, isHidden })),
+            ).toEqual(metrics.map(({ id, priority, isHidden }) => ({ id, priority, isHidden })));
+            expect(page.impactStatistics!.metrics[1].localizations[0]).toEqual(
+                expect.objectContaining({
+                    language: { id: 2, code: 'en' },
+                    name: 'En Metric 1',
+                    translationStatus: TranslationStatus.Relevant,
+                }),
+            );
+        });
+
         it('should handle null values for nested entities (AboutUs, Partners, Statistics)', async () => {
             const emptyDto: MainPageDto = {
                 id: 1,
@@ -137,7 +171,7 @@ describe('MainPageApi (Admin)', () => {
             };
 
             mockClient.get.mockImplementation((url: string) => {
-                if (url === API_ROUTES.MAIN_PAGE.BASE) return Promise.resolve({ data: emptyDto });
+                if (url === API_ROUTES.MAIN_PAGE.ADMIN) return Promise.resolve({ data: emptyDto });
                 if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) return Promise.resolve({ data: [] });
                 return Promise.resolve({ data: {} });
             });
@@ -161,7 +195,7 @@ describe('MainPageApi (Admin)', () => {
             };
 
             mockClient.get.mockImplementation((url: string) => {
-                if (url === API_ROUTES.MAIN_PAGE.BASE) return Promise.resolve({ data: dtoWithoutMetrics });
+                if (url === API_ROUTES.MAIN_PAGE.ADMIN) return Promise.resolve({ data: dtoWithoutMetrics });
                 if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) return Promise.resolve({ data: [] });
                 return Promise.resolve({ data: {} });
             });

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Metric } from '@/types/admin/main-page';
+import { Metric, MetricType } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
@@ -172,6 +172,19 @@ describe('StatisticsMetricsList', () => {
 
         const elements = screen.getAllByText('NoLocName');
         expect(elements).toHaveLength(2);
+    });
+
+    it('renders all four metrics including hidden rows and exposes visibility restoration', () => {
+        const allMetrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
+            (type, index) => ({ ...metricPartners, id: index + 1, type, isHidden: index === 1 }),
+        );
+        const { onToggleVisibility } = setup({ metrics: allMetrics, hiddenMetricIds: [2] });
+
+        expect(screen.getAllByTestId('draggable-row')).toHaveLength(4);
+        const restoreButton = screen.getByRole('button', { name: 'Show metric' });
+        expect(restoreButton).toBeEnabled();
+        fireEvent.click(restoreButton);
+        expect(onToggleVisibility).toHaveBeenCalledWith(2);
     });
 
     it('uses "Show metric" label when metric is hidden', () => {

@@ -1,3 +1,4 @@
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { MainPage, MainPageFormValues, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
@@ -55,6 +56,11 @@ jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
                 <button
                     data-testid="toggle-second-metric"
                     onClick={() => onToggleVisibility(metrics[1]?.id ?? 0)}
+                    type="button"
+                />
+                <button
+                    data-testid="reverse-all-metrics"
+                    onClick={() => onReorder([...metrics].reverse())}
                     type="button"
                 />
                 <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
@@ -261,6 +267,46 @@ describe('StatisticsBlockForm', () => {
         await waitFor(() => {
             expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
         });
+    });
+
+    it('retains all four metrics after load, reorders hidden metrics and restores their visibility', async () => {
+        const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
+        (useAdminClient as jest.Mock).mockReturnValue({});
+        const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
+            (type, index) => ({
+                ...mockInitialData.impactStatistics!.metrics[0],
+                id: index + 101,
+                type,
+                isHidden: index === 0,
+                priority: index,
+            }),
+        );
+        renderComponent({
+            initialData: { ...mockInitialData, impactStatistics: { ...mockInitialData.impactStatistics!, metrics } },
+        });
+
+        expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '4');
+        expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+
+        await waitFor(() => {
+            expect(MainPageApi.updateMetricVisibility).toHaveBeenCalledWith(expect.anything(), 101, {
+                isHidden: false,
+            });
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '');
+        });
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+        await waitFor(() => expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101'));
+        fireEvent.click(screen.getByTestId('reverse-all-metrics'));
+
+        await waitFor(() => {
+            expect(MainPageApi.reorderMetrics).toHaveBeenCalledWith(expect.anything(), {
+                statisticId: 1,
+                orderedIds: [104, 103, 102, 101],
+            });
+        });
+        expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '4');
+        expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
     });
 
     it('updates metrics order when reorder is triggered', async () => {

@@ -52,6 +52,10 @@ export const CardContent = ({
         });
     };
 
+    const handleImageError = (error: string | null) => {
+        setImageError(error === IMAGE_VALIDATION.getFormatError() ? WHO_WE_ARE_TEXT.IMAGE.FORMAT_ERROR : error);
+    };
+
     const handleDescriptionChange = (value: string) => {
         setDescriptionError(null);
         onDescriptionValidate(null);
@@ -80,7 +84,7 @@ export const CardContent = ({
                 onChange={handleImageChange}
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                 variant="whoWeAre"
-                setError={setImageError}
+                setError={handleImageError}
                 disabled={!isBaseLanguage}
                 {...imageInputProps}
                 style={responsiveImageStyle}

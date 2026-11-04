@@ -3,6 +3,7 @@ import { WhoWeAreImageConfigParams } from '@/pages/admin/who-we-are/components/s
 export const WHO_WE_ARE_TEXT = {
     IMAGE: {
         INPUT: 'Додайте файл сюди',
+        FORMAT_ERROR: 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
     },
     WHAT_WE_DO: 'Що ми робимо',
     GO_TO_PROGRAMS: 'Перейти до програм',

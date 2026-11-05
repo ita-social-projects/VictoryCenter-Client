@@ -16,7 +16,7 @@ type ContextType = {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: Credentials) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     refreshAccessToken: () => Promise<void>;
 };
 
@@ -60,7 +60,7 @@ export const AdminContextProvider = ({ children }: Props) => {
                 try {
                     await refreshAccessToken();
                 } catch {
-                    logout();
+                    await logout().catch(() => updateToken(''));
                 } finally {
                     setIsLoading(false);
                 }

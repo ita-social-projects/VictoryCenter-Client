@@ -1,5 +1,5 @@
 import './LoginForm.scss';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ReactComponent as Logo } from '@/assets/icons/logo-with-text.svg';
 import { ReactComponent as EyeOpened } from '@/assets/icons/eye-opened.svg';
@@ -9,15 +9,18 @@ import { LOGIN_CONST } from '@/const/admin/login';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { useAdminContext } from '@/contexts/admin/admin-context-provider/AdminContextProvider';
 import { Credentials } from '@/types/admin/auth';
+import { getLoginErrorType, LoginErrorType } from '@/utils/functions/get-login-error-type/get-login-error-type';
 
 type LoginFormProps = {
-    setShowErrorModal: (value: boolean) => void;
+    onLoginError: (type: LoginErrorType) => void;
 };
 
-export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
+export const LoginForm = ({ onLoginError }: LoginFormProps) => {
     const { login } = useAdminContext();
     const [credentials, setCredentials] = useState<Credentials>({ email: '', password: '' });
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const isSubmittingRef = useRef<boolean>(false);
 
     const handleChange = (field: keyof Credentials) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials((prev) => ({ ...prev, [field]: e.target.value }));
@@ -26,15 +29,22 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSubmittingRef.current) return;
+
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
         try {
             await login(credentials);
         } catch (error) {
-            setShowErrorModal(true);
+            onLoginError(getLoginErrorType(error));
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
+        <form onSubmit={handleSubmit} className="login-form" spellCheck={false} aria-busy={isSubmitting}>
             <NavLink to={PUBLIC_ROUTES.ROOT}>
                 <Logo />
             </NavLink>
@@ -74,8 +84,8 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                 </div>
             </div>
             <div className="login-form-group">
-                <Button type="submit" buttonStyle="primary" className="submit-button">
-                    {LOGIN_CONST.FORM.SUBMIT_BUTTON}
+                <Button type="submit" buttonStyle="primary" className="submit-button" disabled={isSubmitting}>
+                    {isSubmitting ? LOGIN_CONST.FORM.SUBMIT_BUTTON_LOADING : LOGIN_CONST.FORM.SUBMIT_BUTTON}
                 </Button>
             </div>
         </form>

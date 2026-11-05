@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import * as AdminContext from '@/contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
 import { MemoryRouter } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import { LOGIN_CONST } from '@/const/admin/login';
 
 jest.mock('@/assets/icons/logo-with-text.svg', () => ({
@@ -39,7 +40,7 @@ describe('<LoginForm />', () => {
     it('renders logo, title, inputs, toggle and submit button', () => {
         render(
             <MemoryRouter>
-                <LoginForm setShowErrorModal={jest.fn()} />
+                <LoginForm onLoginError={jest.fn()} />
             </MemoryRouter>,
         );
 
@@ -62,7 +63,7 @@ describe('<LoginForm />', () => {
     it('updates email and password inputs on change', () => {
         render(
             <MemoryRouter>
-                <LoginForm setShowErrorModal={jest.fn()} />
+                <LoginForm onLoginError={jest.fn()} />
             </MemoryRouter>,
         );
 
@@ -83,7 +84,7 @@ describe('<LoginForm />', () => {
     it('toggles password visibility and icon', () => {
         render(
             <MemoryRouter>
-                <LoginForm setShowErrorModal={jest.fn()} />
+                <LoginForm onLoginError={jest.fn()} />
             </MemoryRouter>,
         );
 
@@ -100,12 +101,12 @@ describe('<LoginForm />', () => {
     });
 
     it('calls login with credentials on submit (success)', async () => {
-        const setShowErrorModal = jest.fn();
+        const onLoginError = jest.fn();
         loginMock.mockResolvedValueOnce();
 
         render(
             <MemoryRouter>
-                <LoginForm setShowErrorModal={setShowErrorModal} />
+                <LoginForm onLoginError={onLoginError} />
             </MemoryRouter>,
         );
 
@@ -124,20 +125,85 @@ describe('<LoginForm />', () => {
                 password: 'secret',
             }),
         );
-        expect(setShowErrorModal).not.toHaveBeenCalled();
+        expect(onLoginError).not.toHaveBeenCalled();
     });
 
-    it('shows error modal on login failure', async () => {
-        const setShowErrorModal = jest.fn();
-        loginMock.mockRejectedValueOnce(new Error('fail'));
-
+    const renderForm = (onLoginError = jest.fn()) =>
         render(
             <MemoryRouter>
-                <LoginForm setShowErrorModal={setShowErrorModal} />
+                <LoginForm onLoginError={onLoginError} />
             </MemoryRouter>,
         );
 
+    const createAxiosError = (status: number) =>
+        new AxiosError('Request failed', 'ERR_BAD_REQUEST', undefined, undefined, {
+            status,
+            statusText: '',
+            headers: {},
+            config: {} as never,
+            data: null,
+        });
+
+    it('reports invalid-credentials on 401 response', async () => {
+        const onLoginError = jest.fn();
+        loginMock.mockRejectedValueOnce(createAxiosError(401));
+        renderForm(onLoginError);
+
         fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
-        await waitFor(() => expect(setShowErrorModal).toHaveBeenCalledWith(true));
+        await waitFor(() => expect(onLoginError).toHaveBeenCalledWith('invalid-credentials'));
+    });
+
+    it('reports service-error on network failure', async () => {
+        const onLoginError = jest.fn();
+        loginMock.mockRejectedValueOnce(new AxiosError('Network Error', 'ERR_NETWORK'));
+        renderForm(onLoginError);
+
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
+        await waitFor(() => expect(onLoginError).toHaveBeenCalledWith('service-error'));
+    });
+
+    it('reports service-error on server failure', async () => {
+        const onLoginError = jest.fn();
+        loginMock.mockRejectedValueOnce(createAxiosError(500));
+        renderForm(onLoginError);
+
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
+        await waitFor(() => expect(onLoginError).toHaveBeenCalledWith('service-error'));
+    });
+
+    it('disables submit and shows loading label while request is in flight, then re-enables', async () => {
+        let rejectLogin: (reason: unknown) => void = () => {};
+        loginMock.mockImplementationOnce(
+            () =>
+                new Promise<void>((_, reject) => {
+                    rejectLogin = reject;
+                }),
+        );
+        const { container } = renderForm();
+
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
+
+        const loadingButton = await screen.findByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON_LOADING });
+        expect(loadingButton).toBeDisabled();
+        expect(container.querySelector('form')).toHaveAttribute('aria-busy', 'true');
+
+        rejectLogin(createAxiosError(401));
+
+        const submitButton = await screen.findByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON });
+        expect(submitButton).toBeEnabled();
+        expect(container.querySelector('form')).toHaveAttribute('aria-busy', 'false');
+    });
+
+    it('ignores repeated submissions while a login request is pending', async () => {
+        loginMock.mockImplementation(() => new Promise<void>(() => {}));
+        const { container } = renderForm();
+        const form = container.querySelector('form') as HTMLFormElement;
+
+        fireEvent.submit(form);
+        fireEvent.submit(form);
+        fireEvent.submit(form);
+
+        await screen.findByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON_LOADING });
+        expect(loginMock).toHaveBeenCalledTimes(1);
     });
 });

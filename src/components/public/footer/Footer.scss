@@ -177,16 +177,19 @@
 
     .scrolling-text-wrapper {
         width: 100%;
-        height: 12rem;
+        height: 10.875rem;
         overflow: hidden;
         padding: 0;
+        display: flex;
+        align-items: center;
     }
 
     .scrolling-text {
         display: inline-block;
         white-space: nowrap;
+        line-height: 8.24rem;
         margin: 0;
-        font-size: 12rem;
+        font-size: 11.35rem;
         font-weight: 900;
         animation:
             scroll-left 30s linear infinite,
@@ -285,14 +288,6 @@
                 align-self: flex-start;
                 gap: 1.25rem;
             }
-        }
-
-        .scrolling-text {
-            font-size: 10rem;
-        }
-
-        .scrolling-text-wrapper {
-            height: 10rem;
         }
     }
 }
@@ -402,9 +397,6 @@
             }
         }
 
-        .scrolling-text {
-            font-size: 8rem;
-        }
     }
 }
 
@@ -524,13 +516,6 @@
             }
         }
 
-        .scrolling-text {
-            font-size: 6rem;
-        }
-
-        .scrolling-text-wrapper {
-            height: 8rem;
-        }
     }
 }
 
@@ -659,12 +644,5 @@
             }
         }
 
-        .scrolling-text {
-            font-size: 4rem;
-        }
-
-        .scrolling-text-wrapper {
-            height: 6rem;
-        }
     }
 }

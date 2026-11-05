@@ -96,20 +96,15 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
     if (!isOpen) return null;
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+        e.stopPropagation();
         if (e.target === e.currentTarget && !mouseDownInsideModal.current) {
             onClose();
         }
         mouseDownInsideModal.current = false;
     };
 
-    const handleOnMouseDownModal = () => {
-        mouseDownInsideModal.current = true;
-    };
-
-    const handleMouseDownOverlay = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            mouseDownInsideModal.current = false;
-        }
+    const handlePointerDownCapture = (e: React.PointerEvent<HTMLDivElement>) => {
+        mouseDownInsideModal.current = e.target !== e.currentTarget;
     };
 
     return createPortal(
@@ -117,7 +112,7 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
             data-testid="modal-overlay"
             className="modal-overlay"
             onClick={handleOverlayClick}
-            onMouseDown={handleMouseDownOverlay}
+            onPointerDownCapture={handlePointerDownCapture}
             tabIndex={0}
             role="button"
             onKeyDown={handleOverlayClick}
@@ -133,7 +128,6 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
                     },
                     className,
                 )}
-                onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}

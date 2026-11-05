@@ -6,5 +6,12 @@
         "SECOND_TEXT": "Це —",
         "SECOND_HIGHLIGHT": "простір",
         "THIRD_HIGHLIGHT": "взаємодії"
-    }
+    },
+    "ALT": {
+        "INTRO_IMAGE": "Людина і кінь",
+        "QUOTE_IMAGE": "Людина і кінь",
+        "ANOTHER_QUOTE_IMAGE": "Людина і кінь",
+        "ETHICS_IMAGE": "Група людей на конях"
+    },
+    "DOWNLOAD_ERROR": "Не вдалося завантажити сторінку"
 }

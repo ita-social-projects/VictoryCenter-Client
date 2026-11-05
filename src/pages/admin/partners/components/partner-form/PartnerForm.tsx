@@ -140,6 +140,8 @@ const PartnerFormComponent = ({
                         isRequired={true}
                         disabled={disabled || !isBaseLanguage}
                         rows={3}
+                        autoGrow={true}
+                        maxRows={0}
                     />
                 </div>
             </div>

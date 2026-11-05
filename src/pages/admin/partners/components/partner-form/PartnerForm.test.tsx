@@ -67,6 +67,8 @@ jest.mock(
             id,
             placeholder,
             error,
+            autoGrow,
+            maxRows,
         }: TextAreaWithCharacterLimitGroupProps) => (
             <label htmlFor={id}>
                 <span>{label}</span>
@@ -78,6 +80,8 @@ jest.mock(
                     disabled={disabled}
                     placeholder={placeholder}
                     name={name}
+                    data-auto-grow={autoGrow}
+                    data-max-rows={maxRows}
                 />
                 {error && <div data-testid={`${id}-error`}>{error}</div>}
             </label>
@@ -174,6 +178,13 @@ describe('PartnerForm', () => {
         expect(header).toContainElement(getDeleteButton());
         expect(screen.getByPlaceholderText(PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER)).toBeInTheDocument();
         expect(getDescriptionTextarea()).toHaveValue(defaultValues.description);
+    });
+
+    it('lets the description grow to fit the full text without a row cap (#2714)', () => {
+        renderComponent({});
+
+        expect(getDescriptionTextarea()).toHaveAttribute('data-auto-grow', 'true');
+        expect(getDescriptionTextarea()).toHaveAttribute('data-max-rows', '0');
     });
 
     it('validates and propagates description changes', () => {

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection, FundsExpenditureSectionProps } from './FundsExpendituresSection';
 import {
@@ -317,11 +317,13 @@ jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpen
         isOpen,
         onClose,
         transactionType,
+        categories,
         onSubmit,
     }: {
         isOpen: boolean;
         onClose: () => void;
         transactionType: 'income' | 'expense';
+        categories: { id: number; name: string }[];
         onSubmit: (data: {
             categoryId: number;
             reportingYear: string;
@@ -330,7 +332,12 @@ jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpen
             type: 'income' | 'expense';
         }) => Promise<boolean>;
     }) => (
-        <div data-testid="add-record-modal" data-open={String(isOpen)} data-type={transactionType}>
+        <div
+            data-testid="add-record-modal"
+            data-open={String(isOpen)}
+            data-type={transactionType}
+            data-category-count={categories.length}
+        >
             <button data-testid="add-record-close" onClick={onClose}>
                 Close add record
             </button>
@@ -652,26 +659,26 @@ describe('FundsExpenditureSection', () => {
         expect(screen.getByTestId('selected-category-id')).toHaveTextContent('none');
     });
 
-    it('should pass all categories to toolbar when income type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when income type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-income'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
-    it('should pass all categories to toolbar when expense type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when expense type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-expense'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
-    it('should pass all categories to toolbar when no type is selected', () => {
+    it('should pass all non-reserved categories to toolbar when no type is selected', () => {
         render(<FundsExpenditureSection />);
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 
     describe('edit mode', () => {
@@ -954,6 +961,72 @@ describe('FundsExpenditureSection', () => {
         });
     });
 
+    describe('summary cards', () => {
+        const getCard = (title: string) => {
+            const card = screen.getAllByTestId('summary-card').find((c) => c.getAttribute('data-title') === title);
+            expect(card).toBeDefined();
+            return within(card!);
+        };
+
+        const expectAmounts = (title: string, uah: number, usd: number) => {
+            expect(getCard(title).getByTestId('uah')).toHaveTextContent(String(uah));
+            expect(getCard(title).getByTestId('usd')).toHaveTextContent(String(usd));
+        };
+
+        const expectCount = (title: string, count: number) => {
+            expect(getCard(title).getByTestId('count')).toHaveTextContent(String(count));
+        };
+
+        it('shows the server summary in view mode', () => {
+            setupMockDataFetch(undefined, undefined, undefined, {
+                totalCollectedUah: 1,
+                totalCollectedUsd: 2,
+                totalSpentUah: 3,
+                totalSpentUsd: 4,
+                incomeCategories: 5,
+                expenseCategories: 6,
+            });
+            render(<FundsExpenditureSection />);
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 1, 2);
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT, 3, 4);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 5);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES, 6);
+        });
+
+        it('calculates the cards from the current records in edit mode', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 15465, 8950);
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT, 14250, 8260);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 3);
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES, 4);
+        });
+
+        it('recalculates the cards right after a record is added, before publishing', () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
+
+            expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 16465, 8975);
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
+        });
+
+        it('recalculates the cards right after a record is deleted, before publishing', async () => {
+            render(<FundsExpenditureSection isEditing />);
+
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expectAmounts(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED, 8200, 4750);
+            });
+            expectCount(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES, 2);
+            expect(mockBatchSaveRecords).not.toHaveBeenCalled();
+        });
+    });
+
     describe('disclaimer validation', () => {
         beforeEach(() => {
             jest.clearAllMocks();
@@ -1199,39 +1272,38 @@ describe('FundsExpenditureSection', () => {
         });
     });
 
-    describe('delete category modal', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+    describe('reserved "Програмні"-like categories', () => {
+        beforeEach(() => {
             setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
-            render(<FundsExpenditureSection isDeleteCategoryModalOpen onDeleteCategoryModalClose={jest.fn()} />);
+        });
 
-            fireEvent.click(
-                screen.getByRole('button', {
-                    name: FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
-                }),
-            );
+        it.each<[string, Partial<FundsExpenditureSectionProps>, string]>([
+            [
+                'delete category',
+                { isDeleteCategoryModalOpen: true, onDeleteCategoryModalClose: jest.fn() },
+                FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
+            ],
+            [
+                'edit category',
+                { isEditCategoryModalOpen: true, onEditCategoryModalClose: jest.fn() },
+                FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
+            ],
+        ])('are excluded from the %s dropdown', (_, props, placeholder) => {
+            render(<FundsExpenditureSection {...props} />);
 
-            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            fireEvent.click(screen.getByRole('button', { name: placeholder }));
+
+            ['ПРОГРАМНІ', 'програмні тест', 'Програмні тест 2'].forEach((name) => {
+                expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
+            });
             expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
         });
-    });
 
-    describe('edit category modal', () => {
-        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
-            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
-            render(<FundsExpenditureSection isEditCategoryModalOpen onEditCategoryModalClose={jest.fn()} />);
+        it('are excluded from the toolbar category filter and the add record modal', () => {
+            render(<FundsExpenditureSection />);
 
-            fireEvent.click(
-                screen.getByRole('button', {
-                    name: FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
-                }),
-            );
-
-            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '1');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-category-count', '1');
         });
     });
 });

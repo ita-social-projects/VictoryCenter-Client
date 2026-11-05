@@ -32,6 +32,7 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 import { isReservedFundsExpendituresCategoryName } from '@/utils/functions/is-reserved-funds-expenditures-category-name/is-reserved-funds-expenditures-category-name';
+import { calculateFundsExpendituresSummary } from '@/utils/functions/calculate-funds-expenditures-summary/calculate-funds-expenditures-summary';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
@@ -413,6 +414,11 @@ export const FundsExpenditureSection = ({
     }, [settings?.programExpendituresReportingYear]);
 
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
+
+    const displayedSummary = useMemo(
+        () => (isEditing ? calculateFundsExpendituresSummary(recordsState) : summary),
+        [isEditing, recordsState, summary],
+    );
 
     const filteredCategories = useMemo(
         (): ReportFundsExpendituresCategory[] => [...categories].sort((a, b) => a.name.localeCompare(b.name, 'uk')),
@@ -906,28 +912,28 @@ export const FundsExpenditureSection = ({
             <div className={styles['summary-cards']}>
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED}
-                    uah={summary.totalCollectedUah}
-                    usd={summary.totalCollectedUsd}
+                    uah={displayedSummary.totalCollectedUah}
+                    usd={displayedSummary.totalCollectedUsd}
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT}
-                    uah={summary.totalSpentUah}
-                    usd={summary.totalSpentUsd}
+                    uah={displayedSummary.totalSpentUah}
+                    usd={displayedSummary.totalSpentUsd}
                     blueThemeCard
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES}
-                    count={summary.incomeCategories}
+                    count={displayedSummary.incomeCategories}
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES}
-                    count={summary.expenseCategories}
+                    count={displayedSummary.expenseCategories}
                     blueThemeCard
                 />
             </div>
 
             <FundsExpendituresToolbar
-                categories={filteredCategories}
+                categories={manageableCategories}
                 selectedType={selectedType}
                 selectedCategoryId={selectedCategoryId}
                 exchangeRate={currentExchangeRate}
@@ -968,7 +974,7 @@ export const FundsExpenditureSection = ({
                 isOpen={activeRecordModalType !== null}
                 onClose={handleCloseAddIncomeModal}
                 transactionType={activeRecordModalType ?? 'income'}
-                categories={categories}
+                categories={manageableCategories}
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}

@@ -99,6 +99,7 @@ export const API_ROUTES = {
     FEEDBACK_HISTORIES: {
         BASE: 'FeedbackHistories',
         PUBLISHED: 'FeedbackHistories/published',
+        LATEST_PUBLISHED: 'FeedbackHistories/published/latest',
     },
     FEEDBACK_REVIEWS: {
         BASE: 'FeedbackReviews',

@@ -6,6 +6,8 @@ import {
     DEFAULT_ENGLISH_LANGUAGE_ID,
 } from '@/const/common/locales';
 import { LocalizationLanguage, EntityLocalization, TranslationStatus } from '@/types/common/language';
+import { ReactNode } from 'react';
+import { HippotherapyReadOnlyContext } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export const mockTranslationLanguages: LocalizationLanguage[] = [
     {
@@ -47,5 +49,32 @@ export const itRendersTranslationStatuses = (renderComponent: (props?: any) => v
         });
 
         expect(screen.queryByTestId('localization-statuses')).not.toBeInTheDocument();
+    });
+};
+
+export const withReadOnlyContext = (ui: ReactNode, isReadOnly: boolean) => (
+    <HippotherapyReadOnlyContext.Provider value={isReadOnly}>{ui}</HippotherapyReadOnlyContext.Provider>
+);
+
+export const itHidesToolbarWhenReadOnly = (
+    renderSection: (isReadOnly: boolean) => unknown,
+    richInputTestIds: string[],
+) => {
+    describe('read-only mode toolbar', () => {
+        it('shows toolbar when isReadOnly is false', () => {
+            renderSection(false);
+
+            richInputTestIds.forEach((testId) => {
+                expect(screen.getByTestId(testId)).toHaveAttribute('data-hide-toolbar', 'false');
+            });
+        });
+
+        it('hides toolbar when isReadOnly is true', () => {
+            renderSection(true);
+
+            richInputTestIds.forEach((testId) => {
+                expect(screen.getByTestId(testId)).toHaveAttribute('data-hide-toolbar', 'true');
+            });
+        });
     });
 };

@@ -50,6 +50,14 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 onChange={(e) => !disabled && onChange(e.target.files?.[0])}
             />
             <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
+            <button
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    if (!disabled) setError(IMAGE_VALIDATION.getFormatError());
+                }}
+            >
+                Set Format Error
+            </button>
         </div>
     ),
 }));
@@ -161,6 +169,14 @@ describe('CardContent', () => {
             ...baseContent,
             image: file,
         });
+    });
+
+    it('should map the shared format error to the who we are format error', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByText('Set Format Error'));
+
+        expect(mockSetImageError).toHaveBeenCalledWith(WHO_WE_ARE_TEXT.IMAGE.FORMAT_ERROR);
     });
 
     it('should display description validation error on blur', () => {

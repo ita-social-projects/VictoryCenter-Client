@@ -4,7 +4,10 @@ import { HippoventionCenterSection, HippoventionCenterSectionProps } from './Hip
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-page';
-import { itRendersTranslationStatuses } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import {
+    itHidesToolbarWhenReadOnly,
+    itRendersTranslationStatuses,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
 import {
     itDisablesInputsWhenDisabled,
     itHandlesImageField,
@@ -13,6 +16,7 @@ import {
     itUpdatesFieldsOnChange,
     setupValidateTextMock,
 } from '@/utils/mock-data/admin/hippotherapy-section-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
 
 jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
@@ -34,8 +38,12 @@ describe('HippoventionCenterSection', () => {
         imageId: null,
     };
 
-    const renderComponent = (props: Partial<HippoventionCenterSectionProps> = {}) =>
-        render(<HippoventionCenterSection value={defaultValue} onChange={jest.fn()} {...props} />);
+    const renderComponent = (props: Partial<HippoventionCenterSectionProps> = {}, isReadOnly = false) =>
+        render(
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <HippoventionCenterSection value={defaultValue} onChange={jest.fn()} {...props} />
+            </HippotherapyReadOnlyContext.Provider>,
+        );
 
     it('renders title, image, pros, and description', () => {
         renderComponent();
@@ -61,5 +69,16 @@ describe('HippoventionCenterSection', () => {
 
     describe('translation statuses', () => {
         itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            [
+                'mock-rich-input-hippovention-center-title',
+                'mock-rich-input-hippovention-center-pros',
+                'mock-rich-input-hippovention-center-description',
+            ],
+        );
     });
 });

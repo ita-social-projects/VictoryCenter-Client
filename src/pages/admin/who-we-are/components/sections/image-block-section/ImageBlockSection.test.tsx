@@ -25,6 +25,14 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
             <button
                 onClick={() => {
                     const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    if (!disabled) setError(IMAGE_VALIDATION.getFormatError());
+                }}
+            >
+                Set Format Error
+            </button>
+            <button
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
                     if (!disabled) setError(IMAGE_VALIDATION.ImageDimensionsTooSmallError);
                 }}
             >
@@ -240,6 +248,14 @@ describe('ImageSection', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Set Error' }));
 
         expect(await screen.findByText('image size error')).toBeInTheDocument();
+    });
+
+    it('should map the shared format error to the who we are format error', async () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Set Format Error' }));
+
+        expect(await screen.findByTestId('image-error')).toHaveTextContent(WHO_WE_ARE_TEXT.IMAGE.FORMAT_ERROR);
     });
 
     it('should highlight the image input only for a dimensions-too-small error', () => {

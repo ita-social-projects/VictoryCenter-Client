@@ -112,4 +112,10 @@ export const itSupportsTranslateButton = (renderComponent: RenderSection) => {
 
         expect(getButton()).toBeDisabled();
     });
+
+    it('keeps the translation icon enabled when disabled is true but isTranslateDisabled is false', () => {
+        renderComponent({ onTranslateClick: jest.fn(), disabled: true, isTranslateDisabled: false });
+
+        expect(getButton()).toBeEnabled();
+    });
 };

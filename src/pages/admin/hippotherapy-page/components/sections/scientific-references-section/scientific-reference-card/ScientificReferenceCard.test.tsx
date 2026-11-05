@@ -193,11 +193,13 @@ describe('ScientificReferenceCard', () => {
         expect(mockOnTranslateClick).not.toHaveBeenCalled();
     });
 
-    it('disables the translate button when disabled is true', () => {
+    it('does NOT disable the translate button when only disabled is true (allows translation in read-only mode)', () => {
         const mockOnTranslateClick = jest.fn();
+
         renderComponent({ onTranslateClick: mockOnTranslateClick, disabled: true });
 
         const translateButton = screen.getByLabelText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
-        expect(translateButton).toBeDisabled();
+
+        expect(translateButton).toBeEnabled();
     });
 });

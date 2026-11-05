@@ -7,6 +7,7 @@ import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './TextCardSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface TextCardSectionProps {
     value: HippotherapyTextCardContent;
@@ -17,6 +18,7 @@ export interface TextCardSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const TextCardSectionComponent = ({
@@ -28,17 +30,22 @@ const TextCardSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: TextCardSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
+
+    const isReadOnly = useHippotherapyReadOnly();
 
     return (
         <div className="hippotherapy-text-card-section">
@@ -61,6 +68,7 @@ const TextCardSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_TITLE}
                     error={title.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -73,6 +81,7 @@ const TextCardSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.TEXT_CARD_DESCRIPTION}
                     error={description.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
             </div>
         </div>

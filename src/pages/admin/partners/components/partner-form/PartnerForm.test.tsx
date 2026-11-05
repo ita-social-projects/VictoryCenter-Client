@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerForm, PartnerFormValues, PartnerFormErrors } from './PartnerForm';
-import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { PARTNERS_TEXT, PARTNER_VALIDATION } from '@/const/admin/partners';
 import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
 import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
@@ -50,6 +50,17 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 disabled={disabled}
             >
                 Set Large Error
+            </button>
+            <button
+                type="button"
+                data-testid={`${id}-set-format-error`}
+                onClick={() => {
+                    const { IMAGE_VALIDATION } = require('@/const/admin/image');
+                    setError(IMAGE_VALIDATION.getFormatError());
+                }}
+                disabled={disabled}
+            >
+                Set Format Error
             </button>
         </div>
     ),
@@ -126,6 +137,7 @@ describe('PartnerForm', () => {
     const getImageRemoveButton = () => screen.getByTestId(`${imageTestId}-remove`);
     const getImageSetErrorButton = () => screen.getByTestId(`${imageTestId}-set-error`);
     const getImageSetLargeErrorButton = () => screen.getByTestId(`${imageTestId}-set-large-error`);
+    const getImageSetFormatErrorButton = () => screen.getByTestId(`${imageTestId}-set-format-error`);
     const getDeleteButton = () => screen.queryByTestId(`partner-form-delete-button-${cardHtmlId}`);
     const getDescriptionError = () => screen.queryByTestId(`${descriptionTestId}-error`);
     const getImageError = () => screen.queryByTestId('input-error');
@@ -137,6 +149,7 @@ describe('PartnerForm', () => {
     const clickImageRemove = () => fireEvent.click(getImageRemoveButton());
     const clickImageSetError = () => fireEvent.click(getImageSetErrorButton());
     const clickImageSetLargeError = () => fireEvent.click(getImageSetLargeErrorButton());
+    const clickImageSetFormatError = () => fireEvent.click(getImageSetFormatErrorButton());
     const clickDelete = () => {
         const button = getDeleteButton();
         if (button) fireEvent.click(button);
@@ -253,6 +266,17 @@ describe('PartnerForm', () => {
         clickImageSetLargeError();
 
         expect(onValuesChange).not.toHaveBeenCalled();
+    });
+
+    it('maps the shared format error to the partner format error', () => {
+        renderComponent({});
+
+        clickImageSetFormatError();
+
+        expect(onValuesChange).toHaveBeenCalledWith(
+            { ...defaultValues },
+            { ...defaultErrors, image: PARTNER_VALIDATION.image.getFormatError() },
+        );
     });
 
     it('renders errors when provided', () => {

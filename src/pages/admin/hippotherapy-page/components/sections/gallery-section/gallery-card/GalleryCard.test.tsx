@@ -3,6 +3,8 @@ import '@testing-library/jest-dom';
 import { GalleryCard } from './GalleryCard';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HippotherapyGalleryCardContent } from '@/types/admin/hippotherapy-page';
+import { itHidesToolbarWhenReadOnly } from '@/utils/mock-data/admin/section-translation-test-helpers';
+import { HippotherapyReadOnlyContext } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -19,16 +21,19 @@ describe('GalleryCard', () => {
         imageId: null,
     };
 
-    const renderComponent = (props = {}) =>
+    const renderComponent = (props = {}, isReadOnly = false) =>
         render(
-            <GalleryCard
-                card={card}
-                fieldId="test-card-0"
-                onDescriptionChange={onDescriptionChange}
-                onImageChange={onImageChange}
-                onImageError={onImageError}
-                {...props}
-            />,
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <GalleryCard
+                    card={card}
+                    fieldId="test-card-0"
+                    onDescriptionChange={onDescriptionChange}
+                    onImageChange={onImageChange}
+                    onImageError={onImageError}
+                    {...props}
+                />
+                ,
+            </HippotherapyReadOnlyContext.Provider>,
         );
 
     beforeEach(() => {
@@ -97,5 +102,12 @@ describe('GalleryCard', () => {
 
         expect(screen.getByTestId('mock-image-input-file')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-card-0-description')).toBeDisabled();
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            ['mock-rich-input-test-card-0-description'],
+        );
     });
 });

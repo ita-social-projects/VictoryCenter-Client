@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -15,6 +15,7 @@ import { SectionTranslationHeader } from '../../section-translation-header/Secti
 import { ScientificReferenceCard } from './scientific-reference-card/ScientificReferenceCard';
 import './ScientificReferencesSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface ScientificReferencesSectionProps {
     value: HippotherapyScientificReferencesSectionContent;
@@ -28,6 +29,7 @@ export interface ScientificReferencesSectionProps {
     isTranslateReferenceDisabled?: (localId: string) => boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
@@ -51,16 +53,19 @@ const ScientificReferencesSectionComponent = ({
     isTranslateReferenceDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: ScientificReferencesSectionProps) => {
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
+        languageCode,
     });
 
     const [nameErrors, setNameErrors] = useState<Record<string, string | undefined>>({});
@@ -68,6 +73,14 @@ const ScientificReferencesSectionComponent = ({
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [newReferenceLocalId, setNewReferenceLocalId] = useState<string | null>(null);
     const [referenceToDeleteLocalId, setReferenceToDeleteLocalId] = useState<string | null>(null);
+    const isReadOnly = useHippotherapyReadOnly();
+
+    useEffect(() => {
+        if (languageCode !== undefined) {
+            setNameErrors({});
+            setUrlErrors({});
+        }
+    }, [languageCode]);
 
     const areAllReferencesValid = useMemo(
         () =>
@@ -203,6 +216,7 @@ const ScientificReferencesSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_TITLE}
                     error={title.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
                 <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -215,6 +229,7 @@ const ScientificReferencesSectionComponent = ({
                     maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.RESEARCH_DESCRIPTION}
                     error={description.error}
                     disabled={disabled}
+                    hideToolbar={isReadOnly}
                 />
             </div>
             <div className="scientific-references-section-list">

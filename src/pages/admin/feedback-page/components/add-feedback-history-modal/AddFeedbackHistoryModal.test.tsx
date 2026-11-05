@@ -211,32 +211,38 @@ describe('AddFeedbackHistoryModal', () => {
             });
         });
 
-        it('keeps focus and defers required validation when clearing a valid field', async () => {
-            const user = userEvent.setup();
-            renderModal();
-            const input = screen.getByRole('textbox', { name: new RegExp(label()) });
+        it.each(['A valid story', 'Short'])(
+            'clears stale errors and defers required validation when clearing %s',
+            async (value) => {
+                const user = userEvent.setup();
+                renderModal();
+                const input = screen.getByRole('textbox', { name: new RegExp(label()) });
 
-            await user.type(input, 'A valid story');
-            await user.tab();
-            await waitFor(() => expect(input).toHaveAttribute('aria-invalid', 'false'));
-            await user.click(input);
-            await user.click(
-                screen
-                    .getAllByRole('button', { name: 'Clear input' })
-                    .filter((button) => !button.hasAttribute('disabled'))[0],
-            );
+                await user.type(input, value);
+                await user.tab();
+                const isTooShort = value.length < FEEDBACK_HISTORY_VALIDATION[fieldName].min;
+                await waitFor(() => expect(input).toHaveAttribute('aria-invalid', String(isTooShort)));
+                expect(screen.queryByText(minError()) !== null).toBe(isTooShort);
+                await user.click(input);
+                await user.click(
+                    screen
+                        .getAllByRole('button', { name: 'Clear input' })
+                        .filter((button) => !button.hasAttribute('disabled'))[0],
+                );
 
-            expect(input).toHaveFocus();
-            expect(input).toHaveValue('');
-            expect(screen.queryByText(requiredError())).not.toBeInTheDocument();
-            expect(input).toHaveAttribute('aria-invalid', 'false');
+                expect(input).toHaveFocus();
+                expect(input).toHaveValue('');
+                expect(screen.queryByText(minError())).not.toBeInTheDocument();
+                expect(screen.queryByText(requiredError())).not.toBeInTheDocument();
+                expect(input).toHaveAttribute('aria-invalid', 'false');
 
-            await user.tab();
-            await waitFor(() => {
-                expect(screen.getByText(requiredError())).toBeInTheDocument();
-                expect(input).toHaveAttribute('aria-invalid', 'true');
-            });
-        });
+                await user.tab();
+                await waitFor(() => {
+                    expect(screen.getByText(requiredError())).toBeInTheDocument();
+                    expect(input).toHaveAttribute('aria-invalid', 'true');
+                });
+            },
+        );
     });
 
     it('clears field when clean-up icon is clicked', async () => {

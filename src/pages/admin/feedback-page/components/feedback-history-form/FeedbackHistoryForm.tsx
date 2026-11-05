@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { ChangeEvent, forwardRef } from 'react';
+import { Controller, useForm, UseFormClearErrors } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -37,6 +37,19 @@ const mapImageInputError = (error: string | null): string | undefined => {
     return error;
 };
 
+const createTextFieldChangeHandler =
+    <T extends HTMLInputElement | HTMLTextAreaElement>(
+        fieldName: 'title' | 'story',
+        onChange: (event: ChangeEvent<T>) => void,
+        clearErrors: UseFormClearErrors<FeedbackHistoryFormValues>,
+    ) =>
+    (event: ChangeEvent<T>) => {
+        onChange(event);
+        if (event.target.value === '') {
+            clearErrors(fieldName);
+        }
+    };
+
 export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFormProps>(
     ({ initialData, formDisabled, onSubmit, onValidationChange }, ref) => {
         const form = useForm<FeedbackHistoryFormValues>({
@@ -66,7 +79,7 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={createTextFieldChangeHandler('title', field.onChange, clearErrors)}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
                                 isRequired
@@ -90,7 +103,7 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={createTextFieldChangeHandler('story', field.onChange, clearErrors)}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired

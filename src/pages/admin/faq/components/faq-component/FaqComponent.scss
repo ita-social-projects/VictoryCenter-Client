@@ -41,6 +41,10 @@
             }
         }
 
+        &-answer p {
+            white-space: pre-line;
+        }
+
         &-status {
             flex: 0 0 11.25rem;
             display: flex;

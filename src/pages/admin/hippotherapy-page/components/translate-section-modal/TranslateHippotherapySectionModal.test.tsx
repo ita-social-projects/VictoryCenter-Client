@@ -25,6 +25,8 @@ const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
 const frenchLanguage = { id: 3, code: 'fr', name: 'Французька' };
 const VALID_TEXT = 'Valid translated quote';
 
+const buildImages = (prefix: string) => [1, 2, 3, 4].map((index) => `${prefix}-${index}.webp`);
+
 const quoteInput = (sectionKey = 'quoteSection') =>
     screen.getByTestId(`mock-rich-input-hippotherapy-translation-${sectionKey}-quoteText`);
 const authorInput = (sectionKey = 'quoteSection') =>
@@ -135,28 +137,32 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
     });
 
-    it('opens Advantages with exactly one title and four empty, required image-backed descriptions', () => {
-        const descriptionImages = ['advantage-1.webp', 'advantage-2.webp', 'advantage-3.webp', 'advantage-4.webp'];
-        renderModal({
-            block: HippotherapyPageLocalizationBlock.Advantages,
-            descriptionImages,
-        });
+    it.each([
+        ['Advantages', HippotherapyPageLocalizationBlock.Advantages, buildImages('advantage')],
+        ['Participants', HippotherapyPageLocalizationBlock.Participants, buildImages('participant')],
+    ])(
+        'opens %s with exactly one title and four empty, required image-backed descriptions',
+        (_name, block, descriptionImages) => {
+            renderModal({ block, descriptionImages });
 
-        const titleInput = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE, { exact: false });
-        const descriptionInputs = screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
+            const title = screen.getByLabelText(COMMON_TEXT_ADMIN.TYPE.TITLE, { exact: false });
+            const descriptions = screen.getAllByLabelText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION);
 
-        expect(titleInput).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE));
-        expect(titleInput).toHaveValue('');
-        expect(screen.getByText('0/50')).toBeInTheDocument();
-        expect(descriptionInputs).toHaveLength(4);
-        descriptionInputs.forEach((input) => {
-            expect(input).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION));
-            expect(input).toHaveValue('');
-        });
-        expect(screen.getAllByRole('img')).toHaveLength(4);
-        expect(screen.getAllByRole('img').map((image) => image.getAttribute('src'))).toEqual(descriptionImages);
-        expect(saveButton()).toBeDisabled();
-    });
+            expect(title).toHaveAttribute('maxLength', String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE));
+            expect(title).toHaveValue('');
+            expect(screen.getByText(`0/${HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE}`)).toBeInTheDocument();
+            expect(descriptions).toHaveLength(4);
+            descriptions.forEach((input) => {
+                expect(input).toHaveAttribute(
+                    'maxLength',
+                    String(HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION),
+                );
+                expect(input).toHaveValue('');
+            });
+            expect(screen.getAllByRole('img').map((image) => image.getAttribute('src'))).toEqual(descriptionImages);
+            expect(saveButton()).toBeDisabled();
+        },
+    );
 
     it('selects English by default and keeps the save button disabled on open', () => {
         renderModal();

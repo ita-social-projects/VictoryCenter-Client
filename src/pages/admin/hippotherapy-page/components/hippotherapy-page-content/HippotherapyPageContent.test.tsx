@@ -776,10 +776,30 @@ describe('HippotherapyPageContent', () => {
             expect(imageSources?.every(Boolean)).toBe(true);
         });
 
+        it('opens the Participants translation modal with the four source images', async () => {
+            await renderLoaded();
+
+            clickButton('Translate hippotherapy-participants');
+
+            expectTranslationModalBlock(HippotherapyPageLocalizationBlock.Participants);
+            const imageSources = screen
+                .getByTestId('translate-section-modal-description-images')
+                .textContent?.split(',');
+            expect(imageSources).toHaveLength(4);
+            expect(imageSources?.[0]).toBe('https://example.com/image.webp');
+            expect(imageSources?.every(Boolean)).toBe(true);
+        });
+
         it('disables the Advantages translation icon when an English translation exists', async () => {
             await renderLoaded(withEnglishLocalization({ advantagesSection: { title: 'English title', cards: [] } }));
 
             expect(translateButton('hippotherapy-advantages')).toBeDisabled();
+        });
+
+        it('disables the Participants translation icon when an English translation exists', async () => {
+            await renderLoaded(withEnglishLocalization({ participantsSection: { title: 'English title', cards: [] } }));
+
+            expect(translateButton('hippotherapy-participants')).toBeDisabled();
         });
 
         it('keeps the Advantages translation icon enabled when English fields contain only empty rich text', async () => {
@@ -793,6 +813,19 @@ describe('HippotherapyPageContent', () => {
             );
 
             expect(translateButton('hippotherapy-advantages')).toBeEnabled();
+        });
+
+        it('keeps the Participants translation icon enabled when English fields contain only empty rich text', async () => {
+            await renderLoaded(
+                withEnglishLocalization({
+                    participantsSection: {
+                        title: '<p><br></p>',
+                        cards: [{ description: '<p><br></p>' }],
+                    },
+                }),
+            );
+
+            expect(translateButton('hippotherapy-participants')).toBeEnabled();
         });
 
         it.each([

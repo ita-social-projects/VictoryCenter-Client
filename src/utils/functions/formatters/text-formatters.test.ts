@@ -4,6 +4,7 @@ import {
     getNormalizedInputTextWhileTyping,
     getTrimmedInputText,
     parseDescriptionList,
+    getNormalizedMultilineInputText,
 } from './text-formatters';
 
 describe('text-formatters', () => {
@@ -88,6 +89,26 @@ describe('text-formatters', () => {
 
         it('should keep newlines untouched', () => {
             expect(getNormalizedInputTextWhileTyping('Hello\nworld')).toBe('Hello\nworld');
+        });
+    });
+
+    describe('getNormalizedMultilineInputText', () => {
+        it('should keep line breaks inside the text', () => {
+            expect(getNormalizedMultilineInputText('Line one\nLine two\n\nLine three')).toBe(
+                'Line one\nLine two\n\nLine three',
+            );
+        });
+
+        it('should remove leading and trailing spaces and line breaks', () => {
+            expect(getNormalizedMultilineInputText('\n  Hello world  \n')).toBe('Hello world');
+        });
+
+        it('should collapse consecutive spaces and tabs into a single space', () => {
+            expect(getNormalizedMultilineInputText('Hello   \t world')).toBe('Hello world');
+        });
+
+        it('should remove spaces around line breaks', () => {
+            expect(getNormalizedMultilineInputText('Line one  \n  Line two')).toBe('Line one\nLine two');
         });
     });
 

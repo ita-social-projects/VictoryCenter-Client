@@ -351,6 +351,39 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
+    it('keeps line breaks inside the story when submitting', async () => {
+        onSubmit.mockResolvedValueOnce(mockCreatedHistory);
+
+        renderModal();
+
+        await fillValidForm('Перемога 2026', 'Перший рядок історії \n Другий рядок історії');
+
+        const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+        await waitFor(() => {
+            expect(publishBtn).not.toBeDisabled();
+        });
+
+        fireEvent.click(publishBtn);
+        fireEvent.click(await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({ story: 'Перший рядок історії\nДругий рядок історії' }),
+                undefined,
+            );
+        });
+    });
+
+    it('normalises spaces around line breaks in the story on blur', () => {
+        renderModal();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+        fireEvent.change(storyTextarea, { target: { value: 'Перший рядок \n другий рядок' } });
+        fireEvent.blur(storyTextarea);
+
+        expect(storyTextarea).toHaveValue('Перший рядок\nдругий рядок');
+    });
+
     it('calls onError when history creation fails', async () => {
         onSubmit.mockRejectedValueOnce(new Error('Network error'));
 

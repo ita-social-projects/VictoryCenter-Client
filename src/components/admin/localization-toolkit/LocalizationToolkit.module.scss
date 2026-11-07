@@ -1,4 +1,14 @@
+@use '@/assets/sass/variables/colors';
+
 .toolkit {
     display: flex;
     flex-direction: row;
+}
+
+.toolkit :global(.select) > :global(.select-head) span {
+    color: colors.$blue-500;
+}
+
+.toolkit :global(.select-options) button span {
+    color: colors.$blue-500;
 }

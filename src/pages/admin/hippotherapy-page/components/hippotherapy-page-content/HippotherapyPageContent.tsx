@@ -220,11 +220,11 @@ const hasScientificReferenceTranslation = (
     localization: HippotherapyPageLocalization | null,
     referenceId: number | null,
 ): boolean => {
-    if (referenceId === null || !localization?.scientificReferencesSection?.scientificReferences) {
+    if (referenceId === null || !localization?.scientificReferencesSection?.references) {
         return false;
     }
-    return localization.scientificReferencesSection.scientificReferences.some(
-        (ref) => ref.id === referenceId && Boolean(ref.name?.trim()),
+    return localization.scientificReferencesSection.references.some(
+        (ref) => ref.referenceId === referenceId && Boolean(ref.name?.trim()),
     );
 };
 

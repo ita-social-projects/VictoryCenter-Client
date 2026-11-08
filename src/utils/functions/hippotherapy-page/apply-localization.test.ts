@@ -162,9 +162,9 @@ describe('applyHippotherapyLocalization', () => {
                 scientificReferencesSection: {
                     title: 'EN References',
                     description: 'EN Ref Desc',
-                    scientificReferences: [
-                        { id: 10, name: 'EN Ref 10' },
-                        { id: 20, name: 'EN Ref 20' },
+                    references: [
+                        { referenceId: 10, name: 'EN Ref 10' },
+                        { referenceId: 20, name: 'EN Ref 20' },
                     ],
                 },
             });
@@ -181,9 +181,9 @@ describe('applyHippotherapyLocalization', () => {
                 scientificReferencesSection: {
                     title: 'EN',
                     description: 'EN',
-                    scientificReferences: [
-                        { id: 20, name: 'EN Ref 20' },
-                        { id: 10, name: 'EN Ref 10' },
+                    references: [
+                        { referenceId: 20, name: 'EN Ref 20' },
+                        { referenceId: 10, name: 'EN Ref 10' },
                     ],
                 },
             });
@@ -201,7 +201,7 @@ describe('applyHippotherapyLocalization', () => {
                 scientificReferencesSection: {
                     title: '',
                     description: '   ',
-                    scientificReferences: [{ id: 10, name: '   ' }],
+                    references: [{ referenceId: 10, name: '   ' }],
                 },
             });
 
@@ -216,7 +216,7 @@ describe('applyHippotherapyLocalization', () => {
                 scientificReferencesSection: {
                     title: 'EN',
                     description: 'EN',
-                    scientificReferences: [{ id: 10, name: 'EN' }],
+                    references: [{ referenceId: 10, name: 'EN' }],
                 },
             });
 

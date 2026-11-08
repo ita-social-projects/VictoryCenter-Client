@@ -1011,7 +1011,7 @@ describe('HippotherapyPageContent', () => {
                 {
                     title: 'English Title',
                     description: 'English Description',
-                    scientificReferences: [],
+                    references: [],
                 },
             ],
             [
@@ -1020,7 +1020,7 @@ describe('HippotherapyPageContent', () => {
                 {
                     title: '',
                     description: '',
-                    scientificReferences: [{ id: 1, name: 'Translated citation' }],
+                    references: [{ referenceId: 1, name: 'Translated citation' }],
                 },
             ],
         ])(
@@ -1038,7 +1038,7 @@ describe('HippotherapyPageContent', () => {
                     scientificReferencesSection: {
                         title: '<p><br></p>',
                         description: '<p><br></p>',
-                        scientificReferences: [],
+                        references: [],
                     },
                 }),
             );

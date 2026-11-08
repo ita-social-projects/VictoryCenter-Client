@@ -47,7 +47,10 @@ export const HippotherapyPage = () => {
                     />
                     <TextCard {...data.hippoventionSection} />
                     <SloganSection />
-                    <HippoventionCenter {...data.hippoventionCenterSection} />
+                    <HippoventionCenter
+                        {...data.hippoventionCenterSection}
+                        imgAlternativeText={data.hippoventionCenterSection.imgAlternativeText || t('ALT.CENTER_IMAGE')}
+                    />
                     <SwipedGallery title={data.advantagesSection.title} cards={data.advantagesSection.advantages} />
                     <TextCard {...data.analysisSection} />
                     <ResearchSection {...data.researchSection} />

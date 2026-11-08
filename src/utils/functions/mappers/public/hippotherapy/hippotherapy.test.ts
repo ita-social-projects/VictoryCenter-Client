@@ -232,5 +232,20 @@ describe('mapHippotherapyPageToAbout', () => {
             expect(localized.advantagesSection.advantages[0].text).toBe('EN Card 1');
             expect(localized.advantagesSection.advantages[1].text).toBe('Advantage two');
         });
+
+        it('falls back to Ukrainian author when English quote author is empty string or whitespace', () => {
+            const dto = buildDto();
+            dto.quoteSection.authorName = 'Український Автор';
+            dto.localizations = [
+                {
+                    localizationInfoDto: { code: 'en' },
+                    quoteSection: { quoteText: 'EN Quote', authorName: '   ' },
+                } as any,
+            ];
+
+            const localized = mapHippotherapyPageToAbout(dto, 'en');
+
+            expect(localized.quoteSection.text).toBe('EN Quote<br /><br />Український Автор');
+        });
     });
 });

@@ -3,7 +3,6 @@ import {
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageEmbeddedLocalizationDto,
-    HippotherapyPageLocalizationDto,
     HippotherapyQuoteContent,
 } from '@/types/admin/hippotherapy-page';
 import { HippotherapyAbout, HippotherapySwipedCard, Quote } from '@/types/public/hippotherapy-page';
@@ -26,10 +25,7 @@ const toQuote = (
     localizedQuote?: { quoteText?: string; authorName?: string | null },
 ): Quote => {
     const quoteText = resolveText(localizedQuote?.quoteText, section.quoteText);
-    const authorName =
-        localizedQuote && localizedQuote.authorName !== undefined && localizedQuote.authorName !== null
-            ? localizedQuote.authorName
-            : section.authorName;
+    const authorName = resolveText(localizedQuote?.authorName, section.authorName);
 
     return {
         text: toPlain(authorName) ? `${quoteText}<br /><br />${authorName}` : quoteText,
@@ -39,18 +35,13 @@ const toQuote = (
 
 const toSwipedCards = (
     cards: HippotherapyGalleryCardContent[],
-    localizedCards?: Array<{ cardId?: number; description?: string }>,
+    localizedCards?: Array<{ description?: string }>,
 ): HippotherapySwipedCard[] =>
-    cards.map((card, index) => {
-        const cardId = (card as any).id;
-        const localizedCard = localizedCards?.find((c) => c.cardId === cardId) ?? localizedCards?.[index];
-
-        return {
-            imgURL: getImageUrl(card),
-            imgAlternativeText: '',
-            text: resolvePlain(localizedCard?.description, card.description),
-        };
-    });
+    cards.map((card, index) => ({
+        imgURL: getImageUrl(card),
+        imgAlternativeText: '',
+        text: resolvePlain(localizedCards?.[index]?.description, card.description),
+    }));
 
 const toProsList = (pros: string): string[] =>
     pros
@@ -59,19 +50,12 @@ const toProsList = (pros: string): string[] =>
         .filter(Boolean);
 
 const getActiveLocalization = (
-    localizations: HippotherapyPageEmbeddedLocalizationDto[] | HippotherapyPageLocalizationDto[] | undefined | null,
+    localizations: HippotherapyPageEmbeddedLocalizationDto[] | undefined | null,
     languageCode: string,
-) => {
+): HippotherapyPageEmbeddedLocalizationDto | null => {
     if (!localizations || !Array.isArray(localizations)) return null;
     const target = languageCode.toLowerCase();
-    return (
-        localizations.find(
-            (loc: any) =>
-                loc?.localizationInfoDto?.code?.toLowerCase() === target ||
-                loc?.language?.code?.toLowerCase() === target ||
-                loc?.code?.toLowerCase() === target,
-        ) ?? null
-    );
+    return localizations.find((loc) => loc.localizationInfoDto?.code?.toLowerCase() === target) ?? null;
 };
 
 export const mapHippotherapyPageToAbout = (
@@ -99,6 +83,7 @@ export const mapHippotherapyPageToAbout = (
         hippoventionCenterSection: {
             title: resolvePlain(activeLoc?.hippoventionCenterSection?.title, dto.hippoventionCenterSection.title),
             imgURL: getImageUrl(dto.hippoventionCenterSection),
+            imgAlternativeText: '',
             pros: toProsList(
                 resolveText(activeLoc?.hippoventionCenterSection?.pros, dto.hippoventionCenterSection.pros),
             ),
@@ -121,12 +106,10 @@ export const mapHippotherapyPageToAbout = (
                 activeLoc?.scientificReferencesSection?.description,
                 dto.scientificReferencesSection.description,
             ),
-            researches: dto.scientificReferencesSection.scientificReferences.map((reference, index) => {
-                const localizedRefs =
-                    (activeLoc?.scientificReferencesSection as any)?.references ??
-                    (activeLoc?.scientificReferencesSection as any)?.scientificReferences;
-                const localizedRef =
-                    localizedRefs?.find((r: any) => (r.referenceId ?? r.id) === reference.id) ?? localizedRefs?.[index];
+            researches: dto.scientificReferencesSection.scientificReferences.map((reference) => {
+                const localizedRef = activeLoc?.scientificReferencesSection?.references?.find(
+                    (r) => r.referenceId === reference.id,
+                );
 
                 return {
                     text: resolveText(localizedRef?.name, reference.name),

@@ -46,7 +46,6 @@ export interface HippotherapyScientificReferencesLocalizedContent {
     title: string;
     description: string;
     references?: { referenceId: number; name: string }[];
-    scientificReferences?: { id: number; name: string }[];
 }
 export interface HippotherapyEthicsLocalizedContent {
     title: string;

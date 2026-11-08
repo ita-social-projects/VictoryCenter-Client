@@ -105,6 +105,22 @@ describe('FeedbackComponent', () => {
         expect(link).toHaveAttribute('rel', 'noreferrer');
     });
 
+    it('uses single-line truncation for long video titles and links and preserves full values in attributes', () => {
+        const title = 'QA3455 long video title '.repeat(9).slice(0, 200);
+        const link = `https://victorycenter.online/?qa3455=${'a'.repeat(350)}`;
+
+        renderComponent({ item: { ...mockVideoItem, title, link } });
+
+        const titleEl = screen.getByTitle(title);
+        expect(titleEl).toHaveTextContent(title);
+        expect(titleEl.parentElement).toHaveClass('feedback-truncate');
+
+        const linkEl = screen.getByRole('link', { name: link });
+        expect(linkEl).toHaveAttribute('href', link);
+        expect(linkEl).toHaveAttribute('title', link);
+        expect(linkEl.parentElement).toHaveClass('feedback-truncate');
+    });
+
     it('renders empty string fallbacks when title/authorName and description fields are missing', () => {
         const minimalItem = {
             id: 99,

@@ -25,32 +25,132 @@ export enum HippotherapyPageLocalizationBlock {
     Ethics = 10,
 }
 
+export type CreateSectionDto<TContent> = TContent & {
+    entityId: number;
+    languageId: number;
+};
+
+export type UpdateSectionDto<TContent> = TContent;
+
 export interface HippotherapyTextCardLocalizedContent {
     title: string;
     description: string;
 }
+
 export interface HippotherapyQuoteLocalizedContent {
     quoteText: string;
     authorName: string | null;
 }
+
 export interface HippotherapyGalleryLocalizedContent {
     title: string;
     cards: { cardId: number; description: string }[];
 }
+
 export interface HippoventionCenterLocalizedContent {
     title: string;
     pros: string;
     description: string;
 }
+
 export interface HippotherapyScientificReferencesLocalizedContent {
     title: string;
     description: string;
     references?: { referenceId: number; name: string }[];
 }
+
 export interface HippotherapyEthicsLocalizedContent {
     title: string;
     description: string;
     principles: { principleId: number; text: string }[];
+}
+
+export interface HippotherapyGalleryCardItem {
+    cardId: number;
+    description: string;
+}
+
+export interface HippotherapyGalleryLocalizedContentDto {
+    title: string;
+    cards: HippotherapyGalleryCardItem[];
+}
+
+export interface HippotherapyScientificReferenceItem {
+    referenceId: number;
+    name: string;
+}
+
+export interface HippotherapyScientificReferencesLocalizedContentDto {
+    title: string;
+    description: string;
+    references: HippotherapyScientificReferenceItem[];
+}
+
+export interface HippotherapyEthicsPrincipleItem {
+    principleId: number;
+    text: string;
+}
+
+export interface HippotherapyEthicsLocalizedContentDto {
+    title: string;
+    description: string;
+    principles: HippotherapyEthicsPrincipleItem[];
+}
+
+export type CreateGallerySectionDto = CreateSectionDto<HippotherapyGalleryLocalizedContentDto>;
+export type UpdateGallerySectionDto = UpdateSectionDto<HippotherapyGalleryLocalizedContentDto>;
+
+export type CreateScientificReferencesSectionDto =
+    CreateSectionDto<HippotherapyScientificReferencesLocalizedContentDto>;
+export type UpdateScientificReferencesSectionDto =
+    UpdateSectionDto<HippotherapyScientificReferencesLocalizedContentDto>;
+
+export type CreateEthicsSectionDto = CreateSectionDto<HippotherapyEthicsLocalizedContentDto>;
+export type UpdateEthicsSectionDto = UpdateSectionDto<HippotherapyEthicsLocalizedContentDto>;
+
+export type CreateTextCardSectionDto = CreateSectionDto<HippotherapyTextCardLocalizedContent>;
+export type UpdateTextCardSectionDto = UpdateSectionDto<HippotherapyTextCardLocalizedContent>;
+
+export type CreateQuoteSectionDto = CreateSectionDto<HippotherapyQuoteLocalizedContent>;
+export type UpdateQuoteSectionDto = UpdateSectionDto<HippotherapyQuoteLocalizedContent>;
+
+export type CreateHippoventionCenterSectionDto = CreateSectionDto<HippoventionCenterLocalizedContent>;
+export type UpdateHippoventionCenterSectionDto = UpdateSectionDto<HippoventionCenterLocalizedContent>;
+
+export interface HippotherapyTextCardSectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyTextCardLocalizedContent {
+    entityId: number;
+}
+
+export interface HippotherapyQuoteSectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyQuoteLocalizedContent {
+    entityId: number;
+}
+
+export interface HippoventionCenterSectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippoventionCenterLocalizedContent {
+    entityId: number;
+}
+
+export interface HippotherapyGallerySectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyGalleryLocalizedContentDto {
+    entityId: number;
+}
+
+export interface HippotherapyScientificReferencesSectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyScientificReferencesLocalizedContentDto {
+    entityId: number;
+}
+
+export interface HippotherapyEthicsSectionLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyEthicsLocalizedContentDto {
+    entityId: number;
 }
 
 export interface HippotherapyPageLocalizedContent {

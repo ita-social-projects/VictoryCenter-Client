@@ -205,5 +205,38 @@ export const API_ROUTES = {
     },
     HIPPOTHERAPY_PAGE_LOCALIZATIONS: {
         BASE: 'HippotherapyPageLocalizations',
+        ADVANTAGES_SECTION: {
+            BASE: 'HippotherapyLandingPageAdvantagesSectionLocalizations',
+        },
+        ANALYSIS_SECTION: {
+            BASE: 'HippotherapyLandingPageAnalysisSectionLocalizations',
+        },
+        ANOTHER_QUOTE_SECTION: {
+            BASE: 'HippotherapyLandingPageAnotherQuoteSectionLocalizations',
+        },
+        DESCRIPTION_SECTION: {
+            BASE: 'HippotherapyLandingPageDescriptionSectionLocalizations',
+        },
+        ETHICS_SECTION: {
+            BASE: 'HippotherapyLandingPageEthicsSectionLocalizations',
+        },
+        HIPPOVENTION_CENTER_SECTION: {
+            BASE: 'HippotherapyLandingPageHippoventionCenterSectionLocalizations',
+        },
+        HIPPOVENTION_SECTION: {
+            BASE: 'HippotherapyLandingPageHippoventionSectionLocalizations',
+        },
+        INTRO_SECTION: {
+            BASE: 'HippotherapyLandingPageIntroSectionLocalizations',
+        },
+        PARTICIPANTS_SECTION: {
+            BASE: 'HippotherapyLandingPageParticipantsSectionLocalizations',
+        },
+        QUOTE_SECTION: {
+            BASE: 'HippotherapyLandingPageQuoteSectionLocalizations',
+        },
+        SCIENTIFIC_REFERENCES_SECTION: {
+            BASE: 'HippotherapyLandingPageScientificReferencesSectionLocalizations',
+        },
     },
 };

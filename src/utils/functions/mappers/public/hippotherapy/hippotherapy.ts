@@ -14,8 +14,10 @@ const toPlain = (value: string): string => getPlainTextFromHtml(value).trim();
 
 const getImageUrl = (value: HippotherapyImageValue): string => getImageSrc(value.image);
 
+const hasVisibleText = (value: string | undefined | null): value is string => Boolean(value && toPlain(value));
+
 const resolveText = (localized: string | undefined | null, fallback: string): string =>
-    localized?.trim() ? localized : fallback;
+    hasVisibleText(localized) ? localized : fallback;
 
 const resolvePlain = (localized: string | undefined | null, fallback: string): string =>
     toPlain(resolveText(localized, fallback));

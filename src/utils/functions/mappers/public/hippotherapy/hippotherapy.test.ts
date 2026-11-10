@@ -1,5 +1,6 @@
 import { mapHippotherapyPageToAbout } from './hippotherapy';
-import { HippotherapyPageContentDto } from '@/types/admin/hippotherapy-page';
+import { HippotherapyPageContentDto, HippotherapyPageEmbeddedLocalizationDto } from '@/types/admin/hippotherapy-page';
+import { TranslationStatus } from '@/types/common/language';
 
 const withImage = (name: string) => ({
     image: { id: 1, url: `https://example.com/${name}.png`, mimeType: 'image/png' },
@@ -24,8 +25,8 @@ const buildDto = (): HippotherapyPageContentDto => ({
     advantagesSection: {
         title: '<p>Advantages title</p>',
         cards: [
-            { id: 10, description: '<p>Advantage one</p>', ...withImage('card1') } as any,
-            { id: 20, description: '<p>Advantage two</p>', ...withImage('card2') } as any,
+            { description: '<p>Advantage one</p>', ...withImage('card1') },
+            { description: '<p>Advantage two</p>', ...withImage('card2') },
         ],
     },
     analysisSection: { title: 'Analysis title', description: 'Analysis text' },
@@ -40,7 +41,7 @@ const buildDto = (): HippotherapyPageContentDto => ({
     anotherQuoteSection: { quoteText: 'Another quote', authorName: '', ...noImage },
     participantsSection: {
         title: 'Participants title',
-        cards: [{ id: 30, description: 'Participant one', ...noImage } as any],
+        cards: [{ description: 'Participant one', ...noImage }],
     },
     ethicsSection: {
         title: '<p>Ethics title</p>',
@@ -105,8 +106,9 @@ describe('mapHippotherapyPageToAbout', () => {
     });
 
     describe('Localization support', () => {
-        const englishLocalization = {
-            localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+        const englishLocalization: HippotherapyPageEmbeddedLocalizationDto = {
+            localizationInfoDto: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
             introSection: { title: '<h3>EN Intro</h3>', description: '<p>EN Intro desc</p>' },
             descriptionSection: { title: 'EN Desc title', description: '<p>EN Desc text</p>' },
             quoteSection: { quoteText: 'EN Quote text', authorName: 'EN Author' },
@@ -149,7 +151,7 @@ describe('mapHippotherapyPageToAbout', () => {
 
         it('returns Ukrainian original when language is uk even if English localization exists', () => {
             const dto = buildDto();
-            dto.localizations = [englishLocalization as any];
+            dto.localizations = [englishLocalization];
 
             const localized = mapHippotherapyPageToAbout(dto, 'uk');
 
@@ -159,7 +161,7 @@ describe('mapHippotherapyPageToAbout', () => {
 
         it('maps all 11 sections to English when language is en and full localization is present', () => {
             const dto = buildDto();
-            dto.localizations = [englishLocalization as any];
+            dto.localizations = [englishLocalization];
 
             const localized = mapHippotherapyPageToAbout(dto, 'en');
 
@@ -203,7 +205,8 @@ describe('mapHippotherapyPageToAbout', () => {
             const dto = buildDto();
             dto.localizations = [
                 {
-                    localizationInfoDto: { code: 'en' },
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
                     introSection: { title: 'EN Intro only', description: '   ' },
                     ethicsSection: {
                         title: '',
@@ -219,7 +222,7 @@ describe('mapHippotherapyPageToAbout', () => {
                             { cardId: 20, description: '' },
                         ],
                     },
-                } as any,
+                },
             ];
 
             const localized = mapHippotherapyPageToAbout(dto, 'en');
@@ -238,14 +241,54 @@ describe('mapHippotherapyPageToAbout', () => {
             dto.quoteSection.authorName = 'Український Автор';
             dto.localizations = [
                 {
-                    localizationInfoDto: { code: 'en' },
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
                     quoteSection: { quoteText: 'EN Quote', authorName: '   ' },
-                } as any,
+                },
             ];
 
             const localized = mapHippotherapyPageToAbout(dto, 'en');
 
             expect(localized.quoteSection.text).toBe('EN Quote<br /><br />Український Автор');
+        });
+
+        it('falls back to Ukrainian when localized fields contain empty HTML like <p><br></p>', () => {
+            const dto = buildDto();
+            dto.quoteSection.authorName = 'Український Автор';
+            dto.localizations = [
+                {
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                    introSection: {
+                        title: '<p><br></p>',
+                        description: '<p>&nbsp;</p>',
+                    },
+                    quoteSection: {
+                        quoteText: '<p><br></p>',
+                        authorName: '<p><br></p>',
+                    },
+                    advantagesSection: {
+                        title: '<p><br></p>',
+                        cards: [{ cardId: 10, description: '<p><br></p>' }],
+                    },
+                    scientificReferencesSection: {
+                        title: '<p><br></p>',
+                        description: '<p><br></p>',
+                        references: [{ referenceId: 100, name: '<p><br></p>' }],
+                    },
+                },
+            ];
+
+            const localized = mapHippotherapyPageToAbout(dto, 'en');
+
+            expect(localized.introSection.title).toBe('<h3>Intro title</h3>');
+            expect(localized.introSection.description).toBe('<p>Intro description</p>');
+            expect(localized.quoteSection.text).toBe('Quote text<br /><br />Український Автор');
+            expect(localized.advantagesSection.title).toBe('Advantages title');
+            expect(localized.advantagesSection.advantages[0].text).toBe('Advantage one');
+            expect(localized.researchSection.title).toBe('Research title');
+            expect(localized.researchSection.description).toBe('Research description');
+            expect(localized.researchSection.researches[0].text).toBe('Reference one');
         });
     });
 });

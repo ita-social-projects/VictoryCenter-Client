@@ -15,8 +15,8 @@ import {
     HippotherapyPageLocalizationBlock,
 } from '@/types/admin/hippotherapy-page';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { TranslationStatus } from '@/types/common/language';
-import { DEFAULT_ENGLISH_LANGUAGE_ID } from '@/const/common/locales';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID, DEFAULT_LOCALE, DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
 function mockDisabledAttr(isDisabled: unknown) {
     return String(Boolean(isDisabled));
@@ -294,7 +294,25 @@ jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => 
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
 const mockedUseLocalizationToolkit = useLocalizationToolkit as jest.Mock;
-const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
+
+const ukrainianLanguage: LocalizationLanguage = {
+    id: DEFAULT_UKRAINIAN_LANGUAGE_ID,
+    code: DEFAULT_LOCALE,
+    name: 'Українська',
+};
+const englishLanguage: LocalizationLanguage = {
+    id: DEFAULT_ENGLISH_LANGUAGE_ID,
+    code: 'en',
+    name: 'Англійська',
+};
+
+const createToolkitMock = (overrides: Record<string, unknown> = {}) => ({
+    allLanguages: [ukrainianLanguage, englishLanguage],
+    translationLanguages: [englishLanguage],
+    selectedLanguage: ukrainianLanguage,
+    onLanguageChange: jest.fn(),
+    ...overrides,
+});
 
 jest.mock('@/services/api/admin/hippotherapy-page/hippotherapy-page-api');
 const mockedHippotherapyPageApi = HippotherapyPageApi as jest.Mocked<typeof HippotherapyPageApi>;
@@ -316,7 +334,7 @@ const mockedIsContentValid = isHippotherapyPageContentValid as jest.Mock;
 
 const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'image/webp' };
 
-const buildContent = (): HippotherapyPageContentModel => ({
+const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
     introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
@@ -357,6 +375,7 @@ const buildContent = (): HippotherapyPageContentModel => ({
         image: savedImage,
         imageId: savedImage.id,
     },
+    ...overrides,
 });
 
 const expectOpensGeneralTranslationModalAndDisablesOnEdit = async (
@@ -366,7 +385,6 @@ const expectOpensGeneralTranslationModalAndDisablesOnEdit = async (
     expectedSubBlock: string | null = 'general',
 ) => {
     mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
     render(<HippotherapyPageContent />);
 
     const generalTranslateButton = await screen.findByRole('button', { name: translateButtonLabel });
@@ -393,7 +411,6 @@ const expectGeneralTranslationDisabledWhenTranslationExists = async (
         localizations: [localization],
     };
     mockedHippotherapyPageApi.get.mockResolvedValue(contentWithTranslation);
-
     render(<HippotherapyPageContent />);
 
     const generalTranslateButton = await screen.findByRole('button', { name: translateButtonLabel });
@@ -447,6 +464,38 @@ const renderLoaded = async (content: HippotherapyPageContentModel = buildContent
     await screen.findByTestId('section-intro');
 };
 
+const setup = (
+    options: {
+        content?: HippotherapyPageContentModel;
+        apiError?: any;
+        toolkitOverrides?: Record<string, unknown>;
+        isValid?: boolean;
+    } = {},
+) => {
+    if (options.isValid !== undefined) {
+        mockedIsContentValid.mockReturnValue(options.isValid);
+    }
+    if (options.apiError) {
+        mockedHippotherapyPageApi.get.mockRejectedValue(options.apiError);
+    } else {
+        mockedHippotherapyPageApi.get.mockResolvedValue(options.content ?? buildContent());
+    }
+    mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock(options.toolkitOverrides));
+    return render(<HippotherapyPageContent />);
+};
+
+const contentWithEnglish = (): HippotherapyPageContentModel =>
+    buildContent({
+        localizations: [
+            {
+                language: englishLanguage,
+                translationStatus: TranslationStatus.Relevant,
+                introSection: { title: 'English Intro Title', description: 'English Intro Description' },
+                descriptionSection: { title: 'English Desc Title', description: 'English Desc Text' },
+            } as any,
+        ],
+    });
+
 const mockPageNotFound = () => {
     jest.spyOn(axios, 'isAxiosError').mockImplementation((error: unknown) => Boolean((error as any)?.response));
     mockedHippotherapyPageApi.get.mockRejectedValue({ response: { status: 404 } });
@@ -488,7 +537,9 @@ describe('HippotherapyPageContent', () => {
         mockedUseAdminClient.mockReturnValue(mockClient);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
         mockedIsContentValid.mockReturnValue(true);
-        mockedUseLocalizationToolkit.mockReturnValue({ translationLanguages: [englishLanguage] });
+
+        // CRITICAL FIX: Ensure the localization toolkit mock is always initialized with all required properties
+        mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock());
 
         if (!(global as any).crypto) {
             Object.defineProperty(global, 'crypto', { value: {}, configurable: true, writable: true });
@@ -502,17 +553,12 @@ describe('HippotherapyPageContent', () => {
 
     it('shows a loader while fetching', () => {
         mockedHippotherapyPageApi.get.mockReturnValue(new Promise(() => {}));
-
-        render(<HippotherapyPageContent />);
-
+        setup();
         expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
     });
 
     it('shows an error state with a retry action when the fetch fails', async () => {
-        mockedHippotherapyPageApi.get.mockRejectedValue(new Error('network error'));
-
-        render(<HippotherapyPageContent />);
-
+        setup({ apiError: new Error('network error') });
         expect(await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.FAIL_TO_FETCH)).toBeInTheDocument();
 
         mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
@@ -524,7 +570,6 @@ describe('HippotherapyPageContent', () => {
 
     it('falls back to a blank, editable form with an empty-state notice when the page has not been created yet (404)', async () => {
         mockPageNotFound();
-
         render(<HippotherapyPageContent />);
 
         expect(await screen.findByText(HIPPOTHERAPY_PAGE_TEXT.EMPTY_STATE_NOTICE)).toBeInTheDocument();
@@ -715,6 +760,7 @@ describe('HippotherapyPageContent', () => {
 
         expectTranslationDisabledForEverySection(true);
     });
+
     describe('section translation', () => {
         it('opens the Advantages translation modal with the four source images', async () => {
             await renderLoaded();
@@ -730,10 +776,30 @@ describe('HippotherapyPageContent', () => {
             expect(imageSources?.every(Boolean)).toBe(true);
         });
 
+        it('opens the Participants translation modal with the four source images', async () => {
+            await renderLoaded();
+
+            clickButton('Translate hippotherapy-participants');
+
+            expectTranslationModalBlock(HippotherapyPageLocalizationBlock.Participants);
+            const imageSources = screen
+                .getByTestId('translate-section-modal-description-images')
+                .textContent?.split(',');
+            expect(imageSources).toHaveLength(4);
+            expect(imageSources?.[0]).toBe('https://example.com/image.webp');
+            expect(imageSources?.every(Boolean)).toBe(true);
+        });
+
         it('disables the Advantages translation icon when an English translation exists', async () => {
             await renderLoaded(withEnglishLocalization({ advantagesSection: { title: 'English title', cards: [] } }));
 
             expect(translateButton('hippotherapy-advantages')).toBeDisabled();
+        });
+
+        it('disables the Participants translation icon when an English translation exists', async () => {
+            await renderLoaded(withEnglishLocalization({ participantsSection: { title: 'English title', cards: [] } }));
+
+            expect(translateButton('hippotherapy-participants')).toBeDisabled();
         });
 
         it('keeps the Advantages translation icon enabled when English fields contain only empty rich text', async () => {
@@ -747,6 +813,19 @@ describe('HippotherapyPageContent', () => {
             );
 
             expect(translateButton('hippotherapy-advantages')).toBeEnabled();
+        });
+
+        it('keeps the Participants translation icon enabled when English fields contain only empty rich text', async () => {
+            await renderLoaded(
+                withEnglishLocalization({
+                    participantsSection: {
+                        title: '<p><br></p>',
+                        cards: [{ description: '<p><br></p>' }],
+                    },
+                }),
+            );
+
+            expect(translateButton('hippotherapy-participants')).toBeEnabled();
         });
 
         it.each([
@@ -850,6 +929,7 @@ describe('HippotherapyPageContent', () => {
                 expect(translateButton(otherFieldIdPrefix)).toBeEnabled();
             },
         );
+
         it.each([
             ['intro', 'introSection', { title: '<p><br></p>', description: '<p><br></p>' }],
             ['hippotherapy-description', 'descriptionSection', { title: '<p><br></p>', description: '<p><br></p>' }],
@@ -884,16 +964,18 @@ describe('HippotherapyPageContent', () => {
         );
 
         it('hides the translation icons while no translation languages are available', async () => {
-            mockedUseLocalizationToolkit.mockReturnValue({ translationLanguages: [] });
-            await renderLoaded();
+            mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock({ translationLanguages: [] }));
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+            render(<HippotherapyPageContent />);
+            await screen.findByTestId('section-hippotherapy-quote');
 
-            expect(screen.queryByRole('button', { name: /^Translate / })).not.toBeInTheDocument();
+            expect(screen.queryAllByRole('button', { name: /^Translate / })).toHaveLength(0);
         });
 
         it('hides the translation icons when English is not among the translation languages', async () => {
-            mockedUseLocalizationToolkit.mockReturnValue({
-                translationLanguages: [{ id: 3, code: 'pl', name: 'Польська' }],
-            });
+            mockedUseLocalizationToolkit.mockReturnValue(
+                createToolkitMock({ translationLanguages: [{ id: 3, code: 'pl', name: 'Польська' }] }),
+            );
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
 
             render(<HippotherapyPageContent />);
@@ -1009,7 +1091,6 @@ describe('HippotherapyPageContent', () => {
 
         it('disables the translation action when a principle is edited but not published', async () => {
             mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
-
             render(<HippotherapyPageContent />);
 
             const translateButton = await screen.findByRole('button', { name: 'Translate ethics' });
@@ -1030,36 +1111,37 @@ describe('HippotherapyPageContent', () => {
             expectGeneralTranslationDisabledWhenTranslationExists('Translate ethics', {
                 language: { id: 2, code: 'en' },
                 translationStatus: 1 as any,
-                ethicsSection: { title: '', description: '', principles: ['Translated principle'] },
+                ethicsSection: {
+                    title: '',
+                    description: '',
+                    principles: [{ principleId: 1, text: 'Translated principle' }],
+                },
             }));
     });
 
     describe('translation statuses mapping by block', () => {
         it('passes localizations to the corresponding sections and ignores null translationStatus', async () => {
-            const contentWithStatuses: HippotherapyPageContentModel = {
-                ...buildContent(),
-                translationStatuses: [
-                    {
-                        block: HippotherapyPageLocalizationBlock.Intro,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: TranslationStatus.Relevant,
-                    },
-                    {
-                        block: HippotherapyPageLocalizationBlock.Intro,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: null as any,
-                    },
-                    {
-                        block: HippotherapyPageLocalizationBlock.Quote,
-                        languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
-                        translationStatus: TranslationStatus.Outdated,
-                    },
-                ],
-            };
-
-            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithStatuses);
-
-            render(<HippotherapyPageContent />);
+            setup({
+                content: buildContent({
+                    translationStatuses: [
+                        {
+                            block: HippotherapyPageLocalizationBlock.Intro,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: TranslationStatus.Relevant,
+                        },
+                        {
+                            block: HippotherapyPageLocalizationBlock.Intro,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: null as any,
+                        },
+                        {
+                            block: HippotherapyPageLocalizationBlock.Quote,
+                            languageId: DEFAULT_ENGLISH_LANGUAGE_ID,
+                            translationStatus: TranslationStatus.Outdated,
+                        },
+                    ],
+                }),
+            });
 
             const introSection = await screen.findByTestId('section-intro');
             expect(introSection).toHaveAttribute('data-localizations-count', '1');
@@ -1069,6 +1151,102 @@ describe('HippotherapyPageContent', () => {
 
             const ethicsSection = screen.getByTestId('section-ethics');
             expect(ethicsSection).toHaveAttribute('data-localizations-count', '0');
+        });
+    });
+
+    describe('read-only language mode (non-default locale)', () => {
+        it('displays translated content and hides the publish button when non-default language is active', async () => {
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('English Intro Title');
+
+            const descSection = screen.getByTestId('section-hippotherapy-description');
+            expect(descSection).toHaveTextContent('English Desc Title');
+
+            expect(
+                screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+            ).not.toBeInTheDocument();
+        });
+
+        it('disables section editing controls when in read-only language mode', async () => {
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
+
+            const editButton = await screen.findByRole('button', { name: 'Edit intro' });
+            expect(editButton).toBeDisabled();
+        });
+
+        it('switches back to Ukrainian base editable content when returning to default locale', async () => {
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: ukrainianLanguage } });
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('Intro title');
+
+            const editButton = screen.getByRole('button', { name: 'Edit intro' });
+            expect(editButton).toBeEnabled();
+
+            expect(
+                screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe('language switching and validation', () => {
+        it('uses fetchedContent (not draftContent) for read-only language preview', async () => {
+            setup({ content: contentWithEnglish(), toolkitOverrides: { selectedLanguage: englishLanguage } });
+
+            const introSection = await screen.findByTestId('section-intro');
+            expect(introSection).toHaveTextContent('English Intro Title');
+            expect(introSection).not.toHaveTextContent('Intro title');
+        });
+
+        it('keeps Ukrainian draft intact when switching to English and back', async () => {
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
+
+            await screen.findByTestId('section-intro');
+            fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+
+            onLanguageChange(englishLanguage);
+            onLanguageChange(ukrainianLanguage);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('re-validates fields when language changes to prevent stale errors', async () => {
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            setup({
+                isValid: false,
+                content: buildContent({
+                    introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
+                }),
+                toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange },
+            });
+
+            await screen.findByTestId('section-intro');
+            onLanguageChange(englishLanguage);
+
+            expect(onLanguageChange).toHaveBeenCalledWith(englishLanguage);
+        });
+    });
+
+    describe('external-value tag prevents draft overwrite', () => {
+        it('does not overwrite draftContent when switching languages (OnChangePlugin blocked)', async () => {
+            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
+            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
+
+            await screen.findByTestId('section-intro');
+
+            fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+
+            onLanguageChange(englishLanguage);
+            onLanguageChange(ukrainianLanguage);
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+            expect(screen.getByTestId('section-intro')).toHaveTextContent('Edited intro title');
         });
     });
 });

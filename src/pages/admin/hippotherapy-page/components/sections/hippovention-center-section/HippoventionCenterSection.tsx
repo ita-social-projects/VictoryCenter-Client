@@ -14,6 +14,7 @@ import { HippoventionCenterSectionContent } from '@/types/admin/hippotherapy-pag
 import { SectionTranslationHeader } from '../../section-translation-header/SectionTranslationHeader';
 import './HippoventionCenterSection.scss';
 import { LocalizationLanguage, EntityLocalization } from '@/types/common/language';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface HippoventionCenterSectionProps {
     value: HippoventionCenterSectionContent;
@@ -24,6 +25,7 @@ export interface HippoventionCenterSectionProps {
     isTranslateDisabled?: boolean;
     translationLanguages?: LocalizationLanguage[];
     localizations?: EntityLocalization[];
+    languageCode?: string;
 }
 
 const HippoventionCenterSectionComponent = ({
@@ -35,28 +37,33 @@ const HippoventionCenterSectionComponent = ({
     isTranslateDisabled,
     translationLanguages,
     localizations,
+    languageCode,
 }: HippoventionCenterSectionProps) => {
     const { imageError, handleImageErrorChange, handleImageChange } = useHippotherapyImageField({
         value,
         onChange,
         onImageError,
     });
+    const isReadOnly = useHippotherapyReadOnly();
 
     const title = useValidatedRichTextField({
         value: value.title,
         onChange: (title) => onChange({ ...value, title }),
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
+        languageCode,
     });
 
     const pros = useValidatedRichTextField({
         value: value.pros,
         onChange: (pros) => onChange({ ...value, pros }),
+        languageCode,
     });
 
     const description = useValidatedRichTextField({
         value: value.description,
         onChange: (description) => onChange({ ...value, description }),
         isOptional: true,
+        languageCode,
     });
 
     return (
@@ -101,6 +108,7 @@ const HippoventionCenterSectionComponent = ({
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_TITLE}
                             error={title.error}
                             disabled={disabled}
+                            hideToolbar={isReadOnly}
                         />
                     </div>
 
@@ -117,6 +125,7 @@ const HippoventionCenterSectionComponent = ({
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_PROS}
                             error={pros.error}
                             disabled={disabled}
+                            hideToolbar={isReadOnly}
                         />
                         <RichTextInputGroup
                             className="hippovention-center-section-description"
@@ -129,6 +138,7 @@ const HippoventionCenterSectionComponent = ({
                             maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.HIPPOVENTION_CENTER_DESCRIPTION}
                             error={description.error}
                             disabled={disabled}
+                            hideToolbar={isReadOnly}
                         />
                     </div>
                 </div>

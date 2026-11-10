@@ -68,6 +68,10 @@
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
     animation: expandHeight 1s ease-out forwards;
 
+    .titleContent {
+        white-space: pre-line;
+    }
+
     &::-webkit-scrollbar {
         width: 8px;
     }

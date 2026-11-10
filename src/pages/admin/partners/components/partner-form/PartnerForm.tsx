@@ -75,7 +75,14 @@ const PartnerFormComponent = ({
             if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
                 return;
             }
-            onValuesChange({ ...values }, { ...errors, image: error });
+            onValuesChange(
+                { ...values },
+                {
+                    ...errors,
+                    image:
+                        error === IMAGE_VALIDATION.getFormatError() ? PARTNER_VALIDATION.image.getFormatError() : error,
+                },
+            );
         },
         [onValuesChange, values, errors, isBaseLanguage],
     );
@@ -140,6 +147,8 @@ const PartnerFormComponent = ({
                         isRequired={true}
                         disabled={disabled || !isBaseLanguage}
                         rows={3}
+                        autoGrow={true}
+                        maxRows={0}
                     />
                 </div>
             </div>

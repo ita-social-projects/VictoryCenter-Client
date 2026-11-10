@@ -16,7 +16,7 @@ type ContextType = {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: Credentials) => Promise<void>;
-    logout: () => Promise<void>;
+    logout: () => void;
     refreshAccessToken: () => Promise<void>;
 };
 
@@ -47,8 +47,8 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
-    // never rejects: local sign-out always happens, server-side logout is best effort
-    const logout = useCallback(async () => {
+    // local sign-out happens immediately; server-side logout is best effort and runs in the background
+    const logout = useCallback(() => {
         logoutCountRef.current += 1;
         const currentToken = tokenRef.current;
         updateToken('');
@@ -57,10 +57,14 @@ export const AdminContextProvider = ({ children }: Props) => {
             return;
         }
 
-        try {
+        void (async () => {
+            // an expired access token would be rejected by the logout endpoint, leaving the refresh token unrevoked
             const logoutToken = isAccessTokenValid(currentToken) ? currentToken : await tokenRefreshRequest();
             await logoutRequest(logoutToken);
-        } catch {}
+        })().catch((error: unknown) => {
+            // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
+            console.error('Server-side logout failed:', error);
+        });
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
@@ -70,6 +74,8 @@ export const AdminContextProvider = ({ children }: Props) => {
             throw new CanceledError('Session ended during token refresh');
         }
         if (refresh.status === 'rejected') {
+            // the session can't be renewed, so end it locally; a following logout() then has no token to revoke
+            updateToken('');
             throw refresh.reason;
         }
         updateToken(refresh.value);

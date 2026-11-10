@@ -6,6 +6,7 @@ import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_IMAGE_CONFIGS } from '
 import { useValidatedRichTextField } from '@/hooks/admin/use-validated-rich-text-field/useValidatedRichTextField';
 import { HippotherapyGalleryCardContent } from '@/types/admin/hippotherapy-page';
 import { ImageValues } from '@/types/common/image';
+import { useHippotherapyReadOnly } from '@/pages/admin/hippotherapy-page/context/HippotherapyReadOnlyContext';
 
 export interface GalleryCardProps {
     card: HippotherapyGalleryCardContent;
@@ -16,6 +17,7 @@ export interface GalleryCardProps {
     onImageError: (error: string | null) => void;
     imageError?: string | null;
     disabled?: boolean;
+    languageCode?: string;
 }
 
 const GalleryCardComponent = ({
@@ -27,11 +29,14 @@ const GalleryCardComponent = ({
     onImageError,
     imageError,
     disabled,
+    languageCode,
 }: GalleryCardProps) => {
     const description = useValidatedRichTextField({
         value: card.description,
         onChange: onDescriptionChange,
+        languageCode,
     });
+    const isReadOnly = useHippotherapyReadOnly();
 
     return (
         <div className="hippotherapy-gallery-section-card">
@@ -66,6 +71,7 @@ const GalleryCardComponent = ({
                 maxLength={HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION}
                 error={description.error}
                 disabled={disabled}
+                hideToolbar={isReadOnly}
             />
             {imageError && <p className="hippotherapy-gallery-section-error">{imageError}</p>}
         </div>

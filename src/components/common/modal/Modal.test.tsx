@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { HTMLAttributes, ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Modal, ModalProps } from './Modal';
@@ -9,6 +9,49 @@ const defaultProps: ModalProps = {
     isOpen: true,
     fullscreen: false,
     onClose: mockOnClose,
+};
+
+const mockParentClick = jest.fn();
+
+type ModalElements = { overlay: HTMLElement; container: HTMLElement };
+
+const getModalElements = (): ModalElements => ({
+    overlay: screen.getByTestId('modal-overlay'),
+    container: document.querySelector('.modal-container') as HTMLElement,
+});
+
+const renderModal = (children: ReactNode = <Modal.Content>Content</Modal.Content>) => {
+    render(<Modal {...defaultProps}>{children}</Modal>);
+    return getModalElements();
+};
+
+const renderDraggableModal = (innerProps: HTMLAttributes<HTMLDivElement> = {}) => {
+    // eslint-disable-next-line testing-library/render-result-naming-convention
+    const elements = renderModal(
+        <Modal.Content>
+            <div data-testid="inner" {...innerProps}>
+                Draggable
+            </div>
+        </Modal.Content>,
+    );
+    return { ...elements, inner: screen.getByTestId('inner') };
+};
+
+const renderModalInsideParent = () => {
+    render(
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={mockParentClick}>
+            <Modal {...defaultProps}>
+                <Modal.Content>Content</Modal.Content>
+            </Modal>
+        </div>,
+    );
+    return getModalElements();
+};
+
+const pressAndRelease = (pressTarget: Element, releaseTarget: Element = pressTarget) => {
+    fireEvent.pointerDown(pressTarget);
+    fireEvent.click(releaseTarget);
 };
 
 describe('Modal Component', () => {
@@ -44,23 +87,6 @@ describe('Modal Component', () => {
         expect(screen.getByText('Modal Content')).toBeInTheDocument();
         expect(screen.getByText('Modal Actions')).toBeInTheDocument();
         expect(document.querySelector('.modal-container')).toBeInTheDocument();
-    });
-
-    test('calls onClose when clicking overlay (proper sequence)', async () => {
-        render(
-            <Modal {...defaultProps}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>,
-        );
-
-        const overlay = screen.getByTestId('modal-overlay');
-
-        // Simulate proper mouse interaction: mousedown on overlay, then click on overlay
-        fireEvent.mouseDown(overlay, { target: overlay, currentTarget: overlay });
-        fireEvent.click(overlay, { target: overlay, currentTarget: overlay });
-
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     test('calls onClose when clicking close button', async () => {
@@ -109,23 +135,6 @@ describe('Modal Component', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    test('does not call onClose when clicking inside modal container', async () => {
-        render(
-            <Modal {...defaultProps}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>,
-        );
-
-        const modalContainer = document.querySelector('.modal-container');
-
-        // Simulate clicking inside modal: mousedown on modal, then click on modal
-        fireEvent.mouseDown(modalContainer!);
-        fireEvent.click(modalContainer!);
-
-        expect(mockOnClose).not.toHaveBeenCalled();
-    });
-
     test('does not call onClose when pressing keys inside modal container', async () => {
         render(
             <Modal {...defaultProps}>
@@ -139,6 +148,47 @@ describe('Modal Component', () => {
         fireEvent.keyDown(modalContainer!, { key: 'Enter' });
         fireEvent.keyDown(modalContainer!, { key: ' ' });
         expect(mockOnClose).not.toHaveBeenCalled();
+    });
+
+    describe('drag behaviour', () => {
+        test.each([
+            ['a plain child', {}],
+            [
+                'a child that stops pointerdown propagation (capture phase)',
+                { onPointerDown: (e: React.PointerEvent) => e.stopPropagation() },
+            ],
+        ])('does NOT call onClose when drag starts inside modal on %s and ends on overlay', (_name, innerProps) => {
+            const { overlay, inner } = renderDraggableModal(innerProps);
+
+            pressAndRelease(inner, overlay);
+
+            expect(mockOnClose).not.toHaveBeenCalled();
+        });
+
+        test('resets drag state after an interrupted drag, so the next overlay click closes the modal', () => {
+            const { overlay, inner } = renderDraggableModal();
+
+            pressAndRelease(inner, overlay);
+            expect(mockOnClose).not.toHaveBeenCalled();
+
+            pressAndRelease(overlay);
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('event bubbling through the React tree (portal)', () => {
+        test.each([
+            ['drag started inside and ended on overlay', 'container', 'overlay', 0],
+            ['click on overlay', 'overlay', 'overlay', 1],
+            ['click inside container', 'container', 'container', 0],
+        ] as const)('%s: onClose x%i, parent onClick not called', (_name, press, release, closeCalls) => {
+            const view = renderModalInsideParent();
+
+            pressAndRelease(view[press], view[release]);
+
+            expect(mockOnClose).toHaveBeenCalledTimes(closeCalls);
+            expect(mockParentClick).not.toHaveBeenCalled();
+        });
     });
 
     test('renders without title, content, or actions when not provided', () => {
@@ -227,26 +277,6 @@ describe('Modal Component', () => {
         expect(screen.getByText('Fragment Title')).toBeInTheDocument();
         expect(screen.getByText('Array Content')).toBeInTheDocument();
         expect(screen.getByText('Fragment Actions')).toBeInTheDocument();
-    });
-
-    test('does NOT call onClose when clicking inside modal container', () => {
-        const onClose = jest.fn();
-
-        render(
-            <Modal isOpen={true} onClose={onClose}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-                <Modal.Actions>Actions</Modal.Actions>
-            </Modal>,
-        );
-
-        const container = document.querySelector('.modal-container');
-
-        // Simulate proper click inside modal: mousedown on modal, then click on modal
-        fireEvent.mouseDown(container!);
-        fireEvent.click(container!);
-
-        expect(onClose).not.toHaveBeenCalled();
     });
 
     test('closes when mousedown starts outside modal and ends outside', async () => {

@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { ChangeEvent, forwardRef } from 'react';
+import { Controller, useForm, UseFormClearErrors } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -10,7 +10,10 @@ import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useFeedbackForm } from '@/hooks/admin/use-feedback-form/useFeedbackForm';
 import { GenericFormRef } from '@/hooks/admin/use-generic-modal/useGenericModal';
-import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import {
+    getNormalizedInputTextWhileTyping,
+    getNormalizedMultilineInputText,
+} from '@/utils/functions/formatters/text-formatters';
 import {
     FeedbackHistoryFormValues,
     FeedbackHistoryValidationSchema,
@@ -36,6 +39,19 @@ const mapImageInputError = (error: string | null): string | undefined => {
     }
     return error;
 };
+
+const createTextFieldChangeHandler =
+    <T extends HTMLInputElement | HTMLTextAreaElement>(
+        fieldName: 'title' | 'story',
+        onChange: (event: ChangeEvent<T>) => void,
+        clearErrors: UseFormClearErrors<FeedbackHistoryFormValues>,
+    ) =>
+    (event: ChangeEvent<T>) => {
+        onChange(event);
+        if (event.target.value === '') {
+            clearErrors(fieldName);
+        }
+    };
 
 export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFormProps>(
     ({ initialData, formDisabled, onSubmit, onValidationChange }, ref) => {
@@ -66,7 +82,7 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={createTextFieldChangeHandler('title', field.onChange, clearErrors)}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
                                 isRequired
@@ -90,8 +106,13 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
                                 value={field.value}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
+                                onChange={createTextFieldChangeHandler('story', field.onChange, clearErrors)}
+                                onBlur={() => {
+                                    if (field.value) {
+                                        field.onChange(getNormalizedMultilineInputText(field.value));
+                                    }
+                                    field.onBlur();
+                                }}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired
                                 maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.story.getMaxError()}

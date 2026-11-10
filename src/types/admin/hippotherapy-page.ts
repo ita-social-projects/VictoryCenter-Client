@@ -127,6 +127,7 @@ export interface HippotherapyQuoteContent extends HippotherapyImageValue {
 }
 
 export interface HippotherapyGalleryCardContent extends HippotherapyImageValue {
+    id: number | null;
     description: string;
 }
 
@@ -160,10 +161,15 @@ export interface HippotherapyScientificReferenceDto {
     url: string;
 }
 
+export interface HippotherapyEthicsPrinciple {
+    id: number | null;
+    text: string;
+}
+
 export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue {
     title: string;
     description: string;
-    principles: string[];
+    principles: HippotherapyEthicsPrinciple[];
 }
 
 export type HippotherapyPageTranslationStatusInfo = TranslationStatusInfo & {

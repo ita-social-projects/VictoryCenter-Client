@@ -66,9 +66,15 @@ const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageConten
     anotherQuoteSection: withImageId(dto.anotherQuoteSection),
     participantsSection: {
         ...dto.participantsSection,
-        cards: dto.participantsSection.cards.map((card) => withImageId(card)),
+        cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
     },
-    ethicsSection: withImageId(dto.ethicsSection),
+    ethicsSection: withImageId({
+        ...dto.ethicsSection,
+        principles: dto.ethicsSection.principles.map((principle) => ({
+            id: principle.id ?? null,
+            text: principle.text,
+        })),
+    }),
     scientificReferencesSection: {
         ...dto.scientificReferencesSection,
         scientificReferences: attachReferenceLocalIds(dto.scientificReferencesSection.scientificReferences),

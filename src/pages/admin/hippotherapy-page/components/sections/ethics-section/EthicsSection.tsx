@@ -44,8 +44,8 @@ const EthicsSectionComponent = ({
         languageCode,
     });
 
-    const handlePrincipleChange = (index: number, principle: string) => {
-        const principles = value.principles.map((item, itemIndex) => (itemIndex === index ? principle : item));
+    const handlePrincipleChange = (index: number, text: string) => {
+        const principles = value.principles.map((item, itemIndex) => (itemIndex === index ? { ...item, text } : item));
         onChange({ ...value, principles });
     };
 
@@ -110,7 +110,7 @@ const EthicsSectionComponent = ({
                             {value.principles.map((principle, index) => (
                                 <EthicsPrinciple
                                     key={index}
-                                    value={principle}
+                                    value={principle.text}
                                     fieldId={`hippotherapy-ethics-principle-${index}`}
                                     onChange={(nextValue) => handlePrincipleChange(index, nextValue)}
                                     disabled={disabled}

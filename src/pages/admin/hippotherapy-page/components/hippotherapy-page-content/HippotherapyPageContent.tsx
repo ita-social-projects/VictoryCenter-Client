@@ -124,7 +124,10 @@ const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPa
         ...content.ethicsSection,
         title: normalizeHtml(content.ethicsSection.title),
         description: normalizeHtml(content.ethicsSection.description),
-        principles: content.ethicsSection.principles.map((principle) => normalizeHtml(principle)),
+        principles: content.ethicsSection.principles.map((principle) => ({
+            ...principle,
+            text: normalizeHtml(principle.text),
+        })),
     },
 });
 
@@ -156,6 +159,7 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
     advantagesSection: {
         title: '',
         cards: Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, () => ({
+            id: null,
             description: '',
             image: null,
             imageId: null,
@@ -170,12 +174,12 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
     anotherQuoteSection: { quoteText: '', authorName: '', image: null, imageId: null },
     participantsSection: {
         title: '',
-        cards: Array.from({ length: 4 }, () => ({ description: '', image: null, imageId: null })),
+        cards: Array.from({ length: 4 }, () => ({ id: null, description: '', image: null, imageId: null })),
     },
     ethicsSection: {
         title: '',
         description: '',
-        principles: ['', '', '', ''],
+        principles: Array.from({ length: 4 }, () => ({ id: null, text: '' })),
         image: null,
         imageId: null,
     },
@@ -291,13 +295,19 @@ export const HippotherapyPageContent = () => {
         return findLocalization(fetchedContent, selectedLanguage);
     }, [fetchedContent, isReadOnlyLanguage, selectedLanguage]);
 
-    const displayContent = useMemo(
-        () =>
-            isReadOnlyLanguage
-                ? applyHippotherapyLocalization(fetchedContent ?? draftContent, selectedLocalization)
-                : draftContent,
-        [fetchedContent, draftContent, isReadOnlyLanguage, selectedLocalization],
-    );
+    const displayContent = useMemo(() => {
+        const baseContent = fetchedContent ?? draftContent;
+
+        if (!isReadOnlyLanguage) {
+            return draftContent;
+        }
+
+        if (!baseContent) {
+            return null;
+        }
+
+        return applyHippotherapyLocalization(baseContent, selectedLocalization);
+    }, [fetchedContent, draftContent, isReadOnlyLanguage, selectedLocalization]);
 
     const advantageDescriptionImages = useMemo(
         () =>

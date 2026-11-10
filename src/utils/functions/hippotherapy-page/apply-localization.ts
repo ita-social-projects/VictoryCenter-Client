@@ -2,20 +2,27 @@ import { HippotherapyPageContentModel, HippotherapyPageLocalization } from '@/ty
 
 const pick = (translated: string | null | undefined, base: string): string => (translated?.trim() ? translated : base);
 
-const mapCards = <T extends { description: string }>(
+const translatedById = <TItem, TKey extends keyof TItem>(
+    items: TItem[] | undefined,
+    idKey: TKey,
+): Map<TItem[TKey], TItem> => new Map((items ?? []).map((item) => [item[idKey], item]));
+
+const mapCards = <T extends { id: number | null; description: string }>(
     baseCards: T[],
     translated: { cardId: number; description: string }[] | undefined,
-): T[] =>
-    baseCards.map((card, index) => ({
+): T[] => {
+    const byId = translatedById(translated, 'cardId');
+    return baseCards.map((card) => ({
         ...card,
-        description: pick(translated?.[index]?.description, card.description),
+        description: pick(card.id === null ? undefined : byId.get(card.id)?.description, card.description),
     }));
+};
 
 export const applyHippotherapyLocalization = (
-    content: HippotherapyPageContentModel | null,
+    content: HippotherapyPageContentModel,
     localization: HippotherapyPageLocalization | null,
-): HippotherapyPageContentModel | null => {
-    if (!content || !localization) return content;
+): HippotherapyPageContentModel => {
+    if (!localization) return content;
 
     const {
         introSection,
@@ -30,6 +37,9 @@ export const applyHippotherapyLocalization = (
         participantsSection,
         ethicsSection,
     } = localization;
+
+    const referencesById = translatedById(scientificReferencesSection?.scientificReferences, 'id');
+    const principlesById = translatedById(ethicsSection?.principles, 'principleId');
 
     return {
         ...content,
@@ -73,10 +83,7 @@ export const applyHippotherapyLocalization = (
             ),
             scientificReferences: content.scientificReferencesSection.scientificReferences.map((reference) => ({
                 ...reference,
-                name: pick(
-                    scientificReferencesSection?.scientificReferences?.find((item) => item.id === reference.id)?.name,
-                    reference.name,
-                ),
+                name: pick(reference.id === null ? undefined : referencesById.get(reference.id)?.name, reference.name),
             })),
         },
         anotherQuoteSection: {
@@ -92,9 +99,10 @@ export const applyHippotherapyLocalization = (
             ...content.ethicsSection,
             title: pick(ethicsSection?.title, content.ethicsSection.title),
             description: pick(ethicsSection?.description, content.ethicsSection.description),
-            principles: content.ethicsSection.principles.map((principle, index) =>
-                pick(ethicsSection?.principles?.[index]?.text, principle),
-            ),
+            principles: content.ethicsSection.principles.map((principle) => ({
+                ...principle,
+                text: pick(principle.id === null ? undefined : principlesById.get(principle.id)?.text, principle.text),
+            })),
         },
     };
 };

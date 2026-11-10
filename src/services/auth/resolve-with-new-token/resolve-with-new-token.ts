@@ -1,11 +1,11 @@
-import { InternalAxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 export type RefreshHandler = (config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>;
 
 export const resolveWithNewTokenConcurrent = (
     refreshAccessToken: () => Promise<void>,
     getAccessToken: () => string,
-    logout: (token: string) => void,
+    logout: () => void,
 ): RefreshHandler => {
     let isRefreshing = false;
     const retryQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
@@ -38,7 +38,9 @@ export const resolveWithNewTokenConcurrent = (
                         resolveQueue(getAccessToken());
                     })
                     .catch((error) => {
-                        logout(getAccessToken());
+                        if (!axios.isCancel(error)) {
+                            logout();
+                        }
                         rejectQueue(error);
                     })
                     .finally(() => {
@@ -52,7 +54,7 @@ export const resolveWithNewTokenConcurrent = (
 export const resolveWithNewToken = (
     refreshAccessToken: () => Promise<void>,
     getAccessToken: () => string,
-    logout: (token: string) => void,
+    logout: () => void,
 ): RefreshHandler => {
     return async function (config: InternalAxiosRequestConfig) {
         try {
@@ -61,7 +63,9 @@ export const resolveWithNewToken = (
             config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
             return config;
         } catch (err) {
-            logout(getAccessToken());
+            if (!axios.isCancel(err)) {
+                logout();
+            }
             throw err;
         }
     };

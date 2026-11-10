@@ -216,6 +216,14 @@ const hasAdvantagesTranslation = (localization: HippotherapyPageLocalization | n
             localization?.advantagesSection?.cards?.some((card) => getPlainTextFromHtml(card.description ?? '').trim()),
     );
 
+const hasParticipantsTranslation = (localization: HippotherapyPageLocalization | null): boolean =>
+    Boolean(
+        getPlainTextFromHtml(localization?.participantsSection?.title ?? '').trim() ||
+            localization?.participantsSection?.cards?.some((card) =>
+                getPlainTextFromHtml(card.description ?? '').trim(),
+            ),
+    );
+
 const hasScientificReferenceTranslation = (
     localization: HippotherapyPageLocalization | null,
     referenceId: number | null,
@@ -295,6 +303,15 @@ export const HippotherapyPageContent = () => {
         () =>
             Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, index) => {
                 const cardImage = fetchedContent?.advantagesSection.cards[index]?.image;
+                return getImageSrc(cardImage) || HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES[index];
+            }),
+        [fetchedContent],
+    );
+
+    const participantsDescriptionImages = useMemo(
+        () =>
+            Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, index) => {
+                const cardImage = fetchedContent?.participantsSection.cards[index]?.image;
                 return getImageSrc(cardImage) || HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES[index];
             }),
         [fetchedContent],
@@ -463,6 +480,7 @@ export const HippotherapyPageContent = () => {
             analysisSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Analysis }),
             anotherQuoteSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.AnotherQuote }),
             advantagesSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Advantages }),
+            participantsSection: () => setTranslationTarget({ block: HippotherapyPageLocalizationBlock.Participants }),
             scientificGeneral: () =>
                 setTranslationTarget({
                     block: HippotherapyPageLocalizationBlock.ScientificReferences,
@@ -649,7 +667,8 @@ export const HippotherapyPageContent = () => {
                     defaultCardImageStyles={HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES.PARTICIPANTS_CARDS}
                     onCardImageError={imageErrorHandlers.participantsSection}
                     disabled={isDisabled}
-                    isTranslateDisabled={isTranslateDisabled}
+                    onTranslateClick={canTranslate ? translationHandlers.participantsSection : undefined}
+                    isTranslateDisabled={isTranslateDisabled || hasParticipantsTranslation(targetLocalization)}
                     translationLanguages={translationLanguages}
                     localizations={getLocalizations(HippotherapyPageLocalizationBlock.Participants)}
                     languageCode={selectedLanguage?.code}
@@ -704,7 +723,11 @@ export const HippotherapyPageContent = () => {
                 isOpen={translationTarget != null}
                 onClose={() => setTranslationTarget(null)}
                 block={translationTarget?.block ?? null}
-                descriptionImages={advantageDescriptionImages}
+                descriptionImages={
+                    translationTarget?.block === HippotherapyPageLocalizationBlock.Participants
+                        ? participantsDescriptionImages
+                        : advantageDescriptionImages
+                }
                 subBlock={translationTarget?.subBlock}
                 targetResearchLocalId={translationTarget?.targetResearchLocalId}
                 translatedLanguages={translationLanguages}

@@ -2,7 +2,7 @@
 
 .root {
     width: 13rem;
-    height: 25.25rem;
+    min-height: 25.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -45,5 +45,5 @@
 .description {
     position: relative;
     width: 13rem;
-    height: 9.75rem;
+    min-height: 9.75rem;
 }

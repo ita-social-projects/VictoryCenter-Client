@@ -20,10 +20,6 @@
       "SECOND_BOLD_TEXT": "Perhaps, your letter will be the beginning of a great change — for someone, or maybe even for you."
     },
     "FORM": {
-      "NAME": "Enter your name",
-      "EMAIL": "Enter your email for contact",
-      "SUBJECT": "Enter the subject of your inquiry",
-      "MESSAGE": "Write your message",
       "SUBMIT_BUTTON": "Send"
     }
   },

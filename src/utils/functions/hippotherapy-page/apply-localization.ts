@@ -74,7 +74,7 @@ export const applyHippotherapyLocalization = (
             scientificReferences: content.scientificReferencesSection.scientificReferences.map((reference) => ({
                 ...reference,
                 name: pick(
-                    scientificReferencesSection?.scientificReferences?.find((item) => item.id === reference.id)?.name,
+                    scientificReferencesSection?.references?.find((item) => item.referenceId === reference.id)?.name,
                     reference.name,
                 ),
             })),

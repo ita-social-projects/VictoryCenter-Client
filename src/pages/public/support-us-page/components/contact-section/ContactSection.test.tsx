@@ -31,6 +31,10 @@ const T = {
     FIRST_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT',
     SECOND_BOLD_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT',
     SUBMIT_BUTTON: 'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON',
+    NAME_PLACEHOLDER: 'namePlaceholder',
+    EMAIL_PLACEHOLDER: 'emailPlaceholder',
+    SUBJECT_PLACEHOLDER: 'subjectPlaceholder',
+    MESSAGE_PLACEHOLDER: 'messagePlaceholder',
     NAME_REQUIRED: 'contactForm.nameRequired',
     EMAIL_REQUIRED: 'contactForm.emailRequired',
     EMAIL_INVALID: 'contactForm.emailInvalid',
@@ -125,6 +129,15 @@ describe('ContactSection', () => {
         expect(getField(MESSAGE_FIELD)).toHaveAttribute('maxlength', String(CONTACT_FORM_LIMITS.MESSAGE.MAX));
         expect(getField(MESSAGE_FIELD).tagName).toBe('TEXTAREA');
         expect(screen.getByRole('button', { name: T.SUBMIT_BUTTON })).toBeEnabled();
+    });
+
+    it('renders the same placeholders as the other contact forms', () => {
+        render(<ContactSection />);
+
+        expect(getField(NAME_FIELD)).toHaveAttribute('placeholder', T.NAME_PLACEHOLDER);
+        expect(getField(EMAIL_FIELD)).toHaveAttribute('placeholder', T.EMAIL_PLACEHOLDER);
+        expect(getField(SUBJECT_FIELD)).toHaveAttribute('placeholder', T.SUBJECT_PLACEHOLDER);
+        expect(getField(MESSAGE_FIELD)).toHaveAttribute('placeholder', T.MESSAGE_PLACEHOLDER);
     });
 
     it('disables submission and does not call the API when CAPTCHA has no token', async () => {

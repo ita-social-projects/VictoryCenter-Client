@@ -760,6 +760,25 @@ describe('ProgramExpensesSection', () => {
             expect(getSummaryCard()).toHaveTextContent(formatCardAmount(3000, 'USD'));
         });
 
+        it('should round the summary to two decimal places', () => {
+            const onSummaryChange = jest.fn();
+            mockUseDataFetchResult = {
+                data: {
+                    ...MOCK_PROGRAM_EXPENSES_DATA,
+                    records: [
+                        { ...MOCK_PROGRAM_EXPENSES_DATA.records[0], amountUah: '0,1', amountUsd: '0,1' },
+                        { ...MOCK_PROGRAM_EXPENSES_DATA.records[2], amountUah: '0,2', amountUsd: '0,2' },
+                    ],
+                },
+                isLoading: false,
+                refetch: mockRefetch,
+            };
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            expect(onSummaryChange).toHaveBeenLastCalledWith({ totalAmountUah: 0.3, totalAmountUsd: 0.3 });
+        });
+
         it('should recalculate the summary after a single record is deleted', async () => {
             const onSummaryChange = jest.fn();
 

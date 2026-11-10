@@ -39,6 +39,8 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 
 const MAX_PROGRAM_EXPENSE_RECORDS = 4;
 
+const roundToCents = (value: number): number => Math.round(value * 100) / 100;
+
 interface ProgramExpensesSectionProps {
     isEditing?: boolean;
     isRowEditMode?: boolean;
@@ -171,17 +173,20 @@ export const ProgramExpensesSection = ({
         onCountsChange?.(programExpenseRecordsCount);
     }, [programExpenseRecordsCount, onCountsChange]);
 
-    const summary = useMemo<ProgramExpensesSummary>(
-        () =>
-            recordsState.reduce<ProgramExpensesSummary>(
-                (acc, record) => ({
-                    totalAmountUah: acc.totalAmountUah + (parseFormattedNumber(record.amountUah) ?? 0),
-                    totalAmountUsd: acc.totalAmountUsd + (parseFormattedNumber(record.amountUsd) ?? 0),
-                }),
-                { totalAmountUah: 0, totalAmountUsd: 0 },
-            ),
-        [recordsState],
-    );
+    const summary = useMemo<ProgramExpensesSummary>(() => {
+        const totals = recordsState.reduce<ProgramExpensesSummary>(
+            (acc, record) => ({
+                totalAmountUah: acc.totalAmountUah + (parseFormattedNumber(record.amountUah) ?? 0),
+                totalAmountUsd: acc.totalAmountUsd + (parseFormattedNumber(record.amountUsd) ?? 0),
+            }),
+            { totalAmountUah: 0, totalAmountUsd: 0 },
+        );
+
+        return {
+            totalAmountUah: roundToCents(totals.totalAmountUah),
+            totalAmountUsd: roundToCents(totals.totalAmountUsd),
+        };
+    }, [recordsState]);
 
     useEffect(() => {
         onSummaryChange?.(summary);

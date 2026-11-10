@@ -35,7 +35,7 @@ describe('HippotherapyPageApi', () => {
         },
         advantagesSection: {
             title: 'Advantages title',
-            cards: [{ description: 'Card description', image: null, imageId: null }],
+            cards: [{ id: 11, description: 'Card description', image: null, imageId: null }],
         },
         analysisSection: { title: 'Analysis title', description: 'Analysis text' },
         scientificReferencesSection: {
@@ -46,12 +46,12 @@ describe('HippotherapyPageApi', () => {
         anotherQuoteSection: { quoteText: 'Another quote', authorName: 'Another author', image: null, imageId: null },
         participantsSection: {
             title: 'Participants title',
-            cards: [{ description: 'Participant description', image: null, imageId: null }],
+            cards: [{ id: 21, description: 'Participant description', image: null, imageId: null }],
         },
         ethicsSection: {
             title: 'Ethics title',
             description: 'Ethics text',
-            principles: ['Principle one'],
+            principles: [{ id: 31, text: 'Principle one' }],
             image: null,
             imageId: null,
         },
@@ -403,6 +403,55 @@ describe('HippotherapyPageApi', () => {
                     translationStatus: TranslationStatus.Relevant,
                 },
             ]);
+        });
+    });
+
+    describe('card and principle ids', () => {
+        it('keeps ids of cards and principles in the model returned by GET', async () => {
+            mockGetResponse();
+
+            const result = await HippotherapyPageApi.get(mockClient);
+
+            expect(result.advantagesSection.cards[0].id).toBe(11);
+            expect(result.participantsSection.cards[0].id).toBe(21);
+            expect(result.ethicsSection.principles).toEqual([{ id: 31, text: 'Principle one' }]);
+        });
+
+        it('falls back to null when the API does not return an id', async () => {
+            const dto = buildDto();
+            (dto.advantagesSection.cards[0] as { id: number | null }).id = undefined as unknown as null;
+            mockGetResponse(dto);
+
+            const result = await HippotherapyPageApi.get(mockClient);
+
+            expect(result.advantagesSection.cards[0].id).toBeNull();
+        });
+
+        it('sends ids of cards and principles in the PUT body', async () => {
+            mockPutResponse();
+
+            await HippotherapyPageApi.update(mockClient, buildContent());
+
+            expectPutCalledWith({
+                advantagesSection: expect.objectContaining({ cards: [expect.objectContaining({ id: 11 })] }),
+                ethicsSection: expect.objectContaining({ principles: [{ id: 31, text: 'Principle one' }] }),
+            });
+        });
+
+        it('sends id: null for newly added cards and principles', async () => {
+            const content = buildContent();
+            content.participantsSection.cards.push({ id: null, description: 'New', image: null, imageId: null });
+            content.ethicsSection.principles.push({ id: null, text: 'New principle' });
+            mockPutResponse();
+
+            await HippotherapyPageApi.update(mockClient, content);
+
+            const payload = getSentPayload() as Pick<
+                HippotherapyPageContentDto,
+                'participantsSection' | 'ethicsSection'
+            >;
+            expect(payload.participantsSection.cards[1].id).toBeNull();
+            expect(payload.ethicsSection.principles[1]).toEqual({ id: null, text: 'New principle' });
         });
     });
 });

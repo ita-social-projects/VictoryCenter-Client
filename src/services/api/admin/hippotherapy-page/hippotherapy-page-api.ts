@@ -61,7 +61,7 @@ const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageConten
     hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
     advantagesSection: {
         ...dto.advantagesSection,
-        cards: dto.advantagesSection.cards.map((card) => withImageId(card)),
+        cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
     },
     anotherQuoteSection: withImageId(dto.anotherQuoteSection),
     participantsSection: {

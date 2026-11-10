@@ -177,6 +177,11 @@ jest.mock('../sections/gallery-section/GallerySection', () => ({
             data-localizations-count={localizations?.length ?? 0}
         >
             <span>{value.title}</span>
+            {value.cards?.map((card: any, i: number) => (
+                <span key={i} data-testid={`${fieldIdPrefix}-card-${i}`}>
+                    {card.description}
+                </span>
+            ))}
             {mockTranslateButton({ onClick: onTranslateClick, disabled: isTranslateDisabled, label: fieldIdPrefix })}
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited gallery title' })}>
                 Edit {fieldIdPrefix}
@@ -227,7 +232,7 @@ jest.mock('../sections/scientific-references-section/ScientificReferencesSection
             })}
             {mockTranslateButton({
                 onClick: onTranslateReferenceClick && (() => onTranslateReferenceClick('local-1')),
-                disabled: isTranslateReferenceDisabled?.('local-1'),
+                disabled: isTranslateReferenceDisabled?.(value.scientificReferences[0]?.localId),
                 label: 'research-item',
             })}
         </div>
@@ -250,12 +255,24 @@ jest.mock('../sections/ethics-section/EthicsSection', () => ({
             data-localizations-count={localizations?.length ?? 0}
         >
             <span>{value.title}</span>
+            {value.principles?.map((p: any, i: number) => (
+                <span key={i} data-testid={`ethics-principle-${i}`}>
+                    {p.text}
+                </span>
+            ))}
             <button disabled={disabled} onClick={() => onChange({ ...value, title: 'Edited ethics title' })}>
                 Edit ethics
             </button>
             <button
                 disabled={disabled}
-                onClick={() => onChange({ ...value, principles: ['Edited principle', ...value.principles.slice(1)] })}
+                onClick={() =>
+                    onChange({
+                        ...value,
+                        principles: value.principles.map((p: any, i: number) =>
+                            i === 0 ? { ...p, text: 'Edited principle' } : p,
+                        ),
+                    })
+                }
             >
                 Edit ethics principle
             </button>
@@ -350,7 +367,7 @@ const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): Hi
     },
     advantagesSection: {
         title: 'Advantages title',
-        cards: [{ description: 'Card description', image: savedImage, imageId: savedImage.id }],
+        cards: [{ id: 101, description: 'Card description', image: savedImage, imageId: savedImage.id }],
     },
     analysisSection: { title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
@@ -366,12 +383,12 @@ const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): Hi
     },
     participantsSection: {
         title: 'Participants title',
-        cards: [{ description: 'Participant description', image: savedImage, imageId: savedImage.id }],
+        cards: [{ id: 201, description: 'Participant description', image: savedImage, imageId: savedImage.id }],
     },
     ethicsSection: {
         title: 'Ethics title',
         description: 'Ethics text',
-        principles: ['Principle one'],
+        principles: [{ id: 301, text: 'Principle one' }],
         image: savedImage,
         imageId: savedImage.id,
     },
@@ -538,7 +555,6 @@ describe('HippotherapyPageContent', () => {
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
         mockedIsContentValid.mockReturnValue(true);
 
-        // CRITICAL FIX: Ensure the localization toolkit mock is always initialized with all required properties
         mockedUseLocalizationToolkit.mockReturnValue(createToolkitMock());
 
         if (!(global as any).crypto) {
@@ -807,7 +823,7 @@ describe('HippotherapyPageContent', () => {
                 withEnglishLocalization({
                     advantagesSection: {
                         title: '<p><br></p>',
-                        cards: [{ description: '<p><br></p>' }],
+                        cards: [{ id: 101, description: '<p><br></p>' }],
                     },
                 }),
             );
@@ -820,7 +836,7 @@ describe('HippotherapyPageContent', () => {
                 withEnglishLocalization({
                     participantsSection: {
                         title: '<p><br></p>',
-                        cards: [{ description: '<p><br></p>' }],
+                        cards: [{ id: 201, description: '<p><br></p>' }],
                     },
                 }),
             );
@@ -1065,6 +1081,20 @@ describe('HippotherapyPageContent', () => {
             },
         );
 
+        it('keeps the specific reference translation action enabled when localization has a translation for a different referenceId', async () => {
+            await renderLoaded(
+                withEnglishLocalization({
+                    scientificReferencesSection: {
+                        title: '',
+                        description: '',
+                        scientificReferences: [{ id: 999, name: 'Translated other citation' }],
+                    },
+                }),
+            );
+
+            expect(getButton('Translate research-item')).toBeEnabled();
+        });
+
         it('keeps the general research translation action enabled when localization contains only empty rich-text markup', async () => {
             await renderLoaded(
                 withEnglishLocalization({
@@ -1114,7 +1144,7 @@ describe('HippotherapyPageContent', () => {
                 ethicsSection: {
                     title: '',
                     description: '',
-                    principles: [{ principleId: 1, text: 'Translated principle' }],
+                    principles: [{ principleId: 301, text: 'Translated principle' }],
                 },
             }));
     });
@@ -1189,6 +1219,36 @@ describe('HippotherapyPageContent', () => {
                 screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
             ).toBeInTheDocument();
         });
+
+        it('matches card translations by id even when localization array is reversed', async () => {
+            const content = buildContent({
+                advantagesSection: {
+                    title: 'Advantages title',
+                    cards: [
+                        { id: 1, description: 'Card 1 UA', image: null, imageId: null },
+                        { id: 2, description: 'Card 2 UA', image: null, imageId: null },
+                    ],
+                },
+                localizations: [
+                    {
+                        language: englishLanguage,
+                        translationStatus: TranslationStatus.Relevant,
+                        advantagesSection: {
+                            title: 'EN Adv',
+                            cards: [
+                                { cardId: 2, description: 'Translated Card 2' },
+                                { cardId: 1, description: 'Translated Card 1' },
+                            ],
+                        },
+                    } as any,
+                ],
+            });
+
+            setup({ content, toolkitOverrides: { selectedLanguage: englishLanguage } });
+
+            expect(await screen.findByTestId('hippotherapy-advantages-card-0')).toHaveTextContent('Translated Card 1');
+            expect(screen.getByTestId('hippotherapy-advantages-card-1')).toHaveTextContent('Translated Card 2');
+        });
     });
 
     describe('language switching and validation', () => {
@@ -1201,18 +1261,69 @@ describe('HippotherapyPageContent', () => {
         });
 
         it('keeps Ukrainian draft intact when switching to English and back', async () => {
-            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
-            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
+            const onLanguageChangeMock = jest.fn((lang) => {
+                mockedUseLocalizationToolkit.mockReturnValue(
+                    createToolkitMock({
+                        selectedLanguage: lang,
+                        onLanguageChange: onLanguageChangeMock,
+                    }),
+                );
+            });
+
+            mockedUseLocalizationToolkit.mockReturnValue(
+                createToolkitMock({
+                    selectedLanguage: ukrainianLanguage,
+                    onLanguageChange: onLanguageChangeMock,
+                }),
+            );
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+            render(<HippotherapyPageContent />);
 
             await screen.findByTestId('section-intro');
             fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
 
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
 
-            onLanguageChange(englishLanguage);
-            onLanguageChange(ukrainianLanguage);
+            onLanguageChangeMock(englishLanguage);
+            onLanguageChangeMock(ukrainianLanguage);
 
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        it('does not enable publish button when switching uk -> en -> uk without editing', async () => {
+            const onLanguageChangeMock = jest.fn((lang) => {
+                mockedUseLocalizationToolkit.mockReturnValue(
+                    createToolkitMock({
+                        selectedLanguage: lang,
+                        onLanguageChange: onLanguageChangeMock,
+                    }),
+                );
+            });
+
+            mockedUseLocalizationToolkit.mockReturnValue(
+                createToolkitMock({
+                    selectedLanguage: ukrainianLanguage,
+                    onLanguageChange: onLanguageChangeMock,
+                }),
+            );
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(contentWithEnglish());
+            render(<HippotherapyPageContent />);
+
+            await screen.findByTestId('section-intro');
+            expect(publishButton()).toBeDisabled();
+
+            onLanguageChangeMock(englishLanguage);
+
+            const pubButton = screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+            if (pubButton) {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(pubButton).toBeDisabled();
+            }
+
+            onLanguageChangeMock(ukrainianLanguage);
+            expect(publishButton()).toBeDisabled();
         });
 
         it('re-validates fields when language changes to prevent stale errors', async () => {
@@ -1234,16 +1345,32 @@ describe('HippotherapyPageContent', () => {
 
     describe('external-value tag prevents draft overwrite', () => {
         it('does not overwrite draftContent when switching languages (OnChangePlugin blocked)', async () => {
-            const { onLanguageChange } = createToolkitMock({ selectedLanguage: ukrainianLanguage });
-            setup({ toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange } });
+            const onLanguageChangeMock = jest.fn((lang) => {
+                mockedUseLocalizationToolkit.mockReturnValue(
+                    createToolkitMock({
+                        selectedLanguage: lang,
+                        onLanguageChange: onLanguageChangeMock,
+                    }),
+                );
+            });
+
+            mockedUseLocalizationToolkit.mockReturnValue(
+                createToolkitMock({
+                    selectedLanguage: ukrainianLanguage,
+                    onLanguageChange: onLanguageChangeMock,
+                }),
+            );
+
+            mockedHippotherapyPageApi.get.mockResolvedValue(buildContent());
+            render(<HippotherapyPageContent />);
 
             await screen.findByTestId('section-intro');
 
             fireEvent.click(screen.getByRole('button', { name: 'Edit intro' }));
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
 
-            onLanguageChange(englishLanguage);
-            onLanguageChange(ukrainianLanguage);
+            onLanguageChangeMock(englishLanguage);
+            onLanguageChangeMock(ukrainianLanguage);
 
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
             expect(screen.getByTestId('section-intro')).toHaveTextContent('Edited intro title');

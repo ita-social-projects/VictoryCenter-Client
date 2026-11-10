@@ -31,8 +31,8 @@ describe('GallerySection', () => {
     const defaultValue: HippotherapyGallerySectionContent = {
         title: 'Initial title',
         cards: [
-            { description: 'Card one', image: null, imageId: null },
-            { description: 'Card two', image: null, imageId: null },
+            { id: 1, description: 'Card one', image: null, imageId: null },
+            { id: null, description: 'Card two', image: null, imageId: null },
         ],
     };
 
@@ -105,6 +105,15 @@ describe('GallerySection', () => {
         fireEvent.blur(screen.getAllByTestId('mock-image-input-file')[0]);
 
         expect(screen.queryByText('Too short')).not.toBeInTheDocument();
+    });
+
+    it('keeps ids (including null for unsaved cards) when a card changes', () => {
+        const onChange = jest.fn();
+        renderComponent({ onChange });
+
+        fireEvent.change(screen.getByTestId(cardDescriptionId(1)), { target: { value: 'Edited' } });
+
+        expect(onChange.mock.calls[0][0].cards.map((c: { id: number | null }) => c.id)).toEqual([1, null]);
     });
 
     itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, cardDescriptionId(0), cardDescriptionId(1)]);

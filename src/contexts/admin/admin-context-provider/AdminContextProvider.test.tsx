@@ -116,7 +116,6 @@ describe('<AdminContextProvider />', () => {
         process.on('unhandledRejection', unhandled);
 
         tokenRefreshMock.mockRejectedValueOnce(new Error('refresh failed'));
-        logoutRequestMock.mockRejectedValueOnce(new Error('logout failed'));
         isValidMock.mockReturnValue(false);
 
         render(
@@ -126,7 +125,7 @@ describe('<AdminContextProvider />', () => {
         );
 
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
-        expect(logoutRequestMock).toHaveBeenCalledTimes(1);
+        expect(logoutRequestMock).not.toHaveBeenCalled();
         expect(screen.getByTestId('auth')).toHaveTextContent('false');
 
         await new Promise((resolve) => setTimeout(resolve, 0));

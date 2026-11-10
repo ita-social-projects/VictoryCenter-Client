@@ -43,16 +43,19 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
-    const logout = useCallback(() => {
+    const logout = useCallback((): Promise<void> => {
         const currentToken = tokenRef.current;
         updateToken('');
 
         if (currentToken) {
-            void logoutRequest(currentToken).catch((error: unknown) => {
-                // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
-                console.error('Server-side logout failed:', error);
-            });
+            return logoutRequest(currentToken)
+                .catch((error: unknown) => {
+                    // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
+                    console.error('Server-side logout failed:', error);
+                })
+                .then(() => undefined);
         }
+        return Promise.resolve();
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {

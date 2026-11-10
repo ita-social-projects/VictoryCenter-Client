@@ -5,6 +5,7 @@ import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT, REPORTS_TEXT } from '@/
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
+import { formatSummaryAmount } from '@/utils/functions/format-summary-amount/format-summary-amount';
 
 const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     exchangeRate: '41.25',
@@ -318,11 +319,8 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
 }));
 
 describe('ProgramExpensesSection', () => {
-    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
-
     beforeEach(() => {
         jest.clearAllMocks();
-        dispatchEventSpy.mockClear();
         mockBatchSaveRecords.mockResolvedValue(undefined);
         mockRefetch.mockResolvedValue(undefined);
         mockUseDataFetchResult = {
@@ -713,11 +711,6 @@ describe('ProgramExpensesSection', () => {
                 expect(mockUpdate).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
                 expect(mockRefetch).not.toHaveBeenCalled();
-
-                expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
-                expect(dispatchEventSpy).toHaveBeenCalledWith(
-                    expect.objectContaining({ type: 'program-expenses-updated' }),
-                );
             });
         });
 
@@ -745,6 +738,86 @@ describe('ProgramExpensesSection', () => {
                 expect(selectionRow).toHaveAttribute('aria-hidden', 'true');
                 expect(screen.getByRole('checkbox', { name: 'Select record 1' })).not.toBeChecked();
                 expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+            });
+        });
+    });
+
+    describe('summary recalculation', () => {
+        const INITIAL_SUMMARY = { totalAmountUah: 123750, totalAmountUsd: 3000 };
+
+        const getSummaryCard = () => screen.getByText(PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.TITLE).parentElement!;
+        // toHaveTextContent normalizes whitespace (incl. the uk-UA non-breaking group separator) only in received text
+        const formatCardAmount = (value: number, currency: string) =>
+            `${formatSummaryAmount(value)} ${currency}`.replace(/\s/g, ' ');
+
+        it('should report the summary calculated from loaded records', () => {
+            const onSummaryChange = jest.fn();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            expect(onSummaryChange).toHaveBeenLastCalledWith(INITIAL_SUMMARY);
+            expect(getSummaryCard()).toHaveTextContent(formatCardAmount(123750, 'UAH'));
+            expect(getSummaryCard()).toHaveTextContent(formatCardAmount(3000, 'USD'));
+        });
+
+        it('should recalculate the summary after a single record is deleted', async () => {
+            const onSummaryChange = jest.fn();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            fireEvent.click(screen.getByLabelText('Delete record 1'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(onSummaryChange).toHaveBeenLastCalledWith({ totalAmountUah: 74250, totalAmountUsd: 1800 });
+            });
+            expect(getSummaryCard()).toHaveTextContent(formatCardAmount(74250, 'UAH'));
+            expect(getSummaryCard()).toHaveTextContent(formatCardAmount(1800, 'USD'));
+        });
+
+        it('should recalculate the summary after bulk deletion', async () => {
+            const onSummaryChange = jest.fn();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+            fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 2' }));
+            fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(onSummaryChange).toHaveBeenLastCalledWith({ totalAmountUah: 49500, totalAmountUsd: 1200 });
+            });
+        });
+
+        it('should recalculate the summary after a record is added', async () => {
+            const onSummaryChange = jest.fn();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(onSummaryChange).toHaveBeenLastCalledWith({ totalAmountUah: 124750, totalAmountUsd: 3025 });
+            });
+        });
+
+        it('should recalculate the summary after a record amount is edited', async () => {
+            const onSummaryChange = jest.fn();
+
+            render(<ProgramExpensesSection exchangeRate="41.25" onSummaryChange={onSummaryChange} />);
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            // Records 1 and 2 share Program A, so pick an unused program to pass the uniqueness check
+            fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+            // 8250 UAH / 41.25 = 200 USD, so the amounts stay consistent with the exchange rate
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8250' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '200' } });
+            fireEvent.click(screen.getByLabelText('Accept record 1'));
+
+            await waitFor(() => {
+                expect(onSummaryChange).toHaveBeenLastCalledWith({ totalAmountUah: 82500, totalAmountUsd: 2000 });
             });
         });
     });

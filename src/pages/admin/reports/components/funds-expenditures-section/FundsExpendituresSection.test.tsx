@@ -242,6 +242,8 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
                 data-record-count={records.length}
                 data-editing={String(isEditing ?? false)}
                 data-has-aggregate-row={String(Boolean(programAggregateRow))}
+                data-aggregate-amount-uah={programAggregateRow?.amountUah ?? ''}
+                data-aggregate-amount-usd={programAggregateRow?.amountUsd ?? ''}
             >
                 <input type="checkbox" aria-label="Select all records" onClick={() => onSelectAllToggle?.(true)} />
                 <button
@@ -375,13 +377,6 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     },
 }));
 
-const mockProgramExpensesSummaryGet = jest.fn();
-jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
-    ProgramExpensesApi: {
-        getSummary: (...args: unknown[]) => mockProgramExpensesSummaryGet(...args),
-    },
-}));
-
 const mockGetByEntityId = jest.fn();
 jest.mock(
     '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api',
@@ -433,7 +428,7 @@ jest.mock('./components/common/translate-disclaimer-modal/TranslateDisclaimerMod
     },
 }));
 
-const MOCK_EMPTY_PROGRAM_SUMMARY: ProgramExpensesSummary = { totalAmountUah: 0, totalAmountUsd: 0 };
+const DATA_FETCH_SLOTS_COUNT = 4;
 
 const setupMockDataFetch = (
     settings: ReportFundsExpendituresSettings | null = MOCK_FUNDS_EXPENDITURES_SETTINGS,
@@ -441,21 +436,19 @@ const setupMockDataFetch = (
     records: ReportFundsExpendituresRecord[] = MOCK_FUNDS_EXPENDITURES_RECORDS,
     summary: FundsExpendituresSummary = MOCK_FUNDS_EXPENDITURES_SUMMARY,
     loadingBySlot: Partial<Record<number, boolean>> = {},
-    programExpenses: ProgramExpensesSummary = MOCK_EMPTY_PROGRAM_SUMMARY,
 ) => {
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
         // IMPORTANT: slot order must match the order useDataFetch is called in
-        // FundsExpendituresSection: 0=settings, 1=categories, 2=records, 3=summary, 4=programExpenses
+        // FundsExpendituresSection: 0=settings, 1=categories, 2=records, 3=summary
         // If a new useDataFetch call is added to the component, add a slot here in the same position.
-        const slot = callOrder % 5;
+        const slot = callOrder % DATA_FETCH_SLOTS_COUNT;
         const slotDataMap: Record<number, unknown> = {
             0: settings,
             1: categories,
             2: records,
             3: summary,
-            4: programExpenses,
         };
         const data = slotDataMap[slot];
         return {
@@ -474,35 +467,29 @@ describe('FundsExpenditureSection', () => {
         mockGetByEntityId.mockResolvedValue([]);
     });
 
-    describe('cross-tab synchronization', () => {
-        it('should add, execute, and properly clean up the program-expenses-updated event listener', () => {
-            const addSpy = jest.spyOn(window, 'addEventListener');
-            const removeSpy = jest.spyOn(window, 'removeEventListener');
+    describe('program expenses aggregate row', () => {
+        it('should show zero amounts when no program expenses summary is provided', () => {
+            render(<FundsExpenditureSection />);
+            const table = screen.getByTestId('funds-table');
 
-            const { unmount } = render(<FundsExpenditureSection />);
+            expect(table).toHaveAttribute('data-aggregate-amount-uah', '0');
+            expect(table).toHaveAttribute('data-aggregate-amount-usd', '0');
+        });
 
-            expect(addSpy).toHaveBeenCalledWith('program-expenses-updated', expect.any(Function));
+        it('should reflect the program expenses summary passed from the parent and update when it changes', () => {
+            const { rerender } = render(
+                <FundsExpenditureSection programExpensesSummary={{ totalAmountUah: 1500.5, totalAmountUsd: 36 }} />,
+            );
+            const table = screen.getByTestId('funds-table');
 
-            const attachedCallback = addSpy.mock.calls.find((call) => call[0] === 'program-expenses-updated')?.[1] as
-                | EventListener
-                | undefined;
+            expect(table).toHaveAttribute('data-aggregate-amount-uah', '1500,5');
+            expect(table).toHaveAttribute('data-aggregate-amount-usd', '36');
 
-            if (!attachedCallback) {
-                throw new Error('Event listener not attached');
-            }
+            const nextSummary: ProgramExpensesSummary = { totalAmountUah: 500, totalAmountUsd: 12 };
+            rerender(<FundsExpenditureSection programExpensesSummary={nextSummary} />);
 
-            expect(attachedCallback).toBeDefined();
-
-            if (attachedCallback) {
-                attachedCallback(new Event('program-expenses-updated'));
-            }
-
-            unmount();
-
-            expect(removeSpy).toHaveBeenCalledWith('program-expenses-updated', attachedCallback);
-
-            addSpy.mockRestore();
-            removeSpy.mockRestore();
+            expect(table).toHaveAttribute('data-aggregate-amount-uah', '500');
+            expect(table).toHaveAttribute('data-aggregate-amount-usd', '12');
         });
     });
 
@@ -1591,33 +1578,6 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
     });
 });
 
-describe('FundsExpenditureSection fetch handler delegation', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        setupMockDataFetch();
-        mockGetByEntityId.mockResolvedValue([]);
-    });
-
-    it('fetchProgramSummary calls ProgramExpensesApi.getSummary with the admin client', async () => {
-        const capturedFetchHandlers: Array<(opts?: object) => unknown> = [];
-        // Wrap the slot-based impl so stable data refs are preserved (avoids infinite re-renders)
-        const slotImpl = mockUseDataFetch.getMockImplementation()!;
-        mockUseDataFetch.mockImplementation((props: any) => {
-            capturedFetchHandlers.push(props.fetchHandler);
-            return slotImpl(props);
-        });
-
-        mockProgramExpensesSummaryGet.mockResolvedValueOnce({ totalAmountUah: 500, totalAmountUsd: 200 });
-        render(<FundsExpenditureSection />);
-
-        // slot 4 = fetchProgramSummary (5th useDataFetch call in the component)
-        const result = await capturedFetchHandlers[4]({});
-
-        expect(mockProgramExpensesSummaryGet).toHaveBeenCalledWith(stableAdminClient, {});
-        expect(result).toEqual({ totalAmountUah: 500, totalAmountUsd: 200 });
-    });
-});
-
 describe('FundsExpenditureSection aggregate row visibility', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -1950,7 +1910,7 @@ describe('FundsExpenditureSection category limit', () => {
 
         const getRefetchCallCount = (slot: number) =>
             mockUseDataFetch.mock.results
-                .filter((_, index) => index % 5 === slot)
+                .filter((_, index) => index % DATA_FETCH_SLOTS_COUNT === slot)
                 .reduce((count, result) => count + (result.value.refetch as jest.Mock).mock.calls.length, 0);
 
         const setupPublish = () => {
@@ -1995,7 +1955,7 @@ describe('FundsExpenditureSection category limit', () => {
 
         const failRefetch = (slot: number) =>
             mockUseDataFetch.mock.results
-                .filter((_, index) => index % 5 === slot)
+                .filter((_, index) => index % DATA_FETCH_SLOTS_COUNT === slot)
                 .forEach((result) => (result.value.refetch as jest.Mock).mockRejectedValue(new Error('Network Error')));
 
         it('does not warn when every refetch succeeds', async () => {

@@ -13,8 +13,10 @@ import {
     ProgramExpensesProgram,
     ProgramExpensesReadOnlyData,
     ProgramExpensesRecord,
+    ProgramExpensesSummary,
     ReportProgramExpendituresRecordState,
 } from '@/types/admin/reports';
+import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
@@ -43,6 +45,7 @@ interface ProgramExpensesSectionProps {
     onRowEditModeChange?: (isEditing: boolean) => void;
     onCountsChange?: (count: number) => void;
     onDataChange?: () => void;
+    onSummaryChange?: (summary: ProgramExpensesSummary) => void;
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     exchangeRate: string | null;
 }
@@ -53,6 +56,7 @@ export const ProgramExpensesSection = ({
     onRowEditModeChange,
     onCountsChange,
     onDataChange,
+    onSummaryChange,
     registerSaveCallback,
     exchangeRate,
 }: ProgramExpensesSectionProps) => {
@@ -166,6 +170,22 @@ export const ProgramExpensesSection = ({
     useEffect(() => {
         onCountsChange?.(programExpenseRecordsCount);
     }, [programExpenseRecordsCount, onCountsChange]);
+
+    const summary = useMemo<ProgramExpensesSummary>(
+        () =>
+            recordsState.reduce<ProgramExpensesSummary>(
+                (acc, record) => ({
+                    totalAmountUah: acc.totalAmountUah + (parseFormattedNumber(record.amountUah) ?? 0),
+                    totalAmountUsd: acc.totalAmountUsd + (parseFormattedNumber(record.amountUsd) ?? 0),
+                }),
+                { totalAmountUah: 0, totalAmountUsd: 0 },
+            ),
+        [recordsState],
+    );
+
+    useEffect(() => {
+        onSummaryChange?.(summary);
+    }, [summary, onSummaryChange]);
 
     const handleOpenAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(true);
@@ -387,7 +407,7 @@ export const ProgramExpensesSection = ({
 
     return (
         <div className={styles.section}>
-            <ProgramExpensesSummaryCard summary={data.summary} />
+            <ProgramExpensesSummaryCard summary={summary} />
 
             <div className={styles.filters}>
                 <ProgramExpensesToolbar

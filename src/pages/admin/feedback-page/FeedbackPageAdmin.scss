@@ -28,6 +28,14 @@
             margin-bottom: 102px;
         }
 
+        .draggable-item {
+            min-width: 0;
+
+            .item-data {
+                min-width: 0;
+            }
+        }
+
         .btn-add {
             display: flex;
             gap: 8px;

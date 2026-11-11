@@ -590,6 +590,24 @@ describe('ProgramExpensesSection', () => {
         });
     });
 
+    it('should remove a selected record from the selection when it is deleted via its row delete icon', async () => {
+        render(<ProgramExpensesSection exchangeRate={'41.25'} />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+        expect(screen.getByText(/^Вибрано 1 з \d+$/)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
+
+        expect(screen.queryByRole('checkbox', { name: 'Select record 1' })).not.toBeInTheDocument();
+        expect(screen.queryByText(/^Вибрано 1 з \d+$/)).not.toBeInTheDocument();
+        expect(screen.getByText(/^Вибрано 0 з \d+$/).closest('[aria-hidden]')).toHaveAttribute('aria-hidden', 'true');
+    });
+
     it('should open bulk delete modal when delete selected button is clicked', () => {
         render(<ProgramExpensesSection exchangeRate={'41.25'} />);
 

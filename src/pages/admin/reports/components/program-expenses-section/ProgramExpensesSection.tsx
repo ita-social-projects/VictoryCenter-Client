@@ -281,6 +281,7 @@ export const ProgramExpensesSection = ({
         if (!recordToDelete) return;
 
         setRecordsState((prev) => prev.filter((record) => record.id !== recordToDelete.id));
+        setSelectedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
 
         if (!isTempId(recordToDelete.id)) {
             setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));

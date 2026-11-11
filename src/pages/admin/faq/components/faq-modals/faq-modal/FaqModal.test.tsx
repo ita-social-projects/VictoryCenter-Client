@@ -374,21 +374,25 @@ describe('FaqModal', () => {
             fireEvent.click(getQuestionCancelButton());
 
             expect(getQuestionModal()).not.toBeInTheDocument();
+            expect(mockOnClose).not.toHaveBeenCalled();
             expect(mockFaqApi.post).not.toHaveBeenCalled();
             expect(mockOnAddFaq).not.toHaveBeenCalled();
         });
 
-        it('should keep the modal open when cancelling a draft save', () => {
+        it('should close the modal without saving when cancelling a draft save', () => {
             render(<FaqModal {...addModeProps} />);
             simulateFormBecomesValid();
 
             fireEvent.click(getDraftButton());
             simulateFormSubmit(VisibilityStatus.Draft);
+            expect(getQuestionTitle()).toHaveTextContent(FAQ_TEXT.QUESTION.DRAFT_FAQ);
+
             fireEvent.click(getQuestionCancelButton());
 
             expect(getQuestionModal()).not.toBeInTheDocument();
-            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
             expect(mockFaqApi.post).not.toHaveBeenCalled();
+            expect(mockOnAddFaq).not.toHaveBeenCalled();
         });
     });
 

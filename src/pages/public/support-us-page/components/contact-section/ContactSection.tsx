@@ -115,7 +115,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ title, submitLabel }) => {
         formState: { errors, touchedFields, isSubmitted },
     } = useForm<ContactFormData>({
         resolver: yupResolver(contactFormSchema),
-        mode: 'onBlur',
+        mode: 'onTouched',
     });
     const { token, containerRef, reset: resetTurnstile } = useTurnstile(CF_TURNSTILE_SITE_KEY);
     const [toast, setToast] = useState<Toast | null>(null);

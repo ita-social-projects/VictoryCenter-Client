@@ -16,10 +16,6 @@ const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
 interface ContactFormProps {
     title: string;
-    namePlaceholder: string;
-    emailPlaceholder: string;
-    subjectPlaceholder: string;
-    messagePlaceholder: string;
     submitLabel: string;
 }
 
@@ -98,14 +94,7 @@ const getHint = (
     return null;
 };
 
-const ContactForm: React.FC<ContactFormProps> = ({
-    title,
-    namePlaceholder,
-    emailPlaceholder,
-    subjectPlaceholder,
-    messagePlaceholder,
-    submitLabel,
-}) => {
+const ContactForm: React.FC<ContactFormProps> = ({ title, submitLabel }) => {
     const { t } = useTranslation('contactUsPage');
     const contactFormSchema = useMemo(() => createContactFormSchema(t), [t]);
     const requiredMessages = useMemo(
@@ -204,7 +193,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
             <form className={styles.form} aria-label={title} onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Field error={getErrorMessage('name', errors.name?.message, errors.name?.type)}>
                     <ContactField
-                        placeholder={namePlaceholder}
+                        placeholder={t('namePlaceholder')}
                         className={fieldClass(Boolean(errors.name) && isFieldTouched('name'))}
                         registration={nameRegistration}
                         onBlur={(event) => {
@@ -215,7 +204,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 </Field>
                 <Field error={getErrorMessage('email', errors.email?.message, errors.email?.type, emailValue)}>
                     <ContactField
-                        placeholder={emailPlaceholder}
+                        placeholder={t('emailPlaceholder')}
                         className={fieldClass(Boolean(errors.email) && isFieldTouched('email'))}
                         registration={emailRegistration}
                         onBlur={(event) => {
@@ -236,7 +225,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                     }
                 >
                     <ContactField
-                        placeholder={subjectPlaceholder}
+                        placeholder={t('subjectPlaceholder')}
                         className={fieldClass(Boolean(errors.subject) && isFieldTouched('subject'))}
                         registration={subjectRegistration}
                         onBlur={(event) => {
@@ -257,7 +246,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                     }
                 >
                     <ContactField
-                        placeholder={messagePlaceholder}
+                        placeholder={t('messagePlaceholder')}
                         className={classNames(
                             fieldClass(Boolean(errors.message) && isFieldTouched('message')),
                             styles['field--textarea'],
@@ -298,14 +287,7 @@ export const ContactSection = () => {
                     </p>
                 </div>
                 <div className={styles['form-container']}>
-                    <ContactForm
-                        title={formTitle}
-                        namePlaceholder={t('SUPPORT_INQUIRY.FORM.NAME')}
-                        emailPlaceholder={t('SUPPORT_INQUIRY.FORM.EMAIL')}
-                        subjectPlaceholder={t('SUPPORT_INQUIRY.FORM.SUBJECT')}
-                        messagePlaceholder={t('SUPPORT_INQUIRY.FORM.MESSAGE')}
-                        submitLabel={t('SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON')}
-                    />
+                    <ContactForm title={formTitle} submitLabel={t('SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON')} />
                 </div>
             </section>
         </>

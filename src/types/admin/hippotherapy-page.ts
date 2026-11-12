@@ -212,31 +212,36 @@ export interface HippotherapyImageValue {
 }
 
 export interface HippotherapyIntroSectionContent extends HippotherapyImageValue {
+    id: number;
     title: string;
     description: string;
 }
 
 export interface HippotherapyTextCardContent {
+    id: number;
     title: string;
     description: string;
 }
 
 export interface HippotherapyQuoteContent extends HippotherapyImageValue {
+    id: number;
     quoteText: string;
     authorName: string;
 }
 
 export interface HippotherapyGalleryCardContent extends HippotherapyImageValue {
-    id: number | null;
+    id: number;
     description: string;
 }
 
 export interface HippotherapyGallerySectionContent {
+    id: number;
     title: string;
     cards: HippotherapyGalleryCardContent[];
 }
 
 export interface HippoventionCenterSectionContent extends HippotherapyImageValue {
+    id: number;
     title: string;
     pros: string;
     description: string;
@@ -244,19 +249,20 @@ export interface HippoventionCenterSectionContent extends HippotherapyImageValue
 
 export interface HippotherapyScientificReference {
     localId: string;
-    id: number | null;
+    id: number;
     name: string;
     url: string;
 }
 
 export interface HippotherapyScientificReferencesSectionContent {
+    id: number;
     title: string;
     description: string;
     scientificReferences: HippotherapyScientificReference[];
 }
 
 export interface HippotherapyScientificReferenceDto {
-    id: number | null;
+    id: number;
     name: string;
     url: string;
 }
@@ -267,9 +273,15 @@ export interface HippotherapyEthicsPrinciple {
 }
 
 export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue {
+    id: number;
     title: string;
     description: string;
     principles: HippotherapyEthicsPrinciple[];
+}
+
+export interface HippotherapyEthicsPrinciple {
+    id: number;
+    text: string;
 }
 
 export type HippotherapyPageTranslationStatusInfo = TranslationStatusInfo & {
@@ -299,6 +311,7 @@ export interface HippotherapyPageContentDto
         EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
     translationStatuses?: HippotherapyPageTranslationStatusDto[];
     scientificReferencesSection: {
+        id: number | null;
         title: string;
         description: string;
         scientificReferences: HippotherapyScientificReferenceDto[];

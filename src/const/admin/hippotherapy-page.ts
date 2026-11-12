@@ -1,6 +1,10 @@
 import type { CSSProperties } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { HippotherapyPageLocalizationBlock, HippotherapyPageLocalizedContent } from '@/types/admin/hippotherapy-page';
+import {
+    HippotherapyPageContentModel,
+    HippotherapyPageLocalizationBlock,
+    HippotherapyPageLocalizedContent,
+} from '@/types/admin/hippotherapy-page';
 import introDefaultImage from '@/assets/images/man-touching-white-horse-side.webp';
 import quoteDefaultImage from '@/assets/images/man-holding-horse-cheek-close.webp';
 import anotherQuoteDefaultImage from '@/assets/images/man-facing-horse-forehead.webp';
@@ -31,6 +35,9 @@ export const HIPPOTHERAPY_PAGE_TEXT = {
 
     CONFIRMATION: {
         DELETE_REFERENCE: 'Видалити наукове дослідження?',
+    },
+    ERRORS: {
+        TRANSLATION_SAVE_FAILED: 'Помилка збереження перекладу',
     },
 };
 
@@ -133,9 +140,9 @@ export const createScientificReferenceItemTranslationFields = (): HippotherapyTr
 
 export const ETHICS_PRINCIPLES_COUNT = 4;
 
-export const getEthicsPrincipleFieldName = (index: number) => `principle-${index}`;
+export const getEthicsPrincipleFieldName = (principleId: number) => `principle-${principleId}`;
 
-export const createEthicsTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+export const createEthicsTranslationFields = (principleIds: number[]): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -150,8 +157,8 @@ export const createEthicsTranslationFields = (): HippotherapyTranslationFieldCon
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
         isRequired: true,
     },
-    ...Array.from({ length: ETHICS_PRINCIPLES_COUNT }, (_, index) => ({
-        name: getEthicsPrincipleFieldName(index),
+    ...principleIds.map((principleId) => ({
+        name: getEthicsPrincipleFieldName(principleId),
         label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.ETHICS_PRINCIPLE,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
@@ -159,7 +166,9 @@ export const createEthicsTranslationFields = (): HippotherapyTranslationFieldCon
     })),
 ];
 
-const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+export const getGalleryCardDescriptionFieldName = (cardId: number) => `description${cardId}`;
+
+const createAdvantagesTranslationFields = (cardIds: number[]): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -168,8 +177,8 @@ const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig
         isRequired: true,
         type: 'text',
     },
-    ...Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, imageIndex) => ({
-        name: `description${imageIndex + 1}`,
+    ...cardIds.map((cardId, imageIndex) => ({
+        name: getGalleryCardDescriptionFieldName(cardId),
         label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
@@ -178,7 +187,7 @@ const createAdvantagesTranslationFields = (): HippotherapyTranslationFieldConfig
     })),
 ];
 
-const createParticipantsTranslationFields = (): HippotherapyTranslationFieldConfig[] => [
+const createParticipantsTranslationFields = (cardIds: number[]): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -187,8 +196,8 @@ const createParticipantsTranslationFields = (): HippotherapyTranslationFieldConf
         isRequired: true,
         type: 'text',
     },
-    ...Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, (_, imageIndex) => ({
-        name: `description${imageIndex + 1}`,
+    ...cardIds.map((cardId, imageIndex) => ({
+        name: getGalleryCardDescriptionFieldName(cardId),
         label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
         minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
@@ -260,14 +269,6 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
         sectionKey: 'anotherQuoteSection',
         fields: createQuoteTranslationFields(),
     },
-    [HippotherapyPageLocalizationBlock.Advantages]: {
-        sectionKey: 'advantagesSection',
-        fields: createAdvantagesTranslationFields(),
-    },
-    [HippotherapyPageLocalizationBlock.Participants]: {
-        sectionKey: 'participantsSection',
-        fields: createParticipantsTranslationFields(),
-    },
     [HippotherapyPageLocalizationBlock.HippoventionCenter]: {
         sectionKey: 'hippoventionCenterSection',
         fields: createHippoventionCenterTranslationFields(),
@@ -275,10 +276,6 @@ export const HIPPOTHERAPY_TRANSLATION_SECTIONS: Partial<
     [HippotherapyPageLocalizationBlock.ScientificReferences]: {
         sectionKey: 'scientificReferencesSection-general',
         fields: createScientificReferencesGeneralTranslationFields(),
-    },
-    [HippotherapyPageLocalizationBlock.Ethics]: {
-        sectionKey: 'ethicsSection',
-        fields: createEthicsTranslationFields(),
     },
 };
 
@@ -290,15 +287,40 @@ const SCIENTIFIC_REFERENCES_RESEARCH_CONFIG: HippotherapyTranslationSectionConfi
 export const getHippotherapyTranslationConfig = (
     block: HippotherapyPageLocalizationBlock | null,
     subBlock?: 'general' | 'research' | null,
+    content?: HippotherapyPageContentModel | null,
 ): HippotherapyTranslationSectionConfig | undefined => {
     if (block == null) return undefined;
-    if (block === HippotherapyPageLocalizationBlock.ScientificReferences) {
-        if (subBlock === 'research') {
-            return SCIENTIFIC_REFERENCES_RESEARCH_CONFIG;
+
+    switch (block) {
+        case HippotherapyPageLocalizationBlock.Advantages: {
+            const cardIds = content?.advantagesSection.cards.map((card) => card.id) ?? [];
+            return {
+                sectionKey: 'advantagesSection',
+                fields: createAdvantagesTranslationFields(cardIds),
+            };
         }
-        return HIPPOTHERAPY_TRANSLATION_SECTIONS[HippotherapyPageLocalizationBlock.ScientificReferences];
+        case HippotherapyPageLocalizationBlock.Participants: {
+            const cardIds = content?.participantsSection.cards.map((card) => card.id) ?? [];
+            return {
+                sectionKey: 'participantsSection',
+                fields: createParticipantsTranslationFields(cardIds),
+            };
+        }
+        case HippotherapyPageLocalizationBlock.Ethics: {
+            const principleIds = content?.ethicsSection.principles.map((principle) => principle.id) ?? [];
+            return {
+                sectionKey: 'ethicsSection',
+                fields: createEthicsTranslationFields(principleIds),
+            };
+        }
+        case HippotherapyPageLocalizationBlock.ScientificReferences:
+            if (subBlock === 'research') {
+                return SCIENTIFIC_REFERENCES_RESEARCH_CONFIG;
+            }
+            return HIPPOTHERAPY_TRANSLATION_SECTIONS[HippotherapyPageLocalizationBlock.ScientificReferences];
+        default:
+            return HIPPOTHERAPY_TRANSLATION_SECTIONS[block];
     }
-    return HIPPOTHERAPY_TRANSLATION_SECTIONS[block];
 };
 
 export interface HippotherapyImageConfig {

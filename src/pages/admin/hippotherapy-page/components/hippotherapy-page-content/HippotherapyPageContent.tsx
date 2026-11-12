@@ -17,6 +17,7 @@ import {
     HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT,
     HIPPOTHERAPY_PAGE_ADVANTAGES_DEFAULT_IMAGES,
     HIPPOTHERAPY_PAGE_DEFAULT_IMAGE_STYLES,
+    ETHICS_PRINCIPLES_COUNT,
     HIPPOTHERAPY_PAGE_TEXT,
 } from '@/const/admin/hippotherapy-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -63,7 +64,7 @@ const findLocalization = (
     );
 };
 
-const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPageContentModel => ({
+const normalizeContent = (content: HippotherapyPageContentModel) => ({
     localizations: [],
     translationStatuses: [],
     introSection: {
@@ -145,11 +146,12 @@ const hasDraftImage = (content: HippotherapyPageContentModel, errorKey: string):
 const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: '', description: '', image: null, imageId: null },
-    descriptionSection: { title: '', description: '' },
-    quoteSection: { quoteText: '', authorName: '', image: null, imageId: null },
-    hippoventionSection: { title: '', description: '' },
+    introSection: { id: -1, title: '', description: '', image: null, imageId: null },
+    descriptionSection: { id: -1, title: '', description: '' },
+    quoteSection: { id: -1, quoteText: '', authorName: '', image: null, imageId: null },
+    hippoventionSection: { id: -1, title: '', description: '' },
     hippoventionCenterSection: {
+        id: -1,
         title: '',
         description: '',
         pros: '',
@@ -157,29 +159,33 @@ const createBlankHippotherapyPageContent = (): HippotherapyPageContentModel => (
         imageId: null,
     },
     advantagesSection: {
+        id: -1,
         title: '',
         cards: Array.from({ length: HIPPOTHERAPY_PAGE_ADVANTAGES_CARDS_COUNT }, () => ({
-            id: null,
+            id: -1,
             description: '',
             image: null,
             imageId: null,
         })),
     },
-    analysisSection: { title: '', description: '' },
+    analysisSection: { id: -1, title: '', description: '' },
     scientificReferencesSection: {
+        id: -1,
         title: '',
         description: '',
-        scientificReferences: [{ localId: crypto.randomUUID(), id: null, name: '', url: '' }],
+        scientificReferences: [{ localId: crypto.randomUUID(), id: -1, name: '', url: '' }],
     },
-    anotherQuoteSection: { quoteText: '', authorName: '', image: null, imageId: null },
+    anotherQuoteSection: { id: -1, quoteText: '', authorName: '', image: null, imageId: null },
     participantsSection: {
+        id: -1,
         title: '',
-        cards: Array.from({ length: 4 }, () => ({ id: null, description: '', image: null, imageId: null })),
+        cards: Array.from({ length: 4 }, () => ({ id: -1, description: '', image: null, imageId: null })),
     },
     ethicsSection: {
+        id: -1,
         title: '',
         description: '',
-        principles: Array.from({ length: 4 }, () => ({ id: null, text: '' })),
+        principles: Array.from({ length: 4 }, () => ({ id: -1, text: '' })),
         image: null,
         imageId: null,
     },
@@ -512,6 +518,12 @@ export const HippotherapyPageContent = () => {
         [isTranslateDisabled, fetchedContent, targetLocalization],
     );
 
+    const handleTranslationSuccess = useCallback(async () => {
+        await refetch();
+        setTranslationTarget(null);
+        addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
+    }, [refetch, addToast]);
+
     const renderContent = () => {
         if (isLoading) {
             return (
@@ -733,6 +745,8 @@ export const HippotherapyPageContent = () => {
                 subBlock={translationTarget?.subBlock}
                 targetResearchLocalId={translationTarget?.targetResearchLocalId}
                 translatedLanguages={translationLanguages}
+                pageContent={fetchedContent}
+                onTranslate={handleTranslationSuccess}
             />
             <ToastContainer />
         </>

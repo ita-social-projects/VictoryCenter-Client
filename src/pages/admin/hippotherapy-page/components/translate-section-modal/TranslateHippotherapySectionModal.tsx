@@ -6,7 +6,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getHippotherapyTranslationConfig } from '@/const/admin/hippotherapy-page';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { VisibilityStatus } from '@/types/admin/common';
-import { HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
+import { HippotherapyPageContentModel, HippotherapyPageLocalizationBlock } from '@/types/admin/hippotherapy-page';
 import { LocalizationLanguage } from '@/types/common/language';
 import {
     TranslateHippotherapySectionForm,
@@ -14,6 +14,7 @@ import {
     TranslateHippotherapySectionFormValues,
 } from '../translate-section-form/TranslateHippotherapySectionForm';
 import './TranslateHippotherapySectionModal.scss';
+import { useTranslateHippotherapySection } from '@/hooks/admin/use-translate-hippotherapy-section/useTranslateHippotherapySection';
 
 export type HippotherapyTranslationSubBlock = 'general' | 'research';
 
@@ -24,7 +25,9 @@ export interface TranslateHippotherapySectionModalProps {
     descriptionImages?: string[];
     subBlock?: HippotherapyTranslationSubBlock | null;
     targetResearchLocalId?: string | null;
+    pageContent: HippotherapyPageContentModel | null;
     translatedLanguages: LocalizationLanguage[];
+    onTranslate: () => void | Promise<void>;
 }
 
 const getAvailableLanguages = (languages: LocalizationLanguage[]): LocalizationLanguage[] => {
@@ -45,7 +48,9 @@ export const TranslateHippotherapySectionModal = ({
     descriptionImages,
     subBlock,
     targetResearchLocalId,
+    pageContent,
     translatedLanguages,
+    onTranslate,
 }: TranslateHippotherapySectionModalProps) => {
     const availableLanguages = useMemo(() => getAvailableLanguages(translatedLanguages), [translatedLanguages]);
 
@@ -63,16 +68,22 @@ export const TranslateHippotherapySectionModal = ({
         setLanguage(getDefaultLanguage(availableLanguages));
     }, [isOpen, availableLanguages]);
 
-    const sectionConfig = getHippotherapyTranslationConfig(block, subBlock);
+    const { translateHippotherapySection, isSubmitting, error } = useTranslateHippotherapySection({
+        pageContent,
+        block,
+        language,
+        onSuccess: onTranslate,
+    });
+
+    const sectionConfig = getHippotherapyTranslationConfig(block, subBlock, pageContent);
 
     const handleSaveClick = () => {
         void formRef.current?.submit(VisibilityStatus.Published);
     };
 
-    // Saving the translation is delivered by the "Apply translation for the section" story (#2781).
-    const handleSubmit = async (_data: TranslateHippotherapySectionFormValues) => {};
-    // Keep Save disabled until #2781 wires it up, so it doesn't look clickable while it's a no-op.
-    const isSaveImplemented = false;
+    const handleSubmit = async (data: TranslateHippotherapySectionFormValues) => {
+        await translateHippotherapySection(data);
+    };
 
     const checkIsDirty = () => formRef.current?.isDirty() ?? false;
 
@@ -111,8 +122,8 @@ export const TranslateHippotherapySectionModal = ({
                 onClose={onClose}
                 title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
                 onSave={handleSaveClick}
-                isSubmitting={false}
-                isFormValid={isFormValid && isSaveImplemented}
+                isSubmitting={isSubmitting}
+                isFormValid={isFormValid}
                 checkIsDirty={checkIsDirty}
                 isDirty={isDirty}
             >
@@ -129,7 +140,7 @@ export const TranslateHippotherapySectionModal = ({
                         </Select>
                     )}
                 </div>
-
+                {error && <div className="error">{error}</div>}
                 <TranslateHippotherapySectionForm
                     key={`${block}-${subBlock ?? 'default'}-${targetResearchLocalId ?? ''}-${language?.id}`}
                     ref={formRef}
@@ -139,6 +150,7 @@ export const TranslateHippotherapySectionModal = ({
                     onSubmit={handleSubmit}
                     onValidationChange={setIsFormValid}
                     onDirtyChange={setIsDirty}
+                    formDisabled={isSubmitting}
                 />
             </LocalizationModal>
 

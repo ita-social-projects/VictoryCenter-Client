@@ -296,17 +296,9 @@ export const HippotherapyPageContent = () => {
     }, [fetchedContent, isReadOnlyLanguage, selectedLanguage]);
 
     const displayContent = useMemo(() => {
-        const baseContent = fetchedContent ?? draftContent;
-
-        if (!isReadOnlyLanguage) {
-            return draftContent;
-        }
-
-        if (!baseContent) {
-            return null;
-        }
-
-        return applyHippotherapyLocalization(baseContent, selectedLocalization);
+        if (!isReadOnlyLanguage) return draftContent;
+        const base = fetchedContent ?? draftContent;
+        return base ? applyHippotherapyLocalization(base, selectedLocalization) : null;
     }, [fetchedContent, draftContent, isReadOnlyLanguage, selectedLocalization]);
 
     const advantageDescriptionImages = useMemo(

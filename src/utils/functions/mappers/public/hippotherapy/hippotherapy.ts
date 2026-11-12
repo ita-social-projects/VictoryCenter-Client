@@ -77,6 +77,9 @@ export const mapHippotherapyPageToAbout = (dto: HippotherapyPageContentDto): Hip
         imgURL: getImageUrl(dto.ethicsSection),
         imgAlternativeText: '',
         text: toPlain(dto.ethicsSection.description),
-        principles: dto.ethicsSection.principles.map(toPlain),
+        principles: dto.ethicsSection.principles.map((principle) => ({
+            id: principle.id,
+            text: toPlain(principle.text),
+        })),
     },
 });

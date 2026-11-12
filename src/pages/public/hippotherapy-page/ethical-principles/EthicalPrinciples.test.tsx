@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { EthicalPrinciples } from './EthicalPrinciples';
 import { useMediaQuery } from '@/hooks/common/use-media-query/useMediaQuery';
+import { text } from 'stream/consumers';
 
 jest.mock('@/hooks/common/use-media-query/useMediaQuery', () => ({
     useMediaQuery: jest.fn(),
@@ -14,7 +15,11 @@ describe('EthicalPrinciples', () => {
         imgURL: 'test-image.jpg',
         imgAlternativeText: 'Test Image',
         text: 'Test text content',
-        principles: ['Principle 1', 'Principle 2', 'Principle 3'],
+        principles: [
+            { id: 1, text: 'Principle 1' },
+            { id: 2, text: 'Principle 2' },
+            { id: 3, text: 'Principle 3' },
+        ],
     };
 
     beforeEach(() => {

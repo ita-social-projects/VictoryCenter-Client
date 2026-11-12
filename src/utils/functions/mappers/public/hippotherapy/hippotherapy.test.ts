@@ -23,7 +23,7 @@ const buildDto = (): HippotherapyPageContentDto => ({
     },
     advantagesSection: {
         title: '<p>Advantages title</p>',
-        cards: [{ description: '<p>Advantage one</p>', ...withImage('card') }],
+        cards: [{ id: 1, description: '<p>Advantage one</p>', ...withImage('card') }],
     },
     analysisSection: { title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
@@ -32,11 +32,17 @@ const buildDto = (): HippotherapyPageContentDto => ({
         scientificReferences: [{ id: 1, name: 'Reference name', url: 'https://example.com/reference' }],
     },
     anotherQuoteSection: { quoteText: 'Another quote', authorName: '', ...noImage },
-    participantsSection: { title: 'Participants title', cards: [{ description: 'Participant one', ...noImage }] },
+    participantsSection: {
+        title: 'Participants title',
+        cards: [{ id: 1, description: 'Participant one', ...noImage }],
+    },
     ethicsSection: {
         title: '<p>Ethics title</p>',
         description: '<p>Ethics text</p>',
-        principles: ['<p>Principle one</p>', 'Principle two'],
+        principles: [
+            { id: 1, text: '<p>Principle one</p>' },
+            { id: 2, text: 'Principle two' },
+        ],
         ...withImage('ethics'),
     },
 });
@@ -66,7 +72,10 @@ describe('mapHippotherapyPageToAbout', () => {
 
     it('strips html in the sections that render plain text', () => {
         expect(result.ethicsSection.title).toBe('Ethics title');
-        expect(result.ethicsSection.principles).toEqual(['Principle one', 'Principle two']);
+        expect(result.ethicsSection.principles).toEqual([
+            { id: 1, text: 'Principle one' },
+            { id: 2, text: 'Principle two' },
+        ]);
         expect(result.advantagesSection.advantages[0].text).toBe('Advantage one');
         expect(result.researchSection.description).toBe('Research description');
     });

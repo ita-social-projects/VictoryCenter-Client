@@ -31,7 +31,7 @@ export const EthicalPrinciples = ({
                 </div>
                 <ul className={styles.principles}>
                     {principles.map((principle, index) => (
-                        <li key={index}>{principle}</li>
+                        <li key={index}>{principle.text}</li>
                     ))}
                 </ul>
             </div>

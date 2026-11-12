@@ -111,7 +111,7 @@ describe('<AdminContextProvider />', () => {
         expect(screen.getByTestId('auth')).toHaveTextContent('false');
     });
 
-    it('on mount failure with failing logout: handles the rejection and still finishes loading', async () => {
+    it('on mount refresh failure: does not call logoutRequest and finishes loading', async () => {
         const unhandled = jest.fn();
         process.on('unhandledRejection', unhandled);
 

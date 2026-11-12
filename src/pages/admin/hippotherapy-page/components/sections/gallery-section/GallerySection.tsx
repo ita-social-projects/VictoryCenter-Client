@@ -88,7 +88,7 @@ const GallerySectionComponent = ({
             <div className="hippotherapy-gallery-section-cards">
                 {value.cards.map((card, index) => (
                     <GalleryCard
-                        key={card.id ?? `new-${index}`}
+                        key={index}
                         card={card}
                         fieldId={`${fieldIdPrefix}-card-${index}`}
                         defaultImageStyle={defaultCardImageStyles?.[index]}

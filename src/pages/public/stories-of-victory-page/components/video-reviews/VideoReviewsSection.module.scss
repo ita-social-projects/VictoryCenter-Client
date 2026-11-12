@@ -1,7 +1,7 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/colors' as colors;
 
-$card-gap: 12px;
+$card-gap: 16px;
 
 .container {
     margin-right: 56px;
@@ -11,6 +11,7 @@ $card-gap: 12px;
 
 .title {
     @include type.h4-semibold;
+    line-height: 38px;
     color: colors.$blue-900;
     text-align: left;
     margin-bottom: 24px;
@@ -92,7 +93,7 @@ $card-gap: 12px;
 }
 
 .videoTitle {
-    @include type.subtitle-2-bold;
+    @include type.body-2-bold;
     color: colors.$blue-900;
     text-align: left;
     margin: 0;

@@ -405,9 +405,6 @@
         align-items: flex-start;
         padding: 0 1rem;
 
-        .newsletter-block {
-            display: flex;
-        }
 
         .main-block {
             border-top: none;
@@ -421,7 +418,9 @@
             grid-template-areas: 'logo logo' 'menu about' 'hippotherapy hippotherapy';
 
             .logo-container {
-                display: none;
+                grid-area: logo;
+                width: 100%;
+                margin-bottom: 0;
             }
 
             .menu {

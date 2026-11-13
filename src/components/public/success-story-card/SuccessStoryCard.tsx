@@ -21,6 +21,7 @@ export const SuccessStoryCard: React.FC<SuccessStoryCardProps> = ({ article }) =
     const [isExpandedByClick, setIsExpandedByClick] = useState(false);
     const [isHoverDismissed, setIsHoverDismissed] = useState(false);
     const cardRef = useRef<HTMLElement>(null);
+    const expandedTextRef = useRef<HTMLDivElement>(null);
     const { title, story } = useGetLocalization(article.localizations, {
         title: article.title,
         story: article.story,
@@ -59,12 +60,24 @@ export const SuccessStoryCard: React.FC<SuccessStoryCardProps> = ({ article }) =
             }
         };
 
+        const handleScroll = (event: Event) => {
+            if (
+                expandedTextRef.current &&
+                event.target instanceof Node &&
+                expandedTextRef.current.contains(event.target)
+            ) {
+                return;
+            }
+
+            collapse();
+        };
+
         document.addEventListener('pointerdown', handlePointerDown);
-        window.addEventListener('scroll', collapse);
+        window.addEventListener('scroll', handleScroll, true);
 
         return () => {
             document.removeEventListener('pointerdown', handlePointerDown);
-            window.removeEventListener('scroll', collapse);
+            window.removeEventListener('scroll', handleScroll, true);
         };
     }, [collapse, isExpanded]);
 
@@ -89,7 +102,7 @@ export const SuccessStoryCard: React.FC<SuccessStoryCardProps> = ({ article }) =
                                 "{truncateText(story)}"
                             </div>
                             {isExpanded && (
-                                <div className={styles.expandedText}>
+                                <div ref={expandedTextRef} className={styles.expandedText}>
                                     <div className={styles.titleContent}>"{story}"</div>
                                 </div>
                             )}

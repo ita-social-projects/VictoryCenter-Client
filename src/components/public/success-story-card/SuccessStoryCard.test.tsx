@@ -99,11 +99,16 @@ describe('SuccessStoryCard', () => {
         expect(screen.queryByText(`"${longStory}"`)).not.toBeInTheDocument();
     });
 
-    it('collapses on page scroll and keeps expanded text in a scrollable area', () => {
+    it('keeps expanded text open while it scrolls and collapses on page scroll', () => {
         render(<SuccessStoryCard article={{ ...article, story: longStory }} />);
         fireEvent.click(screen.getByRole('button', { name: 'ARTICLES.READ_STORY' }));
 
-        expect(screen.getByText(`"${longStory}"`).parentElement).toHaveClass('expandedText');
+        const expandedText = screen.getByText(`"${longStory}"`).parentElement;
+        expect(expandedText).toHaveClass('expandedText');
+
+        fireEvent.scroll(expandedText!);
+        expect(screen.getByText(`"${longStory}"`)).toBeInTheDocument();
+
         fireEvent.scroll(window);
         expect(screen.getByText(collapsedStory)).toBeInTheDocument();
         expect(screen.queryByText(`"${longStory}"`)).not.toBeInTheDocument();

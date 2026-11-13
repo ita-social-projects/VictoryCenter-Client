@@ -113,12 +113,10 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        flex: 1;
-        min-width: 0;
+        flex: 1 0 auto;
     }
 
     &-actions {
-        width: 200px;
         height: 24px;
         display: flex;
         justify-content: end;

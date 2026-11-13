@@ -113,7 +113,7 @@ const ScientificReferencesSectionComponent = ({
     const handleAddReference = useCallback(() => {
         const newReference: HippotherapyScientificReference = {
             localId: crypto.randomUUID(),
-            id: null,
+            id: -1,
             name: '',
             url: '',
         };

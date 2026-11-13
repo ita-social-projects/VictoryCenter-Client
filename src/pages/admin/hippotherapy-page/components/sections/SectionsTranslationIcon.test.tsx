@@ -36,7 +36,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         'IntroBannerSection',
         (props) => (
             <IntroBannerSection
-                value={{ title: 'Title', description: 'Description', ...image }}
+                value={{ id: 1, title: 'Title', description: 'Description', ...image }}
                 onChange={jest.fn()}
                 {...props}
             />
@@ -46,7 +46,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         'TextCardSection',
         (props) => (
             <TextCardSection
-                value={{ title: 'Title', description: 'Description' }}
+                value={{ id: 1, title: 'Title', description: 'Description' }}
                 onChange={jest.fn()}
                 fieldIdPrefix="text-card"
                 {...props}
@@ -57,7 +57,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         'HippotherapyQuoteSection',
         (props) => (
             <HippotherapyQuoteSection
-                value={{ quoteText: 'Quote', authorName: 'Author', ...image }}
+                value={{ id: 1, quoteText: 'Quote', authorName: 'Author', ...image }}
                 onChange={jest.fn()}
                 fieldIdPrefix="quote"
                 {...props}
@@ -68,7 +68,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         'HippoventionCenterSection',
         (props) => (
             <HippoventionCenterSection
-                value={{ title: 'Title', description: 'Description', pros: 'Pros', ...image }}
+                value={{ id: 1, title: 'Title', description: 'Description', pros: 'Pros', ...image }}
                 onChange={jest.fn()}
                 {...props}
             />
@@ -78,7 +78,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         'GallerySection',
         (props) => (
             <GallerySection
-                value={{ title: 'Title', cards: [{ id: 1, description: 'Card', ...image }] }}
+                value={{ id: 1, title: 'Title', cards: [{ id: 1, description: 'Card', ...image }] }}
                 onChange={jest.fn()}
                 fieldIdPrefix="gallery"
                 {...props}
@@ -90,6 +90,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         (props) => (
             <ScientificReferencesSection
                 value={{
+                    id: 1,
                     title: 'Title',
                     description: 'Description',
                     scientificReferences: [{ localId: 'ref-1', id: 1, name: 'Citation', url: 'https://example.com' }],
@@ -104,6 +105,7 @@ const SECTIONS: Array<[string, (props: TranslationProps) => ReactElement]> = [
         (props) => (
             <EthicsSection
                 value={{
+                    id: 1,
                     title: 'Title',
                     description: 'Description',
                     principles: [{ id: 1, text: 'Principle' }],

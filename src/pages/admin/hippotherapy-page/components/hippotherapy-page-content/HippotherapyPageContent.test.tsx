@@ -394,11 +394,12 @@ const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'im
 const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
-    descriptionSection: { title: 'Description title', description: 'Description text' },
-    quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
-    hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
+    introSection: { id: 1, title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+    descriptionSection: { id: 1, title: 'Description title', description: 'Description text' },
+    quoteSection: { id: 1, quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
+    hippoventionSection: { id: 1, title: 'Hippovention title', description: 'Hippovention text' },
     hippoventionCenterSection: {
+        id: 1,
         title: 'Hippovention center title',
         description: 'Hippovention center text',
         pros: 'Pro one and pro two',
@@ -406,26 +407,31 @@ const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): Hi
         imageId: savedImage.id,
     },
     advantagesSection: {
+        id: 1,
         title: 'Advantages title',
         cards: [{ id: 101, description: 'Card description', image: savedImage, imageId: savedImage.id }],
     },
-    analysisSection: { title: 'Analysis title', description: 'Analysis text' },
+    analysisSection: { id: 1, title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
+        id: 1,
         title: 'Research title',
         description: 'Research text',
         scientificReferences: [{ localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' }],
     },
     anotherQuoteSection: {
+        id: 1,
         quoteText: 'Another quote',
         authorName: 'Another author',
         image: savedImage,
         imageId: savedImage.id,
     },
     participantsSection: {
+        id: 1,
         title: 'Participants title',
         cards: [{ id: 201, description: 'Participant description', image: savedImage, imageId: savedImage.id }],
     },
     ethicsSection: {
+        id: 1,
         title: 'Ethics title',
         description: 'Ethics text',
         principles: [{ id: 301, text: 'Principle one' }],
@@ -1248,7 +1254,7 @@ describe('HippotherapyPageContent', () => {
             await renderLoaded({
                 isValid: false,
                 content: buildContent({
-                    introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
+                    introSection: { id: 1, title: 'Short', description: 'Short', image: null, imageId: 1 },
                 }),
                 toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange },
             });

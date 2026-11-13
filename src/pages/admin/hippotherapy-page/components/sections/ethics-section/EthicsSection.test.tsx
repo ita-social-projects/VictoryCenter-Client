@@ -30,6 +30,7 @@ describe('EthicsSection', () => {
     const principleId = (index: number) => `mock-rich-input-hippotherapy-ethics-principle-${index}`;
 
     const defaultValue: HippotherapyEthicsSectionContent = {
+        id: 1,
         title: 'Initial title',
         description: 'Initial description',
         principles: [

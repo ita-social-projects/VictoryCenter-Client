@@ -49,6 +49,7 @@ export const applyHippotherapyLocalization = (
             description: pick(introSection?.description, content.introSection.description),
         },
         descriptionSection: {
+            ...content.descriptionSection,
             title: pick(descriptionSection?.title, content.descriptionSection.title),
             description: pick(descriptionSection?.description, content.descriptionSection.description),
         },
@@ -58,6 +59,7 @@ export const applyHippotherapyLocalization = (
             authorName: pick(quoteSection?.authorName, content.quoteSection.authorName),
         },
         hippoventionSection: {
+            ...content.hippoventionSection,
             title: pick(hippoventionSection?.title, content.hippoventionSection.title),
             description: pick(hippoventionSection?.description, content.hippoventionSection.description),
         },
@@ -68,14 +70,17 @@ export const applyHippotherapyLocalization = (
             description: pick(hippoventionCenterSection?.description, content.hippoventionCenterSection.description),
         },
         advantagesSection: {
+            ...content.advantagesSection,
             title: pick(advantagesSection?.title, content.advantagesSection.title),
             cards: mapCards(content.advantagesSection.cards, advantagesSection?.cards),
         },
         analysisSection: {
+            ...content.analysisSection,
             title: pick(analysisSection?.title, content.analysisSection.title),
             description: pick(analysisSection?.description, content.analysisSection.description),
         },
         scientificReferencesSection: {
+            ...content.scientificReferencesSection,
             title: pick(scientificReferencesSection?.title, content.scientificReferencesSection.title),
             description: pick(
                 scientificReferencesSection?.description,
@@ -92,6 +97,7 @@ export const applyHippotherapyLocalization = (
             authorName: pick(anotherQuoteSection?.authorName, content.anotherQuoteSection.authorName),
         },
         participantsSection: {
+            ...content.participantsSection,
             title: pick(participantsSection?.title, content.participantsSection.title),
             cards: mapCards(content.participantsSection.cards, participantsSection?.cards),
         },

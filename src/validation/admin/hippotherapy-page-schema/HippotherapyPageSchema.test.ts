@@ -4,11 +4,12 @@ import { HippotherapyPageContentModel } from '@/types/admin/hippotherapy-page';
 const buildValidContent = (): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: 'Valid title text', description: 'Valid description text', image: null, imageId: 1 },
-    descriptionSection: { title: 'Valid title text', description: 'Valid description text' },
-    quoteSection: { quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 2 },
-    hippoventionSection: { title: 'Valid title text', description: 'Valid description text' },
+    introSection: { id: 1, title: 'Valid title text', description: 'Valid description text', image: null, imageId: 1 },
+    descriptionSection: { id: 1, title: 'Valid title text', description: 'Valid description text' },
+    quoteSection: { id: 1, quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 2 },
+    hippoventionSection: { id: 1, title: 'Valid title text', description: 'Valid description text' },
     hippoventionCenterSection: {
+        id: 1,
         title: 'Valid title text',
         description: 'Valid description text',
         pros: 'Valid pro one and pro two',
@@ -16,23 +17,28 @@ const buildValidContent = (): HippotherapyPageContentModel => ({
         imageId: 3,
     },
     advantagesSection: {
+        id: 1,
         title: 'Valid title text',
         cards: [{ id: 1, description: 'Valid card description', image: null, imageId: 4 }],
+        cards: [{ id: 1, description: 'Valid card description', image: null, imageId: 4 }],
     },
-    analysisSection: { title: 'Valid title text', description: 'Valid description text' },
+    analysisSection: { id: 1, title: 'Valid title text', description: 'Valid description text' },
     scientificReferencesSection: {
+        id: 1,
         title: 'Valid title text',
         description: 'Valid description text',
         scientificReferences: [
             { localId: 'local-1', id: 1, name: 'Valid research citation', url: 'https://example.com/citation' },
         ],
     },
-    anotherQuoteSection: { quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 5 },
+    anotherQuoteSection: { id: 1, quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 5 },
     participantsSection: {
+        id: 1,
         title: 'Valid title text',
         cards: [{ id: 6, description: 'Valid card description', image: null, imageId: 6 }],
     },
     ethicsSection: {
+        id: 1,
         title: 'Valid title text',
         description: 'Valid description text',
         principles: [{ id: 7, text: 'Valid principle one' }],

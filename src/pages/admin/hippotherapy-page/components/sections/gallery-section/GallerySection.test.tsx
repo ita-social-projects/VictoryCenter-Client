@@ -29,10 +29,11 @@ describe('GallerySection', () => {
     const cardDescriptionId = (index: number) => `mock-rich-input-test-gallery-card-${index}-description`;
 
     const defaultValue: HippotherapyGallerySectionContent = {
+        id: 1,
         title: 'Initial title',
         cards: [
             { id: 1, description: 'Card one', image: null, imageId: null },
-            { id: null, description: 'Card two', image: null, imageId: null },
+            { id: 2, description: 'Card two', image: null, imageId: null },
         ],
     };
 

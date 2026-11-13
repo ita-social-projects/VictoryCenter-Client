@@ -76,6 +76,7 @@ describe('ScientificReferencesSection', () => {
     let mockOnChange: jest.Mock;
 
     const defaultValue: HippotherapyScientificReferencesSectionContent = {
+        id: 1,
         title: 'Research title',
         description: 'Research description',
         scientificReferences: [
@@ -291,7 +292,7 @@ describe('ScientificReferencesSection', () => {
             expect.objectContaining({
                 scientificReferences: [
                     ...defaultValue.scientificReferences,
-                    expect.objectContaining({ localId: 'generated-uuid', id: null, name: '', url: '' }),
+                    expect.objectContaining({ localId: 'generated-uuid', id: -1, name: '', url: '' }),
                 ],
             }),
         );

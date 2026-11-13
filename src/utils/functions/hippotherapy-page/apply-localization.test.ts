@@ -2,31 +2,42 @@ import { applyHippotherapyLocalization } from './apply-localization';
 import { HippotherapyPageContentModel, HippotherapyPageLocalization } from '@/types/admin/hippotherapy-page';
 import { TranslationStatus } from '@/types/common/language';
 
-const text = (title: string, description: string) => ({ title, description });
-const quote = (quoteText: string, authorName: string) => ({ quoteText, authorName, image: null, imageId: null });
-const card = (id: number | null, description: string) => ({ id, description, image: null, imageId: null });
-const principle = (id: number | null, value: string) => ({ id, text: value });
+const text = (id: number, title: string, description: string) => ({ id, title, description });
+const quote = (id: number, quoteText: string, authorName: string) => ({
+    id,
+    quoteText,
+    authorName,
+    image: null,
+    imageId: null,
+});
+const card = (id: number, description: string) => ({ id, description, image: null, imageId: null });
 const reference = (id: number, name: string) => ({ localId: `l-${id}`, id, name, url: `https://ref${id}.com` });
+const principle = (id: number, text: string) => ({ id, text });
 
 const createBaseContent = (): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { ...text('Укр Інтро', 'Опис Інтро'), image: null, imageId: null },
-    descriptionSection: text('Укр Опис', 'Текст Опису'),
-    quoteSection: quote('Укр Цитата', 'Автор'),
-    hippoventionSection: text('Укр Гіпповенція', 'Опис Гіпповенції'),
-    hippoventionCenterSection: { ...text('Укр Центр', 'Опис Центру'), pros: 'Плюси', image: null, imageId: null },
-    advantagesSection: { title: 'Укр Переваги', cards: [card(1, 'Картка 1 Укр'), card(2, 'Картка 2 Укр')] },
-    analysisSection: text('Укр Аналіз', 'Опис Аналізу'),
+    introSection: { ...text(1, 'Укр Інтро', 'Опис Інтро'), image: null, imageId: null },
+    descriptionSection: text(1, 'Укр Опис', 'Текст Опису'),
+    quoteSection: quote(1, 'Укр Цитата', 'Автор'),
+    hippoventionSection: text(1, 'Укр Гіпповенція', 'Опис Гіпповенції'),
+    hippoventionCenterSection: {
+        ...text(1, 'Укр Центр', 'Опис Центру'),
+        pros: 'Плюси',
+        image: null,
+        imageId: null,
+    },
+    advantagesSection: { id: 1, title: 'Укр Переваги', cards: [card(1, 'Картка 1 Укр'), card(2, 'Картка 2 Укр')] },
+    analysisSection: text(1, 'Укр Аналіз', 'Опис Аналізу'),
     scientificReferencesSection: {
-        ...text('Укр Джерела', 'Опис Джерел'),
+        ...text(1, 'Укр Джерела', 'Опис Джерел'),
         scientificReferences: [reference(10, 'Джерело 10 Укр'), reference(20, 'Джерело 20 Укр')],
     },
-    anotherQuoteSection: quote('Укр Ще Цитата', 'Ще Автор'),
-    participantsSection: { title: 'Укр Учасники', cards: [card(5, 'Учасник 1 Укр'), card(6, 'Учасник 2 Укр')] },
+    anotherQuoteSection: quote(1, 'Укр Ще Цитата', 'Ще Автор'),
+    participantsSection: { id: 1, title: 'Укр Учасники', cards: [card(1, 'Учасник 1 Укр'), card(2, 'Учасник 2 Укр')] },
     ethicsSection: {
-        ...text('Укр Етика', 'Опис Етики'),
-        principles: [principle(7, 'Принцип 1'), principle(8, 'Принцип 2')],
+        ...text(1, 'Укр Етика', 'Опис Етики'),
+        principles: [principle(1, 'Принцип 1'), principle(2, 'Принцип 2')],
         image: null,
         imageId: null,
     },
@@ -54,7 +65,7 @@ describe('applyHippotherapyLocalization', () => {
         const base = createBaseContent();
         const snapshot = JSON.parse(JSON.stringify(base));
 
-        applyTo(base, { introSection: text('EN', 'EN') });
+        applyTo(base, { introSection: text(1, 'EN', 'EN') });
 
         expect(base).toEqual(snapshot);
     });
@@ -76,7 +87,7 @@ describe('applyHippotherapyLocalization', () => {
         ] as const;
 
         it.each(sections)('applies translated title and description for %s', (key, title, description) => {
-            const result = apply({ [key]: text(title, description) });
+            const result = apply({ [key]: text(1, title, description) });
 
             expect(result[key].title).toBe(title);
             expect(result[key].description).toBe(description);
@@ -84,7 +95,7 @@ describe('applyHippotherapyLocalization', () => {
 
         it.each(sections)('falls back to base for empty or whitespace values in %s', (key) => {
             const base = createBaseContent();
-            const result = applyTo(base, { [key]: text('   ', '') });
+            const result = applyTo(base, { [key]: text(1, '   ', '') });
 
             expect(result[key].title).toBe(base[key].title);
             expect(result[key].description).toBe(base[key].description);

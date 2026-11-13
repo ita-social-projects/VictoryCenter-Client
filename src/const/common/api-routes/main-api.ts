@@ -9,6 +9,7 @@ export const API_ROUTES = {
     },
     MAIN_PAGE: {
         BASE: 'MainPage',
+        ADMIN: 'MainPage/admin',
         PUBLIC: 'MainPage',
     },
     MAIN_PAGE_LOCALIZATIONS: {

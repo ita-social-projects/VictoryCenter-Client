@@ -6,6 +6,8 @@
         display: flex;
         align-items: center;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         height: 100%;
     }
 
@@ -62,6 +64,7 @@
                     overflow-wrap: normal;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+                    max-width: 100%;
                 }
             }
         }
@@ -105,6 +108,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                max-width: 100%;
             }
         }
     }
@@ -118,10 +122,12 @@
     }
 
     &-actions {
-        width: 200px;
+        width: auto;
+        min-width: fit-content;
+        max-width: 200px;
         height: 24px;
         display: flex;
-        justify-content: end;
+        justify-content: flex-end;
         gap: 10px;
         flex-shrink: 0;
 
@@ -129,6 +135,7 @@
             border: none;
             width: 24px;
             height: 24px;
+            flex-shrink: 0;
         }
     }
 }

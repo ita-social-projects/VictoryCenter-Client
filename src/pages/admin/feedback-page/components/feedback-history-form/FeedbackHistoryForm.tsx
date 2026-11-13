@@ -42,10 +42,14 @@ const createTextFieldChangeHandler =
         fieldName: 'title' | 'story',
         onChange: (event: ChangeEvent<T>) => void,
         clearErrors: UseFormClearErrors<FeedbackHistoryFormValues>,
+        hasError: boolean,
+        minimumLength: number,
     ) =>
     (event: ChangeEvent<T>) => {
         onChange(event);
         if (event.target.value === '') {
+            clearErrors(fieldName);
+        } else if (hasError && event.target.value.trim().length >= minimumLength) {
             clearErrors(fieldName);
         }
     };
@@ -79,7 +83,13 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.TITLE}
                                 value={field.value}
-                                onChange={createTextFieldChangeHandler('title', field.onChange, clearErrors)}
+                                onChange={createTextFieldChangeHandler(
+                                    'title',
+                                    field.onChange,
+                                    clearErrors,
+                                    !!errors.title,
+                                    FEEDBACK_HISTORY_VALIDATION.title.min,
+                                )}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.title.max}
                                 isRequired
@@ -103,7 +113,13 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                 name={field.name}
                                 label={FEEDBACK_TEXT.ADD_HISTORY_MODAL.LABEL.STORY}
                                 value={field.value}
-                                onChange={createTextFieldChangeHandler('story', field.onChange, clearErrors)}
+                                onChange={createTextFieldChangeHandler(
+                                    'story',
+                                    field.onChange,
+                                    clearErrors,
+                                    !!errors.story,
+                                    FEEDBACK_HISTORY_VALIDATION.story.min,
+                                )}
                                 onBlur={field.onBlur}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired

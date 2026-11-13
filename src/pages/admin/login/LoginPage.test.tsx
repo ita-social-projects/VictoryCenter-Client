@@ -43,6 +43,15 @@ describe('LoginPage', () => {
         expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.INVALID_CREDENTIALS)).not.toBeInTheDocument();
     });
 
+    it('renders the error modal with the login-specific class', () => {
+        render(<LoginPage />);
+        fireEvent.click(screen.getByTestId('simulate-invalid-credentials'));
+
+        const message = screen.getByText(LOGIN_CONST.ERROR_MODAL.INVALID_CREDENTIALS);
+
+        expect(message.closest('.modal-container')).toHaveClass('login-error-modal');
+    });
+
     it('closes the modal when action button is clicked', () => {
         render(<LoginPage />);
         fireEvent.click(screen.getByTestId('simulate-invalid-credentials'));

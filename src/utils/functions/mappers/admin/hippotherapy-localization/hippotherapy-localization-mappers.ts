@@ -1,16 +1,23 @@
 import { getEthicsPrincipleFieldName, getGalleryCardDescriptionFieldName } from '@/const/admin/hippotherapy-page';
 import { TranslateHippotherapySectionFormValues } from '@/pages/admin/hippotherapy-page/components/translate-section-form/TranslateHippotherapySectionForm';
+import { HippotherapyTranslationSubBlock } from '@/pages/admin/hippotherapy-page/components/translate-section-modal/TranslateHippotherapySectionModal';
 import {
     CreateEthicsSectionDto,
     CreateGallerySectionDto,
     CreateHippoventionCenterSectionDto,
     CreateQuoteSectionDto,
+    CreateScientificReferencesSectionDto,
     CreateTextCardSectionDto,
     HippotherapyPageLocalizationBlock,
+    HippotherapyPageLocalizedContent,
+    HippotherapyPageLocalizedPartial,
+    HippotherapyScientificReference,
+    HippotherapyScientificReferenceItem,
     UpdateEthicsSectionDto,
     UpdateGallerySectionDto,
     UpdateHippoventionCenterSectionDto,
     UpdateQuoteSectionDto,
+    UpdateScientificReferencesSectionDto,
     UpdateTextCardSectionDto,
 } from '@/types/admin/hippotherapy-page';
 
@@ -24,7 +31,10 @@ export interface GallerySectionMapContext extends SectionMapContext {
 }
 
 export interface ScientificReferencesSectionMapContext extends SectionMapContext {
-    referenceIds: number[];
+    subBlock?: HippotherapyTranslationSubBlock | null;
+    targetResearchLocalId?: string | null;
+    existingSectionLocalization?: HippotherapyPageLocalizedPartial['scientificReferencesSection'] | null;
+    scientificReferences: HippotherapyScientificReference[];
 }
 
 export interface EthicsSectionMapContext extends SectionMapContext {
@@ -121,10 +131,79 @@ export const mapFormValuesToCreateEthicsSectionDto = (
     languageId: context.languageId,
 });
 
+export const mapFormValuesToScientificReferencesSectionDto = (
+    values: TranslateHippotherapySectionFormValues,
+    context: ScientificReferencesSectionMapContext,
+): UpdateScientificReferencesSectionDto => {
+    const { subBlock, targetResearchLocalId, existingSectionLocalization, scientificReferences } = context;
+
+    const existingReferences: HippotherapyScientificReferenceItem[] = (
+        existingSectionLocalization?.scientificReferences ?? []
+    )
+        .filter((ref) => Boolean(ref.name.trim()))
+        .map((ref) => ({
+            referenceId: ref.id,
+            name: ref.name ?? '',
+        }));
+
+    if (subBlock === 'research') {
+        const title = existingSectionLocalization?.title ?? '';
+        const description = existingSectionLocalization?.description ?? '';
+
+        const currentReference = (scientificReferences ?? []).find((ref) => ref.localId === targetResearchLocalId);
+        const currentReferenceId = currentReference?.id;
+        const newReferenceName = values.name ?? '';
+
+        let updatedReferences: HippotherapyScientificReferenceItem[];
+
+        if (currentReferenceId != null && currentReferenceId > 0) {
+            const isAlreadyInList = existingReferences.some((ref) => ref.referenceId === currentReferenceId);
+
+            if (isAlreadyInList) {
+                updatedReferences = existingReferences.map((ref) =>
+                    ref.referenceId === currentReferenceId ? { ...ref, name: newReferenceName } : ref,
+                );
+            } else {
+                updatedReferences = [
+                    ...existingReferences,
+                    { referenceId: currentReferenceId, name: newReferenceName },
+                ];
+            }
+        } else {
+            updatedReferences = existingReferences;
+        }
+
+        return {
+            title,
+            description,
+            references: updatedReferences,
+        };
+    }
+
+    return {
+        title: values.title ?? '',
+        description: values.description ?? '',
+        references: existingReferences,
+    };
+};
+
+export const mapFormValuesToCreateScientificReferencesSectionDto = (
+    values: TranslateHippotherapySectionFormValues,
+    context: ScientificReferencesSectionMapContext,
+): CreateScientificReferencesSectionDto => ({
+    ...mapFormValuesToScientificReferencesSectionDto(values, context),
+    entityId: context.entityId,
+    languageId: context.languageId,
+});
+
 export const mapHippotherapySectionFormValuesToDto = (
     block: HippotherapyPageLocalizationBlock,
     values: TranslateHippotherapySectionFormValues,
-    context: SectionMapContext | GallerySectionMapContext | EthicsSectionMapContext,
+    context:
+        | SectionMapContext
+        | GallerySectionMapContext
+        | EthicsSectionMapContext
+        | ScientificReferencesSectionMapContext,
     isUpdate: boolean,
 ) => {
     switch (block) {
@@ -153,6 +232,16 @@ export const mapHippotherapySectionFormValuesToDto = (
             return isUpdate
                 ? mapFormValuesToEthicsSectionDto(values, context as EthicsSectionMapContext)
                 : mapFormValuesToCreateEthicsSectionDto(values, context as EthicsSectionMapContext);
+        case HippotherapyPageLocalizationBlock.ScientificReferences:
+            return isUpdate
+                ? mapFormValuesToScientificReferencesSectionDto(
+                      values,
+                      context as ScientificReferencesSectionMapContext,
+                  )
+                : mapFormValuesToCreateScientificReferencesSectionDto(
+                      values,
+                      context as ScientificReferencesSectionMapContext,
+                  );
         default:
             return null;
     }

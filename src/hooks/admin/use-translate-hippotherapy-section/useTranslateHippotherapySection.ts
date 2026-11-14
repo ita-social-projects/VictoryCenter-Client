@@ -12,13 +12,17 @@ import {
     EthicsSectionMapContext,
     GallerySectionMapContext,
     mapHippotherapySectionFormValuesToDto,
+    ScientificReferencesSectionMapContext,
     SectionMapContext,
 } from '@/utils/functions/mappers/admin/hippotherapy-localization/hippotherapy-localization-mappers';
 import { getHippotherapySectionLocalizationApi } from '@/utils/functions/get-hippotherapy-section-localization-api/get-hippotherapy-section-localization-api';
+import { HippotherapyTranslationSubBlock } from '@/pages/admin/hippotherapy-page/components/translate-section-modal/TranslateHippotherapySectionModal';
 
 export interface UseTranslateHippotherapySectionParams {
     pageContent: HippotherapyPageContentModel | null;
     block: HippotherapyPageLocalizationBlock | null;
+    subBlock?: HippotherapyTranslationSubBlock | null;
+    targetResearchLocalId?: string | null;
     language: LocalizationLanguage | null;
     onSuccess: () => void | Promise<void>;
 }
@@ -59,7 +63,14 @@ export const createSectionMapContext = (
     content: HippotherapyPageContentModel,
     block: HippotherapyPageLocalizationBlock,
     languageId: number,
-): SectionMapContext | GallerySectionMapContext | EthicsSectionMapContext | null => {
+    subBlock?: HippotherapyTranslationSubBlock | null,
+    targetResearchLocalId?: string | null,
+):
+    | SectionMapContext
+    | GallerySectionMapContext
+    | EthicsSectionMapContext
+    | ScientificReferencesSectionMapContext
+    | null => {
     const entityId = getHippotherapySectionEntityId(content, block);
     if (entityId == null || entityId <= 0) return null;
 
@@ -81,6 +92,19 @@ export const createSectionMapContext = (
                 ...baseContext,
                 principleIds: content.ethicsSection.principles.map((p) => p.id),
             };
+        case HippotherapyPageLocalizationBlock.ScientificReferences: {
+            const existingSectionLocalization = content.localizations?.find(
+                (loc) => loc.languageId === languageId || loc.language?.id === languageId,
+            );
+
+            return {
+                ...baseContext,
+                subBlock,
+                targetResearchLocalId,
+                existingSectionLocalization: existingSectionLocalization?.scientificReferencesSection ?? null,
+                scientificReferences: content.scientificReferencesSection.scientificReferences,
+            };
+        }
         default:
             return baseContext;
     }
@@ -94,6 +118,11 @@ const isSectionLocalizationExist = (
     const existingLocalization = pageContent.localizations?.find(
         (loc) => loc.languageId === languageId || loc.language?.id === languageId,
     );
+
+    if (block === HippotherapyPageLocalizationBlock.ScientificReferences) {
+        return Boolean(existingLocalization?.scientificReferencesSection);
+    }
+
     const sectionConfig = getHippotherapyTranslationConfig(block);
     const sectionKey = sectionConfig?.sectionKey as keyof HippotherapyPageLocalizedContent | undefined;
 
@@ -104,6 +133,8 @@ export const useTranslateHippotherapySection = ({
     pageContent,
     block,
     language,
+    subBlock,
+    targetResearchLocalId,
     onSuccess,
 }: UseTranslateHippotherapySectionParams) => {
     const client = useAdminClient();
@@ -116,7 +147,7 @@ export const useTranslateHippotherapySection = ({
             return;
         }
 
-        const mapContext = createSectionMapContext(pageContent, block, language.id);
+        const mapContext = createSectionMapContext(pageContent, block, language.id, subBlock, targetResearchLocalId);
         const apiService = getHippotherapySectionLocalizationApi(block);
 
         if (!mapContext || !apiService) {

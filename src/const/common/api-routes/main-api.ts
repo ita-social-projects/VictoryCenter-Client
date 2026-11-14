@@ -204,7 +204,6 @@ export const API_ROUTES = {
         BASE: 'EventNewsLocalizations',
     },
     HIPPOTHERAPY_PAGE_LOCALIZATIONS: {
-        BASE: 'HippotherapyPageLocalizations',
         ADVANTAGES_SECTION: {
             BASE: 'HippotherapyLandingPageAdvantagesSectionLocalizations',
         },

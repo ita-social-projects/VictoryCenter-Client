@@ -71,6 +71,8 @@ export const TranslateHippotherapySectionModal = ({
     const { translateHippotherapySection, isSubmitting, error } = useTranslateHippotherapySection({
         pageContent,
         block,
+        subBlock,
+        targetResearchLocalId,
         language,
         onSuccess: onTranslate,
     });

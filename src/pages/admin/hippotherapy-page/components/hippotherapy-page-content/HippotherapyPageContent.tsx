@@ -64,7 +64,7 @@ const findLocalization = (
     );
 };
 
-const normalizeContent = (content: HippotherapyPageContentModel) => ({
+const normalizeContent = (content: HippotherapyPageContentModel): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
     introSection: {
@@ -73,6 +73,7 @@ const normalizeContent = (content: HippotherapyPageContentModel) => ({
         description: normalizeHtml(content.introSection.description),
     },
     descriptionSection: {
+        ...content.descriptionSection,
         title: normalizeHtml(content.descriptionSection.title),
         description: normalizeHtml(content.descriptionSection.description),
     },
@@ -82,6 +83,7 @@ const normalizeContent = (content: HippotherapyPageContentModel) => ({
         authorName: normalizeHtml(content.quoteSection.authorName),
     },
     hippoventionSection: {
+        ...content.hippoventionSection,
         title: normalizeHtml(content.hippoventionSection.title),
         description: normalizeHtml(content.hippoventionSection.description),
     },
@@ -92,6 +94,7 @@ const normalizeContent = (content: HippotherapyPageContentModel) => ({
         pros: normalizeHtml(content.hippoventionCenterSection.pros),
     },
     advantagesSection: {
+        ...content.advantagesSection,
         title: normalizeHtml(content.advantagesSection.title),
         cards: content.advantagesSection.cards.map((card) => ({
             ...card,
@@ -99,10 +102,12 @@ const normalizeContent = (content: HippotherapyPageContentModel) => ({
         })),
     },
     analysisSection: {
+        ...content.analysisSection,
         title: normalizeHtml(content.analysisSection.title),
         description: normalizeHtml(content.analysisSection.description),
     },
     scientificReferencesSection: {
+        ...content.scientificReferencesSection,
         title: normalizeHtml(content.scientificReferencesSection.title),
         description: normalizeHtml(content.scientificReferencesSection.description),
         scientificReferences: content.scientificReferencesSection.scientificReferences.map((reference) => ({
@@ -115,6 +120,7 @@ const normalizeContent = (content: HippotherapyPageContentModel) => ({
         authorName: normalizeHtml(content.anotherQuoteSection.authorName),
     },
     participantsSection: {
+        ...content.participantsSection,
         title: normalizeHtml(content.participantsSection.title),
         cards: content.participantsSection.cards.map((card) => ({
             ...card,
@@ -509,7 +515,9 @@ export const HippotherapyPageContent = () => {
 
     const isTranslateReferenceDisabled = useCallback(
         (localId: string) => {
-            if (isTranslateDisabled || !fetchedContent) return true;
+            if (isTranslateDisabled || !fetchedContent || !hasScientificGeneralTranslation(targetLocalization)) {
+                return true;
+            }
             const reference = fetchedContent.scientificReferencesSection.scientificReferences.find(
                 (ref) => ref.localId === localId,
             );

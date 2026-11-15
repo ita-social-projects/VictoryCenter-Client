@@ -13,8 +13,10 @@ import {
     ProgramExpensesProgram,
     ProgramExpensesReadOnlyData,
     ProgramExpensesRecord,
+    ProgramExpensesSummary,
     ReportProgramExpendituresRecordState,
 } from '@/types/admin/reports';
+import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
@@ -37,12 +39,15 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 
 const MAX_PROGRAM_EXPENSE_RECORDS = 4;
 
+const roundToCents = (value: number): number => Math.round(value * 100) / 100;
+
 interface ProgramExpensesSectionProps {
     isEditing?: boolean;
     isRowEditMode?: boolean;
     onRowEditModeChange?: (isEditing: boolean) => void;
     onCountsChange?: (count: number) => void;
     onDataChange?: () => void;
+    onSummaryChange?: (summary: ProgramExpensesSummary) => void;
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
     exchangeRate: string | null;
 }
@@ -53,6 +58,7 @@ export const ProgramExpensesSection = ({
     onRowEditModeChange,
     onCountsChange,
     onDataChange,
+    onSummaryChange,
     registerSaveCallback,
     exchangeRate,
 }: ProgramExpensesSectionProps) => {
@@ -166,6 +172,25 @@ export const ProgramExpensesSection = ({
     useEffect(() => {
         onCountsChange?.(programExpenseRecordsCount);
     }, [programExpenseRecordsCount, onCountsChange]);
+
+    const summary = useMemo<ProgramExpensesSummary>(() => {
+        const totals = recordsState.reduce<ProgramExpensesSummary>(
+            (acc, record) => ({
+                totalAmountUah: acc.totalAmountUah + (parseFormattedNumber(record.amountUah) ?? 0),
+                totalAmountUsd: acc.totalAmountUsd + (parseFormattedNumber(record.amountUsd) ?? 0),
+            }),
+            { totalAmountUah: 0, totalAmountUsd: 0 },
+        );
+
+        return {
+            totalAmountUah: roundToCents(totals.totalAmountUah),
+            totalAmountUsd: roundToCents(totals.totalAmountUsd),
+        };
+    }, [recordsState]);
+
+    useEffect(() => {
+        onSummaryChange?.(summary);
+    }, [summary, onSummaryChange]);
 
     const handleOpenAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(true);
@@ -281,6 +306,7 @@ export const ProgramExpensesSection = ({
         if (!recordToDelete) return;
 
         setRecordsState((prev) => prev.filter((record) => record.id !== recordToDelete.id));
+        setSelectedRecordIds((prev) => prev.filter((id) => id !== recordToDelete.id));
 
         if (!isTempId(recordToDelete.id)) {
             setDeletedRecordIds((prev) => (prev.includes(recordToDelete.id) ? prev : [...prev, recordToDelete.id]));
@@ -387,7 +413,7 @@ export const ProgramExpensesSection = ({
 
     return (
         <div className={styles.section}>
-            <ProgramExpensesSummaryCard summary={data.summary} />
+            <ProgramExpensesSummaryCard summary={summary} />
 
             <div className={styles.filters}>
                 <ProgramExpensesToolbar

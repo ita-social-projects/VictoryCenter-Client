@@ -1028,12 +1028,20 @@ describe('HippotherapyPageContent', () => {
             [
                 'general research',
                 'Translate research-general',
-                { title: 'English Title', description: 'English Description', scientificReferences: [] },
+                {
+                    title: 'English Title',
+                    description: 'English Description',
+                    references: [],
+                },
             ],
             [
                 'research reference item',
                 'Translate research-item',
-                { title: '', description: '', scientificReferences: [{ id: 1, name: 'Translated citation' }] },
+                {
+                    title: '',
+                    description: '',
+                    references: [{ referenceId: 1, name: 'Translated citation' }],
+                },
             ],
         ])(
             'disables the %s translation action when an English translation already exists',
@@ -1049,7 +1057,7 @@ describe('HippotherapyPageContent', () => {
                     scientificReferencesSection: {
                         title: '',
                         description: '',
-                        scientificReferences: [{ id: 999, name: 'Translated other citation' }],
+                        references: [{ referenceId: 999, name: 'Translated other citation' }],
                     },
                 }),
             );
@@ -1063,7 +1071,7 @@ describe('HippotherapyPageContent', () => {
                     scientificReferencesSection: {
                         title: '<p><br></p>',
                         description: '<p><br></p>',
-                        scientificReferences: [],
+                        references: [],
                     },
                 }),
             );

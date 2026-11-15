@@ -496,7 +496,7 @@ describe('PartnerSectionsEditor', () => {
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
     });
 
-    it('deletes an unsaved section without calling API', async () => {
+    it('deletes an unsaved non-empty section after confirmation without calling API', async () => {
         mockSections([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
@@ -508,8 +508,9 @@ describe('PartnerSectionsEditor', () => {
             ref.current?.addSection();
         });
 
-        await waitFor(() => {
-            expect(mockPartnerSectionFormRender).toHaveBeenCalled();
+        const initialProps = getLatestFormProps();
+        await act(async () => {
+            initialProps.onChange({ ...initialProps.value, title: 'Draft title' }, initialProps.errors);
         });
 
         await openDeleteModal(getLatestFormProps());
@@ -524,6 +525,63 @@ describe('PartnerSectionsEditor', () => {
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
+    });
+
+    it('deletes an empty unsaved section immediately without confirmation', async () => {
+        mockSections([]);
+
+        const ref = createRef<PartnerSectionsEditorRef>();
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
+
+        await act(async () => {
+            ref.current?.addSection();
+        });
+
+        const props = getLatestFormProps();
+        const sectionLocalId = props.value.localId;
+        await act(async () => {
+            props.onDelete(sectionLocalId);
+        });
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
+        expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
+        expect(screen.queryByTestId(`partner-section-${sectionLocalId}`)).not.toBeInTheDocument();
+    });
+
+    it('deletes an empty persisted section immediately without confirmation', async () => {
+        mockSections([{ id: 9, title: '', description: '', partners: [] }]);
+
+        await renderEditor();
+
+        const props = getLatestFormProps();
+        await act(async () => {
+            props.onDelete(props.value.localId);
+        });
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 9);
+        });
+        expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
+    });
+
+    it('asks for confirmation when only a partner profile has content', async () => {
+        mockSections([
+            {
+                id: 10,
+                title: '',
+                description: '',
+                partners: [{ id: 30, description: 'Partner text', image: null, imageId: null }],
+            },
+        ]);
+
+        await renderEditor();
+
+        await openDeleteModal(getLatestFormProps());
+        expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
     });
 
     it('does not toast when fetch error is a cancellation', () => {

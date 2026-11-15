@@ -275,12 +275,6 @@ export const ProgramExpensesTable = ({
                     return;
                 }
 
-                window.dispatchEvent(
-                    new CustomEvent('program-expenses-updated', {
-                        detail: { source: 'ProgramExpensesSection' },
-                    }),
-                );
-
                 setRowEditMode(null);
             } finally {
                 setSavingRecordId(null);

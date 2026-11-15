@@ -15,7 +15,6 @@ import { Button } from '@/components/admin/button/Button';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
-import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ReportFundsExpendituresSettingsLocalizationsApi } from '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api';
 import {
     FundsExpendituresAmountField,
@@ -86,6 +85,8 @@ const getCategoryLimitMessage = (
     return undefined;
 };
 
+const EMPTY_PROGRAM_EXPENSES_SUMMARY: ProgramExpensesSummary = { totalAmountUah: 0, totalAmountUsd: 0 };
+
 export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
@@ -108,6 +109,7 @@ export interface FundsExpenditureSectionProps {
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
     onSelectionChange?: (hasSelected: boolean) => void;
+    programExpensesSummary?: ProgramExpensesSummary;
 }
 
 export const FundsExpenditureSection = ({
@@ -132,6 +134,7 @@ export const FundsExpenditureSection = ({
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
+    programExpensesSummary: programSummary = EMPTY_PROGRAM_EXPENSES_SUMMARY,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -241,10 +244,6 @@ export const FundsExpenditureSection = ({
         (options = {}) => FundsExpendituresApi.getSummary(adminClient, options),
         [adminClient],
     );
-    const fetchProgramSummary = useCallback(
-        (options = {}) => ProgramExpensesApi.getSummary(adminClient, options),
-        [adminClient],
-    );
 
     const {
         data: settings,
@@ -295,11 +294,6 @@ export const FundsExpenditureSection = ({
         fetchHandler: fetchSummary,
     });
 
-    const { data: programSummary, refetch: refetchProgramSummary } = useDataFetch<ProgramExpensesSummary>({
-        initialData: { totalAmountUah: 0, totalAmountUsd: 0 },
-        fetchHandler: fetchProgramSummary,
-    });
-
     const isInitialLoading =
         (isSettingsLoading || isCategoriesLoading || isRecordsLoading || isSummaryLoading) &&
         categories.length === 0 &&
@@ -334,20 +328,6 @@ export const FundsExpenditureSection = ({
     useEffect(() => {
         registerRefetchSettingsCallback?.(() => refetchSettings());
     }, [registerRefetchSettingsCallback, refetchSettings]);
-
-    useEffect(() => {
-        const handleProgramExpensesUpdate = (event: Event) => {
-            if (event instanceof CustomEvent && event.detail?.source === 'ProgramExpensesSection') {
-                refetchProgramSummary()?.catch(() => {});
-            }
-        };
-
-        window.addEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
-
-        return () => {
-            window.removeEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
-        };
-    }, [refetchProgramSummary]);
 
     useEffect(() => {
         setRecordsState(
@@ -497,7 +477,6 @@ export const FundsExpenditureSection = ({
                 });
                 setProgramYearValue(yearNumber);
                 refetchSettings();
-                refetchProgramSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -505,7 +484,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [adminClient, settings, refetchSettings, refetchProgramSummary, addToast],
+        [adminClient, settings, refetchSettings, addToast],
     );
 
     const handleRecordSave = useCallback(

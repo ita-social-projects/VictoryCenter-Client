@@ -38,7 +38,7 @@ export const applyHippotherapyLocalization = (
         ethicsSection,
     } = localization;
 
-    const referencesById = translatedById(scientificReferencesSection?.scientificReferences, 'id');
+    const referencesById = translatedById(scientificReferencesSection?.references, 'referenceId');
     const principlesById = translatedById(ethicsSection?.principles, 'principleId');
 
     return {

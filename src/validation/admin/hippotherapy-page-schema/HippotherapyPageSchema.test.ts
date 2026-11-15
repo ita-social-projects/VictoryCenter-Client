@@ -17,7 +17,7 @@ const buildValidContent = (): HippotherapyPageContentModel => ({
     },
     advantagesSection: {
         title: 'Valid title text',
-        cards: [{ description: 'Valid card description', image: null, imageId: 4 }],
+        cards: [{ id: 1, description: 'Valid card description', image: null, imageId: 4 }],
     },
     analysisSection: { title: 'Valid title text', description: 'Valid description text' },
     scientificReferencesSection: {
@@ -30,12 +30,12 @@ const buildValidContent = (): HippotherapyPageContentModel => ({
     anotherQuoteSection: { quoteText: 'Valid quote text', authorName: 'Valid author', image: null, imageId: 5 },
     participantsSection: {
         title: 'Valid title text',
-        cards: [{ description: 'Valid card description', image: null, imageId: 6 }],
+        cards: [{ id: 6, description: 'Valid card description', image: null, imageId: 6 }],
     },
     ethicsSection: {
         title: 'Valid title text',
         description: 'Valid description text',
-        principles: ['Valid principle one'],
+        principles: [{ id: 7, text: 'Valid principle one' }],
         image: null,
         imageId: 7,
     },
@@ -115,7 +115,7 @@ describe('isHippotherapyPageContentValid', () => {
 
     it('returns false when an ethics principle is invalid', () => {
         const content = buildValidContent();
-        content.ethicsSection.principles = [''];
+        content.ethicsSection.principles[0].text = '';
 
         expect(isHippotherapyPageContentValid(content)).toBe(false);
     });

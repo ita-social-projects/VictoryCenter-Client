@@ -66,6 +66,6 @@ export const isHippotherapyPageContentValid = (content: HippotherapyPageContentM
         content.participantsSection.cards.every((card) => isValidHtmlText(card.description)) &&
         isValidTitle(content.ethicsSection.title) &&
         isValidHtmlText(content.ethicsSection.description) &&
-        content.ethicsSection.principles.every((principle) => isValidHtmlText(principle))
+        content.ethicsSection.principles.every((principle) => isValidHtmlText(principle.text))
     );
 };

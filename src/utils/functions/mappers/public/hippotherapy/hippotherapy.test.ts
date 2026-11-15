@@ -25,8 +25,8 @@ const buildDto = (): HippotherapyPageContentDto => ({
     advantagesSection: {
         title: '<p>Advantages title</p>',
         cards: [
-            { description: '<p>Advantage one</p>', ...withImage('card1') },
-            { description: '<p>Advantage two</p>', ...withImage('card2') },
+            { id: 1, description: '<p>Advantage one</p>', ...withImage('card1') },
+            { id: 2, description: '<p>Advantage two</p>', ...withImage('card2') },
         ],
     },
     analysisSection: { title: 'Analysis title', description: 'Analysis text' },
@@ -41,12 +41,15 @@ const buildDto = (): HippotherapyPageContentDto => ({
     anotherQuoteSection: { quoteText: 'Another quote', authorName: '', ...noImage },
     participantsSection: {
         title: 'Participants title',
-        cards: [{ description: 'Participant one', ...noImage }],
+        cards: [{ id: 1, description: 'Participant one', ...noImage }],
     },
     ethicsSection: {
         title: '<p>Ethics title</p>',
         description: '<p>Ethics text</p>',
-        principles: ['<p>Principle one</p>', 'Principle two'],
+        principles: [
+            { id: 1, text: '<p>Principle one</p>' },
+            { id: 2, text: 'Principle two' },
+        ],
         ...withImage('ethics'),
     },
 });
@@ -76,7 +79,10 @@ describe('mapHippotherapyPageToAbout', () => {
 
     it('strips html in the sections that render plain text', () => {
         expect(result.ethicsSection.title).toBe('Ethics title');
-        expect(result.ethicsSection.principles).toEqual(['Principle one', 'Principle two']);
+        expect(result.ethicsSection.principles).toEqual([
+            { id: 1, text: 'Principle one' },
+            { id: 2, text: 'Principle two' },
+        ]);
         expect(result.advantagesSection.advantages[0].text).toBe('Advantage one');
         expect(result.researchSection.description).toBe('Research description');
     });
@@ -188,7 +194,10 @@ describe('mapHippotherapyPageToAbout', () => {
             expect(localized.participantsSection.participants[0].text).toBe('EN Participant one');
             expect(localized.ethicsSection.title).toBe('EN Ethics title');
             expect(localized.ethicsSection.text).toBe('EN Ethics text');
-            expect(localized.ethicsSection.principles).toEqual(['EN Principle one', 'EN Principle two']);
+            expect(localized.ethicsSection.principles).toEqual([
+                { id: 1, text: 'EN Principle one' },
+                { id: 2, text: 'EN Principle two' },
+            ]);
         });
 
         it('falls back to Ukrainian when English translation is missing', () => {
@@ -198,7 +207,10 @@ describe('mapHippotherapyPageToAbout', () => {
             const localized = mapHippotherapyPageToAbout(dto, 'en');
 
             expect(localized.introSection.title).toBe('<h3>Intro title</h3>');
-            expect(localized.ethicsSection.principles).toEqual(['Principle one', 'Principle two']);
+            expect(localized.ethicsSection.principles).toEqual([
+                { id: 1, text: 'Principle one' },
+                { id: 2, text: 'Principle two' },
+            ]);
         });
 
         it('partially falls back to Ukrainian when specific localized fields are empty or whitespace', () => {
@@ -231,7 +243,10 @@ describe('mapHippotherapyPageToAbout', () => {
             expect(localized.introSection.description).toBe('<p>Intro description</p>');
             expect(localized.ethicsSection.title).toBe('Ethics title');
             expect(localized.ethicsSection.text).toBe('EN Ethics desc only');
-            expect(localized.ethicsSection.principles).toEqual(['EN Principle 1', 'Principle two']);
+            expect(localized.ethicsSection.principles).toEqual([
+                { id: 1, text: 'EN Principle 1' },
+                { id: 2, text: 'Principle two' },
+            ]);
             expect(localized.advantagesSection.advantages[0].text).toBe('EN Card 1');
             expect(localized.advantagesSection.advantages[1].text).toBe('Advantage two');
         });

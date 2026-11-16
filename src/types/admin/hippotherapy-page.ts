@@ -178,8 +178,9 @@ export interface HippotherapyPageLocalization extends EntityLocalization, Hippot
 
 export interface HippotherapyPageEmbeddedLocalizationDto
     extends EntityLocalizationDto,
-        HippotherapyPageLocalizedPartial {
+        Omit<HippotherapyPageLocalizedPartial, 'scientificReferencesSection'> {
     entityId?: number;
+    scientificReferencesSection?: Partial<HippotherapyScientificReferencesLocalizedContentDto> | null;
 }
 
 export type HippotherapyPageLocalizedSections = {
@@ -311,7 +312,7 @@ export interface HippotherapyPageContentDto
         EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
     translationStatuses?: HippotherapyPageTranslationStatusDto[];
     scientificReferencesSection: {
-        id: number | null;
+        id: number;
         title: string;
         description: string;
         scientificReferences: HippotherapyScientificReferenceDto[];

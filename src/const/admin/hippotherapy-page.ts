@@ -293,21 +293,21 @@ export const getHippotherapyTranslationConfig = (
 
     switch (block) {
         case HippotherapyPageLocalizationBlock.Advantages: {
-            const cardIds = content?.advantagesSection.cards.map((card) => card.id) ?? [];
+            const cardIds = content?.advantagesSection?.cards?.map((card) => card.id) ?? [];
             return {
                 sectionKey: 'advantagesSection',
                 fields: createAdvantagesTranslationFields(cardIds),
             };
         }
         case HippotherapyPageLocalizationBlock.Participants: {
-            const cardIds = content?.participantsSection.cards.map((card) => card.id) ?? [];
+            const cardIds = content?.participantsSection?.cards?.map((card) => card.id) ?? [];
             return {
                 sectionKey: 'participantsSection',
                 fields: createParticipantsTranslationFields(cardIds),
             };
         }
         case HippotherapyPageLocalizationBlock.Ethics: {
-            const principleIds = content?.ethicsSection.principles.map((principle) => principle.id) ?? [];
+            const principleIds = content?.ethicsSection?.principles?.map((principle) => principle.id) ?? [];
             return {
                 sectionKey: 'ethicsSection',
                 fields: createEthicsTranslationFields(principleIds),

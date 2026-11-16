@@ -9,7 +9,6 @@ import {
     CreateScientificReferencesSectionDto,
     CreateTextCardSectionDto,
     HippotherapyPageLocalizationBlock,
-    HippotherapyPageLocalizedContent,
     HippotherapyPageLocalizedPartial,
     HippotherapyScientificReference,
     HippotherapyScientificReferenceItem,

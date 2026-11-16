@@ -22,11 +22,12 @@ describe('HippotherapyPageApi', () => {
     const buildDto = (): HippotherapyPageContentDto => ({
         localizations: [],
         translationStatuses: [],
-        introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
-        descriptionSection: { title: 'Description title', description: 'Description text' },
-        quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
-        hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
+        introSection: { id: 1, title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+        descriptionSection: { id: 1, title: 'Description title', description: 'Description text' },
+        quoteSection: { id: 1, quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
+        hippoventionSection: { id: 1, title: 'Hippovention title', description: 'Hippovention text' },
         hippoventionCenterSection: {
+            id: 1,
             title: 'Hippovention center title',
             description: 'Hippovention center text',
             pros: 'Pro one and pro two',
@@ -34,21 +35,31 @@ describe('HippotherapyPageApi', () => {
             imageId: null,
         },
         advantagesSection: {
+            id: 1,
             title: 'Advantages title',
             cards: [{ id: 11, description: 'Card description', image: null, imageId: null }],
         },
-        analysisSection: { title: 'Analysis title', description: 'Analysis text' },
+        analysisSection: { id: 1, title: 'Analysis title', description: 'Analysis text' },
         scientificReferencesSection: {
+            id: 1,
             title: 'Research title',
             description: 'Research text',
             scientificReferences: [{ id: 1, name: 'Citation', url: 'https://example.com/citation' }],
         },
-        anotherQuoteSection: { quoteText: 'Another quote', authorName: 'Another author', image: null, imageId: null },
+        anotherQuoteSection: {
+            id: 1,
+            quoteText: 'Another quote',
+            authorName: 'Another author',
+            image: null,
+            imageId: null,
+        },
         participantsSection: {
+            id: 1,
             title: 'Participants title',
             cards: [{ id: 21, description: 'Participant description', image: null, imageId: null }],
         },
         ethicsSection: {
+            id: 1,
             title: 'Ethics title',
             description: 'Ethics text',
             principles: [{ id: 31, text: 'Principle one' }],
@@ -217,11 +228,11 @@ describe('HippotherapyPageApi', () => {
             );
         });
 
-        it('sends a null id for a newly added, unsaved reference', async () => {
+        it('sends a -1 id for a newly added, unsaved reference', async () => {
             const content = buildContent();
             content.scientificReferencesSection.scientificReferences.push({
                 localId: 'local-2',
-                id: null,
+                id: -1,
                 name: 'New citation',
                 url: 'https://example.com/new',
             });

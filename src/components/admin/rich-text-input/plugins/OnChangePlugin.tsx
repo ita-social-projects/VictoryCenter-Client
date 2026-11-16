@@ -12,11 +12,14 @@ export const OnChangePlugin = ({ onChange }: OnChangePluginProps) => {
     const isFirstRender = useRef(true);
 
     useEffect(() => {
-        return editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves }) => {
+        return editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves, tags }) => {
             if (isFirstRender.current) {
                 isFirstRender.current = false;
                 return;
             }
+
+            if (tags.has('external-value')) return;
+
             if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
 
             editorState.read(() => {

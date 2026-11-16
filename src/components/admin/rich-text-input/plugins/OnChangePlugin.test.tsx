@@ -12,36 +12,46 @@ jest.mock('@lexical/react/LexicalComposerContext', () => ({
 }));
 
 const mockGenerateHtmlFromNodes = jest.fn();
-
 jest.mock('@lexical/html', () => ({
     $generateHtmlFromNodes: (...args: any[]) => mockGenerateHtmlFromNodes(...args),
 }));
 
-const triggerUserChange = (mockHtml: string) => {
-    const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
-    const mockEditorState = {
-        read: jest.fn((callback) => callback()),
-    };
+interface UpdateOptions {
+    dirty?: boolean;
+    tags?: string[];
+}
 
-    listenerCallback({
-        editorState: mockEditorState,
-        dirtyElements: new Map(),
+const renderPlugin = () => {
+    const onChange = jest.fn();
+    const utils = render(<OnChangePlugin onChange={onChange} />);
+    return { onChange, ...utils };
+};
+
+const getListener = () => mockRegisterUpdateListener.mock.calls[0][0];
+
+const emitUpdate = ({ dirty = false, tags = [] }: UpdateOptions = {}) => {
+    getListener()({
+        editorState: { read: jest.fn((callback) => callback()) },
+        dirtyElements: dirty ? new Map([['key', true]]) : new Map(),
         dirtyLeaves: new Set(),
-    });
-
-    mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
-
-    listenerCallback({
-        editorState: mockEditorState,
-        dirtyElements: new Map([['key', true]]),
-        dirtyLeaves: new Set(),
+        tags: new Set(tags),
     });
 };
 
-const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
-    render(<OnChangePlugin onChange={onChange} />);
-    triggerUserChange(mockHtml);
-    expect(onChange).toHaveBeenCalledWith(expectedOutput);
+const emitInitialUpdate = () => emitUpdate();
+
+const emitUserChange = (html: string, tags: string[] = []) => {
+    emitInitialUpdate();
+    mockGenerateHtmlFromNodes.mockReturnValue(html);
+    emitUpdate({ dirty: true, tags });
+};
+
+const expectSanitized = (input: string, expected: string) => {
+    const { onChange } = renderPlugin();
+
+    emitUserChange(input);
+
+    expect(onChange).toHaveBeenCalledWith(expected);
 };
 
 describe('OnChangePlugin', () => {
@@ -52,125 +62,128 @@ describe('OnChangePlugin', () => {
     });
 
     it('renders without crashing', () => {
-        const onChange = jest.fn();
-        const { container } = render(<OnChangePlugin onChange={onChange} />);
+        const { container } = renderPlugin();
+
         expect(container).toBeEmptyDOMElement();
     });
 
     it('registers update listener on mount', () => {
-        const onChange = jest.fn();
-        render(<OnChangePlugin onChange={onChange} />);
+        renderPlugin();
+
         expect(mockRegisterUpdateListener).toHaveBeenCalledWith(expect.any(Function));
-    });
-
-    it('does not call onChange on initial render', () => {
-        const onChange = jest.fn();
-        render(<OnChangePlugin onChange={onChange} />);
-
-        const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
-        const mockEditorState = { read: jest.fn((cb) => cb()) };
-
-        listenerCallback({
-            editorState: mockEditorState,
-            dirtyElements: new Map(),
-            dirtyLeaves: new Set(),
-        });
-
-        expect(onChange).not.toHaveBeenCalled();
-    });
-
-    it('does not call onChange when there are no dirty elements or leaves', () => {
-        const onChange = jest.fn();
-        render(<OnChangePlugin onChange={onChange} />);
-
-        const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
-        const mockEditorState = { read: jest.fn((cb) => cb()) };
-
-        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
-
-        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
-
-        expect(onChange).not.toHaveBeenCalled();
-    });
-
-    it('calls onChange callback when editor updates', () => {
-        const onChange = jest.fn();
-        testOnChangeCallback(onChange, '<p>Generated HTML</p>', '<p>Generated HTML</p>');
-    });
-
-    it('calls onChange with sanitized HTML generated from nodes', () => {
-        const onChange = jest.fn();
-        testOnChangeCallback(onChange, '<p>Custom <strong>HTML</strong></p>', '<p>Custom <strong>HTML</strong></p>');
     });
 
     it('unregisters listener on unmount', () => {
         const unregister = jest.fn();
         mockRegisterUpdateListener.mockReturnValue(unregister);
-
-        const onChange = jest.fn();
-        const { unmount } = render(<OnChangePlugin onChange={onChange} />);
-
+        const { unmount } = renderPlugin();
         expect(unregister).not.toHaveBeenCalled();
+
         unmount();
+
         expect(unregister).toHaveBeenCalled();
     });
 
+    describe('when onChange must not be called', () => {
+        it('does not call onChange on initial render', () => {
+            const { onChange } = renderPlugin();
+
+            emitInitialUpdate();
+
+            expect(onChange).not.toHaveBeenCalled();
+        });
+
+        it('does not call onChange when there are no dirty elements or leaves', () => {
+            const { onChange } = renderPlugin();
+
+            emitInitialUpdate();
+            emitUpdate();
+
+            expect(onChange).not.toHaveBeenCalled();
+        });
+
+        it('does not call onChange when update has external-value tag', () => {
+            const { onChange } = renderPlugin();
+
+            emitInitialUpdate();
+            emitUpdate({ dirty: true, tags: ['external-value'] });
+
+            expect(onChange).not.toHaveBeenCalled();
+        });
+
+        it('does not call onChange for external-value tag even together with other tags', () => {
+            const { onChange } = renderPlugin();
+
+            emitInitialUpdate();
+            emitUpdate({ dirty: true, tags: ['history-merge', 'external-value'] });
+
+            expect(onChange).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('when the user edits the content', () => {
+        it('calls onChange with HTML generated from nodes', () => {
+            const { onChange } = renderPlugin();
+
+            emitUserChange('<p>Generated HTML</p>');
+
+            expect(onChange).toHaveBeenCalledWith('<p>Generated HTML</p>');
+        });
+
+        it('calls onChange with sanitized HTML generated from nodes', () => {
+            expectSanitized('<p>Custom <strong>HTML</strong></p>', '<p>Custom <strong>HTML</strong></p>');
+        });
+
+        it('calls onChange for updates with unrelated tags', () => {
+            const { onChange } = renderPlugin();
+
+            emitUserChange('<p>Text</p>', ['history-merge']);
+
+            expect(onChange).toHaveBeenCalledWith('<p>Text</p>');
+        });
+    });
+
     describe('HTML Sanitization', () => {
-        const sanitizationTestCases = [
-            {
-                name: 'removes CSS module class attributes from HTML',
-                input: '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_text-bold__xyz">bold</strong></p>',
-                expected: '<p>Text with <strong>bold</strong></p>',
-            },
-            {
-                name: 'removes inline style attributes from HTML',
-                input: '<p style="white-space: pre-wrap;">Text with <span style="white-space: pre-wrap;">span</span></p>',
-                expected: '<p>Text with span</p>',
-            },
-            {
-                name: 'removes redundant b tags wrapping strong tags',
-                input: '<p>Text <b><strong>bold</strong></b> here</p>',
-                expected: '<p>Text <strong>bold</strong> here</p>',
-            },
-            {
-                name: 'removes redundant i tags wrapping em tags',
-                input: '<p>Text <i><em>italic</em></i> here</p>',
-                expected: '<p>Text <em>italic</em> here</p>',
-            },
-            {
-                name: 'handles empty string input',
-                input: '',
-                expected: '',
-            },
-            {
-                name: 'sanitizes complex Lexical output with multiple issues',
-                input:
-                    '<p class="RichTextInput_paragraph__wO3kv" style="text-align: center;">' +
+        it.each([
+            [
+                'removes CSS module class attributes from HTML',
+                '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_text-bold__xyz">bold</strong></p>',
+                '<p>Text with <strong>bold</strong></p>',
+            ],
+            [
+                'removes inline style attributes from HTML',
+                '<p style="white-space: pre-wrap;">Text with <span style="white-space: pre-wrap;">span</span></p>',
+                '<p>Text with span</p>',
+            ],
+            [
+                'removes redundant b tags wrapping strong tags',
+                '<p>Text <b><strong>bold</strong></b> here</p>',
+                '<p>Text <strong>bold</strong> here</p>',
+            ],
+            [
+                'removes redundant i tags wrapping em tags',
+                '<p>Text <i><em>italic</em></i> here</p>',
+                '<p>Text <em>italic</em> here</p>',
+            ],
+            ['handles empty string input', '', ''],
+            [
+                'sanitizes complex Lexical output with multiple issues',
+                '<p class="RichTextInput_paragraph__wO3kv" style="text-align: center;">' +
                     '<span style="white-space: pre-wrap;">Ми не </span>' +
                     '<b><strong class="RichTextInput_text-bold__TIQja" style="white-space: pre-wrap;">одні</strong></b>' +
                     '<span style="white-space: pre-wrap;">. І це наша </span>' +
                     '<b><strong class="RichTextInput_text-bold__TIQja" style="white-space: pre-wrap;">сила</strong></b>' +
                     '</p>',
-                expected: '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
-            },
-            {
-                name: 'preserves multiple consecutive spaces using non-breaking spaces',
-                input: '<p><span style="white-space: pre-wrap;">text  with   multiple    spaces</span></p>',
-                expected: '<p>text &nbsp;with &nbsp;&nbsp;multiple &nbsp;&nbsp;&nbsp;spaces</p>',
-            },
-            {
-                name: 'preserves double spaces to prevent cursor jumping',
-                input: '<p>First  Second</p>',
-                expected: '<p>First &nbsp;Second</p>',
-            },
-        ];
-
-        it.each(sanitizationTestCases.map(({ name, input, expected }) => [name, input, expected]))(
-            '%s',
-            (_name, input, expected) => {
-                const onChange = jest.fn();
-                testOnChangeCallback(onChange, input, expected);
-            },
-        );
+                '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
+            ],
+            [
+                'preserves multiple consecutive spaces using non-breaking spaces',
+                '<p><span style="white-space: pre-wrap;">text  with   multiple    spaces</span></p>',
+                '<p>text &nbsp;with &nbsp;&nbsp;multiple &nbsp;&nbsp;&nbsp;spaces</p>',
+            ],
+            ['preserves double spaces to prevent cursor jumping', '<p>First  Second</p>', '<p>First &nbsp;Second</p>'],
+        ])('%s', (_name, input, expected) => {
+            expectSanitized(input, expected);
+        });
     });
 });

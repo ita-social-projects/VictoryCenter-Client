@@ -119,7 +119,7 @@ describe('EventsNewsPage component', () => {
 
             await fetchHandler(requestOptions);
 
-            expect(mockedPageApiGet).toHaveBeenCalledWith(language, requestOptions);
+            expect(mockedPageApiGet).toHaveBeenCalledWith(requestOptions);
         });
     });
 });

@@ -5,6 +5,7 @@ export const createTranslationFieldHandlers = (
     setError: (error: string | undefined) => void,
     validateRealTime: (value: string) => string | undefined,
     validateOnBlur: (value: string) => string | undefined,
+    normalize: (value: string) => string = getNormalizedInputText,
 ) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const value = e.target.value;
@@ -13,7 +14,7 @@ export const createTranslationFieldHandlers = (
     };
 
     const handleBlur = (currentValue: string) => () => {
-        const normalised = getNormalizedInputText(currentValue);
+        const normalised = normalize(currentValue);
         setValue(normalised);
         setError(validateOnBlur(normalised));
     };

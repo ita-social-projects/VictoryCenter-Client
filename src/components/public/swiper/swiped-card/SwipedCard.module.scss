@@ -14,10 +14,14 @@
         }
     }
 
+    // Pages can set these custom properties on an ancestor to change the desktop stagger
     @media (min-width: 1440px) {
-        &.card-2,
+        &.card-2 {
+            margin-top: var(--swiped-card-2-offset, 392px);
+        }
+
         &.card-4 {
-            margin-top: 392px;
+            margin-top: var(--swiped-card-4-offset, 392px);
         }
     }
 }

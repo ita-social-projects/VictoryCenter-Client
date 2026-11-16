@@ -27,6 +27,26 @@
         .infinite-scroll-list-container {
             margin-bottom: 102px;
         }
+
+        .draggable-item {
+            min-width: 0;
+
+            .item-data {
+                min-width: 0;
+            }
+        }
+
+        .btn-add {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            max-width: 427px;
+        }
+
+        .plus-icon path {
+            stroke: colors.$blue-500;
+        }
     }
 
     &-error-container {
@@ -62,10 +82,10 @@
 }
 
 .feedback-form-modal {
-    .modal-footer {
+    > .modal-footer {
         justify-content: center;
 
-        button {
+        > button {
             width: auto;
             min-width: 227px;
         }

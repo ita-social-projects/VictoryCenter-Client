@@ -21,6 +21,7 @@ export const PARTNERS_TEXT = {
         },
         IMAGE: {
             ADD_IMAGE_HERE: 'Додайте файл сюди',
+            FORMAT_ERROR: 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
         },
     },
     BANNER: {
@@ -44,7 +45,7 @@ export const PARTNERS_TEXT = {
     MESSAGE: {
         SECTION_CREATED: 'Секція успішно створена',
         SECTION_UPDATED: 'Секція успішно оновлена',
-        SECTION_DELETED: 'Секція успішно видалена',
+        SECTION_DELETED: 'Секцію видалено успішно',
         SECTION_PUBLISHED: 'Секція успішно опублікована',
         BANNER_PUBLISHED: 'Зміни успішно опубліковано',
         FAIL_TO_LOAD_PARTNERS: 'Виникла помилка, не вдалося завантажити партнерів',
@@ -75,7 +76,7 @@ export const PARTNER_BANNER_VALIDATION = {
     image: {
         width: 1440,
         height: 860,
-        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
+        getFormatError: () => PARTNERS_TEXT.FORM.IMAGE.FORMAT_ERROR,
     },
 };
 
@@ -106,5 +107,6 @@ export const PARTNER_VALIDATION = {
     image: {
         width: 200,
         height: 200,
+        getFormatError: () => PARTNERS_TEXT.FORM.IMAGE.FORMAT_ERROR,
     },
 };

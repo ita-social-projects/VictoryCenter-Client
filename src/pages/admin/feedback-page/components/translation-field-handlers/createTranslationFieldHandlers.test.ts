@@ -30,4 +30,19 @@ describe('createTranslationFieldHandlers', () => {
         expect(validateOnBlur).toHaveBeenCalledWith('padded value');
         expect(setError).toHaveBeenCalledWith(undefined);
     });
+
+    it('handleBlur uses the provided normalise function instead of the default one', () => {
+        const setValue = jest.fn();
+        const setError = jest.fn();
+        const validateOnBlur = jest.fn();
+        const normalize = jest.fn().mockReturnValue('custom');
+
+        const { handleBlur } = createTranslationFieldHandlers(setValue, setError, jest.fn(), validateOnBlur, normalize);
+
+        handleBlur('raw value')();
+
+        expect(normalize).toHaveBeenCalledWith('raw value');
+        expect(setValue).toHaveBeenCalledWith('custom');
+        expect(validateOnBlur).toHaveBeenCalledWith('custom');
+    });
 });

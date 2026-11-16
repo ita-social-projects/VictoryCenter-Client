@@ -35,6 +35,7 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
     actionConfirmationTitle: string;
     onActionConfirm: () => void;
     onActionCancel: () => void;
+    onActionDismiss?: () => void;
     isExitConfirmationOpen: boolean;
     onExitConfirm: () => void;
     onExitCancel: () => void;
@@ -61,6 +62,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     onPublishSubmit,
     onActionConfirm,
     onActionCancel,
+    onActionDismiss,
     onExitConfirm,
     onExitCancel,
     renderForm,
@@ -119,7 +121,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 isButtonsDisabled={isSubmitting}
                 onConfirm={onActionConfirm}
                 onCancel={onActionCancel}
-                onClose={onActionCancel}
+                onClose={onActionDismiss ?? onActionCancel}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

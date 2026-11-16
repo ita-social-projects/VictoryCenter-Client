@@ -103,7 +103,7 @@ describe('SummarySection', () => {
         render(<SummarySection />);
 
         const cards = await screen.findAllByTestId('stat-card');
-        expect(cards[0]).toHaveTextContent('Зібрано: 2 352 USD');
+        expect(cards[0]).toHaveTextContent('Зібрано: 2,352 USD');
     });
 
     it('renders lives changed card with static data', async () => {

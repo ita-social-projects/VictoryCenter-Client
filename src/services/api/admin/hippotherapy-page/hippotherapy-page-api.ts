@@ -5,6 +5,8 @@ import {
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageContentModel,
+    HippotherapyPageTranslationStatusDto,
+    HippotherapyPageTranslationStatusInfo,
     HippotherapyScientificReference,
     HippotherapyScientificReferenceDto,
     UpdateHippotherapyPageContentDto,
@@ -43,23 +45,36 @@ const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
     imageId: value.image && 'id' in value.image ? value.image.id : (value.imageId ?? null),
 });
 
+const mapTranslationStatuses = (
+    statuses: HippotherapyPageTranslationStatusDto[] | undefined,
+): HippotherapyPageTranslationStatusInfo[] =>
+    (statuses ?? []).flatMap(({ block, languageId, translationStatus }) =>
+        translationStatus === null ? [] : [{ block, languageId, translationStatus }],
+    );
+
 const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => ({
     ...dto,
     ...mapEntityWithLocalizations(dto),
-    translationStatuses: dto.translationStatuses ?? [],
+    translationStatuses: mapTranslationStatuses(dto.translationStatuses),
     introSection: withImageId(dto.introSection),
     quoteSection: withImageId(dto.quoteSection),
     hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
     advantagesSection: {
         ...dto.advantagesSection,
-        cards: dto.advantagesSection.cards.map((card) => withImageId(card)),
+        cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
     },
     anotherQuoteSection: withImageId(dto.anotherQuoteSection),
     participantsSection: {
         ...dto.participantsSection,
-        cards: dto.participantsSection.cards.map((card) => withImageId(card)),
+        cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
     },
-    ethicsSection: withImageId(dto.ethicsSection),
+    ethicsSection: withImageId({
+        ...dto.ethicsSection,
+        principles: dto.ethicsSection.principles.map((principle) => ({
+            id: principle.id ?? null,
+            text: principle.text,
+        })),
+    }),
     scientificReferencesSection: {
         ...dto.scientificReferencesSection,
         scientificReferences: attachReferenceLocalIds(dto.scientificReferencesSection.scientificReferences),

@@ -7,15 +7,22 @@ import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
+        i18n: {
+            language: 'uk',
+            resolvedLanguage: 'uk',
+        },
     }),
 }));
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
+    useLocation: () => ({
+        pathname: '/',
+        search: '',
+    }),
 }));
 
-// Змінна має починатися з "mock", інакше Jest не дозволить використати її у фабриці
 let mockCurrentLanguage: string = DEFAULT_LOCALE;
 
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
@@ -32,7 +39,7 @@ const mockEventData: EventsNews = {
     tag: { id: '1', name: 'Media' },
     resource: 'Test Source',
     slug: 'test-event',
-    sections: [],
+    localizations: [],
 };
 
 describe('SingleEventNews', () => {
@@ -111,7 +118,6 @@ describe('SingleEventNews', () => {
             description: 'Minimal description',
             tag: { id: '1', name: 'Media' },
             slug: 'minimal-event',
-            sections: [],
         };
         render(<SingleEventNews {...minimalEventData} />);
         expect(screen.getByText('Minimal Event')).toBeInTheDocument();

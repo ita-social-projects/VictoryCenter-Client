@@ -127,6 +127,7 @@ jest.mock('./plugins', () => {
         InitialValuePlugin: MockInitialValuePlugin,
         EditablePlugin: MockEditablePlugin,
         EnterKeyPlugin: MockEnterKeyPlugin,
+        PastePlugin: () => null,
     };
 });
 

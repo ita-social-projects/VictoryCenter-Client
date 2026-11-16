@@ -12,25 +12,44 @@ export interface DropdownLink {
 export interface DropdownMenuProps {
     mainText: string;
     links: DropdownLink[];
+    trigger?: 'hover' | 'click';
+    className?: string;
+    onLinkClick?: () => void;
 }
 
-export const DropdownMenu = ({ links, mainText }: DropdownMenuProps) => {
+export const DropdownMenu = ({ links, mainText, trigger = 'hover', className, onLinkClick }: DropdownMenuProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOnMouseEnter = () => {
-        setIsOpen(true);
+        if (trigger === 'hover') {
+            setIsOpen(true);
+        }
     };
 
     const handleLinkClick = () => {
-        setIsOpen(!isOpen);
-    };
-    const handleOnMouseLeave = () => {
         setIsOpen(false);
+        onLinkClick?.();
+    };
+
+    const handleButtonClick = () => {
+        if (trigger === 'click') {
+            setIsOpen((prev) => !prev);
+        }
+    };
+
+    const handleOnMouseLeave = () => {
+        if (trigger === 'hover') {
+            setIsOpen(false);
+        }
     };
 
     return (
-        <div className="dropdown" onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-            <button className="dropdown-button">
+        <div
+            className={classNames('dropdown', className)}
+            onMouseEnter={handleOnMouseEnter}
+            onMouseLeave={handleOnMouseLeave}
+        >
+            <button type="button" className="dropdown-button" onClick={handleButtonClick}>
                 {mainText} {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
 

@@ -119,6 +119,8 @@ export const TranslatePartnerSectionForm = forwardRef<TranslatePartnerSectionFor
                     name={'title'}
                     id={'translate-section-title'}
                     rows={3}
+                    autoGrow
+                    maxRows={0}
                 />
 
                 <TextAreaWithCharacterLimitGroup
@@ -132,6 +134,8 @@ export const TranslatePartnerSectionForm = forwardRef<TranslatePartnerSectionFor
                     name={'description'}
                     id={'translate-section-description'}
                     rows={3}
+                    autoGrow
+                    maxRows={0}
                 />
 
                 <div className={styles['partners-grid']}>
@@ -164,6 +168,8 @@ export const TranslatePartnerSectionForm = forwardRef<TranslatePartnerSectionFor
                                     name={`translate-partner-description-${partnerValue.partnerId}`}
                                     id={`translate-partner-description-${partnerValue.partnerId}`}
                                     rows={3}
+                                    autoGrow
+                                    maxRows={0}
                                 />
                             </div>
                         );

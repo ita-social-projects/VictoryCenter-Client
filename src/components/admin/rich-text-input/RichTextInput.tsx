@@ -19,6 +19,8 @@ import {
     EnterKeyPlugin,
     EditablePlugin,
     SpaceNormalizationPlugin,
+    PastePlugin,
+    HTML_EXPORT_CONFIG,
 } from './plugins';
 
 export interface RichTextInputProps {
@@ -103,6 +105,7 @@ export const RichTextInput = ({
         () => ({
             namespace: 'RichTextInput-' + id,
             theme,
+            html: HTML_EXPORT_CONFIG,
             onError: () => {},
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
@@ -162,6 +165,7 @@ export const RichTextInput = ({
                 <InitialValuePlugin value={value} />
                 <EditablePlugin disabled={disabled} />
                 <EnterKeyPlugin />
+                <PastePlugin />
             </LexicalComposer>
             <div className={styles.footer}>
                 <button

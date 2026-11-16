@@ -14,19 +14,15 @@
 .image {
     display: block;
     width: 650px;
-    min-height: 504px;
     margin-top: 50px;
 }
 
 .content {
     width: 650px;
-    height: 993px;
 }
 
 .image-wrapper {
-    width: 390px;
-    min-height: 504px;
-    margin: 0 129px;
+    width: 100%;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -36,10 +32,7 @@
     cursor: pointer;
 
     > *:first-child {
-        width: 100%;
-        flex: 0 0 504px;
-        min-height: 504px;
-        height: 504px;
+        flex: 0 0 auto;
     }
 
     > *:not(:first-child) {

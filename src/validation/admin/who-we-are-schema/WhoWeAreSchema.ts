@@ -1,11 +1,13 @@
 import * as Yup from 'yup';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { normalizeSpaces } from '@/utils/functions/normalize-spaces/normalize-spaces';
+
+const normalizeText = (value: string) => normalizeSpaces(value, true).trimEnd();
 
 const createTextValidationRule = (requiredError: string) =>
     Yup.string()
-        .transform((value) => (value ? getNormalizedInputText(value) : value))
+        .transform((value) => (value ? normalizeText(value) : value))
         .required(requiredError)
         .min(WHO_WE_ARE_TEXT.MIN_LENGTH, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH));
 

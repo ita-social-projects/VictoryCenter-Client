@@ -1,4 +1,5 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
 @import '../shared/BaseSectionTemplate.module.scss';
 
 $img-width: 1330px;
@@ -7,43 +8,55 @@ $img-height: 680px;
 .container {
     @extend %section-container;
     background-color: #fff;
-    padding-bottom: 60px;
-}
-
-.template {
-    aspect-ratio: 1440 / 1200;
+    display: flex;
+    flex-direction: column;
 }
 
 .top-section {
-    flex: 0 0 40%;
+    width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .image-wrapper {
-    height: 100%;
+    width: 100%;
     aspect-ratio: $img-width / $img-height;
 }
 
 .image {
     width: 100%;
-    height: auto;
     object-fit: cover;
-    aspect-ratio: $img-width / $img-height;
-}
-
-.description-template {
-    font-size: clamp(3px, 0.9vw, 1.5vmin);
-    line-height: clamp(3px, 0.9vw, 1.4vmin);
-}
-
-.title-template {
-    font-size: clamp(3px, 1.7vw, 3vmin);
-    line-height: clamp(3px, 1.7vw, 3vmin);
 }
 
 .bottom-section {
-    flex: 0 0 60%;
+    width: 100%;
+}
+
+.template {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .top-section {
+        flex: 0 0 45%;
+        padding: 24px 24px 0 24px;
+        box-sizing: border-box;
+    }
+
+    .bottom-section {
+        flex: 0 0 55%;
+    }
+
+    .image-wrapper {
+        height: 100%;
+        width: 100%;
+        aspect-ratio: auto;
+    }
+
+    .image {
+        border-radius: 4px;
+    }
 }
 
 .container.form-container {
@@ -54,7 +67,6 @@ $img-height: 680px;
     .top-section {
         flex: auto;
         height: auto;
-        justify-content: center;
         padding: 1vw 10vw;
     }
 
@@ -64,19 +76,13 @@ $img-height: 680px;
     }
 
     .image-wrapper {
-        width: 100%;
         max-width: 1330px;
         max-height: 680px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        aspect-ratio: $img-width / $img-height;
 
         [class~='input-group'] {
             width: 100%;
-            aspect-ratio: $img-width / $img-height;
-            max-width: $img-width;
-            max-height: $img-height;
+            height: 100%;
         }
     }
 }

@@ -1,5 +1,5 @@
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getRichTextContentFromHtml } from '@/utils/functions/rich-text-content/rich-text-content';
 import { useEffect, useRef } from 'react';
 
 export const useReadyRef = () => {
@@ -28,6 +28,6 @@ export const useDirtyChangeEffect = <TFormState>(
 };
 
 export const getWhoWeAreTextValidationError = (value: string): string | undefined => {
-    const plainText = getPlainTextFromHtml(value).trim();
+    const plainText = getRichTextContentFromHtml(value);
     return WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
 };

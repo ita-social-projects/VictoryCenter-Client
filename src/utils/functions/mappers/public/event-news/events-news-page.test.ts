@@ -19,22 +19,22 @@ describe('mapToEventsNewsPage', () => {
         expect(result.description).toBe('<p>D</p>');
         expect(result.eventsData).toEqual({
             title: '<p>T</p>',
-            tags: [{ id: '10', name: 'Media' }],
+            tags: [{ id: '10', name: 'Media', localizations: [] }],
         });
     });
 
-    it('maps every category to a tag with a string id', () => {
+    it('maps every category to a tag with a string id and properly initialized localizations', () => {
         const result = mapToEventsNewsPage({
             categories: [createCategory({ id: 1, name: 'News' }), createCategory({ id: 2, name: 'Events' })],
         });
 
         expect(result.eventsData.tags).toEqual([
-            { id: '1', name: 'News' },
-            { id: '2', name: 'Events' },
+            { id: '1', name: 'News', localizations: [] },
+            { id: '2', name: 'Events', localizations: [] },
         ]);
     });
 
-    it('uses the localized category name for the given language', () => {
+    it('maps category localizations safely into the tag object', () => {
         const category = createCategory({
             localizations: [
                 { language: { code: 'en' }, name: 'Media EN' },
@@ -42,32 +42,71 @@ describe('mapToEventsNewsPage', () => {
             ],
         });
 
-        expect(mapToEventsNewsPage({ categories: [category] }, 'en').eventsData.tags).toEqual([
-            { id: '10', name: 'Media EN' },
-        ]);
-        expect(mapToEventsNewsPage({ categories: [category] }, 'uk').eventsData.tags).toEqual([
-            { id: '10', name: 'Медіа' },
+        const result = mapToEventsNewsPage({ categories: [category] });
+
+        expect(result.eventsData.tags).toEqual([
+            {
+                id: '10',
+                name: 'Media',
+                localizations: [
+                    { language: { code: 'en' }, name: 'Media EN' },
+                    { language: { code: 'uk' }, name: 'Медіа' },
+                ],
+            },
         ]);
     });
 
-    it('falls back to the base category name when no localization matches', () => {
-        const category = createCategory({
-            localizations: [{ language: { code: 'uk' }, name: 'Медіа' }],
-        });
+    it('uses each available English intro translation independently', () => {
+        const result = mapToEventsNewsPage(
+            {
+                eventsBlockTitle: 'Base title',
+                pageDescription: 'Base description',
+                localizations: [
+                    {
+                        language: { code: 'en' },
+                        pageDescription: 'English description',
+                    },
+                ],
+            },
+            'en',
+        );
 
-        const result = mapToEventsNewsPage({ categories: [category] }, 'en');
-
-        expect(result.eventsData.tags).toEqual([{ id: '10', name: 'Media' }]);
+        expect(result.description).toBe('English description');
+        expect(result.eventsData.title).toBe('Base title');
     });
 
-    it('falls back to the base category name when the localized name is blank', () => {
-        const category = createCategory({
-            localizations: [{ language: { code: 'en' }, name: '   ' }],
+    it('honors the server visibility flags even when translated content exists', () => {
+        const result = mapToEventsNewsPage(
+            {
+                eventsBlockTitle: 'Base title',
+                pageDescription: 'Base description',
+                isEventsBlockTitleHidden: true,
+                isPageDescriptionHidden: true,
+                localizations: [
+                    {
+                        language: { code: 'en' },
+                        eventsBlockTitle: 'English title',
+                        pageDescription: 'English description',
+                    },
+                ],
+            },
+            'en',
+        );
+
+        expect(result.isPageDescriptionHidden).toBe(true);
+        expect(result.isEventsBlockTitleHidden).toBe(true);
+    });
+
+    it('hides empty intro blocks when the server visibility flags are false', () => {
+        const result = mapToEventsNewsPage({
+            eventsBlockTitle: '',
+            pageDescription: '',
+            isEventsBlockTitleHidden: false,
+            isPageDescriptionHidden: false,
         });
 
-        const result = mapToEventsNewsPage({ categories: [category] }, 'en');
-
-        expect(result.eventsData.tags).toEqual([{ id: '10', name: 'Media' }]);
+        expect(result.isPageDescriptionHidden).toBe(true);
+        expect(result.isEventsBlockTitleHidden).toBe(true);
     });
 
     it.each([undefined, null, {}, { categories: null }, { categories: [] }])(

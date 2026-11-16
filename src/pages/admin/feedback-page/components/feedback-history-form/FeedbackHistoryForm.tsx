@@ -10,7 +10,10 @@ import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useFeedbackForm } from '@/hooks/admin/use-feedback-form/useFeedbackForm';
 import { GenericFormRef } from '@/hooks/admin/use-generic-modal/useGenericModal';
-import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import {
+    getNormalizedInputTextWhileTyping,
+    getNormalizedMultilineInputText,
+} from '@/utils/functions/formatters/text-formatters';
 import {
     FeedbackHistoryFormValues,
     FeedbackHistoryValidationSchema,
@@ -121,11 +124,18 @@ export const FeedbackHistoryForm = forwardRef<GenericFormRef, FeedbackHistoryFor
                                     !!errors.story,
                                     FEEDBACK_HISTORY_VALIDATION.story.min,
                                 )}
-                                onBlur={field.onBlur}
+                                onBlur={() => {
+                                    if (field.value) {
+                                        field.onChange(getNormalizedMultilineInputText(field.value));
+                                    }
+                                    field.onBlur();
+                                }}
                                 maxLength={FEEDBACK_HISTORY_VALIDATION.story.max}
                                 isRequired
                                 maxLimitWarning={FEEDBACK_HISTORY_VALIDATION.story.getMaxError()}
-                                rows={5}
+                                rows={4}
+                                autoGrow
+                                maxRows={0}
                                 error={errors.story?.message}
                                 disabled={formDisabled}
                                 normalizeValue={getNormalizedInputTextWhileTyping}

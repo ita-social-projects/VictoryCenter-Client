@@ -246,6 +246,8 @@ const PartnerSectionComponent = ({
                         placeholder={PARTNERS_TEXT.SECTION.TITLE_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.title.max}
                         rows={3}
+                        autoGrow={true}
+                        maxRows={0}
                     />
                 </div>
                 <div className={styles['description-group']}>
@@ -261,6 +263,8 @@ const PartnerSectionComponent = ({
                         placeholder={PARTNERS_TEXT.SECTION.DESCRIPTION_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.description.max}
                         rows={3}
+                        autoGrow={true}
+                        maxRows={0}
                     />
                 </div>
             </div>

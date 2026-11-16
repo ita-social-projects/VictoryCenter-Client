@@ -1,9 +1,17 @@
 {
     "SLOGAN": {
         "FIRST_HIGHLIGHT": "Hippovention",
-        "FIRST_TEXT": "≠ treatment.",
+        "FIRST_SIGN": "≠",
+        "FIRST_TEXT": "treatment.",
         "SECOND_TEXT": "It is a",
         "SECOND_HIGHLIGHT": "space for",
         "THIRD_HIGHLIGHT": "interaction."
+    },
+    "ALT": {
+        "INTRO_IMAGE": "Person and horse",
+        "QUOTE_IMAGE": "Person and horse",
+        "CENTER_IMAGE": "Group of people on horses",
+        "ANOTHER_QUOTE_IMAGE": "Person and horse",
+        "ETHICS_IMAGE": "Group of people on horses"
     }
 }

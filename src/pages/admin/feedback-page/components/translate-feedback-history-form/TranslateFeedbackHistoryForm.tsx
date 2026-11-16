@@ -9,7 +9,10 @@ import {
     FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS,
     FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS,
 } from '@/validation/admin/feedback-translation-schema/feedback-translation-schema';
-import { getNormalizedInputTextWhileTyping } from '@/utils/functions/formatters/text-formatters';
+import {
+    getNormalizedInputTextWhileTyping,
+    getNormalizedMultilineInputText,
+} from '@/utils/functions/formatters/text-formatters';
 import { createTranslationFieldHandlers } from '../translation-field-handlers/createTranslationFieldHandlers';
 import styles from './TranslateFeedbackHistoryForm.module.scss';
 
@@ -88,6 +91,7 @@ export const TranslateFeedbackHistoryForm = forwardRef<
             (error) => setErrors((prev) => ({ ...prev, story: error })),
             FEEDBACK_HISTORY_TRANSLATION_VALIDATION_FUNCTIONS.validateStory,
             FEEDBACK_HISTORY_TRANSLATION_BLUR_VALIDATION_FUNCTIONS.validateStory,
+            getNormalizedMultilineInputText,
         );
 
         return (

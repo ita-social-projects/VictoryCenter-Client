@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 import { DONATION_AMOUNTS } from '@/const/public/donate-page';
 
 describe('DonateSection', () => {

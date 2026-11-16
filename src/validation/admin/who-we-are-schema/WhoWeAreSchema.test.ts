@@ -41,6 +41,22 @@ describe('text validation', () => {
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('  12345   67890  ')).toBeUndefined();
     });
 
+    it('counts line breaks as characters, the same as the editor counter', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('\n\nтест коня')).toBeUndefined();
+    });
+
+    it('does not count line breaks at the end of the text, the same as the editor counter', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('тест коня\n\n')).toBe(
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH),
+        );
+    });
+
+    it('treats a value containing only line breaks as empty', () => {
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription('\n\n\n')).toBe(
+            WHO_WE_ARE_TEXT.FORM.VALIDATION.DESCRIPTION_REQUIRED,
+        );
+    });
+
     it('Accept validation', () => {
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText('Correct text')).toBeUndefined();
     });

@@ -147,6 +147,19 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
+    it('grows the story field with long text instead of showing a scrollbar', async () => {
+        renderModal();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+        const longStory = 'a'.repeat(FEEDBACK_HISTORY_VALIDATION.story.max);
+        fireEvent.change(storyTextarea, { target: { value: longStory } });
+
+        await waitFor(() => {
+            expect(storyTextarea).toHaveValue(longStory);
+        });
+        expect(storyTextarea).toHaveStyle({ overflowY: 'hidden' });
+    });
+
     it('shows validation error when inputs are too short', async () => {
         renderModal();
 
@@ -349,6 +362,39 @@ describe('AddFeedbackHistoryModal', () => {
             expect(onSuccess).toHaveBeenCalledWith(mockCreatedHistory, ModalMode.Add);
             expect(onClose).toHaveBeenCalledTimes(1);
         });
+    });
+
+    it('keeps line breaks inside the story when submitting', async () => {
+        onSubmit.mockResolvedValueOnce(mockCreatedHistory);
+
+        renderModal();
+
+        await fillValidForm('Перемога 2026', 'Перший рядок історії \n Другий рядок історії');
+
+        const publishBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+        await waitFor(() => {
+            expect(publishBtn).not.toBeDisabled();
+        });
+
+        fireEvent.click(publishBtn);
+        fireEvent.click(await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({ story: 'Перший рядок історії\nДругий рядок історії' }),
+                undefined,
+            );
+        });
+    });
+
+    it('normalises spaces around line breaks in the story on blur', () => {
+        renderModal();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+        fireEvent.change(storyTextarea, { target: { value: 'Перший рядок \n другий рядок' } });
+        fireEvent.blur(storyTextarea);
+
+        expect(storyTextarea).toHaveValue('Перший рядок\nдругий рядок');
     });
 
     it('calls onError when history creation fails', async () => {

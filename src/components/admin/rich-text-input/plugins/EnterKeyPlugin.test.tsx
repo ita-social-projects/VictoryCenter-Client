@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EnterKeyPlugin } from './EnterKeyPlugin';
-import { KEY_ENTER_COMMAND } from 'lexical';
+import { INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND } from 'lexical';
 
 const mockRegisterCommand = jest.fn();
 const mockEditor = {
@@ -14,6 +14,7 @@ jest.mock('@lexical/react/LexicalComposerContext', () => ({
 
 jest.mock('lexical', () => ({
     KEY_ENTER_COMMAND: 'KEY_ENTER_COMMAND',
+    INSERT_PARAGRAPH_COMMAND: 'INSERT_PARAGRAPH_COMMAND',
     COMMAND_PRIORITY_HIGH: 1,
     $getSelection: jest.fn(),
     $isRangeSelection: jest.fn(),
@@ -37,7 +38,17 @@ describe('EnterKeyPlugin', () => {
         expect(mockRegisterCommand).toHaveBeenCalledWith(KEY_ENTER_COMMAND, expect.any(Function), expect.any(Number));
     });
 
-    it('unregisters command on unmount', () => {
+    it('registers INSERT_PARAGRAPH_COMMAND on mount', () => {
+        render(<EnterKeyPlugin />);
+
+        expect(mockRegisterCommand).toHaveBeenCalledWith(
+            INSERT_PARAGRAPH_COMMAND,
+            expect.any(Function),
+            expect.any(Number),
+        );
+    });
+
+    it('unregisters commands on unmount', () => {
         const unregister = jest.fn();
         mockRegisterCommand.mockReturnValue(unregister);
 
@@ -47,7 +58,7 @@ describe('EnterKeyPlugin', () => {
 
         unmount();
 
-        expect(unregister).toHaveBeenCalled();
+        expect(unregister).toHaveBeenCalledTimes(2);
     });
 
     describe('Enter key handling', () => {
@@ -120,6 +131,31 @@ describe('EnterKeyPlugin', () => {
 
             expect(result).toBe(false);
             expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Insert paragraph handling', () => {
+        const getHandler = () =>
+            mockRegisterCommand.mock.calls.find(([command]) => command === INSERT_PARAGRAPH_COMMAND)[1];
+
+        it('inserts a line break instead of a new paragraph', () => {
+            render(<EnterKeyPlugin />);
+            const mockSelection = { insertNodes: jest.fn() };
+
+            jest.spyOn(require('lexical'), '$getSelection').mockReturnValue(mockSelection);
+            jest.spyOn(require('lexical'), '$isRangeSelection').mockReturnValue(true);
+
+            expect(getHandler()()).toBe(true);
+            expect(mockSelection.insertNodes).toHaveBeenCalledWith([expect.any(require('lexical').LineBreakNode)]);
+        });
+
+        it('returns false when selection is not a range selection', () => {
+            render(<EnterKeyPlugin />);
+
+            jest.spyOn(require('lexical'), '$getSelection').mockReturnValue({});
+            jest.spyOn(require('lexical'), '$isRangeSelection').mockReturnValue(false);
+
+            expect(getHandler()()).toBe(false);
         });
     });
 });

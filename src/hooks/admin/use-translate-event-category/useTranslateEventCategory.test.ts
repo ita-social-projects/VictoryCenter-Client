@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useTranslateEventCategory } from './useTranslateEventCategory';
 import { EventCategoryLocalizationsApi } from '@/services/api/admin/events/event-category-localization-api/event-category-localization-api';
 import { useAdminClient } from '../use-admin-client/useAdminClient';

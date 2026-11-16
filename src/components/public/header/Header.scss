@@ -2,6 +2,7 @@
 @use '@/assets/sass/variables/fonts';
 @use '@/assets/sass/mixins/utilits.mixins';
 @use '@/assets/sass/variables/z-index';
+@use '@/assets/sass/mixins/typography.mixins' as t;
 
 $header-height: 4rem;
 
@@ -95,6 +96,34 @@ $header-height: 4rem;
     .mobile-language-switcher {
         display: none;
     }
+
+    .mobile-menu-dropdown {
+        width: 100%;
+
+        .dropdown-button {
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 16px;
+            position: relative;
+            border-bottom: 1px solid colors.$blue-50;
+            color: colors.$black;
+        }
+
+        .dropdown-links {
+            position: static;
+            width: 100%;
+            box-shadow: none;
+        }
+
+        .dropdown-link {
+            padding: 16px 16px 16px 32px;
+
+            &::after {
+                content: none;
+            }
+        }
+    }
 }
 
 @media (max-width: 1024px) {
@@ -116,7 +145,7 @@ $header-height: 4rem;
         flex-direction: column;
 
         a {
-            font-weight: 600;
+            @include t.body-2-semibold;
             text-decoration: none;
             padding: 1rem 1rem;
             color: black;

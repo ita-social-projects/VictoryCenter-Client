@@ -252,6 +252,13 @@ export const FaqPanelContent = () => {
         autoFetchDependencies: [searchFaqId],
         autoFetchDisabled: !isSearchResultView || !searchFaqId,
     });
+    useEffect(() => {
+        if (!isSearchResultView || !fetchedSearchFaq || fetchedSearchFaq.pages.length === 0) return;
+
+        setSelectedVisitorPage((prev) =>
+            prev && fetchedSearchFaq.pages.some((page) => page.id === prev.id) ? prev : fetchedSearchFaq.pages[0],
+        );
+    }, [fetchedSearchFaq, isSearchResultView]);
 
     const handleSearchClear = useCallback(() => {
         setIsSearchResultView(false);
@@ -397,6 +404,9 @@ export const FaqPanelContent = () => {
         (updatedFaq: FaqQuestion) => {
             const belongsToSelectedPage = updatedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
             const passesStatusFilter = statusFilter === undefined || updatedFaq.status === statusFilter;
+            const wasPublishedNow =
+                modalState.faqToEdit?.status === VisibilityStatus.Draft &&
+                updatedFaq.status === VisibilityStatus.Published;
 
             setFaqs((prevFaqs) => {
                 if (belongsToSelectedPage && passesStatusFilter) {
@@ -405,8 +415,12 @@ export const FaqPanelContent = () => {
                 return prevFaqs.filter((faq) => faq.id !== updatedFaq.id);
             });
             updateModalState({ faqToEdit: null });
+
+            if (wasPublishedNow) {
+                addToast(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
+            }
         },
-        [updateModalState, selectedVisitorPage?.id, statusFilter],
+        [updateModalState, selectedVisitorPage?.id, statusFilter, modalState.faqToEdit, addToast],
     );
 
     const handleDeleteFaq = useCallback(

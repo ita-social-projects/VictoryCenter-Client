@@ -157,7 +157,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 }
                 return base;
             },
-            closeOnDraftCancel: true,
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );

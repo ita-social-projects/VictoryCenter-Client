@@ -12,8 +12,8 @@ describe('report-amount-formatters', () => {
             expect(normalizeSpaces(formatAllocationAmount(1234.56))).toBe('1 234,56');
         });
 
-        it('formats decimal amounts with dot for English locale', () => {
-            expect(normalizeSpaces(formatAllocationAmount(1234.56, true))).toBe('1 234.56');
+        it('formats decimal amounts with the English number format', () => {
+            expect(formatAllocationAmount(1234.56, 'en-US')).toBe('1,234.56');
         });
     });
 
@@ -24,6 +24,10 @@ describe('report-amount-formatters', () => {
 
         it('formats integer amounts with thousands separators', () => {
             expect(normalizeSpaces(formatCollectedAmount(1234))).toBe('1 234');
+        });
+
+        it('formats amounts with the English number format', () => {
+            expect(formatCollectedAmount(1249854.09, 'en-US')).toBe('1,249,854');
         });
     });
 });

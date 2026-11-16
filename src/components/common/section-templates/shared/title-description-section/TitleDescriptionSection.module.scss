@@ -7,42 +7,68 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-direction: row;
     gap: 16px;
     background-color: c.$white;
 
-    .title {
-        font-size: t.$h4-size;
-        line-height: t.$h4-height;
-        margin-top: 10px;
-        font-family: t.$font-family-base;
-        font-weight: t.$fw-bold;
-        letter-spacing: t.$ls-tight;
-        text-transform: uppercase;
-        flex-shrink: 0;
-    }
-
     .title-section {
         flex: 0 0 50%;
-
     }
 
     .description-section {
         flex: 0 0 50%;
     }
 
+    .title {
+        @include type.h4-bold-uppercase;
+        margin-top: 10px;
+        flex-shrink: 0;
+
+        @media (max-width: 1200px) {
+            @include type.subtitle-1-bold;
+            text-transform: uppercase;
+        }
+    }
+
     .description {
-        font-family: t.$font-family-base;
-        font-weight: t.$fw-regular;
-        letter-spacing: t.$ls-tight;
-        text-transform: none;
+        @include type.small-text-regular;
         white-space: pre-wrap;
-        line-height: t.$small-height;
+        margin: 0;
+        padding: 0;
     }
 
     .title-input {
         input,
         textarea {
-            @include type.h3-semibold-uppercase;
+            @include type.h4-bold-uppercase;
+
+            @media (max-width: 1024px) {
+                @include type.subtitle-1-bold;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    &.template {
+        padding: 4%;
+        gap: 12px;
+
+        .title-section {
+            flex: 0 0 50%;
+        }
+
+        .description-section {
+            flex: 0 0 50%;
+        }
+
+        .title {
+            @include type.subtitle-1-bold;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .description {
+            @include type.small-text-regular;
         }
     }
 
@@ -51,11 +77,7 @@
         gap: 15%;
         justify-content: center;
 
-        .title-section {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
+        .title-section,
         .description-section {
             flex: 1 1 auto;
             min-width: 0;
@@ -64,21 +86,26 @@
 
     @media (max-width: 1024px) {
         .title-section {
-            flex: 0 0 40%;
+            flex: 0 0 50%;
         }
-
         .description-section {
-            flex: 0 0 60%;
+            flex: 0 0 50%;
         }
     }
 
-    @media (max-width: 768px) {
-        .title-section {
-            flex: 0 0 30%;
+    @media (max-width: 900px) {
+        flex-direction: column;
+        padding: 24px;
+        gap: 16px;
+
+        .title-section,
+        .description-section {
+            flex: 0 0 100%;
+            width: 100%;
         }
 
-        .description-section {
-            flex: 0 0 70%;
+        .title {
+            margin-top: 0;
         }
     }
 }

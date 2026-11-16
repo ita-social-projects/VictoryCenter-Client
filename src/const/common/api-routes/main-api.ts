@@ -82,6 +82,9 @@ export const API_ROUTES = {
         TOGGLE_EVENTS_BLOCK_TITLE_VISIBILITY: 'EventsPage/events-block-title/toggle-visibility',
         TOGGLE_DESCRIPTION_VISIBILITY: 'EventsPage/description/toggle-visibility',
     },
+    EVENTS_INTRO_SECTION_LOCALIZATIONS: {
+        BASE: 'EventsIntroSectionLocalizations',
+    },
     WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
         BASE: 'WhoWeAreContentLocalizations',
     },
@@ -96,6 +99,7 @@ export const API_ROUTES = {
     FEEDBACK_HISTORIES: {
         BASE: 'FeedbackHistories',
         PUBLISHED: 'FeedbackHistories/published',
+        LATEST_PUBLISHED: 'FeedbackHistories/published/latest',
     },
     FEEDBACK_REVIEWS: {
         BASE: 'FeedbackReviews',

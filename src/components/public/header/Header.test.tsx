@@ -27,13 +27,25 @@ jest.mock('@/assets/icons/burger.svg', () => ({
 }));
 
 jest.mock('@/components/public/dropdown-menu/DropdownMenu', () => ({
-    DropdownMenu: ({ mainText, links }: { mainText: string; links: any[] }) => (
-        <div data-testid="dropdown-mock">
+    DropdownMenu: ({
+        mainText,
+        links,
+        trigger,
+        className,
+        onLinkClick,
+    }: {
+        mainText: string;
+        links: any[];
+        trigger?: 'hover' | 'click';
+        className?: string;
+        onLinkClick?: () => void;
+    }) => (
+        <div data-testid="dropdown-mock" className={className} data-trigger={trigger}>
             <span>{mainText}</span>
             <ul>
                 {links.map((link) => (
                     <li key={link.text}>
-                        <a href={link.navigateTo || '#'} data-disabled={link.isDisabled}>
+                        <a href={link.navigateTo || '#'} data-disabled={link.isDisabled} onClick={onLinkClick}>
                             {link.text}
                         </a>
                     </li>
@@ -155,9 +167,24 @@ describe('Header', () => {
         const mobileMenu = document.querySelector('.mobile-menu');
         expect(mobileMenu).toBeInTheDocument();
 
-        const aboutUsLink = within(mobileMenu as HTMLElement).getByText(headerUk['ABOUT_US']);
+        const reportingLink = within(mobileMenu as HTMLElement).getByText(headerUk['REPORTING']);
 
-        fireEvent.click(aboutUsLink);
+        fireEvent.click(reportingLink);
+
+        expect(mobileMenu).not.toBeInTheDocument();
+    });
+
+    it('closes mobile menu when a sublink inside mobile dropdown is clicked', () => {
+        render(<Header />, { wrapper: MemoryRouter });
+
+        const burgerMenuButton = screen.getByTestId('burger-icon').closest('button');
+        fireEvent.click(burgerMenuButton!);
+
+        const mobileMenu = document.querySelector('.mobile-menu');
+        expect(mobileMenu).toBeInTheDocument();
+
+        const whoWeAreLink = within(mobileMenu as HTMLElement).getByText(headerUk['WHO_WE_ARE']);
+        fireEvent.click(whoWeAreLink);
 
         expect(mobileMenu).not.toBeInTheDocument();
     });
@@ -226,8 +253,10 @@ describe('Header', () => {
         const mobileMenu = document.querySelector('.mobile-menu');
         expect(mobileMenu).toBeInTheDocument();
 
-        const aboutUsLink = within(mobileMenu as HTMLElement).getByText(headerUk['ABOUT_US']);
-        expect(aboutUsLink).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
+        expect(within(mobileMenu as HTMLElement).getByText(headerUk['ABOUT_US'])).toBeInTheDocument();
+        expect(within(mobileMenu as HTMLElement).getAllByText(headerUk['HIPPOTHERAPY'])).toHaveLength(2);
+        const storiesLink = within(mobileMenu as HTMLElement).getByText(headerUk['STORIES_OF_VICTORIES']);
+        expect(storiesLink).toHaveAttribute('href', PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL);
 
         const reportingLink = within(mobileMenu as HTMLElement).getByText(headerUk['REPORTING']);
         expect(reportingLink).toHaveAttribute('href', PUBLIC_ROUTES.REPORTS.FULL);

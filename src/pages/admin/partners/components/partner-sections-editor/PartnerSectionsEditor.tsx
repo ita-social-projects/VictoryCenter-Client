@@ -406,10 +406,53 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
             [fetchedSections, translatingSectionId],
         );
 
-        const handleDeleteRequest = useCallback((localId: string) => {
-            setSectionToDeleteId(localId);
-            setDeletePhase(DeletePhase.CONFIRM_SECTION);
-        }, []);
+        const deleteSection = useCallback(
+            async (localId: string) => {
+                setIsPublishing(true);
+
+                try {
+                    const sectionToDelete = localSections.find((s) => s.localId === localId);
+
+                    if (sectionToDelete && sectionToDelete.sectionId) {
+                        await PartnersApi.deleteSection(client, sectionToDelete.sectionId);
+                    }
+
+                    const indexToDelete = localSections.findIndex((s) => s.localId === localId);
+                    setLocalSections((current) => current.filter((s) => s.localId !== localId));
+                    setErrors((current) => current.filter((_, i) => i !== indexToDelete));
+
+                    if (sectionToDelete && sectionToDelete.sectionId) {
+                        setFetchedSections((current) =>
+                            (current || []).filter((s) => s.id !== sectionToDelete.sectionId),
+                        );
+                    }
+
+                    addToast(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
+                } catch (error: unknown) {
+                    if (isCancelError(error)) {
+                        return;
+                    }
+                    addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);
+                } finally {
+                    setIsPublishing(false);
+                    setSectionToDeleteId(null);
+                }
+            },
+            [localSections, client, setLocalSections, addToast, setFetchedSections],
+        );
+
+        const handleDeleteRequest = useCallback(
+            (localId: string) => {
+                const section = localSections.find((s) => s.localId === localId);
+                if (section && isSectionEmpty(section)) {
+                    deleteSection(localId);
+                    return;
+                }
+                setSectionToDeleteId(localId);
+                setDeletePhase(DeletePhase.CONFIRM_SECTION);
+            },
+            [localSections, deleteSection],
+        );
 
         const handleCloseModal = useCallback(() => {
             setDeletePhase(DeletePhase.IDLE);
@@ -423,35 +466,9 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
         const handleFinalConfirmDelete = useCallback(async () => {
             if (!sectionToDeleteId) return;
 
-            setIsPublishing(true);
             setDeletePhase(DeletePhase.IDLE);
-
-            try {
-                const sectionToDelete = localSections.find((s) => s.localId === sectionToDeleteId);
-
-                if (sectionToDelete && sectionToDelete.sectionId) {
-                    await PartnersApi.deleteSection(client, sectionToDelete.sectionId);
-                }
-
-                const indexToDelete = localSections.findIndex((s) => s.localId === sectionToDeleteId);
-                setLocalSections((current) => current.filter((s) => s.localId !== sectionToDeleteId));
-                setErrors((current) => current.filter((_, i) => i !== indexToDelete));
-
-                if (sectionToDelete && sectionToDelete.sectionId) {
-                    setFetchedSections((current) => (current || []).filter((s) => s.id !== sectionToDelete.sectionId));
-                }
-
-                addToast(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
-            } catch (error: unknown) {
-                if (isCancelError(error)) {
-                    return;
-                }
-                addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);
-            } finally {
-                setIsPublishing(false);
-                setSectionToDeleteId(null);
-            }
-        }, [localSections, client, setLocalSections, sectionToDeleteId, addToast, setFetchedSections]);
+            await deleteSection(sectionToDeleteId);
+        }, [sectionToDeleteId, deleteSection]);
 
         const addSection = useCallback(() => {
             if (isPublishing || isSectionsLoading || !isBaseLanguage) {

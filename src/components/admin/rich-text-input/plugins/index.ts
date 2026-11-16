@@ -6,3 +6,5 @@ export { ToolbarPlugin } from './ToolbarPlugin';
 export { EnterKeyPlugin } from './EnterKeyPlugin';
 export { EditablePlugin } from './EditablePlugin';
 export { SpaceNormalizationPlugin } from './SpaceNormalizationPlugin';
+export { PastePlugin } from './PastePlugin';
+export { HTML_EXPORT_CONFIG } from './htmlExportConfig';

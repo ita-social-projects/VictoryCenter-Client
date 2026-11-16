@@ -1,6 +1,7 @@
 @use '@/assets/sass/variables/fonts';
 @use '@/assets/sass/variables/colors';
 @use '@/assets/sass/variables/z-index';
+@use '@/assets/sass/mixins/typography.mixins' as t;
 
 .dropdown {
     position: relative;
@@ -10,9 +11,7 @@
         gap: 4px;
         background: none;
         border: none;
-        font-size: 1rem;
-        font-family: fonts.$mulish-regular-font;
-        font-weight: 600;
+        @include t.body-2-semibold;
 
         &:hover {
             cursor: pointer;

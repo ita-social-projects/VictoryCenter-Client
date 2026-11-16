@@ -17,6 +17,20 @@
         width: calc(100% - 19.4375rem);
     }
 
+    @media (max-width: 768px) {
+        flex-direction: column;
+
+        &__navigation {
+            width: 100%;
+            height: auto;
+            position: static;
+        }
+
+        &__page {
+            width: 100%;
+        }
+    }
+
     font-family: fonts.$mulish-regular-font;
 
     button,

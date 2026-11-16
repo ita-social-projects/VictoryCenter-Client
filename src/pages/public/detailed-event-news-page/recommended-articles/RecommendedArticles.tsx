@@ -10,7 +10,6 @@ import styles from './RecommendedArticles.module.scss';
 
 const RecommendedArticlesBase: React.FC = () => {
     const { t } = useTranslation('eventsNewsPage');
-
     const { currentLanguage } = useLocale();
 
     const getEvents = useCallback(async () => EventsNewsApi.get('', 0, 2, currentLanguage), [currentLanguage]);
@@ -33,8 +32,8 @@ const RecommendedArticlesBase: React.FC = () => {
                     </div>
                 )}
 
-                {data.map((item: EventsNews) => (
-                    <SingleEventNews key={item?.id} {...item} />
+                {data.map((item) => (
+                    <SingleEventNews key={item.id} {...item} />
                 ))}
 
                 {isLoading && <LinearProgress />}

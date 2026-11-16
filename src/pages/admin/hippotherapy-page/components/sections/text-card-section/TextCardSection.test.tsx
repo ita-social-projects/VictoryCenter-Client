@@ -4,6 +4,13 @@ import { TextCardSection, TextCardSectionProps } from './TextCardSection';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/hippotherapy-page-schema/HippotherapyPageSchema';
 import { HippotherapyTextCardContent } from '@/types/admin/hippotherapy-page';
+import {
+    itRendersTranslationStatuses,
+    itHidesToolbarWhenReadOnly,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -23,9 +30,12 @@ describe('TextCardSection', () => {
         description: 'Initial description',
     };
 
-    const renderComponent = (props: Partial<TextCardSectionProps> = {}) =>
-        render(<TextCardSection value={defaultValue} onChange={mockOnChange} fieldIdPrefix="test-card" {...props} />);
-
+    const renderComponent = (props: Partial<TextCardSectionProps> = {}, isReadOnly = false) =>
+        render(
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <TextCardSection value={defaultValue} onChange={mockOnChange} fieldIdPrefix="test-card" {...props} />
+            </HippotherapyReadOnlyContext.Provider>,
+        );
     beforeEach(() => {
         mockOnChange = jest.fn();
         validateTextMock().mockReset();
@@ -74,5 +84,16 @@ describe('TextCardSection', () => {
 
         expect(screen.getByTestId('mock-rich-input-test-card-title')).toBeDisabled();
         expect(screen.getByTestId('mock-rich-input-test-card-description')).toBeDisabled();
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            ['mock-rich-input-test-card-title', 'mock-rich-input-test-card-description'],
+        );
     });
 });

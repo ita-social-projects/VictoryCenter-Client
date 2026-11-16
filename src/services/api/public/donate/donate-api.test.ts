@@ -1,6 +1,6 @@
 import { donatePageDataFetch } from './donate-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { Currency } from '@/types/public/donate-page';
+import { Currency } from '@/types/common/currency';
 
 jest.mock('@/services/api/axios', () => ({
     axiosInstance: {

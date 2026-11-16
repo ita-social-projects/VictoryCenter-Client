@@ -11,7 +11,14 @@ export const DonateSection = () => {
             title={t('DONATE.TITLE')}
             description={t('DONATE.DESCRIPTION')}
             mediaUrl={background}
-            buttons={[{ label: t('DONATE.SUBMIT_BUTTON'), href: PUBLIC_ROUTES.DONATE.FULL }]}
+            buttons={[
+                {
+                    label: t('DONATE.SUBMIT_BUTTON'),
+                    href: PUBLIC_ROUTES.DONATE.FULL,
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                },
+            ]}
         />
     );
 };

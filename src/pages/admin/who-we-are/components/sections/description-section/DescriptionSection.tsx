@@ -4,7 +4,7 @@ import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-in
 import { Button } from '@/components/admin/button/Button';
 import { OurMission } from '@/pages/public/about-us-page/our-mission/OurMission';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getRichTextContentFromHtml } from '@/utils/functions/rich-text-content/rich-text-content';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { LocalizationLanguage } from '@/types/common/language';
 import { ContentType } from '@/types/common/about-us';
@@ -59,14 +59,14 @@ export const DescriptionSection = ({
 
     const handleBlur = () => {
         if (!isBaseLanguage) return;
-        const plainText = getPlainTextFromHtml(displayedDescription ?? '');
+        const plainText = getRichTextContentFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 
     const handlePublish = () => {
         const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(
-            getPlainTextFromHtml(displayedDescription ?? ''),
+            getRichTextContentFromHtml(displayedDescription ?? ''),
         );
 
         setDescriptionError(descriptionError || null);
@@ -82,7 +82,7 @@ export const DescriptionSection = ({
         !isBaseLanguage ||
         !isPublishButtonActive ||
         !!descriptionError ||
-        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getPlainTextFromHtml(displayedDescription ?? ''));
+        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getRichTextContentFromHtml(displayedDescription ?? ''));
 
     return (
         <div className="description-section">

@@ -6,6 +6,7 @@ import {
     EntityWithTranslationStatuses,
     LocalizationInfo,
     TranslationStatus,
+    TranslationStatusInfo,
 } from '@/types/common/language';
 
 import { Image, ImageValues } from '@/types/common/image';
@@ -30,11 +31,11 @@ export interface HippotherapyTextCardLocalizedContent {
 }
 export interface HippotherapyQuoteLocalizedContent {
     quoteText: string;
-    authorName: string;
+    authorName: string | null;
 }
 export interface HippotherapyGalleryLocalizedContent {
     title: string;
-    cards: { description: string }[];
+    cards: { cardId: number; description: string }[];
 }
 export interface HippoventionCenterLocalizedContent {
     title: string;
@@ -44,12 +45,12 @@ export interface HippoventionCenterLocalizedContent {
 export interface HippotherapyScientificReferencesLocalizedContent {
     title: string;
     description: string;
-    scientificReferences: { id: number; name: string }[];
+    references?: { referenceId: number; name: string }[];
 }
 export interface HippotherapyEthicsLocalizedContent {
     title: string;
     description: string;
-    principles: string[];
+    principles: { principleId: number; text: string }[];
 }
 
 export interface HippotherapyPageLocalizedContent {
@@ -126,6 +127,7 @@ export interface HippotherapyQuoteContent extends HippotherapyImageValue {
 }
 
 export interface HippotherapyGalleryCardContent extends HippotherapyImageValue {
+    id: number | null;
     description: string;
 }
 
@@ -159,16 +161,26 @@ export interface HippotherapyScientificReferenceDto {
     url: string;
 }
 
+export interface HippotherapyEthicsPrinciple {
+    id: number | null;
+    text: string;
+}
+
 export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue {
     title: string;
     description: string;
-    principles: string[];
+    principles: HippotherapyEthicsPrinciple[];
 }
+
+export type HippotherapyPageTranslationStatusInfo = TranslationStatusInfo & {
+    block: HippotherapyPageLocalizationBlock;
+};
 
 export interface HippotherapyPageContentModel
     extends EntityWithLocalizations<HippotherapyPageLocalization>,
         EntityWithTranslationStatuses {
     id?: number;
+    translationStatuses: HippotherapyPageTranslationStatusInfo[];
     introSection: HippotherapyIntroSectionContent;
     descriptionSection: HippotherapyTextCardContent;
     quoteSection: HippotherapyQuoteContent;
@@ -183,8 +195,9 @@ export interface HippotherapyPageContentModel
 }
 
 export interface HippotherapyPageContentDto
-    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations'>,
+    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations' | 'translationStatuses'>,
         EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
+    translationStatuses?: HippotherapyPageTranslationStatusDto[];
     scientificReferencesSection: {
         title: string;
         description: string;

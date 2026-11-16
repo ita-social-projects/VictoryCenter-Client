@@ -9,7 +9,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ContentType } from '@/types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { getRichTextContentFromHtml } from '@/utils/functions/rich-text-content/rich-text-content';
 import { LocalizationLanguage } from '@/types/common/language';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
@@ -80,6 +80,10 @@ export const ImageSection = ({
         });
     };
 
+    const handleImageError = (error: string | null) => {
+        setImageError(error === IMAGE_VALIDATION.getFormatError() ? WHO_WE_ARE_TEXT.IMAGE.FORMAT_ERROR : error);
+    };
+
     const handleTitleChange = (value: string) => {
         setTitleError(null);
 
@@ -102,25 +106,25 @@ export const ImageSection = ({
 
     const handleTitleBlur = () => {
         if (!isBaseLanguage) return;
-        const plainText = getPlainTextFromHtml(displayedTitle ?? '');
+        const plainText = getRichTextContentFromHtml(displayedTitle ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(plainText);
         setTitleError(error || null);
     };
 
     const handleDescriptionBlur = () => {
         if (!isBaseLanguage) return;
-        const plainText = getPlainTextFromHtml(displayedDescription ?? '');
+        const plainText = getRichTextContentFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(plainText);
         setDescriptionError(error || null);
     };
 
     const handlePublish = () => {
         const titleError = titleContent
-            ? WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))
+            ? WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getRichTextContentFromHtml(displayedTitle ?? ''))
             : null;
 
         const descriptionError = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(
-            getPlainTextFromHtml(displayedDescription ?? ''),
+            getRichTextContentFromHtml(displayedDescription ?? ''),
         );
 
         setTitleError(titleError || null);
@@ -136,14 +140,17 @@ export const ImageSection = ({
         !!imageError ||
         !!titleError ||
         !!descriptionError ||
-        !!(titleContent && WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getPlainTextFromHtml(displayedTitle ?? ''))) ||
-        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getPlainTextFromHtml(displayedDescription ?? ''));
+        !!(
+            titleContent &&
+            WHO_WE_ARE_VALIDATION_FUNCTIONS.validateTitle(getRichTextContentFromHtml(displayedTitle ?? ''))
+        ) ||
+        !!WHO_WE_ARE_VALIDATION_FUNCTIONS.validateDescription(getRichTextContentFromHtml(displayedDescription ?? ''));
 
     return (
         <div className="image-section">
             <div className="image-wrapper">
                 <ImageInput
-                    setError={setImageError}
+                    setError={handleImageError}
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
                     variant="whoWeAre"

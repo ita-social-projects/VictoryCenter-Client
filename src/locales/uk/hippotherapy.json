@@ -1,9 +1,17 @@
 {
     "SLOGAN": {
         "FIRST_HIGHLIGHT": "Іповенція",
-        "FIRST_TEXT": "≠ лікування.",
+        "FIRST_SIGN": "≠",
+        "FIRST_TEXT": "лікування.",
         "SECOND_TEXT": "Це —",
         "SECOND_HIGHLIGHT": "простір",
         "THIRD_HIGHLIGHT": "взаємодії"
+    },
+    "ALT": {
+        "INTRO_IMAGE": "Людина і кінь",
+        "QUOTE_IMAGE": "Людина і кінь",
+        "CENTER_IMAGE": "Група людей на конях",
+        "ANOTHER_QUOTE_IMAGE": "Людина і кінь",
+        "ETHICS_IMAGE": "Група людей на конях"
     }
 }

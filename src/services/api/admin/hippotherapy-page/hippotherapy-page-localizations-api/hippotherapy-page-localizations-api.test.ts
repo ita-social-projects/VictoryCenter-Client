@@ -89,7 +89,10 @@ describe('HippotherapyPageLocalizationsApi', () => {
             ethicsSection: {
                 title: 'Ethics',
                 description: 'Ethics description',
-                principles: ['Principle 1', 'Principle 2'],
+                principles: [
+                    { principleId: 1, text: 'Principle 1' },
+                    { principleId: 2, text: 'Principle 2' },
+                ],
             },
         };
         const mockClient = {

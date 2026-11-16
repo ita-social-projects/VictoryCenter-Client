@@ -4,6 +4,11 @@
     display: flex;
     justify-content: space-between;
 
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
     .error {
         color: colors.$error;
         font-size: 0.875rem;
@@ -11,6 +16,10 @@
 
     .content-wrapper {
         width: 38rem;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
 
         &-fields {
             display: flex;

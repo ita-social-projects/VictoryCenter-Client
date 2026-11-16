@@ -193,6 +193,8 @@ export const ReportsMediaBlock = ({
                             minWidth={imageWidth}
                             minHeight={imageHeight}
                             style={{
+                                width: `${imageWidth}px`,
+                                height: `${imageHeight}px`,
                                 backgroundImage: `
                                     linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
                                     url(${imageUrl})

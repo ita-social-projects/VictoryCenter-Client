@@ -4,6 +4,14 @@ import { ScientificReferencesSection, ScientificReferencesSectionProps } from '.
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import { HippotherapyScientificReferencesSectionContent } from '@/types/admin/hippotherapy-page';
+import {
+    itHidesToolbarWhenReadOnly,
+    itRendersTranslationStatuses,
+    withReadOnlyContext,
+} from '@/utils/mock-data/admin/section-translation-test-helpers';
+import { HippotherapyReadOnlyContext } from '../../../context/HippotherapyReadOnlyContext';
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses');
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -76,8 +84,12 @@ describe('ScientificReferencesSection', () => {
         ],
     };
 
-    const renderComponent = (props: Partial<ScientificReferencesSectionProps> = {}) =>
-        render(<ScientificReferencesSection value={defaultValue} onChange={mockOnChange} {...props} />);
+    const renderComponent = (props: Partial<ScientificReferencesSectionProps> = {}, isReadOnly = false) =>
+        render(
+            <HippotherapyReadOnlyContext.Provider value={isReadOnly}>
+                <ScientificReferencesSection value={defaultValue} onChange={mockOnChange} {...props} />
+            </HippotherapyReadOnlyContext.Provider>,
+        );
 
     const getAddButton = () =>
         screen.getByRole('button', { name: new RegExp(HIPPOTHERAPY_PAGE_TEXT.BUTTON.ADD_REFERENCE) });
@@ -134,7 +146,9 @@ describe('ScientificReferencesSection', () => {
             ],
         };
 
-        rerender(<ScientificReferencesSection value={reloadedValue} onChange={mockOnChange} />);
+        rerender(
+            withReadOnlyContext(<ScientificReferencesSection value={reloadedValue} onChange={mockOnChange} />, false),
+        );
 
         expect(screen.getByTestId('reference-card-regenerated-1')).toHaveAttribute('data-is-expanded', 'true');
     });
@@ -409,5 +423,16 @@ describe('ScientificReferencesSection', () => {
 
         fireEvent.click(translateRef1);
         expect(mockOnTranslateReferenceClick).toHaveBeenCalledWith('ref-1');
+    });
+
+    describe('translation statuses', () => {
+        itRendersTranslationStatuses(renderComponent);
+    });
+
+    describe('read-only toolbar', () => {
+        itHidesToolbarWhenReadOnly(
+            (isReadOnly) => renderComponent({}, isReadOnly),
+            ['mock-rich-input-scientific-references-title', 'mock-rich-input-scientific-references-description'],
+        );
     });
 });

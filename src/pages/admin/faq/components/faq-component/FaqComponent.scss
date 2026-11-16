@@ -10,6 +10,7 @@
     .faq-info {
         display: flex;
         flex: 1;
+        min-width: 0;
         flex-direction: row;
         align-items: center;
         gap: 4.375rem;
@@ -19,6 +20,7 @@
         &-question {
             width: 90%;
             flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -33,10 +35,14 @@
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
-                overflow-wrap: break-word;
+                overflow-wrap: anywhere;
                 word-break: normal;
                 text-overflow: ellipsis;
             }
+        }
+
+        &-answer p {
+            white-space: pre-line;
         }
 
         &-status {
@@ -53,6 +59,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         gap: 5.25rem;
         height: 100%;
 

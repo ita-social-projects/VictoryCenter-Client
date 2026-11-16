@@ -61,14 +61,13 @@
     border-bottom: 1px solid c.$grey-500;
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 32px;
     padding: 48px 24px 24px;
 
     @media (min-width: 560px) {
         width: 433px;
         margin: 0 auto;
         padding: 48px 32px 32px;
-        gap: 64px;
     }
 
     @media (min-width: 1440px) {
@@ -90,7 +89,13 @@
 
 .field--textarea {
     border: 1px solid c.$blue-100;
-    margin-top: 32px;
+    box-sizing: border-box;
+    height: 176px;
+    margin-top: 16px;
+
+    @media (min-width: 560px) {
+        margin-top: 32px;
+    }
 }
 
 .field--error {
@@ -100,6 +105,7 @@
 .input,
 .textarea {
     @include type.body-2-regular;
+    line-height: 24px;
     color: c.$blue-900;
     width: 100%;
     border: none;
@@ -116,6 +122,8 @@
 
 .textarea {
     resize: none;
+    display: block;
+    height: 100%;
 }
 
 .error,
@@ -137,8 +145,14 @@
     color: c.$grey-50;
     border: none;
     padding: 12px 24px;
+    min-height: 48px;
+    margin-top: 16px;
     align-self: flex-end;
     cursor: pointer;
+
+    @media (min-width: 560px) {
+        margin-top: 32px;
+    }
 
     &:disabled {
         opacity: 0.5;

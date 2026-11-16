@@ -117,7 +117,7 @@ export const TitleDescriptionSection = ({
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                     />
                 ) : (
-                    <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>
+                    <p className={cn(baseStyles.description, descriptionClassName)}>{description.trim()}</p>
                 )}
             </div>
         </div>

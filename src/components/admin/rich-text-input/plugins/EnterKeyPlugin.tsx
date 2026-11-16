@@ -1,13 +1,19 @@
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { KEY_ENTER_COMMAND, COMMAND_PRIORITY_HIGH, $getSelection, $isRangeSelection } from 'lexical';
+import {
+    KEY_ENTER_COMMAND,
+    INSERT_PARAGRAPH_COMMAND,
+    COMMAND_PRIORITY_HIGH,
+    $getSelection,
+    $isRangeSelection,
+} from 'lexical';
 import { LineBreakNode } from 'lexical';
 
 export const EnterKeyPlugin = () => {
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
-        const unregister = editor.registerCommand(
+        const unregisterEnterKey = editor.registerCommand(
             KEY_ENTER_COMMAND,
             (event) => {
                 const selection = $getSelection();
@@ -33,7 +39,26 @@ export const EnterKeyPlugin = () => {
             COMMAND_PRIORITY_HIGH,
         );
 
-        return unregister;
+        const unregisterInsertParagraph = editor.registerCommand(
+            INSERT_PARAGRAPH_COMMAND,
+            () => {
+                const selection = $getSelection();
+
+                if (!$isRangeSelection(selection)) {
+                    return false;
+                }
+
+                selection.insertNodes([new LineBreakNode()]);
+
+                return true;
+            },
+            COMMAND_PRIORITY_HIGH,
+        );
+
+        return () => {
+            unregisterEnterKey();
+            unregisterInsertParagraph();
+        };
     }, [editor]);
 
     return null;

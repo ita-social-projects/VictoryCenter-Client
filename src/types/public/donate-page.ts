@@ -1,8 +1,4 @@
-export enum Currency {
-    UAH,
-    USD,
-    EUR,
-}
+import { Currency } from '@/types/common/currency';
 
 export enum DonateTab {
     oneTime,

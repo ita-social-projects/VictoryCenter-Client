@@ -82,13 +82,21 @@ export const Header = () => {
 
                 {isMenuOpen && (
                     <div className="mobile-menu">
-                        <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
-                            {t('ABOUT_US')}
-                        </Link>
+                        <DropdownMenu
+                            mainText={t('ABOUT_US')}
+                            links={aboutUsLinks}
+                            trigger="click"
+                            className="mobile-menu-dropdown"
+                            onLinkClick={toggleMenu}
+                        />
 
-                        <Link to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
-                            {t('HIPPOTHERAPY')}
-                        </Link>
+                        <DropdownMenu
+                            mainText={t('HIPPOTHERAPY')}
+                            links={programsLinks}
+                            trigger="click"
+                            className="mobile-menu-dropdown"
+                            onLinkClick={toggleMenu}
+                        />
 
                         <Link to={PUBLIC_ROUTES.REPORTS.FULL} onClick={toggleMenu}>
                             {t('REPORTING')}

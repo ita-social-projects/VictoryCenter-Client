@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import cn from 'classnames';
 import './Modal.scss';
 
@@ -95,28 +96,23 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
     if (!isOpen) return null;
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+        e.stopPropagation();
         if (e.target === e.currentTarget && !mouseDownInsideModal.current) {
             onClose();
         }
         mouseDownInsideModal.current = false;
     };
 
-    const handleOnMouseDownModal = () => {
-        mouseDownInsideModal.current = true;
+    const handlePointerDownCapture = (e: React.PointerEvent<HTMLDivElement>) => {
+        mouseDownInsideModal.current = e.target !== e.currentTarget;
     };
 
-    const handleMouseDownOverlay = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) {
-            mouseDownInsideModal.current = false;
-        }
-    };
-
-    return (
+    return createPortal(
         <div
             data-testid="modal-overlay"
             className="modal-overlay"
             onClick={handleOverlayClick}
-            onMouseDown={handleMouseDownOverlay}
+            onPointerDownCapture={handlePointerDownCapture}
             tabIndex={0}
             role="button"
             onKeyDown={handleOverlayClick}
@@ -132,7 +128,6 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
                     },
                     className,
                 )}
-                onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}
@@ -151,7 +146,8 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false,
                 <div className="modal-body">{content}</div>
                 <div className="modal-footer">{actions}</div>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 };
 

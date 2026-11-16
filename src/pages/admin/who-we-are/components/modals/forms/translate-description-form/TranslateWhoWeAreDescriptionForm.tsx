@@ -1,12 +1,10 @@
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { forwardRef } from 'react';
 import styles from './TranslationWhoWeAreDescriptionForm.module.scss';
 import cn from 'classnames';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { GeneralFormProps, GeneralFormRef } from '../../strategies/who-we-are-modal-strategy';
-import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import {
     getWhoWeAreTextValidationError,
     useDirtyChangeEffect,
@@ -37,9 +35,8 @@ const validateForm = (
     formState: TranslateWhoWeAreDescriptionFormValues,
     _isPublishing: boolean,
 ): TranslateWhoWeAreDescriptionFormErrorState => {
-    const plainDescription = getPlainTextFromHtml(formState.description ?? '').trim();
     return {
-        description: WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainDescription),
+        description: getWhoWeAreTextValidationError(formState.description ?? ''),
     };
 };
 

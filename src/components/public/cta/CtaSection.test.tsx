@@ -13,8 +13,15 @@ jest.mock('./CtaSection.module.scss', () => ({
 }));
 
 jest.mock('@/components/public/ui/button', () => ({
-    Button: ({ children, href, variant, className }: any) => (
-        <a href={href} className={className} data-variant={variant} data-testid="mock-button">
+    Button: ({
+        children,
+        href,
+        variant,
+        className,
+        target,
+        rel,
+    }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: string }) => (
+        <a href={href} target={target} rel={rel} className={className} data-variant={variant} data-testid="mock-button">
             {children}
         </a>
     ),
@@ -87,8 +94,21 @@ describe('CtaSection', () => {
         const btn = buttons[0];
         expect(btn).toHaveTextContent('Donate');
         expect(btn).toHaveAttribute('href', '/donate');
+        expect(btn).not.toHaveAttribute('target');
+        expect(btn).not.toHaveAttribute('rel');
         expect(btn).toHaveClass('button-class');
         expect(btn).toHaveAttribute('data-variant', 'primary-light');
+    });
+
+    it('forwards new-tab attributes only to the configured button', () => {
+        renderCtaSection({
+            buttons: [{ ...twoButtons[0], target: '_blank', rel: 'noopener noreferrer' }, twoButtons[1]],
+        });
+
+        const donateLink = screen.getByRole('link', { name: 'Donate' });
+        expect(donateLink).toHaveAttribute('target', '_blank');
+        expect(donateLink).toHaveAttribute('rel', 'noopener noreferrer');
+        expect(screen.getByRole('link', { name: 'Support' })).not.toHaveAttribute('target');
     });
 
     it('renders two buttons with correct variant logic (Primary -> Secondary)', () => {

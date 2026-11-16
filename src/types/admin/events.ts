@@ -89,7 +89,7 @@ export interface EventSaveSuccessData {
     shouldMoveDraftToTop: boolean;
 }
 
-export type EventsErrorType = 'categories' | 'events-items' | 'events-intro' | 'search' | 'events-reorder';
+export type EventsErrorType = 'categories' | 'events-items' | 'search' | 'events-reorder';
 
 export interface ErrorState {
     message: string | null;
@@ -130,7 +130,19 @@ export interface EventsIntroSectionDto extends EntityWithLocalizations<EventsInt
     isPageDescriptionHidden: boolean;
 }
 
+export type EventsIntroSectionUpdateField = 'pageDescription' | 'eventsBlockTitle';
+
+export interface CreateEventsIntroSectionLocalizationDto {
+    entityId: number;
+    languageId: number;
+    eventsBlockTitle?: string;
+    pageDescription?: string;
+}
+
+export type UpdateEventsIntroSectionLocalizationDto = Pick<
+    CreateEventsIntroSectionLocalizationDto,
+    'eventsBlockTitle' | 'pageDescription'
+>;
+
 export type EventsIntroSectionResponseDto = Omit<EventsIntroSectionDto, 'localizations'> &
     EntityWithDtoLocalizations<EventsIntroSectionLocalizationDto>;
-
-export type EventsIntroSectionUpdateField = keyof EventsIntroSectionDto;

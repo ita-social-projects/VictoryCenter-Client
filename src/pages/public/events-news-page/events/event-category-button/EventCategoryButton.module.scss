@@ -1,0 +1,9 @@
+@use '@/assets/sass/mixins/utilits.mixins' as utils;
+
+.white-button {
+    @include utils.white-button;
+}
+
+.black-button {
+    @include utils.black-button;
+}

@@ -50,10 +50,7 @@ const createTextFieldChangeHandler =
     ) =>
     (event: ChangeEvent<T>) => {
         onChange(event);
-        if (
-            event.target.value === '' ||
-            (hasError && event.target.value.trim().length >= minimumLength)
-        ) {
+        if (event.target.value === '' || (hasError && event.target.value.trim().length >= minimumLength)) {
             clearErrors(fieldName);
         }
     };

@@ -73,6 +73,12 @@ describe('HistorySection', () => {
     });
 
     describe('TextOnly template', () => {
+        it('should reveal sections as soon as they enter the viewport', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.TextOnly)} />);
+
+            expect(mockedUseScrollAnimation).toHaveBeenCalledWith(0);
+        });
+
         it('should render title and description', () => {
             render(<HistorySection section={makeSection(SectionTemplate.TextOnly)} />);
 

@@ -38,10 +38,16 @@
 }
 
 .articleTitle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0;
+}
+
+.cardTitle {
     @include type.subtitle-2-semibold;
     color: colors.$blue-900;
-    position: relative;
-    padding: 12px 0;
 }
 
 .titleContent {

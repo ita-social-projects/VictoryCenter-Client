@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { NotFound } from '@/pages/public/not-found-page/NotFound';
 import { ProgramsPage } from '@/pages/public/programs-page/ProgramsPage';
 import { DetailedProgramPage } from '@/pages/public/detailed-program-page/DetailedProgramPage';
@@ -70,6 +70,8 @@ export const AppRouter = () => {
                         <Route path="*" element={<PublicContent />} />
                     </Route>
                 </Route>
+
+                <Route path="/login" element={<Navigate to={ADMIN_ROUTES.LOGIN.FULL} replace />} />
 
                 {/*For UA*/}
                 <Route path="/*" element={<LanguageSyncWrapper />}>

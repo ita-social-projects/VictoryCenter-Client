@@ -8,11 +8,9 @@ export const loginRequest = async (creds: Credentials): Promise<string> => {
     return response.data.accessToken;
 };
 
-export const logoutRequest = async (token: string): Promise<AxiosResponse> => {
+export const logoutRequest = async (token?: string): Promise<AxiosResponse> => {
     const response = await AuthClient.post(API_ROUTES.AUTH.LOGOUT, null, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
     return response;
 };

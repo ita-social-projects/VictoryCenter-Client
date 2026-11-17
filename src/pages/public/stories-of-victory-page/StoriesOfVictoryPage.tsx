@@ -3,6 +3,7 @@ import { SloganSection } from './components/slogan/SloganSection';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { ReviewsSection } from './components/reviews/ReviewsSection';
 import { ReviewArticlesSection } from './components/review-articles/ReviewArticlesSection';
+import { FeedbackQuote } from './components/quote/FeedbackQuote';
 import { VideoReviewsSection } from './components/video-reviews/VideoReviewsSection';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PublicFeedbackApi } from '@/services/api/public/feedback/feedback-api';
@@ -41,6 +42,7 @@ export const StoriesOfVictoryPage: React.FC = () => {
             <LoadableContent isLoading={false} error={Boolean(reviews.error)}>
                 <ReviewsSection content={reviews.data} />
             </LoadableContent>
+            <FeedbackQuote />
         </LoadableContent>
     );
 };

@@ -6,6 +6,7 @@ import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api
 import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
 import { Credentials } from '@/types/admin/auth';
+import { ADMIN_ROUTES } from '@/const/admin/routes';
 
 jest.mock('@/services/api/admin/login/login-api', () => ({
     loginRequest: jest.fn(),
@@ -100,7 +101,7 @@ describe('<AdminContextProvider />', () => {
         jest.clearAllMocks();
 
         Object.defineProperty(window, 'location', {
-            value: { pathname: '/admin' },
+            value: { pathname: ADMIN_ROUTES.LOGIN.FULL },
             writable: true,
         });
 
@@ -407,5 +408,46 @@ describe('<AdminContextProvider />', () => {
 
         await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledTimes(1));
         expect(screen.getByTestId('auth')).toHaveTextContent('false');
+    });
+
+    it('runs the silent refresh on mount when opened directly at the admin login URL', async () => {
+        window.location.pathname = ADMIN_ROUTES.LOGIN.FULL;
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+        expect(tokenRefreshMock).toHaveBeenCalledTimes(1);
+        expect(screen.getByTestId('auth')).toHaveTextContent('true');
+    });
+
+    it('does not run the silent refresh on mount for public paths', async () => {
+        window.location.pathname = '/programs';
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+        expect(tokenRefreshMock).not.toHaveBeenCalled();
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+    });
+
+    it('does not run the silent refresh on mount for lookalike paths such as /administrator', async () => {
+        window.location.pathname = '/administrator';
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+        expect(tokenRefreshMock).not.toHaveBeenCalled();
     });
 });

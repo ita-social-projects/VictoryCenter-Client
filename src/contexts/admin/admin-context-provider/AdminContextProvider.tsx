@@ -6,6 +6,7 @@ import { Credentials } from '@/types/admin/auth';
 import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
 import { useOnMountUnsafe } from '@/hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
+import { isAdminPath } from '@/const/admin/routes';
 
 type Props = {
     children: ReactNode;
@@ -84,7 +85,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     // silent refresh on mount
     useOnMountUnsafe(() => {
         (async () => {
-            if (window.location.pathname.startsWith('/admin')) {
+            if (isAdminPath(window.location.pathname)) {
                 try {
                     await refreshAccessToken();
                 } catch {

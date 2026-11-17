@@ -147,6 +147,19 @@ describe('AddFeedbackHistoryModal', () => {
         });
     });
 
+    it('grows the story field with long text instead of showing a scrollbar', async () => {
+        renderModal();
+
+        const storyTextarea = screen.getByRole('textbox', { name: /історія/i });
+        const longStory = 'a'.repeat(FEEDBACK_HISTORY_VALIDATION.story.max);
+        fireEvent.change(storyTextarea, { target: { value: longStory } });
+
+        await waitFor(() => {
+            expect(storyTextarea).toHaveValue(longStory);
+        });
+        expect(storyTextarea).toHaveStyle({ overflowY: 'hidden' });
+    });
+
     it('shows validation error when inputs are too short', async () => {
         renderModal();
 

@@ -129,9 +129,12 @@ export const mapHippotherapyPageToAbout = (
             imgURL: getImageUrl(dto.ethicsSection),
             imgAlternativeText: '',
             text: resolvePlain(activeLoc?.ethicsSection?.description, dto.ethicsSection.description),
-            principles: dto.ethicsSection.principles.map((principle, index) => {
-                const localizedPrinciple = activeLoc?.ethicsSection?.principles?.[index];
-                return resolvePlain(localizedPrinciple?.text, principle);
+            principles: dto.ethicsSection.principles.map((principle) => {
+                const localizedRef = activeLoc?.ethicsSection?.principles?.find((p) => p.principleId === principle.id);
+                return {
+                    id: principle.id,
+                    text: resolvePlain(localizedRef?.text, principle.text),
+                };
             }),
         },
     };

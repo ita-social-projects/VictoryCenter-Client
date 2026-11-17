@@ -32,7 +32,10 @@ describe('EthicsSection', () => {
     const defaultValue: HippotherapyEthicsSectionContent = {
         title: 'Initial title',
         description: 'Initial description',
-        principles: ['Principle one', 'Principle two'],
+        principles: [
+            { id: 1, text: 'Principle one' },
+            { id: 2, text: 'Principle two' },
+        ],
         image: null,
         imageId: null,
     };
@@ -58,7 +61,7 @@ describe('EthicsSection', () => {
         { testId: DESCRIPTION_ID, field: 'description', value: 'New description' },
     ]);
 
-    it('updates only the targeted principle, leaving others intact', () => {
+    it('updates only the targeted principle text and keeps ids', () => {
         const onChange = jest.fn();
         renderComponent({ onChange });
 
@@ -66,8 +69,25 @@ describe('EthicsSection', () => {
 
         expect(onChange).toHaveBeenCalledWith({
             ...defaultValue,
-            principles: ['Principle one', 'Updated principle two'],
+            principles: [
+                { id: 1, text: 'Principle one' },
+                { id: 2, text: 'Updated principle two' },
+            ],
         });
+    });
+
+    it('keeps id: null for a new unsaved principle when its text is edited', () => {
+        const onChange = jest.fn();
+        renderComponent({
+            onChange,
+            value: { ...defaultValue, principles: [{ id: null, text: '' }] },
+        });
+
+        fireEvent.change(screen.getByTestId(principleId(0)), { target: { value: 'Brand new' } });
+
+        expect(onChange).toHaveBeenCalledWith(
+            expect.objectContaining({ principles: [{ id: null, text: 'Brand new' }] }),
+        );
     });
 
     itShowsValidationErrorOnBlur(renderComponent, principleId(0), 'x');

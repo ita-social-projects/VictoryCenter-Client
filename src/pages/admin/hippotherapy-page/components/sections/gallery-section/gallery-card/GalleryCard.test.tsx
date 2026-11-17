@@ -16,6 +16,7 @@ describe('GalleryCard', () => {
     let onImageError: jest.Mock;
 
     const card: HippotherapyGalleryCardContent = {
+        id: null,
         description: 'Card description',
         image: null,
         imageId: null,

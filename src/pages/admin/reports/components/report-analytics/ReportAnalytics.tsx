@@ -9,7 +9,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
-import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
+import { ProgramExpensesSummary, ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { ToastType } from '@/types/admin/toast';
 import { LocalizationLanguage } from '@/types/common/language';
 import styles from './ReportAnalytics.module.scss';
@@ -50,6 +50,10 @@ export const ReportAnalytics = () => {
     const [incomeCount, setIncomeCount] = useState(0);
     const [expenseCount, setExpenseCount] = useState(0);
     const [programRecordsCount, setProgramRecordsCount] = useState(0);
+    const [programExpensesSummary, setProgramExpensesSummary] = useState<ProgramExpensesSummary>({
+        totalAmountUah: 0,
+        totalAmountUsd: 0,
+    });
     const [isFundsValid, setIsFundsValid] = useState(false);
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
@@ -241,6 +245,7 @@ export const ReportAnalytics = () => {
                             refetchSettingsRef.current = fn;
                         }}
                         onSelectionChange={setHasSelectedRecords}
+                        programExpensesSummary={programExpensesSummary}
                     />
                 </div>
                 <div style={{ display: activeTab.id === 'program-expenses' ? 'block' : 'none' }}>
@@ -250,6 +255,7 @@ export const ReportAnalytics = () => {
                         onRowEditModeChange={setIsRowEditMode}
                         onCountsChange={setProgramRecordsCount}
                         onDataChange={() => setHasUnpublishedChanges(true)}
+                        onSummaryChange={setProgramExpensesSummary}
                         exchangeRate={exchangeRateDraft}
                         registerSaveCallback={(saveFn) => {
                             saveProgramExpensesCallbackRef.current = saveFn;

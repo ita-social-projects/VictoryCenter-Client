@@ -185,6 +185,35 @@ describe('ContactSection', () => {
         expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
     });
 
+    it('clears the minimum-length errors while typing after the first blur', async () => {
+        render(<ContactSection />);
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN - 1));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
+        fireEvent.blur(getField(SUBJECT_FIELD));
+        fireEvent.blur(getField(MESSAGE_FIELD));
+
+        expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
+        expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN));
+
+        await waitFor(() => expect(screen.queryByText(T.SUBJECT_MIN_ERROR)).not.toBeInTheDocument());
+        expect(screen.queryByText(T.MESSAGE_MIN_ERROR)).not.toBeInTheDocument();
+    });
+
+    it('does not show the minimum-length errors before the field loses focus', async () => {
+        render(<ContactSection />);
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN - 1));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
+        await act(async () => undefined);
+
+        expect(screen.queryByText(T.SUBJECT_MIN_ERROR)).not.toBeInTheDocument();
+        expect(screen.queryByText(T.MESSAGE_MIN_ERROR)).not.toBeInTheDocument();
+    });
+
     it('shows warning and reached-limit hints at their boundaries', () => {
         render(<ContactSection />);
         setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.INFO_AT));

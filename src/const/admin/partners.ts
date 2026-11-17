@@ -45,7 +45,7 @@ export const PARTNERS_TEXT = {
     MESSAGE: {
         SECTION_CREATED: 'Секція успішно створена',
         SECTION_UPDATED: 'Секція успішно оновлена',
-        SECTION_DELETED: 'Секція успішно видалена',
+        SECTION_DELETED: 'Секцію видалено успішно',
         SECTION_PUBLISHED: 'Секція успішно опублікована',
         BANNER_PUBLISHED: 'Зміни успішно опубліковано',
         FAIL_TO_LOAD_PARTNERS: 'Виникла помилка, не вдалося завантажити партнерів',

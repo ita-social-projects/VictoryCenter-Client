@@ -1,4 +1,4 @@
-import { HippotherapyPageLocalizedPartial } from '@/types/admin/hippotherapy-page';
+import { HippotherapyEthicsPrinciple, HippotherapyPageLocalizedPartial } from '@/types/admin/hippotherapy-page';
 import { LocalizationInfo } from '@/types/common/language';
 
 export interface PublicHippotherapyLocalizationDto extends HippotherapyPageLocalizedPartial {
@@ -53,7 +53,7 @@ export interface HippotherapyEthicsSection {
     imgURL: string;
     imgAlternativeText: string;
     text: string;
-    principles: string[];
+    principles: HippotherapyEthicsPrinciple[];
 }
 
 export interface HippotherapyResearchesSection {

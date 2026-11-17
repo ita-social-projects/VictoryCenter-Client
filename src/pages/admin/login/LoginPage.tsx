@@ -19,7 +19,7 @@ export const LoginPage = () => {
         <div className="page-layout">
             <LoginForm onLoginError={setErrorType} />
 
-            <Modal isOpen={errorType !== null} onClose={onClickHandler}>
+            <Modal isOpen={errorType !== null} onClose={onClickHandler} className="login-error-modal">
                 <Modal.Title>{LOGIN_CONST.ERROR_MODAL.TITLE}</Modal.Title>
                 <Modal.Content>{errorType && ERROR_MESSAGES[errorType]}</Modal.Content>
                 <Modal.Actions>

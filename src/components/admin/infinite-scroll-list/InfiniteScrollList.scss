@@ -53,6 +53,10 @@
             cursor: pointer;
         }
 
+        &:active {
+            background-color: colors.$blue-900;
+        }
+
         &-icon path {
             stroke: white;
         }

@@ -75,6 +75,14 @@ describe('SloganSection', () => {
         expect(firstTextSpan?.className).toContain('yellow');
     });
 
+    it('should apply blue-first-row class to fourth text', () => {
+        render(<SloganSection />);
+        const fourthTextSpan = screen.getByText('SLOGAN.FOURTH_TEXT');
+
+        expect(fourthTextSpan.className).toContain('blue');
+        expect(fourthTextSpan.className).toContain('blue-first-row');
+    });
+
     it('should render correct number of spans', () => {
         const { container } = render(<SloganSection />);
         const spans = container.querySelectorAll('h1 span');

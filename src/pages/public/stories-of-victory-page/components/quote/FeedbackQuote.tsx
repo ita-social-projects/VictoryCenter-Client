@@ -4,7 +4,7 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import quoteBg from './feedback-quote-bg.png';
 
 export const FeedbackQuote = () => {
-    const { t } = useTranslation('historyPage');
+    const { t } = useTranslation('feedbackPage');
 
     return (
         <CtaSection

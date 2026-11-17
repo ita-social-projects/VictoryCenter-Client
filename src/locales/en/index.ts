@@ -15,6 +15,7 @@ import supportUsPageEn from './support-us.json';
 import mainPageEn from './main-page.json';
 import historyPageEn from './history.json';
 import notFoundPageEn from './not-found-page.json';
+import feedbackPageEn from './feedback.json';
 
 export {
     headerEn,
@@ -34,4 +35,5 @@ export {
     mainPageEn,
     historyPageEn,
     notFoundPageEn,
+    feedbackPageEn,
 };

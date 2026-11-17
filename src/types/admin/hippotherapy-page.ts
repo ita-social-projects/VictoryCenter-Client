@@ -263,14 +263,9 @@ export interface HippotherapyScientificReferencesSectionContent {
 }
 
 export interface HippotherapyScientificReferenceDto {
-    id: number;
+    id: number | null;
     name: string;
     url: string;
-}
-
-export interface HippotherapyEthicsPrinciple {
-    id: number | null;
-    text: string;
 }
 
 export interface HippotherapyEthicsSectionContent extends HippotherapyImageValue {

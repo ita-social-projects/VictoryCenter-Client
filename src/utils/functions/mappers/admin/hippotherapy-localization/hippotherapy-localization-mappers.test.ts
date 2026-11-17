@@ -198,7 +198,7 @@ describe('hippotherapy-localization-mappers', () => {
                     existingSectionLocalization: {
                         title: 'Old General Title',
                         description: 'Old General Description',
-                        scientificReferences: [{ id: 501, name: 'Translated Ref 1' }],
+                        references: [{ referenceId: 501, name: 'Translated Ref 1' }],
                     },
                 };
 
@@ -238,9 +238,9 @@ describe('hippotherapy-localization-mappers', () => {
                     subBlock: 'general',
                     scientificReferences: mockReferences,
                     existingSectionLocalization: {
-                        scientificReferences: [
-                            { id: 501, name: 'Valid Ref' },
-                            { id: 502, name: '   ' },
+                        references: [
+                            { referenceId: 501, name: 'Valid Ref' },
+                            { referenceId: 502, name: '   ' },
                         ],
                     },
                 };
@@ -260,7 +260,7 @@ describe('hippotherapy-localization-mappers', () => {
                     existingSectionLocalization: {
                         title: 'Saved Title',
                         description: 'Saved Desc',
-                        scientificReferences: [{ id: 501, name: 'Translated Ref 1' }],
+                        references: [{ referenceId: 501, name: 'Translated Ref 1' }],
                     },
                 };
 
@@ -287,9 +287,9 @@ describe('hippotherapy-localization-mappers', () => {
                     existingSectionLocalization: {
                         title: 'Saved Title',
                         description: 'Saved Desc',
-                        scientificReferences: [
-                            { id: 501, name: 'Old Ref 1 Name' },
-                            { id: 502, name: 'Old Ref 2 Name' },
+                        references: [
+                            { referenceId: 501, name: 'Old Ref 1 Name' },
+                            { referenceId: 502, name: 'Old Ref 2 Name' },
                         ],
                     },
                 };
@@ -313,7 +313,7 @@ describe('hippotherapy-localization-mappers', () => {
                     existingSectionLocalization: {
                         title: 'Saved Title',
                         description: 'Saved Desc',
-                        scientificReferences: [{ id: 501, name: 'Ref 1' }],
+                        references: [{ referenceId: 501, name: 'Ref 1' }],
                     },
                 };
 

@@ -36,12 +36,16 @@ const resolveImageValue = async <T extends HippotherapyImageValue>(
 
 const stripReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReference[],
-): HippotherapyScientificReferenceDto[] => scientificReferences.map(({ localId: _localId, ...rest }) => rest);
+): HippotherapyScientificReferenceDto[] =>
+    scientificReferences.map(({ localId: _localId, id, ...rest }) => ({
+        ...rest,
+        id: id > 0 ? id : null,
+    }));
 
 const attachReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReferenceDto[],
 ): HippotherapyScientificReference[] =>
-    scientificReferences.map((reference) => ({ ...reference, localId: crypto.randomUUID() }));
+    scientificReferences.map((reference) => ({ ...reference, id: reference.id ?? -1, localId: crypto.randomUUID() }));
 
 const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
     ...value,
@@ -65,7 +69,7 @@ const mapScientificReferencesLocalization = (
     return {
         title: section.title ?? '',
         description: section.description ?? '',
-        scientificReferences: (section.references ?? []).map(({ referenceId, name }) => ({ id: referenceId, name })),
+        references: (section.references ?? []).map(({ referenceId, name }) => ({ referenceId, name })),
     };
 };
 

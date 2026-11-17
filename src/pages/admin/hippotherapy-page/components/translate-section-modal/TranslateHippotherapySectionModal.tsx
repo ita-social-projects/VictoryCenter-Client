@@ -77,7 +77,10 @@ export const TranslateHippotherapySectionModal = ({
         onSuccess: onTranslate,
     });
 
-    const sectionConfig = getHippotherapyTranslationConfig(block, subBlock, pageContent);
+    const sectionConfig = useMemo(
+        () => getHippotherapyTranslationConfig(block, subBlock, pageContent),
+        [block, subBlock, pageContent],
+    );
 
     const handleSaveClick = () => {
         void formRef.current?.submit(VisibilityStatus.Published);

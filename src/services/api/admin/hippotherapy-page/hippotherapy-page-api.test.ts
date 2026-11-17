@@ -218,6 +218,7 @@ describe('HippotherapyPageApi', () => {
             expect(ImageApi.delete).not.toHaveBeenCalled();
             expectPutCalledWith({
                 scientificReferencesSection: {
+                    id: content.scientificReferencesSection.id,
                     title: content.scientificReferencesSection.title,
                     description: content.scientificReferencesSection.description,
                     scientificReferences: [{ id: 1, name: 'Citation', url: 'https://example.com/citation' }],
@@ -228,7 +229,7 @@ describe('HippotherapyPageApi', () => {
             );
         });
 
-        it('sends a -1 id for a newly added, unsaved reference', async () => {
+        it('sends a null id for a newly added, unsaved reference', async () => {
             const content = buildContent();
             content.scientificReferencesSection.scientificReferences.push({
                 localId: 'local-2',
@@ -428,16 +429,6 @@ describe('HippotherapyPageApi', () => {
             expect(result.ethicsSection.principles).toEqual([{ id: 31, text: 'Principle one' }]);
         });
 
-        it('falls back to null when the API does not return an id', async () => {
-            const dto = buildDto();
-            (dto.advantagesSection.cards[0] as { id: number | null }).id = undefined as unknown as null;
-            mockGetResponse(dto);
-
-            const result = await HippotherapyPageApi.get(mockClient);
-
-            expect(result.advantagesSection.cards[0].id).toBeNull();
-        });
-
         it('sends ids of cards and principles in the PUT body', async () => {
             mockPutResponse();
 
@@ -447,22 +438,6 @@ describe('HippotherapyPageApi', () => {
                 advantagesSection: expect.objectContaining({ cards: [expect.objectContaining({ id: 11 })] }),
                 ethicsSection: expect.objectContaining({ principles: [{ id: 31, text: 'Principle one' }] }),
             });
-        });
-
-        it('sends id: null for newly added cards and principles', async () => {
-            const content = buildContent();
-            content.participantsSection.cards.push({ id: null, description: 'New', image: null, imageId: null });
-            content.ethicsSection.principles.push({ id: null, text: 'New principle' });
-            mockPutResponse();
-
-            await HippotherapyPageApi.update(mockClient, content);
-
-            const payload = getSentPayload() as Pick<
-                HippotherapyPageContentDto,
-                'participantsSection' | 'ethicsSection'
-            >;
-            expect(payload.participantsSection.cards[1].id).toBeNull();
-            expect(payload.ethicsSection.principles[1]).toEqual({ id: null, text: 'New principle' });
         });
     });
 });

@@ -60,10 +60,6 @@ const buildDto = (): HippotherapyPageContentDto => ({
             { id: 1, text: '<p>Principle one</p>' },
             { id: 2, text: 'Principle two' },
         ],
-        principles: [
-            { id: 1, text: '<p>Principle one</p>' },
-            { id: 2, text: 'Principle two' },
-        ],
         ...withImage('ethics'),
     },
 });

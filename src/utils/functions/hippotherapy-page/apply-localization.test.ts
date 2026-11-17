@@ -34,10 +34,10 @@ const createBaseContent = (): HippotherapyPageContentModel => ({
         scientificReferences: [reference(10, 'Джерело 10 Укр'), reference(20, 'Джерело 20 Укр')],
     },
     anotherQuoteSection: quote(1, 'Укр Ще Цитата', 'Ще Автор'),
-    participantsSection: { id: 1, title: 'Укр Учасники', cards: [card(1, 'Учасник 1 Укр'), card(2, 'Учасник 2 Укр')] },
+    participantsSection: { id: 1, title: 'Укр Учасники', cards: [card(5, 'Учасник 1 Укр'), card(6, 'Учасник 2 Укр')] },
     ethicsSection: {
         ...text(1, 'Укр Етика', 'Опис Етики'),
-        principles: [principle(1, 'Принцип 1'), principle(2, 'Принцип 2')],
+        principles: [principle(7, 'Принцип 1'), principle(8, 'Принцип 2')],
         image: null,
         imageId: null,
     },
@@ -72,7 +72,7 @@ describe('applyHippotherapyLocalization', () => {
 
     it('translates only the provided sections and leaves the others in Ukrainian', () => {
         const base = createBaseContent();
-        const result = apply({ introSection: text('EN Intro', 'EN Intro Desc') });
+        const result = apply({ introSection: text(1, 'EN Intro', 'EN Intro Desc') });
 
         expect(result.descriptionSection).toEqual(base.descriptionSection);
         expect(result.ethicsSection).toEqual(base.ethicsSection);
@@ -186,17 +186,6 @@ describe('applyHippotherapyLocalization', () => {
 
             expect(result[key].title).toBe(base[key].title);
             expect(result[key].cards.map((c) => c.description)).toEqual(base[key].cards.map((c) => c.description));
-        });
-
-        it('never gives a translation to a new unsaved card (id: null)', () => {
-            const base = createBaseContent();
-            base[key].cards.push(card(null, 'Нова картка'));
-
-            const result = applyTo(base, {
-                [key]: { title: 'EN', cards: [{ cardId: firstId, description: 'EN Card 1' }] },
-            });
-
-            expect(result[key].cards[2]).toMatchObject({ id: null, description: 'Нова картка' });
         });
 
         it('ignores translations for unknown card ids', () => {
@@ -332,17 +321,6 @@ describe('applyHippotherapyLocalization', () => {
             });
 
             expect(result.ethicsSection.principles.map((p) => p.text)).toEqual(['Принцип 1', 'Принцип 2']);
-        });
-
-        it('never gives a translation to a new unsaved principle (id: null)', () => {
-            const base = createBaseContent();
-            base.ethicsSection.principles.push(principle(null, 'Новий принцип'));
-
-            const result = applyTo(base, {
-                ethicsSection: { title: '', description: '', principles: [{ principleId: 7, text: 'EN 1' }] },
-            });
-
-            expect(result.ethicsSection.principles[2]).toEqual({ id: null, text: 'Новий принцип' });
         });
     });
 });

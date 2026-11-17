@@ -136,12 +136,10 @@ export const mapFormValuesToScientificReferencesSectionDto = (
 ): UpdateScientificReferencesSectionDto => {
     const { subBlock, targetResearchLocalId, existingSectionLocalization, scientificReferences } = context;
 
-    const existingReferences: HippotherapyScientificReferenceItem[] = (
-        existingSectionLocalization?.scientificReferences ?? []
-    )
+    const existingReferences: HippotherapyScientificReferenceItem[] = (existingSectionLocalization?.references ?? [])
         .filter((ref) => Boolean(ref.name.trim()))
         .map((ref) => ({
-            referenceId: ref.id,
+            referenceId: ref.referenceId,
             name: ref.name ?? '',
         }));
 

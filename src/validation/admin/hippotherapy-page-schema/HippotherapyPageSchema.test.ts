@@ -20,7 +20,6 @@ const buildValidContent = (): HippotherapyPageContentModel => ({
         id: 1,
         title: 'Valid title text',
         cards: [{ id: 1, description: 'Valid card description', image: null, imageId: 4 }],
-        cards: [{ id: 1, description: 'Valid card description', image: null, imageId: 4 }],
     },
     analysisSection: { id: 1, title: 'Valid title text', description: 'Valid description text' },
     scientificReferencesSection: {

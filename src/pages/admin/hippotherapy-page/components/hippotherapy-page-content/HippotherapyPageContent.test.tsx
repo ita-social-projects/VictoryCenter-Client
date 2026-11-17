@@ -1039,7 +1039,7 @@ describe('HippotherapyPageContent', () => {
                     scientificReferencesSection: {
                         title: 'English Title',
                         description: 'English Description',
-                        scientificReferences: [],
+                        references: [],
                     },
                 }),
             );
@@ -1082,7 +1082,7 @@ describe('HippotherapyPageContent', () => {
                 {
                     title: 'English Title',
                     description: 'English Description',
-                    scientificReferences: [{ id: 1, name: 'Translated citation' }],
+                    references: [{ referenceId: 1, name: 'Translated citation' }],
                 },
             ],
         ])(
@@ -1097,8 +1097,8 @@ describe('HippotherapyPageContent', () => {
             await renderLoaded(
                 withEnglishLocalization({
                     scientificReferencesSection: {
-                        title: '',
-                        description: '',
+                        title: 'English Title',
+                        description: 'English Description',
                         references: [{ referenceId: 999, name: 'Translated other citation' }],
                     },
                 }),
@@ -1253,6 +1253,7 @@ describe('HippotherapyPageContent', () => {
                 },
                 {
                     advantagesSection: {
+                        id: 1,
                         title: 'Advantages title',
                         cards: [
                             { id: 1, description: 'Card 1 UA', image: null, imageId: null },

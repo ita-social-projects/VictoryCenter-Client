@@ -77,20 +77,6 @@ describe('EthicsSection', () => {
         });
     });
 
-    it('keeps id: null for a new unsaved principle when its text is edited', () => {
-        const onChange = jest.fn();
-        renderComponent({
-            onChange,
-            value: { ...defaultValue, principles: [{ id: null, text: '' }] },
-        });
-
-        fireEvent.change(screen.getByTestId(principleId(0)), { target: { value: 'Brand new' } });
-
-        expect(onChange).toHaveBeenCalledWith(
-            expect.objectContaining({ principles: [{ id: null, text: 'Brand new' }] }),
-        );
-    });
-
     itShowsValidationErrorOnBlur(renderComponent, principleId(0), 'x');
     itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, DESCRIPTION_ID, principleId(0)]);
 

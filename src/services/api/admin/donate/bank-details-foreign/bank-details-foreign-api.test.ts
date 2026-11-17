@@ -51,6 +51,18 @@ describe('ForeignBankDetailsApi', () => {
                 expect(result).toEqual(mockResponse.data);
             });
         });
+
+        it('passes the cancellation signal to client.get', async () => {
+            mockClient.get.mockResolvedValue({ data: [] });
+            const controller = new AbortController();
+
+            await ForeignBankDetailsApi.getAll(mockClient, BankCurrency.Usd, { cancellationSignal: controller.signal });
+
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, {
+                params: { currency: BankCurrency.Usd },
+                signal: controller.signal,
+            });
+        });
     });
 
     describe('create', () => {

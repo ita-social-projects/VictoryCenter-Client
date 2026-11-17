@@ -80,6 +80,30 @@ describe('resolveWithNewTokenConcurrent', () => {
         expect(refreshAccessToken).toHaveBeenCalledTimes(2);
         expect(second.headers!['Authorization']).toBe('Bearer second_token');
     });
+
+    it('starts a new refresh for a request that arrives while the queue is being resolved', async () => {
+        refreshAccessToken.mockResolvedValue();
+
+        const late = await handler({ headers: {} } as InternalAxiosRequestConfig).then(() =>
+            handler({ headers: {} } as InternalAxiosRequestConfig),
+        );
+
+        expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+        expect(late.headers!['Authorization']).toBe('Bearer new_token');
+    });
+
+    it('starts a new refresh for a request that arrives while the queue is being rejected', async () => {
+        const error = new Error('refresh failed');
+        refreshAccessToken.mockRejectedValueOnce(error).mockResolvedValueOnce();
+
+        const late = await handler({ headers: {} } as InternalAxiosRequestConfig).catch(() =>
+            handler({ headers: {} } as InternalAxiosRequestConfig),
+        );
+
+        expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+        expect(logout).toHaveBeenCalledTimes(1);
+        expect(late.headers!['Authorization']).toBe('Bearer new_token');
+    });
 });
 
 describe('resolveWithNewToken', () => {

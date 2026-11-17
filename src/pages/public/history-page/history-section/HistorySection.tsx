@@ -37,7 +37,7 @@ const HistorySectionHeader = ({ displayTitle, description }: HistorySectionHeade
 
 export const HistorySection = ({ section, showYearLabel = true }: HistorySectionProps) => {
     const { t } = useTranslation('historyPage');
-    const { ref, isVisible } = useScrollAnimation();
+    const { ref, isVisible } = useScrollAnimation(0);
 
     const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
     const descContent = section.contents.find((c) => c.contentType === ContentType.Description);

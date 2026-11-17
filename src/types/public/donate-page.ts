@@ -41,7 +41,7 @@ export interface PublishedCorrespondentBankDetailsDto {
     id: number;
     name: string;
     swift: string;
-    account: string;
+    account?: string | null;
     foreignIban?: string;
     foreignBankDetailsId: number;
 }

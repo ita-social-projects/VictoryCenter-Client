@@ -2,7 +2,7 @@ import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api/main-page-localizations-api';
-import { MainPageLocalizationBlock, MetricType } from '@/types/admin/main-page';
+import { MainPageLocalizationBlock, MetricKind } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -181,13 +181,13 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     __esModule: true,
     StatisticsBlockForm: ({ onMetricsChange, ...props }: any) => {
         const { useFormContext } = require('react-hook-form');
-        const { MetricPrefix, MetricType } = require('@/types/admin/main-page');
+        const { MetricPrefix, MetricKind } = require('@/types/admin/main-page');
         const { setValue } = useFormContext();
         const syncedMetric = {
             id: 3,
             name: 'Залучених коштів',
             value: 7654321,
-            type: MetricType.Raised,
+            kind: MetricKind.RaisedFunds,
             prefix: MetricPrefix.None,
             isHidden: false,
             priority: 3,
@@ -624,7 +624,7 @@ describe('MainPageContent', () => {
                             id: 1,
                             name: 'Metric',
                             value: 10,
-                            type: MetricType.Partners,
+                            kind: MetricKind.Standard,
                             isHidden: false,
                             priority: 1,
                             localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
@@ -655,7 +655,7 @@ describe('MainPageContent', () => {
                             id: 1,
                             name: 'Metric',
                             value: 10,
-                            type: MetricType.Partners,
+                            kind: MetricKind.Standard,
                             isHidden: false,
                             priority: 1,
                             localizations: [{ languageId: 2, translationStatus: TranslationStatus.Outdated }],
@@ -728,7 +728,7 @@ describe('MainPageContent', () => {
                             id: 1,
                             name: 'Metric',
                             value: 10,
-                            type: MetricType.Partners,
+                            kind: MetricKind.Standard,
                             isHidden: false,
                             priority: 1,
                             localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
@@ -1173,7 +1173,7 @@ describe('MainPageContent', () => {
                 expect.objectContaining({
                     id: 3,
                     value: 7654321,
-                    type: MetricType.Raised,
+                    kind: MetricKind.RaisedFunds,
                     isAutoSynced: true,
                     localization: expect.objectContaining({
                         value: '182500.5',

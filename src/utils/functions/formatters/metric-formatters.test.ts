@@ -1,4 +1,4 @@
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricPrefix, MetricKind } from '@/types/admin/main-page';
 import { Currency } from '@/types/common/currency';
 import {
     formatMetricValue,
@@ -16,7 +16,7 @@ describe('metric-formatters', () => {
             id: 1,
             name: 'Базова назва',
             value: 100,
-            type: MetricType.Partners,
+            kind: MetricKind.Standard,
             prefix: MetricPrefix.None,
             isHidden: false,
             priority: 1,
@@ -79,7 +79,7 @@ describe('metric-formatters', () => {
             id: 1,
             name: 'Test',
             value,
-            type: MetricType.Partners,
+            kind: MetricKind.Standard,
             prefix: prefix ?? MetricPrefix.None,
             isHidden: false,
             priority: 1,
@@ -122,7 +122,7 @@ describe('metric-formatters', () => {
         describe('Raised metric type behavior', () => {
             const createRaisedMetric = (uahValue: number, usdValueStr: string): Metric => ({
                 ...createMetric(uahValue),
-                type: MetricType.Raised,
+                kind: MetricKind.RaisedFunds,
                 localizations: [{ languageId: 2, value: usdValueStr } as any],
             });
 
@@ -172,7 +172,7 @@ describe('metric-formatters', () => {
             id: 1,
             name: 'Зібрано',
             value: 5000000,
-            type: MetricType.Raised,
+            kind: MetricKind.RaisedFunds,
             prefix: MetricPrefix.None,
             isHidden: false,
             priority: 1,

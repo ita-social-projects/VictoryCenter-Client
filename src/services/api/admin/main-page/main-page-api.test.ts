@@ -2,7 +2,7 @@ import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import {
     MainPageDto,
     MetricPrefix,
-    MetricType,
+    MetricKind,
     ReorderMetricsDto,
     UpdateMainPageDto,
     UpdateMetricVisibilityDto,
@@ -78,7 +78,7 @@ describe('MainPageApi (Admin)', () => {
                     id: 5,
                     name: 'Metric 1',
                     value: 100,
-                    type: MetricType.Partners,
+                    kind: MetricKind.Standard,
                     prefix: MetricPrefix.Plus,
                     isHidden: false,
                     priority: 1,

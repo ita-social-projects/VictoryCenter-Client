@@ -1,11 +1,11 @@
+import { useCallback, useEffect, useState } from 'react';
 import {
     HippotherapyPageContentModel,
     HippotherapyPageLocalizationBlock,
     HippotherapyPageLocalizedContent,
 } from '@/types/admin/hippotherapy-page';
 import { LocalizationLanguage } from '@/types/common/language';
-import { useAdminClient } from '../use-admin-client/useAdminClient';
-import { useState } from 'react';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TranslateHippotherapySectionFormValues } from '@/pages/admin/hippotherapy-page/components/translate-section-form/TranslateHippotherapySectionForm';
 import { getHippotherapyTranslationConfig, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
 import {
@@ -141,6 +141,14 @@ export const useTranslateHippotherapySection = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
+    const clearError = useCallback(() => {
+        setError('');
+    }, []);
+
+    useEffect(() => {
+        setError('');
+    }, [block, subBlock, targetResearchLocalId, language?.id]);
+
     const translateHippotherapySection = async (data: TranslateHippotherapySectionFormValues) => {
         if (!pageContent || block == null || !language) {
             setError(HIPPOTHERAPY_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
@@ -184,5 +192,6 @@ export const useTranslateHippotherapySection = ({
         translateHippotherapySection,
         isSubmitting,
         error,
+        clearError,
     };
 };

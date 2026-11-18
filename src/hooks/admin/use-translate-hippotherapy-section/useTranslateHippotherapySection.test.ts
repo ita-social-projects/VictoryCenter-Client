@@ -235,28 +235,11 @@ describe('useTranslateHippotherapySection hook', () => {
         expect(mockApiService.create).not.toHaveBeenCalled();
     });
 
-    it('sets error when apiService is not found for the block', async () => {
-        mockedGetApi.mockReturnValue(null);
-
-        const { result } = renderHook(() =>
-            useTranslateHippotherapySection({
-                pageContent: buildContent(),
-                block: HippotherapyPageLocalizationBlock.Intro,
-                language: englishLanguage,
-                onSuccess: mockOnSuccess,
-            }),
-        );
-
-        await act(async () => {
-            await result.current.translateHippotherapySection({ title: 'Test' } as any);
-        });
-
-        expect(result.current.error).toBe(HIPPOTHERAPY_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
-        expect(mockApiService.create).not.toHaveBeenCalled();
-    });
-
-    it('sets error when dto mapping returns null', async () => {
-        mockedMapDto.mockReturnValue(null);
+    it.each([
+        ['apiService is not found for the block', () => mockedGetApi.mockReturnValue(null)],
+        ['dto mapping returns null', () => mockedMapDto.mockReturnValue(null)],
+    ])('sets error when %s', async (_scenario, setupMock) => {
+        setupMock();
 
         const { result } = renderHook(() =>
             useTranslateHippotherapySection({

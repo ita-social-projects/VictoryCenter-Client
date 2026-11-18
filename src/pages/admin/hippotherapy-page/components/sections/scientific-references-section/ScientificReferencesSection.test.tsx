@@ -154,6 +154,23 @@ describe('ScientificReferencesSection', () => {
         expect(screen.getByTestId('reference-card-regenerated-1')).toHaveAttribute('data-is-expanded', 'true');
     });
 
+    it('keeps expansion state independent for multiple unsaved references', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [
+                    { localId: 'unsaved-1', id: -1, name: 'Unsaved one', url: 'https://example.com/one' },
+                    { localId: 'unsaved-2', id: -1, name: 'Unsaved two', url: 'https://example.com/two' },
+                ],
+            },
+        });
+
+        fireEvent.click(screen.getByTestId('toggle-expand-unsaved-1'));
+
+        expect(screen.getByTestId('reference-card-unsaved-1')).toHaveAttribute('data-is-expanded', 'true');
+        expect(screen.getByTestId('reference-card-unsaved-2')).toHaveAttribute('data-is-expanded', 'false');
+    });
+
     it('renders the title, description, and one card per reference', () => {
         renderComponent();
 

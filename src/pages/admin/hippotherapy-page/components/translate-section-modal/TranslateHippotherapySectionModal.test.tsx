@@ -67,6 +67,7 @@ describe('TranslateHippotherapySectionModal', () => {
             translateHippotherapySection: mockTranslateHippotherapySection,
             isSubmitting: false,
             error: '',
+            clearError: jest.fn(),
         });
     });
 
@@ -357,6 +358,7 @@ describe('TranslateHippotherapySectionModal', () => {
             translateHippotherapySection: mockTranslateHippotherapySection,
             isSubmitting: false,
             error: 'Save failed error message',
+            clearError: jest.fn(),
         });
 
         renderModal();
@@ -369,6 +371,7 @@ describe('TranslateHippotherapySectionModal', () => {
             translateHippotherapySection: mockTranslateHippotherapySection,
             isSubmitting: true,
             error: '',
+            clearError: jest.fn(),
         });
 
         renderModal();

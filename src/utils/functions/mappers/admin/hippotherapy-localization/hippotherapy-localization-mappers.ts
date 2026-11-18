@@ -137,7 +137,7 @@ export const mapFormValuesToScientificReferencesSectionDto = (
     const { subBlock, targetResearchLocalId, existingSectionLocalization, scientificReferences } = context;
 
     const existingReferences: HippotherapyScientificReferenceItem[] = (existingSectionLocalization?.references ?? [])
-        .filter((ref) => Boolean(ref.name.trim()))
+        .filter((ref) => Boolean(ref.name?.trim()))
         .map((ref) => ({
             referenceId: ref.referenceId,
             name: ref.name ?? '',

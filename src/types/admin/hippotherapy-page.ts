@@ -65,15 +65,9 @@ export interface HippotherapyEthicsLocalizedContent {
     principles: { principleId: number; text: string }[];
 }
 
-export interface HippotherapyGalleryCardItem {
-    cardId: number;
-    description: string;
-}
+export type HippotherapyGalleryLocalizedContentDto = HippotherapyGalleryLocalizedContent;
 
-export interface HippotherapyGalleryLocalizedContentDto {
-    title: string;
-    cards: HippotherapyGalleryCardItem[];
-}
+export type HippotherapyEthicsLocalizedContentDto = HippotherapyEthicsLocalizedContent;
 
 export interface HippotherapyScientificReferenceItem {
     referenceId: number;
@@ -84,17 +78,6 @@ export interface HippotherapyScientificReferencesLocalizedContentDto {
     title: string;
     description: string;
     references: HippotherapyScientificReferenceItem[];
-}
-
-export interface HippotherapyEthicsPrincipleItem {
-    principleId: number;
-    text: string;
-}
-
-export interface HippotherapyEthicsLocalizedContentDto {
-    title: string;
-    description: string;
-    principles: HippotherapyEthicsPrincipleItem[];
 }
 
 export type CreateGallerySectionDto = CreateSectionDto<HippotherapyGalleryLocalizedContentDto>;
@@ -187,19 +170,6 @@ export type HippotherapyPageLocalizedSections = {
     [K in keyof HippotherapyPageLocalizedContent]: HippotherapyPageLocalizedContent[K] | null;
 };
 
-export interface HippotherapyPageLocalizationDto extends HippotherapyPageLocalizedSections {
-    entityId: number;
-    translationStatus: TranslationStatus;
-    localizationInfoDto: LocalizationInfo;
-}
-
-export interface CreateHippotherapyPageLocalizationDto extends Partial<HippotherapyPageLocalizedSections> {
-    entityId: number;
-    languageId: number;
-}
-
-export interface UpdateHippotherapyPageLocalizationDto extends Partial<HippotherapyPageLocalizedSections> {}
-
 export interface HippotherapyPageTranslationStatusDto {
     block: HippotherapyPageLocalizationBlock;
     entityId: number | null;
@@ -233,6 +203,10 @@ export interface HippotherapyQuoteContent extends HippotherapyImageValue {
 export interface HippotherapyGalleryCardContent extends HippotherapyImageValue {
     id: number;
     description: string;
+}
+
+export interface HippotherapyGalleryCardDto extends Omit<HippotherapyGalleryCardContent, 'id'> {
+    id: number | null;
 }
 
 export interface HippotherapyGallerySectionContent {
@@ -280,6 +254,10 @@ export interface HippotherapyEthicsPrinciple {
     text: string;
 }
 
+export interface HippotherapyEthicsPrincipleDto extends Omit<HippotherapyEthicsPrinciple, 'id'> {
+    id: number | null;
+}
+
 export type HippotherapyPageTranslationStatusInfo = TranslationStatusInfo & {
     block: HippotherapyPageLocalizationBlock;
 };
@@ -303,9 +281,26 @@ export interface HippotherapyPageContentModel
 }
 
 export interface HippotherapyPageContentDto
-    extends Omit<HippotherapyPageContentModel, 'scientificReferencesSection' | 'localizations' | 'translationStatuses'>,
+    extends Omit<
+            HippotherapyPageContentModel,
+            | 'advantagesSection'
+            | 'participantsSection'
+            | 'ethicsSection'
+            | 'scientificReferencesSection'
+            | 'localizations'
+            | 'translationStatuses'
+        >,
         EntityWithDtoLocalizations<HippotherapyPageEmbeddedLocalizationDto> {
     translationStatuses?: HippotherapyPageTranslationStatusDto[];
+    advantagesSection: Omit<HippotherapyPageContentModel['advantagesSection'], 'cards'> & {
+        cards: HippotherapyGalleryCardDto[];
+    };
+    participantsSection: Omit<HippotherapyPageContentModel['participantsSection'], 'cards'> & {
+        cards: HippotherapyGalleryCardDto[];
+    };
+    ethicsSection: Omit<HippotherapyPageContentModel['ethicsSection'], 'principles'> & {
+        principles: HippotherapyEthicsPrincipleDto[];
+    };
     scientificReferencesSection: {
         id: number;
         title: string;

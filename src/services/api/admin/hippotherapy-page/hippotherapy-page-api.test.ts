@@ -68,17 +68,42 @@ describe('HippotherapyPageApi', () => {
         },
     });
 
-    const buildContent = (): HippotherapyPageContentModel => ({
-        ...buildDto(),
-        localizations: [],
-        translationStatuses: [],
-        scientificReferencesSection: {
-            ...buildDto().scientificReferencesSection,
-            scientificReferences: [
-                { localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' },
-            ],
-        },
-    });
+    const buildContent = (): HippotherapyPageContentModel => {
+        const dto = buildDto();
+
+        return {
+            ...dto,
+            localizations: [],
+            translationStatuses: [],
+            advantagesSection: {
+                ...dto.advantagesSection,
+                cards: dto.advantagesSection.cards.map((card) => ({
+                    ...card,
+                    id: card.id ?? -1,
+                })),
+            },
+            participantsSection: {
+                ...dto.participantsSection,
+                cards: dto.participantsSection.cards.map((card) => ({
+                    ...card,
+                    id: card.id ?? -1,
+                })),
+            },
+            ethicsSection: {
+                ...dto.ethicsSection,
+                principles: dto.ethicsSection.principles.map((principle) => ({
+                    ...principle,
+                    id: principle.id ?? -1,
+                })),
+            },
+            scientificReferencesSection: {
+                ...dto.scientificReferencesSection,
+                scientificReferences: [
+                    { localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' },
+                ],
+            },
+        };
+    };
 
     const buildStatus = (
         overrides: Partial<HippotherapyPageTranslationStatusDto> = {},
@@ -429,6 +454,19 @@ describe('HippotherapyPageApi', () => {
             expect(result.ethicsSection.principles).toEqual([{ id: 31, text: 'Principle one' }]);
         });
 
+        it('falls back to -1 when the API does not return an id for cards or principles', async () => {
+            const dto = buildDto();
+            (dto.advantagesSection.cards[0] as { id: number | null }).id = undefined as unknown as null;
+            (dto.ethicsSection.principles[0] as { id: number | null }).id = undefined as unknown as null;
+
+            mockGetResponse(dto);
+
+            const result = await HippotherapyPageApi.get(mockClient);
+
+            expect(result.advantagesSection.cards[0].id).toBe(-1);
+            expect(result.ethicsSection.principles[0].id).toBe(-1);
+        });
+
         it('sends ids of cards and principles in the PUT body', async () => {
             mockPutResponse();
 
@@ -438,6 +476,22 @@ describe('HippotherapyPageApi', () => {
                 advantagesSection: expect.objectContaining({ cards: [expect.objectContaining({ id: 11 })] }),
                 ethicsSection: expect.objectContaining({ principles: [{ id: 31, text: 'Principle one' }] }),
             });
+        });
+
+        it('sends id: null for newly added cards and principles', async () => {
+            const content = buildContent();
+            content.participantsSection.cards.push({ id: -1, description: 'New', image: null, imageId: null });
+            content.ethicsSection.principles.push({ id: -1, text: 'New principle' });
+            mockPutResponse();
+
+            await HippotherapyPageApi.update(mockClient, content);
+
+            const payload = getSentPayload() as Pick<
+                HippotherapyPageContentDto,
+                'participantsSection' | 'ethicsSection'
+            >;
+            expect(payload.participantsSection.cards[1].id).toBeNull();
+            expect(payload.ethicsSection.principles[1]).toEqual({ id: null, text: 'New principle' });
         });
     });
 });

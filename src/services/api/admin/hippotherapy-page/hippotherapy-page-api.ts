@@ -39,7 +39,7 @@ const stripReferenceLocalIds = (
 ): HippotherapyScientificReferenceDto[] =>
     scientificReferences.map(({ localId: _localId, id, ...rest }) => ({
         ...rest,
-        id: id > 0 ? id : null,
+        id: normalizeEntityId(id),
     }));
 
 const attachReferenceLocalIds = (
@@ -93,17 +93,17 @@ const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageConten
         hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
         advantagesSection: {
             ...dto.advantagesSection,
-            cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id })),
+            cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id ?? -1 })),
         },
         anotherQuoteSection: withImageId(dto.anotherQuoteSection),
         participantsSection: {
             ...dto.participantsSection,
-            cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id })),
+            cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id ?? -1 })),
         },
         ethicsSection: withImageId({
             ...dto.ethicsSection,
             principles: dto.ethicsSection.principles.map((principle) => ({
-                id: principle.id,
+                id: principle.id ?? -1,
                 text: principle.text,
             })),
         }),
@@ -113,6 +113,8 @@ const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageConten
         },
     };
 };
+
+const normalizeEntityId = (id: number): number | null => (id > 0 ? id : null);
 
 export const HippotherapyPageApi = {
     get: async (client: AxiosInstance): Promise<HippotherapyPageContentModel> => {
@@ -162,10 +164,28 @@ export const HippotherapyPageApi = {
                 introSection,
                 quoteSection,
                 hippoventionCenterSection,
-                advantagesSection: { ...content.advantagesSection, cards: advantagesCards },
+                advantagesSection: {
+                    ...content.advantagesSection,
+                    cards: advantagesCards.map((card) => ({
+                        ...card,
+                        id: normalizeEntityId(card.id),
+                    })),
+                },
                 anotherQuoteSection,
-                participantsSection: { ...content.participantsSection, cards: participantsCards },
-                ethicsSection,
+                participantsSection: {
+                    ...content.participantsSection,
+                    cards: participantsCards.map((card) => ({
+                        ...card,
+                        id: normalizeEntityId(card.id),
+                    })),
+                },
+                ethicsSection: {
+                    ...ethicsSection,
+                    principles: ethicsSection.principles.map((principle) => ({
+                        ...principle,
+                        id: normalizeEntityId(principle.id),
+                    })),
+                },
                 scientificReferencesSection: {
                     ...content.scientificReferencesSection,
                     scientificReferences: stripReferenceLocalIds(

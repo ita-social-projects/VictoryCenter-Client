@@ -13,8 +13,8 @@ import {
     TranslateHippotherapySectionFormRef,
     TranslateHippotherapySectionFormValues,
 } from '../translate-section-form/TranslateHippotherapySectionForm';
-import './TranslateHippotherapySectionModal.scss';
 import { useTranslateHippotherapySection } from '@/hooks/admin/use-translate-hippotherapy-section/useTranslateHippotherapySection';
+import './TranslateHippotherapySectionModal.scss';
 
 export type HippotherapyTranslationSubBlock = 'general' | 'research';
 
@@ -68,7 +68,7 @@ export const TranslateHippotherapySectionModal = ({
         setLanguage(getDefaultLanguage(availableLanguages));
     }, [isOpen, availableLanguages]);
 
-    const { translateHippotherapySection, isSubmitting, error } = useTranslateHippotherapySection({
+    const { translateHippotherapySection, isSubmitting, error, clearError } = useTranslateHippotherapySection({
         pageContent,
         block,
         subBlock,
@@ -76,6 +76,10 @@ export const TranslateHippotherapySectionModal = ({
         language,
         onSuccess: onTranslate,
     });
+
+    useEffect(() => {
+        clearError();
+    }, [isOpen, clearError]);
 
     const sectionConfig = useMemo(
         () => getHippotherapyTranslationConfig(block, subBlock, pageContent),
@@ -145,7 +149,7 @@ export const TranslateHippotherapySectionModal = ({
                         </Select>
                     )}
                 </div>
-                {error && <div className="error">{error}</div>}
+                {error && <div className="translate-hippotherapy-section-modal-error">{error}</div>}
                 <TranslateHippotherapySectionForm
                     key={`${block}-${subBlock ?? 'default'}-${targetResearchLocalId ?? ''}-${language?.id}`}
                     ref={formRef}

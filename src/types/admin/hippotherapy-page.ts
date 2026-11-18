@@ -4,7 +4,6 @@ import {
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
     EntityWithTranslationStatuses,
-    LocalizationInfo,
     TranslationStatus,
     TranslationStatusInfo,
 } from '@/types/common/language';

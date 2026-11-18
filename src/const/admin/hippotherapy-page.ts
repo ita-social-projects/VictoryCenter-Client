@@ -168,26 +168,7 @@ export const createEthicsTranslationFields = (principleIds: number[]): Hippother
 
 export const getGalleryCardDescriptionFieldName = (cardId: number) => `description${cardId}`;
 
-const createAdvantagesTranslationFields = (cardIds: number[]): HippotherapyTranslationFieldConfig[] => [
-    {
-        name: 'title',
-        label: COMMON_TEXT_ADMIN.TYPE.TITLE,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_TITLE,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TITLE_LENGTH,
-        isRequired: true,
-        type: 'text',
-    },
-    ...cardIds.map((cardId, imageIndex) => ({
-        name: getGalleryCardDescriptionFieldName(cardId),
-        label: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
-        maxLength: HIPPOTHERAPY_PAGE_CHAR_LIMITS.GALLERY_CARD_DESCRIPTION,
-        minLength: HIPPOTHERAPY_PAGE_TEXT.MIN_TEXT_LENGTH,
-        isRequired: true,
-        imageIndex,
-    })),
-];
-
-const createParticipantsTranslationFields = (cardIds: number[]): HippotherapyTranslationFieldConfig[] => [
+const createGalleryTranslationFields = (cardIds: number[]): HippotherapyTranslationFieldConfig[] => [
     {
         name: 'title',
         label: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -296,14 +277,14 @@ export const getHippotherapyTranslationConfig = (
             const cardIds = content?.advantagesSection?.cards?.map((card) => card.id) ?? [];
             return {
                 sectionKey: 'advantagesSection',
-                fields: createAdvantagesTranslationFields(cardIds),
+                fields: createGalleryTranslationFields(cardIds),
             };
         }
         case HippotherapyPageLocalizationBlock.Participants: {
             const cardIds = content?.participantsSection?.cards?.map((card) => card.id) ?? [];
             return {
                 sectionKey: 'participantsSection',
-                fields: createParticipantsTranslationFields(cardIds),
+                fields: createGalleryTranslationFields(cardIds),
             };
         }
         case HippotherapyPageLocalizationBlock.Ethics: {

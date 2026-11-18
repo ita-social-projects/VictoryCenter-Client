@@ -32,7 +32,7 @@ export interface GallerySectionMapContext extends SectionMapContext {
 export interface ScientificReferencesSectionMapContext extends SectionMapContext {
     subBlock?: HippotherapyTranslationSubBlock | null;
     targetResearchLocalId?: string | null;
-    existingSectionLocalization?: HippotherapyPageLocalizedPartial['scientificReferencesSection'] | null;
+    existingSectionLocalization: HippotherapyPageLocalizedPartial['scientificReferencesSection'] | null;
     scientificReferences: HippotherapyScientificReference[];
 }
 

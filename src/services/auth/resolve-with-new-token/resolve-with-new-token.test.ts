@@ -1,3 +1,4 @@
+import { CanceledError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import { resolveWithNewToken, resolveWithNewTokenConcurrent } from './resolve-with-new-token';
 
@@ -51,6 +52,18 @@ describe('resolveWithNewTokenConcurrent', () => {
         expect(logout).toHaveBeenCalledTimes(1);
     });
 
+    it('on cancelled refresh rejects all queued promises without calling logout', async () => {
+        const error = new CanceledError('Session ended during token refresh');
+        refreshAccessToken.mockRejectedValueOnce(error);
+
+        const promise1 = handler({ headers: {} } as InternalAxiosRequestConfig);
+        const promise2 = handler({} as InternalAxiosRequestConfig);
+
+        await expect(promise1).rejects.toBe(error);
+        await expect(promise2).rejects.toBe(error);
+        expect(logout).not.toHaveBeenCalled();
+    });
+
     it('after a successful refresh allows triggering another refresh for subsequent requests', async () => {
         refreshAccessToken.mockResolvedValueOnce();
         const first = await handler({ headers: {} } as InternalAxiosRequestConfig);
@@ -100,5 +113,14 @@ describe('resolveWithNewToken', () => {
         await expect(handler({ ...cfg })).rejects.toThrow(error);
 
         expect(logout).toHaveBeenCalledTimes(1);
+    });
+
+    it('on cancelled refresh throws without calling logout', async () => {
+        const error = new CanceledError('Session ended during token refresh');
+        refreshAccessToken.mockRejectedValueOnce(error);
+
+        await expect(handler({ headers: {} } as InternalAxiosRequestConfig)).rejects.toBe(error);
+
+        expect(logout).not.toHaveBeenCalled();
     });
 });

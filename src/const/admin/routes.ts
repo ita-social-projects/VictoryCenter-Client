@@ -2,7 +2,7 @@ export const ADMIN_ROUTES = {
     ROOT: '/admin-panel',
     LOGIN: {
         PATH: 'login',
-        FULL: '/login',
+        FULL: '/admin-panel/login',
     },
     MAIN: {
         PATH: 'main',
@@ -57,3 +57,6 @@ export const ADMIN_ROUTES = {
         FULL: '/admin-panel/feedback',
     },
 };
+
+export const isAdminPath = (pathname: string): boolean =>
+    pathname === ADMIN_ROUTES.ROOT || pathname.startsWith(`${ADMIN_ROUTES.ROOT}/`);

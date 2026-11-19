@@ -15,7 +15,6 @@ import { Button } from '@/components/admin/button/Button';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
-import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ReportFundsExpendituresSettingsLocalizationsApi } from '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api';
 import {
     FundsExpendituresAmountField,
@@ -32,6 +31,7 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 import { isReservedFundsExpendituresCategoryName } from '@/utils/functions/is-reserved-funds-expenditures-category-name/is-reserved-funds-expenditures-category-name';
+import { calculateFundsExpendituresSummary } from '@/utils/functions/calculate-funds-expenditures-summary/calculate-funds-expenditures-summary';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
@@ -86,6 +86,8 @@ const getCategoryLimitMessage = (
     return undefined;
 };
 
+const EMPTY_PROGRAM_EXPENSES_SUMMARY: ProgramExpensesSummary = { totalAmountUah: 0, totalAmountUsd: 0 };
+
 export interface FundsExpenditureSectionProps {
     isEditing?: boolean;
     draftExchangeRate?: string | null;
@@ -108,6 +110,7 @@ export interface FundsExpenditureSectionProps {
     onUnpublishedChangesChange?: (hasChanges: boolean) => void;
     registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
     onSelectionChange?: (hasSelected: boolean) => void;
+    programExpensesSummary?: ProgramExpensesSummary;
 }
 
 export const FundsExpenditureSection = ({
@@ -132,6 +135,7 @@ export const FundsExpenditureSection = ({
     registerSaveCallback,
     onUnpublishedChangesChange,
     registerRefetchSettingsCallback,
+    programExpensesSummary: programSummary = EMPTY_PROGRAM_EXPENSES_SUMMARY,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -241,10 +245,6 @@ export const FundsExpenditureSection = ({
         (options = {}) => FundsExpendituresApi.getSummary(adminClient, options),
         [adminClient],
     );
-    const fetchProgramSummary = useCallback(
-        (options = {}) => ProgramExpensesApi.getSummary(adminClient, options),
-        [adminClient],
-    );
 
     const {
         data: settings,
@@ -295,11 +295,6 @@ export const FundsExpenditureSection = ({
         fetchHandler: fetchSummary,
     });
 
-    const { data: programSummary, refetch: refetchProgramSummary } = useDataFetch<ProgramExpensesSummary>({
-        initialData: { totalAmountUah: 0, totalAmountUsd: 0 },
-        fetchHandler: fetchProgramSummary,
-    });
-
     const isInitialLoading =
         (isSettingsLoading || isCategoriesLoading || isRecordsLoading || isSummaryLoading) &&
         categories.length === 0 &&
@@ -334,20 +329,6 @@ export const FundsExpenditureSection = ({
     useEffect(() => {
         registerRefetchSettingsCallback?.(() => refetchSettings());
     }, [registerRefetchSettingsCallback, refetchSettings]);
-
-    useEffect(() => {
-        const handleProgramExpensesUpdate = (event: Event) => {
-            if (event instanceof CustomEvent && event.detail?.source === 'ProgramExpensesSection') {
-                refetchProgramSummary()?.catch(() => {});
-            }
-        };
-
-        window.addEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
-
-        return () => {
-            window.removeEventListener('program-expenses-updated', handleProgramExpensesUpdate as EventListener);
-        };
-    }, [refetchProgramSummary]);
 
     useEffect(() => {
         setRecordsState(
@@ -413,6 +394,11 @@ export const FundsExpenditureSection = ({
     }, [settings?.programExpendituresReportingYear]);
 
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
+
+    const displayedSummary = useMemo(
+        () => (isEditing ? calculateFundsExpendituresSummary(recordsState) : summary),
+        [isEditing, recordsState, summary],
+    );
 
     const filteredCategories = useMemo(
         (): ReportFundsExpendituresCategory[] => [...categories].sort((a, b) => a.name.localeCompare(b.name, 'uk')),
@@ -497,7 +483,6 @@ export const FundsExpenditureSection = ({
                 });
                 setProgramYearValue(yearNumber);
                 refetchSettings();
-                refetchProgramSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -505,7 +490,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [adminClient, settings, refetchSettings, refetchProgramSummary, addToast],
+        [adminClient, settings, refetchSettings, addToast],
     );
 
     const handleRecordSave = useCallback(
@@ -906,28 +891,28 @@ export const FundsExpenditureSection = ({
             <div className={styles['summary-cards']}>
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED}
-                    uah={summary.totalCollectedUah}
-                    usd={summary.totalCollectedUsd}
+                    uah={displayedSummary.totalCollectedUah}
+                    usd={displayedSummary.totalCollectedUsd}
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT}
-                    uah={summary.totalSpentUah}
-                    usd={summary.totalSpentUsd}
+                    uah={displayedSummary.totalSpentUah}
+                    usd={displayedSummary.totalSpentUsd}
                     blueThemeCard
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES}
-                    count={summary.incomeCategories}
+                    count={displayedSummary.incomeCategories}
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES}
-                    count={summary.expenseCategories}
+                    count={displayedSummary.expenseCategories}
                     blueThemeCard
                 />
             </div>
 
             <FundsExpendituresToolbar
-                categories={filteredCategories}
+                categories={manageableCategories}
                 selectedType={selectedType}
                 selectedCategoryId={selectedCategoryId}
                 exchangeRate={currentExchangeRate}
@@ -968,7 +953,7 @@ export const FundsExpenditureSection = ({
                 isOpen={activeRecordModalType !== null}
                 onClose={handleCloseAddIncomeModal}
                 transactionType={activeRecordModalType ?? 'income'}
-                categories={categories}
+                categories={manageableCategories}
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}

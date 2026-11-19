@@ -82,7 +82,9 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onSelectionChange,
         registerSaveCallback,
         onRowEditModeChange,
+        programExpensesSummary,
     }: {
+        programExpensesSummary?: { totalAmountUah: number; totalAmountUsd: number };
         isEditing?: boolean;
         draftExchangeRate?: string | null;
         onEditModeChange?: (isEditing: boolean) => void;
@@ -108,6 +110,8 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             data-category-modal-open={String(isAddCategoryModalOpen ?? false)}
             data-edit-category-modal-open={String(isEditCategoryModalOpen ?? false)}
             data-delete-category-modal-open={String(isDeleteCategoryModalOpen ?? false)}
+            data-program-total-uah={programExpensesSummary?.totalAmountUah ?? ''}
+            data-program-total-usd={programExpensesSummary?.totalAmountUsd ?? ''}
         >
             FundsExpenditureSection
             <button type="button" data-testid="trigger-select-records" onClick={() => onSelectionChange?.(true)}>
@@ -206,9 +210,16 @@ jest.mock(
 );
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({ onCountsChange, onDataChange, exchangeRate }: any) => (
+    ProgramExpensesSection: ({ onCountsChange, onDataChange, onSummaryChange, exchangeRate }: any) => (
         <div data-testid="program-expenses-section" data-exchange-rate={exchangeRate ?? ''}>
             ProgramExpensesSection
+            <button
+                type="button"
+                data-testid="trigger-program-summary"
+                onClick={() => onSummaryChange?.({ totalAmountUah: 74250, totalAmountUsd: 1800 })}
+            >
+                Set Program Summary
+            </button>
             <button
                 type="button"
                 data-testid="trigger-program-data"
@@ -229,6 +240,19 @@ describe('ReportAnalytics', () => {
         mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
         mockGetSettings.mockResolvedValue({ hasUnpublishedChanges: false });
+    });
+
+    it('should pass the program expenses summary from the program expenses section to the funds section', () => {
+        render(<ReportAnalytics />);
+
+        const fundsSection = screen.getByTestId('funds-expenditure-section');
+        expect(fundsSection).toHaveAttribute('data-program-total-uah', '0');
+        expect(fundsSection).toHaveAttribute('data-program-total-usd', '0');
+
+        fireEvent.click(screen.getByTestId('trigger-program-summary'));
+
+        expect(fundsSection).toHaveAttribute('data-program-total-uah', '74250');
+        expect(fundsSection).toHaveAttribute('data-program-total-usd', '1800');
     });
 
     it('should render the component with correct title', () => {

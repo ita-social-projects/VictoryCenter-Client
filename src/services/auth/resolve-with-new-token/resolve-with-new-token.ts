@@ -1,4 +1,4 @@
-import { InternalAxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 export type RefreshHandler = (config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>;
 
@@ -38,7 +38,9 @@ export const resolveWithNewTokenConcurrent = (
                         resolveQueue(getAccessToken());
                     })
                     .catch((error) => {
-                        logout();
+                        if (!axios.isCancel(error)) {
+                            logout();
+                        }
                         rejectQueue(error);
                     })
                     .finally(() => {
@@ -61,7 +63,9 @@ export const resolveWithNewToken = (
             config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
             return config;
         } catch (err) {
-            logout();
+            if (!axios.isCancel(err)) {
+                logout();
+            }
             throw err;
         }
     };

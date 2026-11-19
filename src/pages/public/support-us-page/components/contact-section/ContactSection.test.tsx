@@ -31,6 +31,10 @@ const T = {
     FIRST_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.FIRST_TEXT',
     SECOND_BOLD_TEXT: 'SUPPORT_INQUIRY.DESCRIPTION.SECOND_BOLD_TEXT',
     SUBMIT_BUTTON: 'SUPPORT_INQUIRY.FORM.SUBMIT_BUTTON',
+    NAME_PLACEHOLDER: 'namePlaceholder',
+    EMAIL_PLACEHOLDER: 'emailPlaceholder',
+    SUBJECT_PLACEHOLDER: 'subjectPlaceholder',
+    MESSAGE_PLACEHOLDER: 'messagePlaceholder',
     NAME_REQUIRED: 'contactForm.nameRequired',
     EMAIL_REQUIRED: 'contactForm.emailRequired',
     EMAIL_INVALID: 'contactForm.emailInvalid',
@@ -127,6 +131,15 @@ describe('ContactSection', () => {
         expect(screen.getByRole('button', { name: T.SUBMIT_BUTTON })).toBeEnabled();
     });
 
+    it('renders the same placeholders as the other contact forms', () => {
+        render(<ContactSection />);
+
+        expect(getField(NAME_FIELD)).toHaveAttribute('placeholder', T.NAME_PLACEHOLDER);
+        expect(getField(EMAIL_FIELD)).toHaveAttribute('placeholder', T.EMAIL_PLACEHOLDER);
+        expect(getField(SUBJECT_FIELD)).toHaveAttribute('placeholder', T.SUBJECT_PLACEHOLDER);
+        expect(getField(MESSAGE_FIELD)).toHaveAttribute('placeholder', T.MESSAGE_PLACEHOLDER);
+    });
+
     it('disables submission and does not call the API when CAPTCHA has no token', async () => {
         mockTurnstileToken = null;
         render(<ContactSection />);
@@ -170,6 +183,35 @@ describe('ContactSection', () => {
 
         expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
         expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
+    });
+
+    it('clears the minimum-length errors while typing after the first blur', async () => {
+        render(<ContactSection />);
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN - 1));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
+        fireEvent.blur(getField(SUBJECT_FIELD));
+        fireEvent.blur(getField(MESSAGE_FIELD));
+
+        expect(await screen.findByText(T.SUBJECT_MIN_ERROR)).toBeInTheDocument();
+        expect(await screen.findByText(T.MESSAGE_MIN_ERROR)).toBeInTheDocument();
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN));
+
+        await waitFor(() => expect(screen.queryByText(T.SUBJECT_MIN_ERROR)).not.toBeInTheDocument());
+        expect(screen.queryByText(T.MESSAGE_MIN_ERROR)).not.toBeInTheDocument();
+    });
+
+    it('does not show the minimum-length errors before the field loses focus', async () => {
+        render(<ContactSection />);
+
+        setFieldValue(SUBJECT_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.MIN - 1));
+        setFieldValue(MESSAGE_FIELD, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MIN - 1));
+        await act(async () => undefined);
+
+        expect(screen.queryByText(T.SUBJECT_MIN_ERROR)).not.toBeInTheDocument();
+        expect(screen.queryByText(T.MESSAGE_MIN_ERROR)).not.toBeInTheDocument();
     });
 
     it('shows warning and reached-limit hints at their boundaries', () => {

@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, CanceledError } from 'axios';
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -6,6 +6,7 @@ import { Credentials } from '@/types/admin/auth';
 import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
 import { useOnMountUnsafe } from '@/hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
+import { isAdminPath } from '@/const/admin/routes';
 
 type Props = {
     children: ReactNode;
@@ -29,6 +30,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const isAuthenticated = isAccessTokenValid(token);
 
     const tokenRef = useRef<string>(token);
+    const logoutCountRef = useRef<number>(0);
 
     const updateToken = useCallback((newToken: string) => {
         tokenRef.current = newToken;
@@ -37,37 +39,57 @@ export const AdminContextProvider = ({ children }: Props) => {
 
     const login = useCallback(
         async (creds: Credentials) => {
+            const logoutCount = logoutCountRef.current;
             const newToken = await loginRequest(creds);
-            updateToken(newToken);
+            if (logoutCount === logoutCountRef.current) {
+                updateToken(newToken);
+            }
         },
         [updateToken],
     );
 
+    // local sign-out happens immediately; server-side logout is best effort and runs in the background
     const logout = useCallback(() => {
+        logoutCountRef.current += 1;
         const currentToken = tokenRef.current;
         updateToken('');
 
-        if (currentToken) {
-            void logoutRequest(currentToken).catch((error: unknown) => {
-                // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
-                console.error('Server-side logout failed:', error);
-            });
+        if (!currentToken) {
+            return;
         }
+
+        void (async () => {
+            // an expired access token would be rejected by the logout endpoint, leaving the refresh token unrevoked
+            const logoutToken = isAccessTokenValid(currentToken) ? currentToken : await tokenRefreshRequest();
+            await logoutRequest(logoutToken);
+        })().catch((error: unknown) => {
+            // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
+            console.error('Server-side logout failed:', error);
+        });
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
-        const newToken = await tokenRefreshRequest();
-        updateToken(newToken);
+        const logoutCount = logoutCountRef.current;
+        const [refresh] = await Promise.allSettled([tokenRefreshRequest()]);
+        if (logoutCount !== logoutCountRef.current) {
+            throw new CanceledError('Session ended during token refresh');
+        }
+        if (refresh.status === 'rejected') {
+            // the session can't be renewed, so end it locally; a following logout() then has no token to revoke
+            updateToken('');
+            throw refresh.reason;
+        }
+        updateToken(refresh.value);
     }, [updateToken]);
 
     // silent refresh on mount
     useOnMountUnsafe(() => {
         (async () => {
-            if (window.location.pathname.startsWith('/admin')) {
+            if (isAdminPath(window.location.pathname)) {
                 try {
                     await refreshAccessToken();
                 } catch {
-                    logout();
+                    updateToken('');
                 } finally {
                     setIsLoading(false);
                 }

@@ -82,6 +82,7 @@ export const SuccessStoryCard: React.FC<SuccessStoryCardProps> = ({ article }) =
                             <img src={article.image} alt={title || 'Article Image'} className={styles.articleImage} />
                         </div>
                         <div className={styles.articleTitle}>
+                            <div className={styles.cardTitle}>{title}</div>
                             <div
                                 className={`${styles.titleContent} ${isExpanded ? styles.collapsedHidden : ''}`}
                                 aria-hidden={isExpanded}

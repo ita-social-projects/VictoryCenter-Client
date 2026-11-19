@@ -60,6 +60,27 @@ describe('AddFeedbackReviewModal', () => {
                 expect(getTextInput()).toHaveValue('');
             });
 
+            it('renders character counters with the configured limits', () => {
+                render(<AddFeedbackReviewModal {...createProps()} />);
+
+                expect(screen.getByText(`0/${FEEDBACK_REVIEW_VALIDATION.authorName.max}`)).toBeInTheDocument();
+                expect(screen.getByText(`0/${FEEDBACK_REVIEW_VALIDATION.text.max}`)).toBeInTheDocument();
+            });
+
+            it('blocks input beyond the character limits', () => {
+                render(<AddFeedbackReviewModal {...createProps()} />);
+
+                fireEvent.change(getAuthorNameInput(), {
+                    target: { value: 'а'.repeat(FEEDBACK_REVIEW_VALIDATION.authorName.max + 1) },
+                });
+                fireEvent.change(getTextInput(), {
+                    target: { value: 'а'.repeat(FEEDBACK_REVIEW_VALIDATION.text.max + 1) },
+                });
+
+                expect(getAuthorNameInput()).toHaveValue('а'.repeat(FEEDBACK_REVIEW_VALIDATION.authorName.max));
+                expect(getTextInput()).toHaveValue('а'.repeat(FEEDBACK_REVIEW_VALIDATION.text.max));
+            });
+
             it('renders publish button disabled initially', () => {
                 render(<AddFeedbackReviewModal {...createProps()} />);
 

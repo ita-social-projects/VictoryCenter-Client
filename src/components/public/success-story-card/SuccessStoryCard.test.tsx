@@ -43,6 +43,7 @@ const expectDefaultArticleContent = (localizedArticle: StoriesOfVictoryReviewArt
     render(<SuccessStoryCard article={localizedArticle} />);
 
     expect(screen.getByRole('img', { name: 'Story title' })).toBeInTheDocument();
+    expect(screen.getByText('Story title')).toBeInTheDocument();
     expect(screen.getByText('"Story text"')).toBeInTheDocument();
 };
 
@@ -51,10 +52,11 @@ describe('SuccessStoryCard', () => {
         mockCurrentLanguage = 'uk';
     });
 
-    it('renders the image, truncated story, and read button with its icon', () => {
+    it('renders the image, title, truncated story, and read button with its icon', () => {
         render(<SuccessStoryCard article={{ ...article, story: longStory }} />);
 
         expect(screen.getByRole('img', { name: 'Story title' })).toHaveAttribute('src', 'story-image.jpg');
+        expect(screen.getByText('Story title')).toBeInTheDocument();
         expect(screen.getByText(collapsedStory)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'ARTICLES.READ_STORY' })).toHaveAttribute('aria-expanded', 'false');
         expect(screen.getByTestId('external-link-icon')).toBeInTheDocument();
@@ -114,6 +116,7 @@ describe('SuccessStoryCard', () => {
         render(<SuccessStoryCard article={createEnglishLocalizedArticle()} />);
 
         expect(screen.getByRole('img', { name: 'English title' })).toBeInTheDocument();
+        expect(screen.getByText('English title')).toBeInTheDocument();
         expect(screen.getByText('"English story"')).toBeInTheDocument();
     });
 

@@ -42,8 +42,8 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError, disabled, value, deleteConfirmationText }: any) => (
-        <div data-testid="mock-image-input">
+    ImageInput: ({ onChange, label, setError, disabled, value, deleteConfirmationText, style }: any) => (
+        <div data-testid="mock-image-input" style={{ width: style?.width, height: style?.height }}>
             <span>{label}</span>
             <span data-testid="mock-image-disabled">{disabled ? 'disabled' : 'enabled'}</span>
             <span data-testid="mock-image-value">{value ? 'has-value' : 'no-value'}</span>
@@ -246,6 +246,18 @@ describe('ReportsMediaBlock', () => {
             expect(screen.getByTestId('mock-image-delete-confirmation-text')).toHaveTextContent(
                 REPORTS_TEXT.DELETE_IMAGE.TITLE,
             );
+        });
+
+        it('should size the image preview to the landscape crop size', () => {
+            renderComponent({ imageWidth: 600, imageHeight: 500 });
+
+            expect(screen.getByTestId('mock-image-input')).toHaveStyle({ width: '600px', height: '500px' });
+        });
+
+        it('should size the image preview to the portrait crop size', () => {
+            renderComponent({ imageWidth: 280, imageHeight: 890 });
+
+            expect(screen.getByTestId('mock-image-input')).toHaveStyle({ width: '280px', height: '890px' });
         });
     });
 });

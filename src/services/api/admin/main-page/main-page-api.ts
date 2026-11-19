@@ -30,7 +30,7 @@ const toDomainMainPage = (dto: MainPageDto): MainPage => {
 export const MainPageApi = {
     get: async (client: AxiosInstance): Promise<{ page: MainPage; languages?: LocalizationLanguage[] }> => {
         const [pageRes, languagesRes] = await Promise.all([
-            client.get<MainPageDto>(API_ROUTES.MAIN_PAGE.BASE),
+            client.get<MainPageDto>(API_ROUTES.MAIN_PAGE.ADMIN),
             client.get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE),
         ]);
 

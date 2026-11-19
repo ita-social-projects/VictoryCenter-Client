@@ -245,11 +245,11 @@ export const EventModal = (props: EventModalProps) => {
 
     const handleDatePickerConfirm = useCallback(
         (onChange: (value: string) => void) => () => {
-            onChange(formatDateValue(pendingDate ?? initialPickerDate ?? new Date()));
+            onChange(formatDateValue(pendingDate ?? new Date()));
             setIsDatePickerOpen(false);
             setActivePickerLayer('date-picker');
         },
-        [initialPickerDate, pendingDate],
+        [pendingDate],
     );
 
     const handleDateSelect = (date: Date) => {

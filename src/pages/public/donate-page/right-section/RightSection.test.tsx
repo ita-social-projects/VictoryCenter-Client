@@ -47,7 +47,7 @@ jest.mock('@/components/common/tabs/Tabs', () => ({
                     key={tab.id}
                     className={activeTab === tab.id ? 'active tab' : 'tab'}
                     onClick={() => setActiveTab(tab.id)}
-                    data-testid={`tab-${tab.label.toLowerCase().split(' / ')[0]}`}
+                    data-testid={`tab-${tab.label.toLowerCase().split(' / ').pop()}`}
                 >
                     {tab.label}
                 </button>
@@ -189,12 +189,12 @@ describe('RightSection', () => {
             expect(screen.getByTestId('alt-support')).toBeInTheDocument();
         });
 
-        it('renders all available currency tabs', () => {
+        it('renders all available currency tabs with currency names', () => {
             render(<RightSection donateData={createMockDonateData()} />);
 
-            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-eur')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toHaveTextContent('Гривня / UAH');
+            expect(screen.getByTestId('tab-usd')).toHaveTextContent('Долар / USD');
+            expect(screen.getByTestId('tab-eur')).toHaveTextContent('Євро / EUR');
         });
 
         it('switches to USD tab and shows AbroadPaymentDetails', async () => {

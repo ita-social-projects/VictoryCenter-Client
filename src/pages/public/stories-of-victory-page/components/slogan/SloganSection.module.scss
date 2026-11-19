@@ -3,7 +3,8 @@
 @use '@/assets/sass/variables/colors';
 @use '@/assets/sass/variables/z-index';
 
-$line-height-560: 54px;
+$line-height-375: 40px;
+$line-height-560: 48px;
 $line-height-768: 76px;
 
 section {
@@ -12,13 +13,14 @@ section {
 
 .slogan {
     @include type.h3-medium-uppercase;
+    line-height: $line-height-375;
     text-align: center;
     margin: 119px 16px 181px;
 
     @media (min-width: 560px) {
         font-size: 48px;
         line-height: $line-height-560;
-        margin: 119px 64px 191px;
+        margin: 119px 16px 191px;
     }
 
     @media (min-width: 768px) {
@@ -65,7 +67,7 @@ section {
         background: colors.$yellow-400;
         content: '';
         width: 100vw;
-        height: t.$h3-height;
+        height: $line-height-375;
         position: absolute;
         transform: translateX(-100%);
 
@@ -87,7 +89,7 @@ section {
         background: colors.$light-blue-200;
         content: '';
         width: 100vw;
-        height: t.$h3-height;
+        height: $line-height-375;
         position: absolute;
         z-index: z-index.public(programs-page-intro-section-background);
 
@@ -105,11 +107,11 @@ section {
     }
 }
 
-.blue-last-row {
+.blue-first-row {
     &:before {
         @media (max-width: 559px) {
-            transform: translateX(0);
-            left: -37px;
+            top: 100%;
+            left: 0;
             width: 100vw;
         }
     }

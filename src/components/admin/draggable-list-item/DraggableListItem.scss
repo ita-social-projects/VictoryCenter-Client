@@ -1,10 +1,6 @@
 @use '@/assets/sass/variables/colors';
 
 .draggable-item-wrapper {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
     padding: 0.25rem;
     margin: -0.25rem;
 }

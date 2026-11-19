@@ -27,6 +27,7 @@ describe('<LoginForm />', () => {
             client: {} as any,
             isAuthenticated: false,
             isLoading: false,
+            isLogoutRevocationFailed: false,
             login: loginMock,
             logout: jest.fn(),
             refreshAccessToken: jest.fn(),

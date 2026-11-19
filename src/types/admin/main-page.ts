@@ -14,11 +14,9 @@ export enum MetricPrefix {
     Percent = 2,
 }
 
-export enum MetricType {
-    Partners = 0,
-    Programs = 1,
-    Raised = 2,
-    TherapyHours = 3,
+export enum MetricKind {
+    Standard = 0,
+    RaisedFunds = 1,
 }
 
 export enum MainPageLocalizationBlock {
@@ -27,10 +25,7 @@ export enum MainPageLocalizationBlock {
     Partners = 2,
     Donations = 3,
     ImpactStatistics = 4,
-    MetricPartners = 5,
-    MetricPrograms = 6,
-    MetricRaised = 7,
-    MetricTherapyHours = 8,
+    Metric = 5,
 }
 
 // Domain/UI Localizations
@@ -82,7 +77,7 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     id?: number;
     value: number;
     name: string;
-    type: MetricType;
+    kind: MetricKind;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     isAutoSyncFailed?: boolean;
@@ -171,7 +166,7 @@ export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalization
     id?: number;
     value?: number;
     name?: string | null;
-    type?: MetricType;
+    kind?: MetricKind;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     isAutoSyncFailed?: boolean;
@@ -271,7 +266,7 @@ export interface CreateMetricLocalizationDto {
 export interface CreateMetricDto {
     value: number;
     name: string;
-    type: MetricType;
+    kind: MetricKind;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     localization?: CreateMetricLocalizationDto | null;
@@ -389,7 +384,7 @@ export interface UpdateMetricDto {
     id?: number;
     value: number;
     name: string;
-    type: MetricType;
+    kind: MetricKind;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     localization?: UpdateMetricLocalizationDto | null;

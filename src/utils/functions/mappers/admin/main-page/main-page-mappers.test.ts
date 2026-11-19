@@ -3,7 +3,7 @@ import {
     MainPage,
     MainPageFormValues,
     MetricPrefix,
-    MetricType,
+    MetricKind,
 } from '@/types/admin/main-page';
 import type { LocalizationLanguage } from '@/types/common/language';
 import {
@@ -233,7 +233,7 @@ describe('main-page-mappers', () => {
                             id: 1,
                             value: 100,
                             name: 'UA Metric',
-                            type: MetricType.Partners,
+                            kind: MetricKind.Standard,
                             prefix: MetricPrefix.Plus,
                             isAutoSynced: true,
                             localizations: [
@@ -245,7 +245,7 @@ describe('main-page-mappers', () => {
                             id: 2,
                             value: 50,
                             name: 'UA Metric 2',
-                            type: MetricType.Programs,
+                            kind: MetricKind.RaisedFunds,
                             prefix: MetricPrefix.None,
                             localizations: [],
                         } as any,
@@ -272,7 +272,7 @@ describe('main-page-mappers', () => {
                 id: 1,
                 value: 100,
                 name: 'UA Metric',
-                type: MetricType.Partners,
+                kind: MetricKind.Standard,
                 prefix: 1, // MetricPrefix.Plus is 1
                 isAutoSynced: true,
                 localization: {
@@ -283,6 +283,7 @@ describe('main-page-mappers', () => {
                 },
             });
 
+            expect(metrics?.[1].kind).toBe(MetricKind.RaisedFunds);
             expect(metrics?.[1].localization).toBeUndefined();
             expect(patch.impactStatistics?.localization).toEqual({
                 languageId: 2,
@@ -341,7 +342,7 @@ describe('main-page-mappers', () => {
                     id: 4,
                     value: 1200,
                     name: 'Години терапії',
-                    type: MetricType.TherapyHours,
+                    kind: MetricKind.Standard,
                     prefix: MetricPrefix.Plus,
                     isAutoSynced: false,
                     isHidden: false,
@@ -396,7 +397,7 @@ describe('main-page-mappers', () => {
                         {
                             value: 8,
                             name: 'Програми',
-                            type: MetricType.Programs,
+                            kind: MetricKind.Standard,
                             isHidden: false,
                             priority: 2,
                             localizations: [{ language: { code: 'en' }, name: 'Programs', value: null } as any],

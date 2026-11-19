@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricPrefix, MetricKind } from '@/types/admin/main-page';
 import { MockMetricEditActions } from '@/utils/test-mocks/main-page-mocks';
 import { StatisticsMetricEditPanel } from './StatisticsMetricEditPanel';
 
@@ -38,7 +38,7 @@ const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
     id: 1,
     name: 'Назва UA',
     value: 1200,
-    type: MetricType.Partners,
+    kind: MetricKind.Standard,
     prefix: MetricPrefix.Plus,
     isHidden: false,
     priority: 1,

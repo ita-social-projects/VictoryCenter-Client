@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { Metric, MetricLocalization, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricLocalization, MetricPrefix, MetricKind } from '@/types/admin/main-page';
 import { MockMetricEditActions } from '@/utils/test-mocks/main-page-mocks';
 import { RaisedMetricEditPanel } from './RaisedMetricEditPanel';
 
@@ -26,7 +26,7 @@ const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
     id: 3,
     name: 'Залучених коштів',
     value: 1000000,
-    type: MetricType.Raised,
+    kind: MetricKind.RaisedFunds,
     prefix: MetricPrefix.None,
     isHidden: false,
     priority: 3,

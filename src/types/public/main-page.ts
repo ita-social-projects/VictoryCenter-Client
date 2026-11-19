@@ -9,11 +9,9 @@ export enum MetricPrefix {
     Percent = 2,
 }
 
-export enum MetricType {
-    Partners = 0,
-    Programs = 1,
-    Raised = 2,
-    TherapyHours = 3,
+export enum MetricKind {
+    Standard = 0,
+    RaisedFunds = 1,
 }
 
 // Public DTOs
@@ -32,7 +30,7 @@ export interface PublicMetricDto {
     id: number;
     value: number;
     name?: string;
-    type: MetricType;
+    kind: MetricKind;
     prefix?: MetricPrefix | null;
     priority: number;
     localizations?: PublicMainPageLocalizationDto[];
@@ -86,7 +84,7 @@ export interface PublicMetric {
     id: number;
     value: number;
     name: string;
-    type: MetricType;
+    kind: MetricKind;
     prefix: MetricPrefix | null;
 }
 

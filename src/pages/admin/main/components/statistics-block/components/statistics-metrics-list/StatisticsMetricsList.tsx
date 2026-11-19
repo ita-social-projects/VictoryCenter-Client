@@ -9,7 +9,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { ToastType } from '@/types/admin/toast';
-import { Metric, MetricType, UpdateMetricResult, UpdateSingleMetricDto } from '@/types/admin/main-page';
+import { Metric, MetricKind, UpdateMetricResult, UpdateSingleMetricDto } from '@/types/admin/main-page';
 import {
     formatMetricValue,
     getMetricName,
@@ -172,7 +172,7 @@ export const StatisticsMetricsList = ({
     const renderRow = (metric: Metric) => {
         if (editingMetricId === metric.id) {
             const currentMetric = pendingMetric?.id === metric.id ? pendingMetric : metric;
-            if (metric.type === MetricType.Raised) {
+            if (metric.kind === MetricKind.RaisedFunds) {
                 return (
                     <RaisedMetricEditPanel
                         metric={currentMetric}
@@ -202,7 +202,7 @@ export const StatisticsMetricsList = ({
                 <p className={`${styles.en} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric, 'EN')}</p>
 
                 <div className={styles.values}>
-                    {metric.type === MetricType.Raised ? (
+                    {metric.kind === MetricKind.RaisedFunds ? (
                         <div className={styles.raisedValues}>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
                                 {formatCurrency(formatMetricValue(metric, 'UA'), getRaisedMetricCurrency(metric, 'UA'))}

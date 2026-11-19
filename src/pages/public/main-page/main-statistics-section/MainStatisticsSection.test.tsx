@@ -1,6 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import { MainStatisticsSection } from './MainStatisticsSection';
-import { PublicImpactStatisticDto, MetricPrefix, MetricType, PublicMetricDto } from '@/types/public/main-page';
+import { PublicImpactStatisticDto, MetricPrefix, MetricKind, PublicMetricDto } from '@/types/public/main-page';
 import { TranslationStatus } from '@/types/common/language';
 
 let mockCurrentLanguage = 'uk';
@@ -43,14 +43,14 @@ const makeMetric = (
     id: number,
     value: number,
     name: string,
-    type: MetricType = MetricType.Partners,
+    kind: MetricKind = MetricKind.Standard,
     prefix: MetricPrefix | null = null,
     priority = id,
 ): PublicMetricDto => ({
     id,
     value,
     name,
-    type,
+    kind,
     prefix,
     priority,
     localizations: [],
@@ -61,10 +61,10 @@ const makeStatistics = (overrides: Partial<PublicImpactStatisticDto> = {}): Publ
     title: 'Зміни, які можна виміряти',
     image: { id: 10, url: '/stats-image.jpg', mimeType: 'image/jpeg' },
     metrics: [
-        makeMetric(1, 20, 'партнерств', MetricType.Partners, MetricPrefix.Plus),
-        makeMetric(2, 21, 'програм підтримки', MetricType.Programs),
-        makeMetric(3, 1249854, 'зібрано', MetricType.Raised),
-        makeMetric(4, 140, 'годин терапії з кіньми', MetricType.TherapyHours, MetricPrefix.Plus),
+        makeMetric(1, 20, 'партнерств', MetricKind.Standard, MetricPrefix.Plus),
+        makeMetric(2, 21, 'програм підтримки', MetricKind.Standard),
+        makeMetric(3, 1249854, 'зібрано', MetricKind.RaisedFunds),
+        makeMetric(4, 140, 'годин терапії з кіньми', MetricKind.Standard, MetricPrefix.Plus),
     ],
     localizations: [],
     ...overrides,
@@ -150,8 +150,8 @@ describe('MainStatisticsSection', () => {
     it('formats numeric enum values from the API with configured suffixes and currency', () => {
         const stats = makeStatistics({
             metrics: [
-                makeMetric(1, 20, 'партнерств', 0 as MetricType, 1 as MetricPrefix),
-                makeMetric(2, 1249854, 'зібрано', 2 as MetricType, 0 as MetricPrefix),
+                makeMetric(1, 20, 'партнерств', 0 as MetricKind, 1 as MetricPrefix),
+                makeMetric(2, 1249854, 'зібрано', 1 as MetricKind, 0 as MetricPrefix),
             ],
         });
 
@@ -172,7 +172,7 @@ describe('MainStatisticsSection', () => {
                     id: 1,
                     value: 5,
                     name: 'partners (default)',
-                    type: MetricType.Partners,
+                    kind: MetricKind.Standard,
                     prefix: null,
                     priority: 1,
                     localizations: [
@@ -198,7 +198,7 @@ describe('MainStatisticsSection', () => {
                     id: 1,
                     value: 5,
                     name: 'partners fallback',
-                    type: MetricType.Partners,
+                    kind: MetricKind.Standard,
                     prefix: null,
                     priority: 1,
                     localizations: [],
@@ -213,9 +213,9 @@ describe('MainStatisticsSection', () => {
     it('renders metrics ordered by priority', () => {
         const stats = makeStatistics({
             metrics: [
-                makeMetric(3, 100, 'Third', MetricType.Partners, null, 3),
-                makeMetric(1, 50, 'First', MetricType.Partners, null, 1),
-                makeMetric(2, 75, 'Second', MetricType.Partners, null, 2),
+                makeMetric(3, 100, 'Third', MetricKind.Standard, null, 3),
+                makeMetric(1, 50, 'First', MetricKind.Standard, null, 1),
+                makeMetric(2, 75, 'Second', MetricKind.Standard, null, 2),
             ],
         });
 
@@ -245,7 +245,7 @@ describe('MainStatisticsSection', () => {
             ],
             metrics: [
                 {
-                    ...makeMetric(3, 1249854, 'зібрано', MetricType.Raised),
+                    ...makeMetric(3, 1249854, 'зібрано', MetricKind.RaisedFunds),
                     localizations: [
                         {
                             entityId: 3,
@@ -284,7 +284,7 @@ describe('MainStatisticsSection', () => {
 
     it('falls back to the hryvnia amount in English when there is no dollar value', () => {
         mockCurrentLanguage = 'en';
-        const stats = makeStatistics({ metrics: [makeMetric(3, 1249854, 'зібрано', MetricType.Raised)] });
+        const stats = makeStatistics({ metrics: [makeMetric(3, 1249854, 'зібрано', MetricKind.RaisedFunds)] });
 
         render(<MainStatisticsSection impactStatistics={stats} />);
         act(() => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { useCounterAnimation } from '@/hooks/common/use-counter-animation/useCounterAnimation';
-import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricType } from '@/types/public/main-page';
+import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricKind } from '@/types/public/main-page';
 import { LocaleCurrency } from '@/const/common/currency';
 import { getLocaleSettings } from '@/const/common/locales';
 import { formatCurrency } from '@/utils/functions/formatters/format-currency';
@@ -26,7 +26,7 @@ const getMetricLocalizedName = (metric: PublicMetricDto, currentLanguage: string
 };
 
 const getRaisedValue = (metric: PublicMetricDto, currentLanguage: string): ResolvedMetricValue => {
-    if (metric.type !== MetricType.Raised) return { value: metric.value, usedLocalizedValue: false };
+    if (metric.kind !== MetricKind.RaisedFunds) return { value: metric.value, usedLocalizedValue: false };
 
     const loc = metric.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
     return resolveMetricValue(loc?.value, metric.value);
@@ -35,13 +35,13 @@ const getRaisedValue = (metric: PublicMetricDto, currentLanguage: string): Resol
 const formatMetricValue = (
     value: number,
     prefix: MetricPrefix | null | undefined,
-    type: MetricType,
+    kind: MetricKind,
     currency: LocaleCurrency,
     locale: string,
 ): string => {
     const formatted = applyMetricPrefix(value.toLocaleString(locale), prefix);
 
-    if (type !== MetricType.Raised) return formatted;
+    if (kind !== MetricKind.RaisedFunds) return formatted;
 
     return formatCurrency(formatted, currency);
 };
@@ -64,8 +64,8 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ metric, currentLangua
     const name = getMetricLocalizedName(metric, currentLanguage);
     const { numberFormat } = getLocaleSettings(currentLanguage);
     const currency = getAmountCurrency(usedLocalizedValue, currentLanguage);
-    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type, currency, numberFormat);
-    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.type, currency, numberFormat);
+    const valueText = formatMetricValue(displayValue, metric.prefix, metric.kind, currency, numberFormat);
+    const finalValueText = formatMetricValue(targetValue, metric.prefix, metric.kind, currency, numberFormat);
 
     return (
         <div className={styles.metric} role="figure" aria-label={`${name}: ${finalValueText}`}>

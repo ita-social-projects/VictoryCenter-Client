@@ -7,7 +7,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MainPage, MainPageFormValues, Metric, MetricType } from '@/types/admin/main-page';
+import { MainPage, MainPageFormValues, Metric, MetricKind } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -67,7 +67,7 @@ export const StatisticsBlockForm = ({
             id: metric.id ?? null,
             value: metric.value,
             name: metric.name ?? '',
-            type: metric.type,
+            kind: metric.kind,
             prefix: metric.prefix,
             isHidden: metric.isHidden,
             priority: metric.priority,
@@ -85,7 +85,7 @@ export const StatisticsBlockForm = ({
         JSON.stringify(toComparableMetrics(left)) === JSON.stringify(toComparableMetrics(right));
 
     const hasMetricSyncError = (metric: Metric) =>
-        metric.type === MetricType.Raised &&
+        metric.kind === MetricKind.RaisedFunds &&
         Boolean(metric.isAutoSyncFailed || metric.autoSyncError || metric.syncError);
 
     useEffect(() => {

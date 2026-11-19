@@ -128,7 +128,7 @@ export function mapFormValuesToMainPagePatch(
             id: m.id,
             value: m.value,
             name: m.name,
-            type: m.type,
+            kind: m.kind,
             prefix: m.prefix,
             isAutoSynced: m.isAutoSynced,
             localization: enLoc

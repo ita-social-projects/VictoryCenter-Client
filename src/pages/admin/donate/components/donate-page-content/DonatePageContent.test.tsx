@@ -1,5 +1,6 @@
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { DonatePageContent } from './DonatePageContent';
+import { DONATE_TEXT } from '@/const/admin/donate';
 
 const mockUseBankDetails = jest.fn();
 const mockUseAdminClient = jest.fn();
@@ -8,6 +9,7 @@ const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockSetItems = jest.fn();
+const mockRefetchBankDetails = jest.fn();
 const mockAddToast = jest.fn();
 
 const mockCorrespondentCreate = jest.fn();
@@ -117,8 +119,9 @@ jest.mock('../generic-details/GenericDetails', () => {
 });
 
 jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
-    SupportOptionsForm: ({ onCreateOption, onUpdateOption, onDeleteOption }: any) => (
-        <div data-testid="support-options-form">
+    SupportOptionsForm: ({ supportOptions, isLoading, onCreateOption, onUpdateOption, onDeleteOption }: any) => (
+        <div data-testid="support-options-form" data-loading={String(isLoading)}>
+            <span data-testid="support-options-count">{supportOptions.length}</span>
             <button onClick={() => onCreateOption('Test', '123')}>Create</button>
             <button onClick={() => onUpdateOption(1, 'Updated', '456')}>Update</button>
             <button onClick={() => onDeleteOption(1)}>Delete</button>
@@ -163,14 +166,23 @@ describe('DonatePageContent', () => {
         ...(withCorrespondentBanks && { correspondentForm: jest.fn() }),
     });
 
-    const setupMockBankDetails = (items: any[] = [], config: any = createMockConfig(), isLoading = false) => {
+    const setupMockBankDetails = (
+        items: any[] = [],
+        config: any = createMockConfig(),
+        isLoading = false,
+        error: unknown = null,
+    ) => {
         mockUseBankDetails.mockReturnValue({
             items,
             config,
             setItems: mockSetItems,
             isLoading,
+            error,
+            refetch: mockRefetchBankDetails,
         });
     };
+
+    const anyRequestOptions = expect.objectContaining({ cancellationSignal: expect.any(AbortSignal) });
 
     const renderComponent = () => render(<DonatePageContent />);
 
@@ -272,7 +284,7 @@ describe('DonatePageContent', () => {
         it('fetches support options on mount', async () => {
             renderComponent();
             await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0, anyRequestOptions);
             });
         });
 
@@ -316,24 +328,93 @@ describe('DonatePageContent', () => {
             });
         });
 
-        it('handles fetch error gracefully', async () => {
+        it('shows an error with retry instead of the form when the fetch fails', async () => {
             mockGetAll.mockRejectedValue(new Error('Network error'));
             renderComponent();
-            await waitFor(() => expect(mockGetAll).toHaveBeenCalled());
+
+            await waitForElement('support-options-fetch-error');
+            expect(screen.getByText(DONATE_TEXT.SUPPORT_OPTIONS.FAIL_TO_FETCH)).toBeInTheDocument();
+            expect(screen.queryByTestId('support-options-form')).not.toBeInTheDocument();
         });
 
-        it('handles support options fetch rejection on category change', async () => {
+        it('refetches support options on retry and shows the form after success', async () => {
+            mockGetAll.mockRejectedValueOnce(new Error('Network error')).mockResolvedValueOnce([]);
+            renderComponent();
+
+            await waitForElement('support-options-fetch-error');
+            fireEvent.click(screen.getByTestId('support-options-fetch-error-retry'));
+
+            await waitForElement('support-options-form');
+            expect(screen.queryByTestId('support-options-fetch-error')).not.toBeInTheDocument();
+            expect(mockGetAll).toHaveBeenCalledTimes(2);
+        });
+
+        it('shows the error when the support options fetch fails after a category change', async () => {
             mockGetAll.mockResolvedValueOnce([]).mockRejectedValueOnce(new Error('Fetch failed'));
             renderComponent();
 
-            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0));
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0, anyRequestOptions));
+            expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
 
             fireEvent.click(screen.getByText('Switch to USD'));
 
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
-                expect(mockGetAll).toHaveBeenCalledTimes(2);
-            });
+            await waitForElement('support-options-fetch-error');
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1, anyRequestOptions);
+            expect(mockGetAll).toHaveBeenCalledTimes(2);
+        });
+
+        it('does not pass the previous currency options to the form while the new currency loads', async () => {
+            let resolveUsd: (value: any) => void = () => {};
+            mockGetAll
+                .mockResolvedValueOnce([{ id: 1 }, { id: 2 }])
+                .mockReturnValueOnce(new Promise((resolve) => (resolveUsd = resolve)));
+            renderComponent();
+
+            await waitFor(() => expect(screen.getByTestId('support-options-count')).toHaveTextContent('2'));
+
+            fireEvent.click(screen.getByText('Switch to USD'));
+
+            expect(screen.getByTestId('support-options-count')).toHaveTextContent('0');
+            expect(screen.getByTestId('support-options-form')).toHaveAttribute('data-loading', 'true');
+
+            resolveUsd([{ id: 3 }]);
+
+            await waitFor(() => expect(screen.getByTestId('support-options-count')).toHaveTextContent('1'));
+        });
+
+        it('does not show the previous currency options while retrying after an error', async () => {
+            let resolveRetry: (value: any) => void = () => {};
+            mockGetAll
+                .mockResolvedValueOnce([{ id: 1 }, { id: 2 }])
+                .mockRejectedValueOnce(new Error('Fetch failed'))
+                .mockReturnValueOnce(new Promise((resolve) => (resolveRetry = resolve)));
+            renderComponent();
+
+            await waitFor(() => expect(screen.getByTestId('support-options-count')).toHaveTextContent('2'));
+
+            fireEvent.click(screen.getByText('Switch to USD'));
+            await waitForElement('support-options-fetch-error');
+
+            fireEvent.click(screen.getByTestId('support-options-fetch-error-retry'));
+
+            await waitForElement('support-options-form');
+            expect(screen.getByTestId('support-options-count')).toHaveTextContent('0');
+
+            resolveRetry([{ id: 3 }]);
+
+            await waitFor(() => expect(screen.getByTestId('support-options-count')).toHaveTextContent('1'));
+        });
+
+        it('clears the support options error when switching to a category that loads', async () => {
+            mockGetAll.mockRejectedValueOnce(new Error('Fetch failed')).mockResolvedValueOnce([]);
+            renderComponent();
+
+            await waitForElement('support-options-fetch-error');
+
+            fireEvent.click(screen.getByText('Switch to USD'));
+
+            await waitForElement('support-options-form');
+            expect(screen.queryByTestId('support-options-fetch-error')).not.toBeInTheDocument();
         });
 
         it('calls addToast on successful operations', async () => {
@@ -369,11 +450,11 @@ describe('DonatePageContent', () => {
     describe('Category Management', () => {
         it('handles category change', async () => {
             renderComponent();
-            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0));
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0, anyRequestOptions));
 
             fireEvent.click(screen.getByText('Switch to USD'));
 
-            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1));
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1, anyRequestOptions));
         });
 
         it('does not change category when selecting the same category', async () => {
@@ -381,13 +462,42 @@ describe('DonatePageContent', () => {
 
             await waitFor(() => {
                 expect(mockGetAll).toHaveBeenCalledTimes(1);
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0, anyRequestOptions);
             });
 
             fireEvent.click(screen.getByRole('button', { name: 'UAH' }));
             await new Promise((resolve) => setTimeout(resolve, 50));
 
             expect(mockGetAll).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('Bank Details fetch error', () => {
+        it('shows an error with retry instead of the bank details list and add actions', async () => {
+            setupMockBankDetails([], createMockConfig(), false, new Error('Server error'));
+            renderComponent();
+
+            await waitForElement('bank-details-fetch-error');
+            expect(screen.getByText(DONATE_TEXT.BANK_DETAILS.FAIL_TO_FETCH)).toBeInTheDocument();
+            expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
+        });
+
+        it('calls refetch when retry is clicked', async () => {
+            setupMockBankDetails([], createMockConfig(), false, new Error('Server error'));
+            renderComponent();
+
+            await waitForElement('bank-details-fetch-error');
+            fireEvent.click(screen.getByTestId('bank-details-fetch-error-retry'));
+
+            expect(mockRefetchBankDetails).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps support options usable when only bank details fail', async () => {
+            setupMockBankDetails([], createMockConfig(), false, new Error('Server error'));
+            renderComponent();
+
+            await waitForElement('bank-details-fetch-error');
+            expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
         });
     });
 

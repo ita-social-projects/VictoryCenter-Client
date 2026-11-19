@@ -27,9 +27,10 @@ describe('bankDetailsConfig', () => {
 
         it('fetch return empty array', async () => {
             (BankDetailsUahApi.getAll as jest.Mock).mockResolvedValue([]);
-            const result = await bankDetailsConfig.UAH.fetch(mockClient);
+            const options = { cancellationSignal: new AbortController().signal };
+            const result = await bankDetailsConfig.UAH.fetch(mockClient, options);
             expect(result).toEqual([]);
-            expect(BankDetailsUahApi.getAll).toHaveBeenCalledWith(mockClient);
+            expect(BankDetailsUahApi.getAll).toHaveBeenCalledWith(mockClient, options);
         });
 
         it('form exists', () => {
@@ -99,9 +100,10 @@ describe('bankDetailsConfig', () => {
 
         it('fetch calls ForeignBankDetailsApi with USD currency', async () => {
             (ForeignBankDetailsApi.getAll as jest.Mock).mockResolvedValue([]);
-            const result = await bankDetailsConfig.USD.fetch(mockClient);
+            const options = { cancellationSignal: new AbortController().signal };
+            const result = await bankDetailsConfig.USD.fetch(mockClient, options);
             expect(result).toEqual([]);
-            expect(ForeignBankDetailsApi.getAll).toHaveBeenCalledWith(mockClient, BankCurrency.Usd);
+            expect(ForeignBankDetailsApi.getAll).toHaveBeenCalledWith(mockClient, BankCurrency.Usd, options);
         });
 
         it('create calls ForeignBankDetailsApi.create with USD currency', async () => {
@@ -177,9 +179,10 @@ describe('bankDetailsConfig', () => {
 
         it('fetch calls ForeignBankDetailsApi with EUR currency', async () => {
             (ForeignBankDetailsApi.getAll as jest.Mock).mockResolvedValue([]);
-            const result = await bankDetailsConfig.EUR.fetch(mockClient);
+            const options = { cancellationSignal: new AbortController().signal };
+            const result = await bankDetailsConfig.EUR.fetch(mockClient, options);
             expect(result).toEqual([]);
-            expect(ForeignBankDetailsApi.getAll).toHaveBeenCalledWith(mockClient, BankCurrency.Eur);
+            expect(ForeignBankDetailsApi.getAll).toHaveBeenCalledWith(mockClient, BankCurrency.Eur, options);
         });
 
         it('create calls ForeignBankDetailsApi.create with EUR currency', async () => {

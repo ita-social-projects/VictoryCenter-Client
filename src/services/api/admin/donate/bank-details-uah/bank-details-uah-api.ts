@@ -1,10 +1,13 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { UahBankDetailsDto, CreateUahBankDetails, UpdateUahBankDetails } from '@/types/admin/donate';
+import { RequestOptions } from '@/types/common/api';
 
 export const BankDetailsUahApi = {
-    getAll: async (client: AxiosInstance): Promise<UahBankDetailsDto[]> => {
-        const response = await client.get<UahBankDetailsDto[]>(API_ROUTES.DONATE.BANK_DETAILS_UAH);
+    getAll: async (client: AxiosInstance, options: RequestOptions = {}): Promise<UahBankDetailsDto[]> => {
+        const response = await client.get<UahBankDetailsDto[]>(API_ROUTES.DONATE.BANK_DETAILS_UAH, {
+            signal: options.cancellationSignal,
+        });
         return response.data;
     },
 

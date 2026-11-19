@@ -6,11 +6,17 @@ import {
     SupportOptionsDto,
     UpdateSupportOptionsDto,
 } from '@/types/admin/donate';
+import { RequestOptions } from '@/types/common/api';
 
 export const SupportOptionsApi = {
-    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<SupportOptionsDto[]> => {
+    getAll: async (
+        client: AxiosInstance,
+        currency: BankCurrency,
+        options: RequestOptions = {},
+    ): Promise<SupportOptionsDto[]> => {
         const response = await client.get<SupportOptionsDto[]>(API_ROUTES.DONATE.SUPPORT_OPTIONS, {
             params: { currency },
+            signal: options.cancellationSignal,
         });
         return response.data;
     },

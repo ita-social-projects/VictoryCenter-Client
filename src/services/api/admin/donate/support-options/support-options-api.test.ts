@@ -60,6 +60,18 @@ describe('SupportOptionsApi', () => {
             });
             expect(result).toEqual([]);
         });
+
+        it('passes the cancellation signal to client.get', async () => {
+            mockClient.get.mockResolvedValue({ data: [] });
+            const controller = new AbortController();
+
+            await SupportOptionsApi.getAll(mockClient, BankCurrency.Uah, { cancellationSignal: controller.signal });
+
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.SUPPORT_OPTIONS, {
+                params: { currency: BankCurrency.Uah },
+                signal: controller.signal,
+            });
+        });
     });
 
     describe('create', () => {

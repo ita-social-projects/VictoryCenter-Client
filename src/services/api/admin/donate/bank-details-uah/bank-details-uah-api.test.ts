@@ -33,8 +33,19 @@ describe('BankDetailsUahApi', () => {
 
             const result = await BankDetailsUahApi.getAll(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH, { signal: undefined });
             expect(result).toEqual(mockResponse.data);
+        });
+
+        it('passes the cancellation signal to client.get', async () => {
+            mockClient.get.mockResolvedValue({ data: [] });
+            const controller = new AbortController();
+
+            await BankDetailsUahApi.getAll(mockClient, { cancellationSignal: controller.signal });
+
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH, {
+                signal: controller.signal,
+            });
         });
 
         it('returns empty array when no bank details exist', async () => {

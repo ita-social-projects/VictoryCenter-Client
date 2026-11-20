@@ -41,6 +41,10 @@ jest.mock('./components/video-reviews/VideoReviewsSection', () => ({
     ),
 }));
 
+jest.mock('./components/quote/FeedbackQuote', () => ({
+    FeedbackQuote: () => <div data-testid="feedback-quote" />,
+}));
+
 const mockApi = PublicFeedbackApi as jest.Mocked<typeof PublicFeedbackApi>;
 
 const histories = [
@@ -71,13 +75,14 @@ describe('StoriesOfVictoryPage', () => {
         expect(screen.queryByTestId('slogan-section')).not.toBeInTheDocument();
     });
 
-    it('renders all four sections with their fetched data', async () => {
+    it('renders all five sections with their fetched data', async () => {
         render(<StoriesOfVictoryPage />);
 
         expect(await screen.findByTestId('slogan-section')).toBeInTheDocument();
         expect(screen.getByTestId('review-articles-section')).toHaveAttribute('data-count', '2');
         expect(screen.getByTestId('reviews-section')).toHaveAttribute('data-count', '1');
         expect(screen.getByTestId('video-reviews-section')).toHaveAttribute('data-count', '3');
+        expect(screen.getByTestId('feedback-quote')).toBeInTheDocument();
         expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
     });
 

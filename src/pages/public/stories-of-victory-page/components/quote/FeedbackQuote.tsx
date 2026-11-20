@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { CtaSection } from '@/components/public/cta';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
-import quoteBg from './feedback-quote-bg.png';
+import quoteBg from './feedback-quote-bg.webp';
 
 export const FeedbackQuote = () => {
     const { t } = useTranslation('feedbackPage');

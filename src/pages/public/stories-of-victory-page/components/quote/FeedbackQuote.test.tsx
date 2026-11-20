@@ -9,7 +9,7 @@ jest.mock('react-i18next', () => ({
     useTranslation: (ns?: string) => mockUseTranslation(ns),
 }));
 
-jest.mock('./feedback-quote-bg.png', () => 'feedback-quote-bg.png');
+jest.mock('./feedback-quote-bg.webp', () => 'feedback-quote-bg.webp');
 
 jest.mock('@/components/public/cta', () => ({
     CtaSection: ({
@@ -65,7 +65,7 @@ describe('FeedbackQuote', () => {
         render(<FeedbackQuote />);
 
         const section = screen.getByTestId('cta-section');
-        expect(section).toHaveAttribute('data-media-url', 'feedback-quote-bg.png');
+        expect(section).toHaveAttribute('data-media-url', 'feedback-quote-bg.webp');
         expect(section).toHaveAttribute('data-overlay', JSON.stringify({ opacity: 0.35, color: '#0f0600' }));
     });
 

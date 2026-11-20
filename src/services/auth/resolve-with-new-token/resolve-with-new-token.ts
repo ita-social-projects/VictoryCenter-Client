@@ -10,14 +10,9 @@ export const resolveWithNewTokenConcurrent = (
     let isRefreshing = false;
     const retryQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
 
-    const resolveQueue = (token: string) => {
-        retryQueue.forEach(({ resolve }) => resolve(token));
-        retryQueue.length = 0;
-    };
-
-    const rejectQueue = (error: any) => {
-        retryQueue.forEach(({ reject }) => reject(error));
-        retryQueue.length = 0;
+    const takeQueue = () => {
+        isRefreshing = false;
+        return retryQueue.splice(0);
     };
 
     return function resolveWithNewToken(config: InternalAxiosRequestConfig) {
@@ -35,16 +30,15 @@ export const resolveWithNewTokenConcurrent = (
                 isRefreshing = true;
                 refreshAccessToken()
                     .then(() => {
-                        resolveQueue(getAccessToken());
+                        const token = getAccessToken();
+                        takeQueue().forEach(({ resolve }) => resolve(token));
                     })
                     .catch((error) => {
+                        const queue = takeQueue();
                         if (!axios.isCancel(error)) {
                             logout();
                         }
-                        rejectQueue(error);
-                    })
-                    .finally(() => {
-                        isRefreshing = false;
+                        queue.forEach(({ reject }) => reject(error));
                     });
             }
         });

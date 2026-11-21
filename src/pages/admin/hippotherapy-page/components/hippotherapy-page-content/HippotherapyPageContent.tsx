@@ -526,9 +526,14 @@ export const HippotherapyPageContent = () => {
     );
 
     const handleTranslationSuccess = useCallback(async () => {
-        await refetch();
         setTranslationTarget(null);
         addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
+
+        try {
+            await refetch();
+        } catch {
+            // Refetch error handled by useDataFetch
+        }
     }, [refetch, addToast]);
 
     const renderContent = () => {

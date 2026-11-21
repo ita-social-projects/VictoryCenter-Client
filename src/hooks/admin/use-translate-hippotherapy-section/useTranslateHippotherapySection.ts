@@ -179,13 +179,14 @@ export const useTranslateHippotherapySection = ({
             } else {
                 await apiService.create(client, dto);
             }
-
-            await onSuccess();
         } catch {
             setError(HIPPOTHERAPY_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
+            return;
         } finally {
             setIsSubmitting(false);
         }
+
+        await onSuccess();
     };
 
     return {

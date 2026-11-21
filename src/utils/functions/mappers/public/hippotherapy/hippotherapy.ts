@@ -1,5 +1,5 @@
 import {
-    HippotherapyGalleryCardContent,
+    HippotherapyGalleryCardDto,
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageEmbeddedLocalizationDto,
@@ -36,7 +36,7 @@ const toQuote = (
 };
 
 const toSwipedCards = (
-    cards: HippotherapyGalleryCardContent[],
+    cards: HippotherapyGalleryCardDto[],
     localizedCards?: Array<{ description?: string }>,
 ): HippotherapySwipedCard[] =>
     cards.map((card, index) => ({
@@ -132,7 +132,7 @@ export const mapHippotherapyPageToAbout = (
             principles: dto.ethicsSection.principles.map((principle) => {
                 const localizedRef = activeLoc?.ethicsSection?.principles?.find((p) => p.principleId === principle.id);
                 return {
-                    id: principle.id,
+                    id: principle.id ?? -1,
                     text: resolvePlain(localizedRef?.text, principle.text),
                 };
             }),

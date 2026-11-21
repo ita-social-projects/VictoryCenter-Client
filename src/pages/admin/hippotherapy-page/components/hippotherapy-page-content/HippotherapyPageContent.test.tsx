@@ -340,15 +340,17 @@ jest.mock('../translate-section-modal/TranslateHippotherapySectionModal', () => 
         onClose,
         translatedLanguages,
         descriptionImages,
+        onTranslate,
     }: any) =>
         isOpen ? (
             <div data-testid="translate-section-modal">
                 <span data-testid="translate-section-modal-block">{block}</span>
                 <span data-testid="translate-section-modal-sub-block">{subBlock}</span>
                 <span data-testid="translate-section-modal-target-id">{targetResearchLocalId}</span>
-                <span data-testid="translate-section-modal-description-images">{descriptionImages.join(',')}</span>
-                <span>{translatedLanguages.map((language: any) => language.name).join(',')}</span>
+                <span data-testid="translate-section-modal-description-images">{descriptionImages?.join(',')}</span>
+                <span>{translatedLanguages?.map((language: any) => language.name).join(',')}</span>
                 <button onClick={onClose}>Close translation</button>
+                <button onClick={onTranslate}>Trigger translation success</button>
             </div>
         ) : null,
 }));
@@ -394,11 +396,12 @@ const savedImage = { id: 1, url: 'https://example.com/image.webp', mimeType: 'im
 const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
-    descriptionSection: { title: 'Description title', description: 'Description text' },
-    quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
-    hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
+    introSection: { id: 1, title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+    descriptionSection: { id: 1, title: 'Description title', description: 'Description text' },
+    quoteSection: { id: 1, quoteText: 'Quote text', authorName: 'Author', image: savedImage, imageId: savedImage.id },
+    hippoventionSection: { id: 1, title: 'Hippovention title', description: 'Hippovention text' },
     hippoventionCenterSection: {
+        id: 1,
         title: 'Hippovention center title',
         description: 'Hippovention center text',
         pros: 'Pro one and pro two',
@@ -406,26 +409,31 @@ const buildContent = (overrides: Partial<HippotherapyPageContentModel> = {}): Hi
         imageId: savedImage.id,
     },
     advantagesSection: {
+        id: 1,
         title: 'Advantages title',
         cards: [{ id: 101, description: 'Card description', image: savedImage, imageId: savedImage.id }],
     },
-    analysisSection: { title: 'Analysis title', description: 'Analysis text' },
+    analysisSection: { id: 1, title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
+        id: 1,
         title: 'Research title',
         description: 'Research text',
         scientificReferences: [{ localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' }],
     },
     anotherQuoteSection: {
+        id: 1,
         quoteText: 'Another quote',
         authorName: 'Another author',
         image: savedImage,
         imageId: savedImage.id,
     },
     participantsSection: {
+        id: 1,
         title: 'Participants title',
         cards: [{ id: 201, description: 'Participant description', image: savedImage, imageId: savedImage.id }],
     },
     ethicsSection: {
+        id: 1,
         title: 'Ethics title',
         description: 'Ethics text',
         principles: [{ id: 301, text: 'Principle one' }],
@@ -1008,21 +1016,55 @@ describe('HippotherapyPageContent', () => {
     });
 
     describe('scientific references section translation', () => {
-        it.each([
-            ['general block', 'Translate research-general', 'Edit research', 'general', expect.any(String)],
-            ['specific reference item', 'Translate research-item', 'Edit reference item', 'research', 'local-1'],
-        ])(
-            'opens the translation modal for the %s and disables when edited',
-            async (_title, translateButtonName, editButtonName, expectedSubBlock, expectedTargetId) => {
-                await expectOpensModalAndDisablesOnEdit({
-                    translateButtonName,
-                    expectedBlock: HippotherapyPageLocalizationBlock.ScientificReferences,
-                    editButtonName,
-                    expectedSubBlock,
-                    expectedTargetId,
-                });
-            },
-        );
+        it('opens the translation modal for the general block and disables when edited', async () => {
+            await renderLoaded();
+
+            const translateAction = getButton('Translate research-general');
+            expect(translateAction).toBeEnabled();
+
+            fireEvent.click(translateAction);
+
+            expectTranslationModalBlock(HippotherapyPageLocalizationBlock.ScientificReferences);
+            expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent('general');
+
+            closeTranslationModal();
+
+            clickButton('Edit research');
+            expect(translateAction).toBeDisabled();
+        });
+
+        it('opens the translation modal for a specific reference item when general translation exists, and disables when edited', async () => {
+            await renderLoaded(
+                withEnglishLocalization({
+                    scientificReferencesSection: {
+                        title: 'English Title',
+                        description: 'English Description',
+                        references: [],
+                    },
+                }),
+            );
+
+            const translateAction = getButton('Translate research-item');
+            expect(translateAction).toBeEnabled();
+
+            fireEvent.click(translateAction);
+
+            expectTranslationModalBlock(HippotherapyPageLocalizationBlock.ScientificReferences);
+            expect(screen.getByTestId('translate-section-modal-sub-block')).toHaveTextContent('research');
+            expect(screen.getByTestId('translate-section-modal-target-id')).toHaveTextContent('local-1');
+
+            closeTranslationModal();
+
+            clickButton('Edit reference item');
+            expect(translateAction).toBeDisabled();
+        });
+
+        it('disables reference item translation if general translation does not exist yet', async () => {
+            await renderLoaded();
+
+            expect(getButton('Translate research-general')).toBeEnabled();
+            expect(getButton('Translate research-item')).toBeDisabled();
+        });
 
         it.each([
             [
@@ -1038,8 +1080,8 @@ describe('HippotherapyPageContent', () => {
                 'research reference item',
                 'Translate research-item',
                 {
-                    title: '',
-                    description: '',
+                    title: 'English Title',
+                    description: 'English Description',
                     references: [{ referenceId: 1, name: 'Translated citation' }],
                 },
             ],
@@ -1055,8 +1097,8 @@ describe('HippotherapyPageContent', () => {
             await renderLoaded(
                 withEnglishLocalization({
                     scientificReferencesSection: {
-                        title: '',
-                        description: '',
+                        title: 'English Title',
+                        description: 'English Description',
                         references: [{ referenceId: 999, name: 'Translated other citation' }],
                     },
                 }),
@@ -1077,6 +1119,30 @@ describe('HippotherapyPageContent', () => {
             );
 
             expect(getButton('Translate research-general')).toBeEnabled();
+        });
+    });
+
+    describe('translation success handling', () => {
+        it('refetches content, displays success toast and closes modal on translation success', async () => {
+            await renderLoaded();
+
+            const translateIntroBtn = getButton('Translate intro');
+            fireEvent.click(translateIntroBtn);
+
+            expect(screen.getByTestId('translate-section-modal')).toBeInTheDocument();
+
+            const triggerSuccessBtn = screen.getByRole('button', { name: 'Trigger translation success' });
+            fireEvent.click(triggerSuccessBtn);
+
+            await waitFor(() => {
+                expect(mockedHippotherapyPageApi.get).toHaveBeenCalledTimes(2);
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+                    ToastType.Success,
+                    3000,
+                );
+                expect(screen.queryByTestId('translate-section-modal')).not.toBeInTheDocument();
+            });
         });
     });
 
@@ -1187,6 +1253,7 @@ describe('HippotherapyPageContent', () => {
                 },
                 {
                     advantagesSection: {
+                        id: 1,
                         title: 'Advantages title',
                         cards: [
                             { id: 1, description: 'Card 1 UA', image: null, imageId: null },
@@ -1248,7 +1315,7 @@ describe('HippotherapyPageContent', () => {
             await renderLoaded({
                 isValid: false,
                 content: buildContent({
-                    introSection: { title: 'Short', description: 'Short', image: null, imageId: 1 },
+                    introSection: { id: 1, title: 'Short', description: 'Short', image: null, imageId: 1 },
                 }),
                 toolkitOverrides: { selectedLanguage: ukrainianLanguage, onLanguageChange },
             });

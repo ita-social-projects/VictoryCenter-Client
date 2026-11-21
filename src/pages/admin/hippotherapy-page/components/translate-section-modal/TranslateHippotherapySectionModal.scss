@@ -1,3 +1,5 @@
+@use '@/assets/sass/variables/colors' as c;
+
 .translate-hippotherapy-section-modal-language-select {
     display: flex;
     justify-content: center;
@@ -24,4 +26,9 @@
             flex-shrink: 0;
         }
     }
+}
+
+.translate-hippotherapy-section-modal-error {
+    color: c.$error;
+    margin-bottom: 12px;
 }

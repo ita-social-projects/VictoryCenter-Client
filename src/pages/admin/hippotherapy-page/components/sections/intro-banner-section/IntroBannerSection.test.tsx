@@ -29,6 +29,7 @@ describe('IntroBannerSection', () => {
     const DESCRIPTION_ID = 'mock-rich-input-hippotherapy-intro-description';
 
     const defaultValue: HippotherapyIntroSectionContent = {
+        id: 1,
         title: 'Initial title',
         description: 'Initial description',
         image: null,

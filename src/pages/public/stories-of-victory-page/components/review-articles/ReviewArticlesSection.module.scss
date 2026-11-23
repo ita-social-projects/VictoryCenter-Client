@@ -24,7 +24,7 @@
     }
 
     @media (min-width: 1400px) {
-        grid-template-columns: repeat(2, 656px);
+        grid-template-columns: repeat(2, minmax(0, 656px));
         justify-content: center;
         max-width: 100%;
 

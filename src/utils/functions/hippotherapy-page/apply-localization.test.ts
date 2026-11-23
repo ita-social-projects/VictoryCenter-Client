@@ -2,30 +2,41 @@ import { applyHippotherapyLocalization } from './apply-localization';
 import { HippotherapyPageContentModel, HippotherapyPageLocalization } from '@/types/admin/hippotherapy-page';
 import { TranslationStatus } from '@/types/common/language';
 
-const text = (title: string, description: string) => ({ title, description });
-const quote = (quoteText: string, authorName: string) => ({ quoteText, authorName, image: null, imageId: null });
-const card = (id: number | null, description: string) => ({ id, description, image: null, imageId: null });
-const principle = (id: number | null, value: string) => ({ id, text: value });
+const text = (id: number, title: string, description: string) => ({ id, title, description });
+const quote = (id: number, quoteText: string, authorName: string) => ({
+    id,
+    quoteText,
+    authorName,
+    image: null,
+    imageId: null,
+});
+const card = (id: number, description: string) => ({ id, description, image: null, imageId: null });
 const reference = (id: number, name: string) => ({ localId: `l-${id}`, id, name, url: `https://ref${id}.com` });
+const principle = (id: number, text: string) => ({ id, text });
 
 const createBaseContent = (): HippotherapyPageContentModel => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { ...text('Укр Інтро', 'Опис Інтро'), image: null, imageId: null },
-    descriptionSection: text('Укр Опис', 'Текст Опису'),
-    quoteSection: quote('Укр Цитата', 'Автор'),
-    hippoventionSection: text('Укр Гіпповенція', 'Опис Гіпповенції'),
-    hippoventionCenterSection: { ...text('Укр Центр', 'Опис Центру'), pros: 'Плюси', image: null, imageId: null },
-    advantagesSection: { title: 'Укр Переваги', cards: [card(1, 'Картка 1 Укр'), card(2, 'Картка 2 Укр')] },
-    analysisSection: text('Укр Аналіз', 'Опис Аналізу'),
+    introSection: { ...text(1, 'Укр Інтро', 'Опис Інтро'), image: null, imageId: null },
+    descriptionSection: text(1, 'Укр Опис', 'Текст Опису'),
+    quoteSection: quote(1, 'Укр Цитата', 'Автор'),
+    hippoventionSection: text(1, 'Укр Гіпповенція', 'Опис Гіпповенції'),
+    hippoventionCenterSection: {
+        ...text(1, 'Укр Центр', 'Опис Центру'),
+        pros: 'Плюси',
+        image: null,
+        imageId: null,
+    },
+    advantagesSection: { id: 1, title: 'Укр Переваги', cards: [card(1, 'Картка 1 Укр'), card(2, 'Картка 2 Укр')] },
+    analysisSection: text(1, 'Укр Аналіз', 'Опис Аналізу'),
     scientificReferencesSection: {
-        ...text('Укр Джерела', 'Опис Джерел'),
+        ...text(1, 'Укр Джерела', 'Опис Джерел'),
         scientificReferences: [reference(10, 'Джерело 10 Укр'), reference(20, 'Джерело 20 Укр')],
     },
-    anotherQuoteSection: quote('Укр Ще Цитата', 'Ще Автор'),
-    participantsSection: { title: 'Укр Учасники', cards: [card(5, 'Учасник 1 Укр'), card(6, 'Учасник 2 Укр')] },
+    anotherQuoteSection: quote(1, 'Укр Ще Цитата', 'Ще Автор'),
+    participantsSection: { id: 1, title: 'Укр Учасники', cards: [card(5, 'Учасник 1 Укр'), card(6, 'Учасник 2 Укр')] },
     ethicsSection: {
-        ...text('Укр Етика', 'Опис Етики'),
+        ...text(1, 'Укр Етика', 'Опис Етики'),
         principles: [principle(7, 'Принцип 1'), principle(8, 'Принцип 2')],
         image: null,
         imageId: null,
@@ -54,14 +65,14 @@ describe('applyHippotherapyLocalization', () => {
         const base = createBaseContent();
         const snapshot = JSON.parse(JSON.stringify(base));
 
-        applyTo(base, { introSection: text('EN', 'EN') });
+        applyTo(base, { introSection: text(1, 'EN', 'EN') });
 
         expect(base).toEqual(snapshot);
     });
 
     it('translates only the provided sections and leaves the others in Ukrainian', () => {
         const base = createBaseContent();
-        const result = apply({ introSection: text('EN Intro', 'EN Intro Desc') });
+        const result = apply({ introSection: text(1, 'EN Intro', 'EN Intro Desc') });
 
         expect(result.descriptionSection).toEqual(base.descriptionSection);
         expect(result.ethicsSection).toEqual(base.ethicsSection);
@@ -76,7 +87,7 @@ describe('applyHippotherapyLocalization', () => {
         ] as const;
 
         it.each(sections)('applies translated title and description for %s', (key, title, description) => {
-            const result = apply({ [key]: text(title, description) });
+            const result = apply({ [key]: text(1, title, description) });
 
             expect(result[key].title).toBe(title);
             expect(result[key].description).toBe(description);
@@ -84,7 +95,7 @@ describe('applyHippotherapyLocalization', () => {
 
         it.each(sections)('falls back to base for empty or whitespace values in %s', (key) => {
             const base = createBaseContent();
-            const result = applyTo(base, { [key]: text('   ', '') });
+            const result = applyTo(base, { [key]: text(1, '   ', '') });
 
             expect(result[key].title).toBe(base[key].title);
             expect(result[key].description).toBe(base[key].description);
@@ -175,17 +186,6 @@ describe('applyHippotherapyLocalization', () => {
 
             expect(result[key].title).toBe(base[key].title);
             expect(result[key].cards.map((c) => c.description)).toEqual(base[key].cards.map((c) => c.description));
-        });
-
-        it('never gives a translation to a new unsaved card (id: null)', () => {
-            const base = createBaseContent();
-            base[key].cards.push(card(null, 'Нова картка'));
-
-            const result = applyTo(base, {
-                [key]: { title: 'EN', cards: [{ cardId: firstId, description: 'EN Card 1' }] },
-            });
-
-            expect(result[key].cards[2]).toMatchObject({ id: null, description: 'Нова картка' });
         });
 
         it('ignores translations for unknown card ids', () => {
@@ -321,17 +321,6 @@ describe('applyHippotherapyLocalization', () => {
             });
 
             expect(result.ethicsSection.principles.map((p) => p.text)).toEqual(['Принцип 1', 'Принцип 2']);
-        });
-
-        it('never gives a translation to a new unsaved principle (id: null)', () => {
-            const base = createBaseContent();
-            base.ethicsSection.principles.push(principle(null, 'Новий принцип'));
-
-            const result = applyTo(base, {
-                ethicsSection: { title: '', description: '', principles: [{ principleId: 7, text: 'EN 1' }] },
-            });
-
-            expect(result.ethicsSection.principles[2]).toEqual({ id: null, text: 'Новий принцип' });
         });
     });
 });

@@ -1,0 +1,41 @@
+import { AxiosInstance } from 'axios';
+
+const createSectionLocalization = async <TDto, TResponseDto>(
+    client: AxiosInstance,
+    url: string,
+    data: TDto,
+): Promise<TResponseDto> => {
+    const response = await client.post<TResponseDto>(url, data);
+
+    return response.data;
+};
+
+const updateSectionLocalization = async <TDto, TResponseDto>(
+    client: AxiosInstance,
+    url: string,
+    entityId: number,
+    languageId: number,
+    data: TDto,
+): Promise<TResponseDto> => {
+    const response = await client.put<TResponseDto>(`${url}/${entityId}/${languageId}`, data);
+
+    return response.data;
+};
+export interface HippotherapySectionLocalizationApi<TCreateDto = any, TUpdateDto = any, TResponseDto = any> {
+    create: (client: AxiosInstance, data: TCreateDto) => Promise<TResponseDto>;
+    update: (client: AxiosInstance, entityId: number, languageId: number, data: TUpdateDto) => Promise<TResponseDto>;
+}
+
+export const createSectionLocalizationsApi = <TCreateDto, TUpdateDto, TResponseDto>(
+    url: string,
+): HippotherapySectionLocalizationApi<TCreateDto, TUpdateDto, TResponseDto> => ({
+    create: async (client: AxiosInstance, data: TCreateDto): Promise<TResponseDto> =>
+        createSectionLocalization<TCreateDto, TResponseDto>(client, url, data),
+    update: async (
+        client: AxiosInstance,
+        entityId: number,
+        languageId: number,
+        data: TUpdateDto,
+    ): Promise<TResponseDto> =>
+        updateSectionLocalization<TUpdateDto, TResponseDto>(client, url, entityId, languageId, data),
+});

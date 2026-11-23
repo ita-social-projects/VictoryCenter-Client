@@ -31,6 +31,7 @@ describe('HippoventionCenterSection', () => {
     const DESCRIPTION_ID = 'mock-rich-input-hippovention-center-description';
 
     const defaultValue: HippoventionCenterSectionContent = {
+        id: 1,
         title: 'Initial title',
         description: 'Initial description',
         pros: 'Initial pros',

@@ -26,6 +26,7 @@ describe('TextCardSection', () => {
     const validateTextMock = () => HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText as jest.Mock;
 
     const defaultValue: HippotherapyTextCardContent = {
+        id: 1,
         title: 'Initial title',
         description: 'Initial description',
     };

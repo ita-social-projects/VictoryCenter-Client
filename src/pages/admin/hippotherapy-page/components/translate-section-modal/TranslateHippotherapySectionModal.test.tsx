@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { HIPPOTHERAPY_PAGE_CHAR_LIMITS, HIPPOTHERAPY_PAGE_TEXT } from '@/const/admin/hippotherapy-page';
@@ -7,6 +7,7 @@ import {
     TranslateHippotherapySectionModal,
     TranslateHippotherapySectionModalProps,
 } from './TranslateHippotherapySectionModal';
+import { useTranslateHippotherapySection } from '@/hooks/admin/use-translate-hippotherapy-section/useTranslateHippotherapySection';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup');
 
@@ -20,6 +21,9 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
             </div>
         ) : null,
 }));
+
+jest.mock('@/hooks/admin/use-translate-hippotherapy-section/useTranslateHippotherapySection');
+const mockedUseTranslateHippotherapySection = useTranslateHippotherapySection as jest.Mock;
 
 const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
 const frenchLanguage = { id: 3, code: 'fr', name: 'Французька' };
@@ -39,22 +43,52 @@ const saveButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BU
 const closeButton = () => screen.getByLabelText('Close modal');
 const confirmationTitle = () => screen.getByTestId('confirmation-title').textContent;
 
-const renderModal = (props: Partial<TranslateHippotherapySectionModalProps> = {}) => {
-    const onClose = jest.fn();
-    const view = render(
-        <TranslateHippotherapySectionModal
-            isOpen
-            onClose={onClose}
-            block={HippotherapyPageLocalizationBlock.Quote}
-            translatedLanguages={[englishLanguage]}
-            {...props}
-        />,
-    );
-
-    return { onClose, ...view };
-};
+const mockPageContent = {
+    advantagesSection: {
+        cards: [1, 2, 3, 4].map((id) => ({ id, description: '', image: null, imageId: null })),
+    },
+    participantsSection: {
+        cards: [1, 2, 3, 4].map((id) => ({ id, description: '', image: null, imageId: null })),
+    },
+    ethicsSection: {
+        principles: [{ id: 1, text: '' }],
+    },
+    scientificReferencesSection: {
+        scientificReferences: [{ localId: 'ref-1', id: 1, name: 'Ref 1', url: 'https://example.com' }],
+    },
+} as any;
 
 describe('TranslateHippotherapySectionModal', () => {
+    const mockTranslateHippotherapySection = jest.fn();
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockedUseTranslateHippotherapySection.mockReturnValue({
+            translateHippotherapySection: mockTranslateHippotherapySection,
+            isSubmitting: false,
+            error: '',
+            clearError: jest.fn(),
+        });
+    });
+
+    const renderModal = (props: Partial<TranslateHippotherapySectionModalProps> = {}) => {
+        const onClose = jest.fn();
+        const onTranslate = jest.fn();
+        const view = render(
+            <TranslateHippotherapySectionModal
+                isOpen
+                onClose={onClose}
+                block={HippotherapyPageLocalizationBlock.Quote}
+                pageContent={mockPageContent}
+                translatedLanguages={[englishLanguage]}
+                onTranslate={onTranslate}
+                {...props}
+            />,
+        );
+
+        return { onClose, onTranslate, ...view };
+    };
+
     it('renders nothing when closed', () => {
         renderModal({ isOpen: false });
 
@@ -127,14 +161,14 @@ describe('TranslateHippotherapySectionModal', () => {
         },
     );
 
-    it('keeps the save button disabled for Set #1 section even when both title and description are valid', () => {
+    it('enables the save button for Set #1 section when both title and description are valid', () => {
         renderModal({ block: HippotherapyPageLocalizationBlock.Intro });
 
         fireEvent.change(titleInput('introSection'), { target: { value: 'Valid Title' } });
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(descriptionInput('introSection'), { target: { value: 'Valid translation description' } });
-        expect(saveButton()).toBeDisabled();
+        expect(saveButton()).toBeEnabled();
     });
 
     it.each([
@@ -172,12 +206,12 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(closeButton()).toBeEnabled();
     });
 
-    it('keeps the save button disabled even once the required field is valid, since saving is not implemented yet', () => {
+    it('enables the save button once the required field is valid', () => {
         renderModal();
 
         fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
 
-        expect(saveButton()).toBeDisabled();
+        expect(saveButton()).toBeEnabled();
         expect(quoteInput()).toHaveValue(VALID_TEXT);
     });
 
@@ -226,7 +260,9 @@ describe('TranslateHippotherapySectionModal', () => {
                 isOpen
                 onClose={jest.fn()}
                 block={HippotherapyPageLocalizationBlock.Quote}
+                pageContent={mockPageContent}
                 translatedLanguages={[englishLanguage]}
+                onTranslate={jest.fn()}
             />,
         );
 
@@ -244,7 +280,9 @@ describe('TranslateHippotherapySectionModal', () => {
         const props = {
             onClose: jest.fn(),
             block: HippotherapyPageLocalizationBlock.Quote,
+            pageContent: mockPageContent,
             translatedLanguages: [englishLanguage],
+            onTranslate: jest.fn(),
         };
         const { rerender } = render(<TranslateHippotherapySectionModal isOpen {...props} />);
 
@@ -256,7 +294,7 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(screen.getByText('Англійська')).toBeInTheDocument();
     });
 
-    it('opens "Додати переклад" for ScientificReferences general subBlock with rich-text fields', () => {
+    it('opens "Додати переклад" for ScientificReferences general subBlock and enables save when valid', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'general',
@@ -278,10 +316,10 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(descriptionInput, { target: { value: 'Valid scientific description' } });
-        expect(saveButton()).toBeDisabled();
+        expect(saveButton()).toBeEnabled();
     });
 
-    it('opens "Додати переклад" for ScientificReferences research subBlock with character-limited textarea name field', () => {
+    it('opens "Додати переклад" for ScientificReferences research subBlock and enables save when valid', () => {
         renderModal({
             block: HippotherapyPageLocalizationBlock.ScientificReferences,
             subBlock: 'research',
@@ -295,6 +333,50 @@ describe('TranslateHippotherapySectionModal', () => {
         expect(saveButton()).toBeDisabled();
 
         fireEvent.change(nameInput, { target: { value: 'Valid research item citation name' } });
+        expect(saveButton()).toBeEnabled();
+    });
+
+    it('submits form values to translateHippotherapySection when clicking save button', async () => {
+        renderModal({ block: HippotherapyPageLocalizationBlock.Quote });
+
+        fireEvent.change(quoteInput(), { target: { value: VALID_TEXT } });
+        expect(saveButton()).toBeEnabled();
+
+        fireEvent.click(saveButton());
+
+        await waitFor(() => {
+            expect(mockTranslateHippotherapySection).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    quoteText: VALID_TEXT,
+                }),
+            );
+        });
+    });
+
+    it('displays error text returned from the translation hook', () => {
+        mockedUseTranslateHippotherapySection.mockReturnValue({
+            translateHippotherapySection: mockTranslateHippotherapySection,
+            isSubmitting: false,
+            error: 'Save failed error message',
+            clearError: jest.fn(),
+        });
+
+        renderModal();
+
+        expect(screen.getByText('Save failed error message')).toBeInTheDocument();
+    });
+
+    it('disables the save button and form inputs when isSubmitting is true', () => {
+        mockedUseTranslateHippotherapySection.mockReturnValue({
+            translateHippotherapySection: mockTranslateHippotherapySection,
+            isSubmitting: true,
+            error: '',
+            clearError: jest.fn(),
+        });
+
+        renderModal();
+
         expect(saveButton()).toBeDisabled();
+        expect(quoteInput()).toBeDisabled();
     });
 });

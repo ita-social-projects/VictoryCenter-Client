@@ -29,10 +29,11 @@ describe('GallerySection', () => {
     const cardDescriptionId = (index: number) => `mock-rich-input-test-gallery-card-${index}-description`;
 
     const defaultValue: HippotherapyGallerySectionContent = {
+        id: 1,
         title: 'Initial title',
         cards: [
             { id: 1, description: 'Card one', image: null, imageId: null },
-            { id: null, description: 'Card two', image: null, imageId: null },
+            { id: 2, description: 'Card two', image: null, imageId: null },
         ],
     };
 
@@ -107,13 +108,22 @@ describe('GallerySection', () => {
         expect(screen.queryByText('Too short')).not.toBeInTheDocument();
     });
 
-    it('keeps ids (including null for unsaved cards) when a card changes', () => {
+    it('keeps ids when a card changes', () => {
         const onChange = jest.fn();
-        renderComponent({ onChange });
+        renderComponent({
+            value: {
+                ...defaultValue,
+                cards: [
+                    { id: 1, description: 'Card one', image: null, imageId: null },
+                    { id: 2, description: 'Card two', image: null, imageId: null },
+                ],
+            },
+            onChange,
+        });
 
         fireEvent.change(screen.getByTestId(cardDescriptionId(1)), { target: { value: 'Edited' } });
 
-        expect(onChange.mock.calls[0][0].cards.map((c: { id: number | null }) => c.id)).toEqual([1, null]);
+        expect(onChange.mock.calls[0][0].cards.map((c: { id: number }) => c.id)).toEqual([1, 2]);
     });
 
     itDisablesInputsWhenDisabled(renderComponent, [TITLE_ID, cardDescriptionId(0), cardDescriptionId(1)]);

@@ -12,25 +12,33 @@ const noImage = { image: null, imageId: null };
 const buildDto = (): HippotherapyPageContentDto => ({
     localizations: [],
     translationStatuses: [],
-    introSection: { title: '<h3>Intro title</h3>', description: '<p>Intro description</p>', ...withImage('intro') },
-    descriptionSection: { title: 'Description title', description: '<p>Description text</p>' },
-    quoteSection: { quoteText: 'Quote text', authorName: '<p>Author</p>', ...withImage('quote') },
-    hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
+    introSection: {
+        id: 1,
+        title: '<h3>Intro title</h3>',
+        description: '<p>Intro description</p>',
+        ...withImage('intro'),
+    },
+    descriptionSection: { id: 1, title: 'Description title', description: '<p>Description text</p>' },
+    quoteSection: { id: 1, quoteText: 'Quote text', authorName: '<p>Author</p>', ...withImage('quote') },
+    hippoventionSection: { id: 1, title: 'Hippovention title', description: 'Hippovention text' },
     hippoventionCenterSection: {
+        id: 1,
         title: '<p>Center title</p>',
         description: '<p>Center text</p>',
         pros: 'First<br>Second<br />Third',
         ...withImage('center'),
     },
     advantagesSection: {
+        id: 1,
         title: '<p>Advantages title</p>',
         cards: [
             { id: 1, description: '<p>Advantage one</p>', ...withImage('card1') },
             { id: 2, description: '<p>Advantage two</p>', ...withImage('card2') },
         ],
     },
-    analysisSection: { title: 'Analysis title', description: 'Analysis text' },
+    analysisSection: { id: 1, title: 'Analysis title', description: 'Analysis text' },
     scientificReferencesSection: {
+        id: 1,
         title: '<p>Research title</p>',
         description: '<p>Research description</p>',
         scientificReferences: [
@@ -38,12 +46,14 @@ const buildDto = (): HippotherapyPageContentDto => ({
             { id: 200, name: 'Reference two', url: 'https://example.com/ref2' },
         ],
     },
-    anotherQuoteSection: { quoteText: 'Another quote', authorName: '', ...noImage },
+    anotherQuoteSection: { id: 1, quoteText: 'Another quote', authorName: '', ...noImage },
     participantsSection: {
+        id: 1,
         title: 'Participants title',
         cards: [{ id: 1, description: 'Participant one', ...noImage }],
     },
     ethicsSection: {
+        id: 1,
         title: '<p>Ethics title</p>',
         description: '<p>Ethics text</p>',
         principles: [

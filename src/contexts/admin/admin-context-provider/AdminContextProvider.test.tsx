@@ -392,4 +392,36 @@ describe('<AdminContextProvider />', () => {
             expectSignedOut();
         });
     });
+
+    it('ignores a late logout failure after a new login has started a new session', async () => {
+        await renderSignedIn();
+        const pendingLogout = deferred<LogoutResponse>();
+        logoutRequestMock.mockReturnValueOnce(pendingLogout.promise);
+
+        await triggerLogout();
+        await triggerLogin();
+        await act(async () => {
+            pendingLogout.reject(new Error('late failure'));
+        });
+
+        expectRevocationFailed(false);
+        expectAuth(true);
+    });
+
+    it('ignores a late logout success when a newer logout has already failed', async () => {
+        await renderSignedIn();
+        const firstLogout = deferred<LogoutResponse>();
+        logoutRequestMock.mockReturnValueOnce(firstLogout.promise);
+        await triggerLogout();
+
+        failNextLogout();
+        await triggerLogout();
+        expectRevocationFailed(true);
+
+        await act(async () => {
+            firstLogout.resolve(logoutResponse);
+        });
+
+        expectRevocationFailed(true); // the latest logout decides, not the stale one
+    });
 });

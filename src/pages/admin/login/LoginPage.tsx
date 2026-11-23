@@ -4,6 +4,7 @@ import { LoginForm } from './login-form/LoginForm';
 import { Button } from '@/components/admin/button/Button';
 import { Modal } from '@/components/common/modal/Modal';
 import { LOGIN_CONST } from '@/const/admin/login';
+import { useAdminContext } from '@/contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginErrorType } from '@/utils/functions/get-login-error-type/get-login-error-type';
 
 const ERROR_MESSAGES: Record<LoginErrorType, string> = {
@@ -13,10 +14,17 @@ const ERROR_MESSAGES: Record<LoginErrorType, string> = {
 
 export const LoginPage = () => {
     const [errorType, setErrorType] = useState<LoginErrorType | null>(null);
+    const { isLogoutRevocationFailed } = useAdminContext();
     const onClickHandler = () => setErrorType(null);
 
     return (
         <div className="page-layout">
+            {isLogoutRevocationFailed && (
+                <div className="logout-revocation-warning" role="status" data-testid="logout-revocation-warning">
+                    {LOGIN_CONST.LOGOUT_REVOCATION_WARNING}
+                </div>
+            )}
+
             <LoginForm onLoginError={setErrorType} />
 
             <Modal isOpen={errorType !== null} onClose={onClickHandler} className="login-error-modal">

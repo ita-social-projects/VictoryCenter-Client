@@ -32,6 +32,7 @@ export const AdminContextProvider = ({ children }: Props) => {
 
     const tokenRef = useRef<string>(token);
     const logoutCountRef = useRef<number>(0);
+    const sessionEpochRef = useRef<number>(0);
 
     const updateToken = useCallback((newToken: string) => {
         tokenRef.current = newToken;
@@ -43,6 +44,7 @@ export const AdminContextProvider = ({ children }: Props) => {
             const logoutCount = logoutCountRef.current;
             const newToken = await loginRequest(creds);
             if (logoutCount === logoutCountRef.current) {
+                sessionEpochRef.current += 1;
                 updateToken(newToken);
                 setIsLogoutRevocationFailed(false);
             }
@@ -53,18 +55,28 @@ export const AdminContextProvider = ({ children }: Props) => {
     // local sign-out happens immediately; server-side logout is best effort and runs in the background
     const logout = useCallback(() => {
         logoutCountRef.current += 1;
+        sessionEpochRef.current += 1;
+        const epoch = sessionEpochRef.current;
         const currentToken = tokenRef.current;
         updateToken('');
 
         const accessToken = isAccessTokenValid(currentToken) ? currentToken : undefined;
+        const isCurrentSession = () => sessionEpochRef.current === epoch;
 
-        logoutRequest(accessToken)
-            .then(() => setIsLogoutRevocationFailed(false))
-            .catch((error: unknown) => {
-                setIsLogoutRevocationFailed(true);
+        logoutRequest(accessToken).then(
+            () => {
+                if (isCurrentSession()) {
+                    setIsLogoutRevocationFailed(false);
+                }
+            },
+            (error: unknown) => {
                 // eslint-disable-next-line no-console -- Required diagnostic for a failed logout request.
                 console.error('Server-side logout failed:', error);
-            });
+                if (isCurrentSession()) {
+                    setIsLogoutRevocationFailed(true);
+                }
+            },
+        );
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {

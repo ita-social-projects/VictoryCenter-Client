@@ -38,6 +38,8 @@ export const FeedbackReviewFormFields = ({ control, errors, idPrefix, disabled }
                     error={errors.authorName?.message}
                     isRequired
                     showCounterBelow
+                    rows={1}
+                    autoGrow
                 />
             )}
         />
@@ -63,6 +65,8 @@ export const FeedbackReviewFormFields = ({ control, errors, idPrefix, disabled }
                     error={errors.text?.message}
                     isRequired
                     rows={4}
+                    autoGrow
+                    maxRows={0}
                 />
             )}
         />

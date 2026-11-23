@@ -28,6 +28,26 @@ export const expectFieldsDisabledWhenFormDisabled = (labels: RegExp[]) => {
     });
 };
 
+// jsdom does no layout, so scrollHeight is always 0 unless stubbed.
+export const mockTextareaScrollHeight = (height: number) => {
+    beforeEach(() => {
+        Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
+            configurable: true,
+            get: () => height,
+        });
+    });
+
+    afterEach(() => {
+        Reflect.deleteProperty(HTMLTextAreaElement.prototype, 'scrollHeight');
+    });
+};
+
+export const expectFieldGrowsToFitContent = (field: HTMLElement, contentHeight: number) => {
+    expect(field.tagName).toBe('TEXTAREA');
+    expect(Number.parseFloat(field.style.height)).toBeGreaterThanOrEqual(contentHeight);
+    expect(field.style.overflowY).toBe('hidden');
+};
+
 export const MockCategoryBar = ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
     <div data-testid="mock-category-bar">
         {categories.map((cat: any) => (

@@ -3,6 +3,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FEEDBACK_TEXT, VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
 import { FeedbackVideoDto } from '@/types/admin/feedback';
 import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { expectFieldGrowsToFitContent, mockTextareaScrollHeight } from '@/utils/test-mocks/test-mocks';
 import { AddVideoReviewModal, AddVideoReviewModalProps } from './AddVideoReviewModal';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
@@ -469,6 +470,26 @@ describe('AddVideoReviewModal', () => {
 
             expect(getTitleInput()).toHaveValue(otherVideo.title);
             expect(getLinkInput()).toHaveValue(otherVideo.link);
+        });
+    });
+
+    describe('field sizing', () => {
+        const CONTENT_HEIGHT = 7000;
+        mockTextareaScrollHeight(CONTENT_HEIGHT);
+
+        it('grows title and link fields to show maximum-length values without scrolling', async () => {
+            renderOpen();
+
+            const linkPrefix = 'https://example.com/';
+            fillForm(
+                'a '.repeat(VIDEO_REVIEW_VALIDATION.title.max / 2).trim(),
+                linkPrefix + 'a'.repeat(VIDEO_REVIEW_VALIDATION.link.max - linkPrefix.length),
+            );
+
+            await waitFor(() => {
+                expectFieldGrowsToFitContent(getTitleInput(), CONTENT_HEIGHT);
+                expectFieldGrowsToFitContent(getLinkInput(), CONTENT_HEIGHT);
+            });
         });
     });
 });

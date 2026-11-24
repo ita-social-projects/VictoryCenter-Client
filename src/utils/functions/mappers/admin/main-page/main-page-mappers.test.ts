@@ -25,13 +25,13 @@ describe('main-page-mappers', () => {
     it.each([false, true])(
         'preserves hidden metric IDs and translations in publish payloads (edited metrics: %s)',
         (edited) => {
-            const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-                (type, index) => ({
+            const metrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+                (kind, index) => ({
                     id: index + 1,
                     name: 'Metric name',
                     value: 123,
-                    type,
-                    isHidden: type === MetricType.Programs,
+                    kind,
+                    isHidden: index === 1,
                     priority: index,
                     isAutoSynced: false,
                     localizations: [
@@ -71,7 +71,7 @@ describe('main-page-mappers', () => {
             expect(patch.impactStatistics!.metrics.find((metric) => metric.id === 2)).toEqual(
                 expect.objectContaining({
                     id: 2,
-                    type: MetricType.Programs,
+                    kind: MetricKind.Standard,
                     value: 123,
                     localization: { entityId: 2, languageId: 2, name: 'English metric', value: '123 translated' },
                 }),

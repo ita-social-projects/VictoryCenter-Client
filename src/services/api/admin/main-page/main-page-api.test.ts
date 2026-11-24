@@ -125,13 +125,13 @@ describe('MainPageApi (Admin)', () => {
         });
 
         it('preserves all four metrics, hidden state, priority order and localizations from the admin response', async () => {
-            const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-                (type, index) => ({
+            const metrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+                (kind, index) => ({
                     ...fullMainPageDto.impactStatistics!.metrics![0],
                     id: index + 10,
-                    type,
+                    kind,
                     priority: index,
-                    isHidden: type === MetricType.Programs,
+                    isHidden: index === 1,
                 }),
             );
             const dto = {

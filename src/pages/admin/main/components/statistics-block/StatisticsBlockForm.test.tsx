@@ -272,11 +272,11 @@ describe('StatisticsBlockForm', () => {
     it('retains all four metrics after load, reorders hidden metrics and restores their visibility', async () => {
         const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
         (useAdminClient as jest.Mock).mockReturnValue({});
-        const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-            (type, index) => ({
+        const metrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+            (kind, index) => ({
                 ...mockInitialData.impactStatistics!.metrics[0],
                 id: index + 101,
-                type,
+                kind,
                 isHidden: index === 0,
                 priority: index,
             }),

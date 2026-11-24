@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Metric, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricKind } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
@@ -175,8 +175,8 @@ describe('StatisticsMetricsList', () => {
     });
 
     it('renders all four metrics including hidden rows and exposes visibility restoration', () => {
-        const allMetrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-            (type, index) => ({ ...metricPartners, id: index + 1, type, isHidden: index === 1 }),
+        const allMetrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+            (kind, index) => ({ ...metricPartners, id: index + 1, kind, isHidden: index === 1 }),
         );
         const { onToggleVisibility } = setup({ metrics: allMetrics, hiddenMetricIds: [2] });
 

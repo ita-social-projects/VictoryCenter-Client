@@ -1,9 +1,12 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReportsSection } from './ReportsSection';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { useSignalR } from '@/hooks/public/SignalR/useSignalR';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
-import { useSignalR } from '@/hooks/public/SignalR/useSignalR';
+import { PdfSectionPublicApi } from '@/services/api/public/pdf-section/pdf-section-api';
+import { PublicPdfSectionDto } from '@/types/public/reports';
 
 jest.mock('./ReportsSection.module.scss', () => ({
     root: 'root-class',
@@ -21,11 +24,17 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
-    useLocale: () => ({ currentLanguage: 'uk' }),
+    useLocale: jest.fn(),
 }));
 
 jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
     localizationLanguagesDataFetch: jest.fn(),
+}));
+
+jest.mock('@/services/api/public/pdf-section/pdf-section-api', () => ({
+    PdfSectionPublicApi: {
+        get: jest.fn(),
+    },
 }));
 
 jest.mock('@/services/api/admin/reports/pdf-reports/pdf-reports-api', () => ({
@@ -53,13 +62,28 @@ const makeReport = (id: number) => ({
     languageId: 1,
 });
 
+const makePdfSection = (overrides: Partial<PublicPdfSectionDto> = {}): PublicPdfSectionDto => ({
+    title: 'Оновлений заголовок',
+    description: 'Оновлений короткий опис розділу',
+    localizations: [
+        {
+            language: { id: 2, code: 'en' },
+            title: 'Updated Section Title',
+            description: 'Updated Section Description',
+        },
+    ],
+    ...overrides,
+});
+
 describe('ReportsSection', () => {
     let mockSignalROn: jest.Mock;
     let mockSignalROff: jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (useLocale as jest.Mock).mockReturnValue({ currentLanguage: 'uk' });
         (localizationLanguagesDataFetch as jest.Mock).mockResolvedValue([{ id: 1, code: 'uk', name: 'Ukrainian' }]);
+        (PdfSectionPublicApi.get as jest.Mock).mockResolvedValue(makePdfSection());
 
         mockSignalROn = jest.fn();
         mockSignalROff = jest.fn();
@@ -67,6 +91,81 @@ describe('ReportsSection', () => {
         (useSignalR as jest.Mock).mockReturnValue({
             on: mockSignalROn,
             off: mockSignalROff,
+        });
+    });
+
+    describe('PDF section content fetching and localization', () => {
+        it('renders fetched title and description for Ukrainian locale', async () => {
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({ items: [] });
+
+            render(<ReportsSection />);
+
+            await waitFor(() => {
+                expect(screen.getByRole('heading', { level: 2, name: 'Оновлений заголовок' })).toBeInTheDocument();
+                expect(screen.getByText('Оновлений короткий опис розділу')).toBeInTheDocument();
+            });
+            expect(PdfSectionPublicApi.get).toHaveBeenCalledTimes(1);
+        });
+
+        it('renders English localized title and description when currentLanguage is en', async () => {
+            (useLocale as jest.Mock).mockReturnValue({ currentLanguage: 'en' });
+            (localizationLanguagesDataFetch as jest.Mock).mockResolvedValue([{ id: 2, code: 'en', name: 'English' }]);
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({ items: [] });
+
+            render(<ReportsSection />);
+
+            await waitFor(() => {
+                expect(screen.getByRole('heading', { level: 2, name: 'Updated Section Title' })).toBeInTheDocument();
+                expect(screen.getByText('Updated Section Description')).toBeInTheDocument();
+            });
+        });
+
+        it('falls back to primary PDF section text when English localization is missing', async () => {
+            (useLocale as jest.Mock).mockReturnValue({ currentLanguage: 'en' });
+            (localizationLanguagesDataFetch as jest.Mock).mockResolvedValue([{ id: 2, code: 'en', name: 'English' }]);
+            (PdfSectionPublicApi.get as jest.Mock).mockResolvedValueOnce(makePdfSection({ localizations: [] }));
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({ items: [] });
+
+            render(<ReportsSection />);
+
+            await waitFor(() => {
+                expect(screen.getByRole('heading', { level: 2, name: 'Оновлений заголовок' })).toBeInTheDocument();
+                expect(screen.getByText('Оновлений короткий опис розділу')).toBeInTheDocument();
+            });
+        });
+
+        it('falls back to i18n keys when fetching PDF section fails', async () => {
+            (PdfSectionPublicApi.get as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({ items: [] });
+
+            render(<ReportsSection />);
+
+            await waitFor(() => {
+                expect(screen.getByRole('heading', { level: 2, name: 'reports.title' })).toBeInTheDocument();
+                expect(screen.getByText('reports.description')).toBeInTheDocument();
+            });
+        });
+
+        it('does not show fallback i18n text while PDF section fetch is pending', async () => {
+            let resolveSection!: (value: PublicPdfSectionDto) => void;
+            (PdfSectionPublicApi.get as jest.Mock).mockImplementationOnce(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSection = resolve;
+                    }),
+            );
+            (PdfReportsApi.getAllByLanguageId as jest.Mock).mockResolvedValueOnce({ items: [] });
+
+            render(<ReportsSection />);
+
+            expect(screen.queryByText('reports.title')).not.toBeInTheDocument();
+            expect(screen.queryByText('reports.description')).not.toBeInTheDocument();
+
+            await act(async () => {
+                resolveSection(makePdfSection());
+            });
+
+            expect(screen.getByRole('heading', { level: 2, name: 'Оновлений заголовок' })).toBeInTheDocument();
         });
     });
 
@@ -265,6 +364,27 @@ describe('ReportsSection', () => {
             });
         });
 
+        it('updates title and description when PdfSectionUpdated is received', async () => {
+            render(<ReportsSection />);
+            await waitFor(() => {
+                expect(screen.getByRole('heading', { level: 2, name: 'Оновлений заголовок' })).toBeInTheDocument();
+            });
+
+            const sectionUpdatedCallback = mockSignalROn.mock.calls.find((call) => call[0] === 'PdfSectionUpdated')[1];
+
+            await act(async () => {
+                sectionUpdatedCallback(
+                    makePdfSection({
+                        title: 'Живе оновлення заголовка',
+                        description: 'Живе оновлення короткого опису',
+                    }),
+                );
+            });
+
+            expect(screen.getByRole('heading', { level: 2, name: 'Живе оновлення заголовка' })).toBeInTheDocument();
+            expect(screen.getByText('Живе оновлення короткого опису')).toBeInTheDocument();
+        });
+
         it('ignores SignalR events if the report languageId does not match current active language', async () => {
             render(<ReportsSection />);
             await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
@@ -283,15 +403,17 @@ describe('ReportsSection', () => {
             expect(screen.queryByText('Changed')).not.toBeInTheDocument();
         });
 
-        it('ignores SignalR deleted event if component is unmounted', async () => {
+        it('ignores SignalR deleted and section-updated events if component is unmounted', async () => {
             const { unmount } = render(<ReportsSection />);
             await waitFor(() => expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5));
 
             const deletedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfReportDeleted')[1];
+            const sectionUpdatedCb = mockSignalROn.mock.calls.find((c) => c[0] === 'PdfSectionUpdated')[1];
             unmount();
 
             act(() => {
                 deletedCb(1);
+                sectionUpdatedCb(makePdfSection({ title: 'After Unmount' }));
             });
         });
 
@@ -306,6 +428,7 @@ describe('ReportsSection', () => {
             expect(mockSignalROff).toHaveBeenCalledWith('PdfReportUpdated', expect.any(Function));
             expect(mockSignalROff).toHaveBeenCalledWith('PdfReportDeleted', expect.any(Function));
             expect(mockSignalROff).toHaveBeenCalledWith('PdfReportsReordered', expect.any(Function));
+            expect(mockSignalROff).toHaveBeenCalledWith('PdfSectionUpdated', expect.any(Function));
         });
     });
 });

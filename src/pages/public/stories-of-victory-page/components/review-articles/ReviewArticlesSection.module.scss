@@ -15,13 +15,15 @@
         display: none;
     }
 
-    @media (min-width: 1400px) {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 1440px;
-
+    @media (min-width: 1024px) {
         .articleCard:nth-child(n + 2) {
             display: block;
         }
+    }
+
+    @media (min-width: 1400px) {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 1440px;
     }
 }
 

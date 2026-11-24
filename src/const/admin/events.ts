@@ -61,6 +61,7 @@ export const EVENTS_TEXT = {
             LINK_UKR: 'Посилання для UKR',
             LINK_ENG: 'Посилання для ENG',
         },
+        PUBLISH_DATE_PLACEHOLDER: 'ДД/ММ/РРРР',
     },
 };
 

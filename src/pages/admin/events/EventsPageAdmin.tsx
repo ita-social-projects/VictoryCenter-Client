@@ -884,7 +884,7 @@ export const EventsPageAdmin = () => {
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddEvent}
-                    AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_EVENT}
+                    AddItemButtonText={EVENTS_TEXT.BUTTON.ADD_MATERIAL}
                     onSuggestionSelect={handleEventSearchSelect}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}

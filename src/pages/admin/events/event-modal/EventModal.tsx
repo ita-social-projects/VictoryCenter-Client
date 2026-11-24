@@ -486,8 +486,10 @@ export const EventModal = (props: EventModalProps) => {
                                                         : 'Вибір дати'
                                                 }
                                             >
-                                                <span>
-                                                    {field.value ? formatDateLabel(parseDateValue(field.value)) : ''}
+                                                <span className={field.value ? undefined : styles['date-placeholder']}>
+                                                    {field.value
+                                                        ? formatDateLabel(parseDateValue(field.value))
+                                                        : EVENTS_TEXT.FORM.PUBLISH_DATE_PLACEHOLDER}
                                                 </span>
                                                 <CalendarIcon aria-hidden="true" />
                                             </button>

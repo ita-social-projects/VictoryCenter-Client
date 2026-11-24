@@ -795,6 +795,18 @@ describe('EventModal', () => {
             expectDatePickerClosed();
         });
 
+        it('confirms the current date after deselecting a previously selected day', () => {
+            render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
+            const todayLabel = getTodayLabel();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Вибір дати: 18/08/2026' }));
+            fireEvent.click(screen.getByRole('button', { name: '18/08/2026' }));
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+
+            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expectDatePickerClosed();
+        });
+
         it('opens month and year selection from the calendar header', () => {
             render(<EventModal {...defaultProps} />);
 

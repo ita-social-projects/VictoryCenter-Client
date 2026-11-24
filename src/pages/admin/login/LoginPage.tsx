@@ -19,13 +19,15 @@ export const LoginPage = () => {
 
     return (
         <div className="page-layout">
-            {isLogoutRevocationFailed && (
-                <div className="logout-revocation-warning" role="status" data-testid="logout-revocation-warning">
-                    {LOGIN_CONST.LOGOUT_REVOCATION_WARNING}
-                </div>
-            )}
+            <div className="login-content">
+                {isLogoutRevocationFailed && (
+                    <div className="logout-revocation-warning" role="status" data-testid="logout-revocation-warning">
+                        {LOGIN_CONST.LOGOUT_REVOCATION_WARNING}
+                    </div>
+                )}
 
-            <LoginForm onLoginError={setErrorType} />
+                <LoginForm onLoginError={setErrorType} />
+            </div>
 
             <Modal isOpen={errorType !== null} onClose={onClickHandler} className="login-error-modal">
                 <Modal.Title>{LOGIN_CONST.ERROR_MODAL.TITLE}</Modal.Title>

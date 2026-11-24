@@ -852,15 +852,17 @@ describe('EventModal', () => {
             expectDatePickerClosed();
         });
 
-        it('confirms the current date after deselecting a previously selected day', () => {
+        it('keeps the initial date when the previously selected day is deselected and confirmed', () => {
             render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
-            const todayLabel = getTodayLabel();
+            const initialLabel = getDateLabel({ year: 2026, monthIndex: 7, day: 18 });
 
-            fireEvent.click(screen.getByRole('button', { name: 'Вибір дати: 18/08/2026' }));
-            fireEvent.click(screen.getByRole('button', { name: '18/08/2026' }));
-            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            fireEvent.click(screen.getByRole('button', { name: `Вибір дати: ${initialLabel}` }));
+            fireEvent.click(screen.getByRole('button', { name: initialLabel }));
+            expect(screen.getByRole('button', { name: initialLabel })).toHaveAttribute('aria-pressed', 'false');
 
-            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            clickOk();
+
+            expectPublishDate(initialLabel);
             expectDatePickerClosed();
         });
 

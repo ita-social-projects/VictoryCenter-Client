@@ -31,6 +31,7 @@ describe('HippotherapyQuoteSection', () => {
     const AUTHOR_ID = 'mock-rich-input-test-quote-quote-author';
 
     const defaultValue: HippotherapyQuoteContent = {
+        id: 1,
         quoteText: 'Initial quote',
         authorName: 'Initial author',
         image: null,

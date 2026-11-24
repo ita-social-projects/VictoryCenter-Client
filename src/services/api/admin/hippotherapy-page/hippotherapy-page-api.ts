@@ -5,6 +5,9 @@ import {
     HippotherapyImageValue,
     HippotherapyPageContentDto,
     HippotherapyPageContentModel,
+    HippotherapyPageEmbeddedLocalizationDto,
+    HippotherapyPageLocalization,
+    HippotherapyPageLocalizedPartial,
     HippotherapyPageTranslationStatusDto,
     HippotherapyPageTranslationStatusInfo,
     HippotherapyScientificReference,
@@ -33,12 +36,16 @@ const resolveImageValue = async <T extends HippotherapyImageValue>(
 
 const stripReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReference[],
-): HippotherapyScientificReferenceDto[] => scientificReferences.map(({ localId: _localId, ...rest }) => rest);
+): HippotherapyScientificReferenceDto[] =>
+    scientificReferences.map(({ localId: _localId, id, ...rest }) => ({
+        ...rest,
+        id: normalizeEntityId(id),
+    }));
 
 const attachReferenceLocalIds = (
     scientificReferences: HippotherapyScientificReferenceDto[],
 ): HippotherapyScientificReference[] =>
-    scientificReferences.map((reference) => ({ ...reference, localId: crypto.randomUUID() }));
+    scientificReferences.map((reference) => ({ ...reference, id: reference.id ?? -1, localId: crypto.randomUUID() }));
 
 const withImageId = <T extends HippotherapyImageValue>(value: T): T => ({
     ...value,
@@ -52,34 +59,62 @@ const mapTranslationStatuses = (
         translationStatus === null ? [] : [{ block, languageId, translationStatus }],
     );
 
-const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => ({
-    ...dto,
-    ...mapEntityWithLocalizations(dto),
-    translationStatuses: mapTranslationStatuses(dto.translationStatuses),
-    introSection: withImageId(dto.introSection),
-    quoteSection: withImageId(dto.quoteSection),
-    hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
-    advantagesSection: {
-        ...dto.advantagesSection,
-        cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
-    },
-    anotherQuoteSection: withImageId(dto.anotherQuoteSection),
-    participantsSection: {
-        ...dto.participantsSection,
-        cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id ?? null })),
-    },
-    ethicsSection: withImageId({
-        ...dto.ethicsSection,
-        principles: dto.ethicsSection.principles.map((principle) => ({
-            id: principle.id ?? null,
-            text: principle.text,
+const mapScientificReferencesLocalization = (
+    section: HippotherapyPageEmbeddedLocalizationDto['scientificReferencesSection'],
+): HippotherapyPageLocalizedPartial['scientificReferencesSection'] => {
+    if (!section) {
+        return section;
+    }
+
+    return {
+        title: section.title ?? '',
+        description: section.description ?? '',
+        references: (section.references ?? []).map(({ referenceId, name }) => ({ referenceId, name })),
+    };
+};
+
+const toContentModel = (dto: HippotherapyPageContentDto): HippotherapyPageContentModel => {
+    const mappedDto = mapEntityWithLocalizations<
+        HippotherapyPageContentDto,
+        HippotherapyPageEmbeddedLocalizationDto,
+        HippotherapyPageLocalization
+    >(dto);
+
+    return {
+        ...dto,
+        ...mappedDto,
+        localizations: mappedDto.localizations.map((loc) => ({
+            ...loc,
+            scientificReferencesSection: mapScientificReferencesLocalization(loc.scientificReferencesSection),
         })),
-    }),
-    scientificReferencesSection: {
-        ...dto.scientificReferencesSection,
-        scientificReferences: attachReferenceLocalIds(dto.scientificReferencesSection.scientificReferences),
-    },
-});
+        translationStatuses: mapTranslationStatuses(dto.translationStatuses),
+        introSection: withImageId(dto.introSection),
+        quoteSection: withImageId(dto.quoteSection),
+        hippoventionCenterSection: withImageId(dto.hippoventionCenterSection),
+        advantagesSection: {
+            ...dto.advantagesSection,
+            cards: dto.advantagesSection.cards.map((card) => withImageId({ ...card, id: card.id ?? -1 })),
+        },
+        anotherQuoteSection: withImageId(dto.anotherQuoteSection),
+        participantsSection: {
+            ...dto.participantsSection,
+            cards: dto.participantsSection.cards.map((card) => withImageId({ ...card, id: card.id ?? -1 })),
+        },
+        ethicsSection: withImageId({
+            ...dto.ethicsSection,
+            principles: dto.ethicsSection.principles.map((principle) => ({
+                id: principle.id ?? -1,
+                text: principle.text,
+            })),
+        }),
+        scientificReferencesSection: {
+            ...dto.scientificReferencesSection,
+            scientificReferences: attachReferenceLocalIds(dto.scientificReferencesSection.scientificReferences),
+        },
+    };
+};
+
+const normalizeEntityId = (id: number): number | null => (id > 0 ? id : null);
 
 export const HippotherapyPageApi = {
     get: async (client: AxiosInstance): Promise<HippotherapyPageContentModel> => {
@@ -129,10 +164,28 @@ export const HippotherapyPageApi = {
                 introSection,
                 quoteSection,
                 hippoventionCenterSection,
-                advantagesSection: { ...content.advantagesSection, cards: advantagesCards },
+                advantagesSection: {
+                    ...content.advantagesSection,
+                    cards: advantagesCards.map((card) => ({
+                        ...card,
+                        id: normalizeEntityId(card.id),
+                    })),
+                },
                 anotherQuoteSection,
-                participantsSection: { ...content.participantsSection, cards: participantsCards },
-                ethicsSection,
+                participantsSection: {
+                    ...content.participantsSection,
+                    cards: participantsCards.map((card) => ({
+                        ...card,
+                        id: normalizeEntityId(card.id),
+                    })),
+                },
+                ethicsSection: {
+                    ...ethicsSection,
+                    principles: ethicsSection.principles.map((principle) => ({
+                        ...principle,
+                        id: normalizeEntityId(principle.id),
+                    })),
+                },
                 scientificReferencesSection: {
                     ...content.scientificReferencesSection,
                     scientificReferences: stripReferenceLocalIds(

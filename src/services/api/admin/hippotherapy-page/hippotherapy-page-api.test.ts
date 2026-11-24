@@ -22,11 +22,12 @@ describe('HippotherapyPageApi', () => {
     const buildDto = (): HippotherapyPageContentDto => ({
         localizations: [],
         translationStatuses: [],
-        introSection: { title: 'Intro title', description: 'Intro description', image: null, imageId: null },
-        descriptionSection: { title: 'Description title', description: 'Description text' },
-        quoteSection: { quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
-        hippoventionSection: { title: 'Hippovention title', description: 'Hippovention text' },
+        introSection: { id: 1, title: 'Intro title', description: 'Intro description', image: null, imageId: null },
+        descriptionSection: { id: 1, title: 'Description title', description: 'Description text' },
+        quoteSection: { id: 1, quoteText: 'Quote text', authorName: 'Author', image: null, imageId: null },
+        hippoventionSection: { id: 1, title: 'Hippovention title', description: 'Hippovention text' },
         hippoventionCenterSection: {
+            id: 1,
             title: 'Hippovention center title',
             description: 'Hippovention center text',
             pros: 'Pro one and pro two',
@@ -34,21 +35,31 @@ describe('HippotherapyPageApi', () => {
             imageId: null,
         },
         advantagesSection: {
+            id: 1,
             title: 'Advantages title',
             cards: [{ id: 11, description: 'Card description', image: null, imageId: null }],
         },
-        analysisSection: { title: 'Analysis title', description: 'Analysis text' },
+        analysisSection: { id: 1, title: 'Analysis title', description: 'Analysis text' },
         scientificReferencesSection: {
+            id: 1,
             title: 'Research title',
             description: 'Research text',
             scientificReferences: [{ id: 1, name: 'Citation', url: 'https://example.com/citation' }],
         },
-        anotherQuoteSection: { quoteText: 'Another quote', authorName: 'Another author', image: null, imageId: null },
+        anotherQuoteSection: {
+            id: 1,
+            quoteText: 'Another quote',
+            authorName: 'Another author',
+            image: null,
+            imageId: null,
+        },
         participantsSection: {
+            id: 1,
             title: 'Participants title',
             cards: [{ id: 21, description: 'Participant description', image: null, imageId: null }],
         },
         ethicsSection: {
+            id: 1,
             title: 'Ethics title',
             description: 'Ethics text',
             principles: [{ id: 31, text: 'Principle one' }],
@@ -57,17 +68,42 @@ describe('HippotherapyPageApi', () => {
         },
     });
 
-    const buildContent = (): HippotherapyPageContentModel => ({
-        ...buildDto(),
-        localizations: [],
-        translationStatuses: [],
-        scientificReferencesSection: {
-            ...buildDto().scientificReferencesSection,
-            scientificReferences: [
-                { localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' },
-            ],
-        },
-    });
+    const buildContent = (): HippotherapyPageContentModel => {
+        const dto = buildDto();
+
+        return {
+            ...dto,
+            localizations: [],
+            translationStatuses: [],
+            advantagesSection: {
+                ...dto.advantagesSection,
+                cards: dto.advantagesSection.cards.map((card) => ({
+                    ...card,
+                    id: card.id ?? -1,
+                })),
+            },
+            participantsSection: {
+                ...dto.participantsSection,
+                cards: dto.participantsSection.cards.map((card) => ({
+                    ...card,
+                    id: card.id ?? -1,
+                })),
+            },
+            ethicsSection: {
+                ...dto.ethicsSection,
+                principles: dto.ethicsSection.principles.map((principle) => ({
+                    ...principle,
+                    id: principle.id ?? -1,
+                })),
+            },
+            scientificReferencesSection: {
+                ...dto.scientificReferencesSection,
+                scientificReferences: [
+                    { localId: 'local-1', id: 1, name: 'Citation', url: 'https://example.com/citation' },
+                ],
+            },
+        };
+    };
 
     const buildStatus = (
         overrides: Partial<HippotherapyPageTranslationStatusDto> = {},
@@ -207,6 +243,7 @@ describe('HippotherapyPageApi', () => {
             expect(ImageApi.delete).not.toHaveBeenCalled();
             expectPutCalledWith({
                 scientificReferencesSection: {
+                    id: content.scientificReferencesSection.id,
                     title: content.scientificReferencesSection.title,
                     description: content.scientificReferencesSection.description,
                     scientificReferences: [{ id: 1, name: 'Citation', url: 'https://example.com/citation' }],
@@ -221,7 +258,7 @@ describe('HippotherapyPageApi', () => {
             const content = buildContent();
             content.scientificReferencesSection.scientificReferences.push({
                 localId: 'local-2',
-                id: null,
+                id: -1,
                 name: 'New citation',
                 url: 'https://example.com/new',
             });
@@ -417,14 +454,17 @@ describe('HippotherapyPageApi', () => {
             expect(result.ethicsSection.principles).toEqual([{ id: 31, text: 'Principle one' }]);
         });
 
-        it('falls back to null when the API does not return an id', async () => {
+        it('falls back to -1 when the API does not return an id for cards or principles', async () => {
             const dto = buildDto();
             (dto.advantagesSection.cards[0] as { id: number | null }).id = undefined as unknown as null;
+            (dto.ethicsSection.principles[0] as { id: number | null }).id = undefined as unknown as null;
+
             mockGetResponse(dto);
 
             const result = await HippotherapyPageApi.get(mockClient);
 
-            expect(result.advantagesSection.cards[0].id).toBeNull();
+            expect(result.advantagesSection.cards[0].id).toBe(-1);
+            expect(result.ethicsSection.principles[0].id).toBe(-1);
         });
 
         it('sends ids of cards and principles in the PUT body', async () => {
@@ -440,8 +480,8 @@ describe('HippotherapyPageApi', () => {
 
         it('sends id: null for newly added cards and principles', async () => {
             const content = buildContent();
-            content.participantsSection.cards.push({ id: null, description: 'New', image: null, imageId: null });
-            content.ethicsSection.principles.push({ id: null, text: 'New principle' });
+            content.participantsSection.cards.push({ id: -1, description: 'New', image: null, imageId: null });
+            content.ethicsSection.principles.push({ id: -1, text: 'New principle' });
             mockPutResponse();
 
             await HippotherapyPageApi.update(mockClient, content);

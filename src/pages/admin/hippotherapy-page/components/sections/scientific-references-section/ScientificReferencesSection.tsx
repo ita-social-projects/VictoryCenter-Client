@@ -33,7 +33,7 @@ export interface ScientificReferencesSectionProps {
 }
 
 const getExpandKey = (reference: HippotherapyScientificReference) =>
-    reference.id !== null ? `id-${reference.id}` : `local-${reference.localId}`;
+    reference.id > 0 ? `id-${reference.id}` : `local-${reference.localId}`;
 
 const validateReferenceName = (text: string) =>
     HIPPOTHERAPY_PAGE_VALIDATION_FUNCTIONS.validateText(text.trim(), HIPPOTHERAPY_PAGE_TEXT.MIN_REFERENCE_NAME_LENGTH);
@@ -113,7 +113,7 @@ const ScientificReferencesSectionComponent = ({
     const handleAddReference = useCallback(() => {
         const newReference: HippotherapyScientificReference = {
             localId: crypto.randomUUID(),
-            id: null,
+            id: -1,
             name: '',
             url: '',
         };

@@ -76,6 +76,7 @@ describe('ScientificReferencesSection', () => {
     let mockOnChange: jest.Mock;
 
     const defaultValue: HippotherapyScientificReferencesSectionContent = {
+        id: 1,
         title: 'Research title',
         description: 'Research description',
         scientificReferences: [
@@ -151,6 +152,23 @@ describe('ScientificReferencesSection', () => {
         );
 
         expect(screen.getByTestId('reference-card-regenerated-1')).toHaveAttribute('data-is-expanded', 'true');
+    });
+
+    it('keeps expansion state independent for multiple unsaved references', () => {
+        renderComponent({
+            value: {
+                ...defaultValue,
+                scientificReferences: [
+                    { localId: 'unsaved-1', id: -1, name: 'Unsaved one', url: 'https://example.com/one' },
+                    { localId: 'unsaved-2', id: -1, name: 'Unsaved two', url: 'https://example.com/two' },
+                ],
+            },
+        });
+
+        fireEvent.click(screen.getByTestId('toggle-expand-unsaved-1'));
+
+        expect(screen.getByTestId('reference-card-unsaved-1')).toHaveAttribute('data-is-expanded', 'true');
+        expect(screen.getByTestId('reference-card-unsaved-2')).toHaveAttribute('data-is-expanded', 'false');
     });
 
     it('renders the title, description, and one card per reference', () => {
@@ -291,7 +309,7 @@ describe('ScientificReferencesSection', () => {
             expect.objectContaining({
                 scientificReferences: [
                     ...defaultValue.scientificReferences,
-                    expect.objectContaining({ localId: 'generated-uuid', id: null, name: '', url: '' }),
+                    expect.objectContaining({ localId: 'generated-uuid', id: -1, name: '', url: '' }),
                 ],
             }),
         );

@@ -30,6 +30,7 @@ describe('EthicsSection', () => {
     const principleId = (index: number) => `mock-rich-input-hippotherapy-ethics-principle-${index}`;
 
     const defaultValue: HippotherapyEthicsSectionContent = {
+        id: 1,
         title: 'Initial title',
         description: 'Initial description',
         principles: [
@@ -74,20 +75,6 @@ describe('EthicsSection', () => {
                 { id: 2, text: 'Updated principle two' },
             ],
         });
-    });
-
-    it('keeps id: null for a new unsaved principle when its text is edited', () => {
-        const onChange = jest.fn();
-        renderComponent({
-            onChange,
-            value: { ...defaultValue, principles: [{ id: null, text: '' }] },
-        });
-
-        fireEvent.change(screen.getByTestId(principleId(0)), { target: { value: 'Brand new' } });
-
-        expect(onChange).toHaveBeenCalledWith(
-            expect.objectContaining({ principles: [{ id: null, text: 'Brand new' }] }),
-        );
     });
 
     itShowsValidationErrorOnBlur(renderComponent, principleId(0), 'x');

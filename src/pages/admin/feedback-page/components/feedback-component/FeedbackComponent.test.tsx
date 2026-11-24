@@ -4,7 +4,7 @@ import {
     FeedbackComponent,
     FeedbackComponentProps,
 } from '@/pages/admin/feedback-page/components/feedback-component/FeedbackComponent';
-import { FEEDBACK_TEXT } from '@/const/admin/feedback';
+import { FEEDBACK_REVIEW_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedback';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FeedbackHistoryDto, FeedbackReviewDto, FeedbackVideoDto } from '@/types/admin/feedback';
 import { TranslationStatus } from '@/types/common/language';
@@ -82,8 +82,8 @@ describe('FeedbackComponent', () => {
     });
 
     it('uses single-line truncation for long review names and preserves the full name and review', () => {
-        const authorName = 'QA3466 temporary review '.repeat(9).slice(0, 200);
-        const text = 'This is a synthetic QA review. '.repeat(17).slice(0, 500);
+        const authorName = 'QA3466 temporary review '.repeat(9).slice(0, FEEDBACK_REVIEW_VALIDATION.authorName.max);
+        const text = 'This is a synthetic QA review. '.repeat(17).slice(0, FEEDBACK_REVIEW_VALIDATION.text.max);
 
         renderComponent({ item: { ...mockReviewItem, authorName, text } });
 
@@ -103,6 +103,22 @@ describe('FeedbackComponent', () => {
         expect(link).toHaveAttribute('href', mockVideoItem.link);
         expect(link).toHaveAttribute('target', '_blank');
         expect(link).toHaveAttribute('rel', 'noreferrer');
+    });
+
+    it('uses single-line truncation for long video titles and links and preserves full values in attributes', () => {
+        const title = 'QA3455 long video title '.repeat(9).slice(0, 200);
+        const link = `https://victorycenter.online/?qa3455=${'a'.repeat(350)}`;
+
+        renderComponent({ item: { ...mockVideoItem, title, link } });
+
+        const titleEl = screen.getByTitle(title);
+        expect(titleEl).toHaveTextContent(title);
+        expect(titleEl.parentElement).toHaveClass('feedback-truncate');
+
+        const linkEl = screen.getByRole('link', { name: link });
+        expect(linkEl).toHaveAttribute('href', link);
+        expect(linkEl).toHaveAttribute('title', link);
+        expect(linkEl.parentElement).toHaveClass('feedback-truncate');
     });
 
     it('renders empty string fallbacks when title/authorName and description fields are missing', () => {

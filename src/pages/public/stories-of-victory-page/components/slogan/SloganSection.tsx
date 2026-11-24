@@ -5,7 +5,7 @@ export const SloganSection = () => {
     const { t } = useTranslation('successPage');
     const yellowHighlightClass = `${styles.highlight} ${styles.yellow}`;
     const blueHighlightClass = `${styles.highlight} ${styles.blue} ${styles['break-text']}`;
-    const blueHighlightLastRowClass = `${styles.highlight} ${styles.blue} ${styles['break-text']} ${styles['blue-last-row']}`;
+    const blueHighlightFirstRowClass = `${styles.highlight} ${styles.blue} ${styles['break-text']} ${styles['blue-first-row']}`;
     const spacedClass = `${styles['break-text']} ${styles.spaced}`;
 
     return (
@@ -19,7 +19,7 @@ export const SloganSection = () => {
                     <br />
                 </span>
 
-                <span className={blueHighlightClass}> {t('SLOGAN.FOURTH_TEXT')} </span>
+                <span className={blueHighlightFirstRowClass}> {t('SLOGAN.FOURTH_TEXT')}</span>
                 <span className={styles['break-above-560']}>
                     <br />
                 </span>
@@ -27,7 +27,7 @@ export const SloganSection = () => {
                 <span className={styles['break-below-560']}>
                     <br />
                 </span>
-                <span className={blueHighlightLastRowClass}>{t('SLOGAN.SIXTH_TEXT')}</span>
+                <span className={blueHighlightClass}>{t('SLOGAN.SIXTH_TEXT')}</span>
             </h1>
         </section>
     );

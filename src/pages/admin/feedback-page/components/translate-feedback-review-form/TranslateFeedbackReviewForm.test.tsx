@@ -7,6 +7,7 @@ import {
     expectFormRefExposesDirtyState,
     expectFieldsDisabledWhenFormDisabled,
 } from '@/utils/test-mocks/test-mocks';
+import { FEEDBACK_REVIEW_VALIDATION } from '@/const/admin/feedback';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackReviewFormRef>();
@@ -107,17 +108,17 @@ describe('TranslateFeedbackReviewForm', () => {
     it('truncates typed input at the character limit', () => {
         renderForm();
 
-        const longText = 'a'.repeat(501);
+        const longText = 'a'.repeat(FEEDBACK_REVIEW_VALIDATION.text.max + 1);
         fireEvent.change(screen.getByLabelText(/Відгук/), { target: { value: longText } });
 
-        expect(screen.getByLabelText(/Відгук/)).toHaveValue('a'.repeat(500));
+        expect(screen.getByLabelText(/Відгук/)).toHaveValue('a'.repeat(FEEDBACK_REVIEW_VALIDATION.text.max));
     });
 
     it('does not submit when initialData exceeds max length', async () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
-            initialData: { authorName: 'a'.repeat(201), text: 'Nice' },
+            initialData: { authorName: 'a'.repeat(FEEDBACK_REVIEW_VALIDATION.authorName.max + 1), text: 'Nice' },
         });
 
         await act(async () => {

@@ -9,6 +9,7 @@ export const API_ROUTES = {
     },
     MAIN_PAGE: {
         BASE: 'MainPage',
+        ADMIN: 'MainPage/admin',
         PUBLIC: 'MainPage',
     },
     MAIN_PAGE_LOCALIZATIONS: {
@@ -204,6 +205,38 @@ export const API_ROUTES = {
         BASE: 'EventNewsLocalizations',
     },
     HIPPOTHERAPY_PAGE_LOCALIZATIONS: {
-        BASE: 'HippotherapyPageLocalizations',
+        ADVANTAGES_SECTION: {
+            BASE: 'HippotherapyLandingPageAdvantagesSectionLocalizations',
+        },
+        ANALYSIS_SECTION: {
+            BASE: 'HippotherapyLandingPageAnalysisSectionLocalizations',
+        },
+        ANOTHER_QUOTE_SECTION: {
+            BASE: 'HippotherapyLandingPageAnotherQuoteSectionLocalizations',
+        },
+        DESCRIPTION_SECTION: {
+            BASE: 'HippotherapyLandingPageDescriptionSectionLocalizations',
+        },
+        ETHICS_SECTION: {
+            BASE: 'HippotherapyLandingPageEthicsSectionLocalizations',
+        },
+        HIPPOVENTION_CENTER_SECTION: {
+            BASE: 'HippotherapyLandingPageHippoventionCenterSectionLocalizations',
+        },
+        HIPPOVENTION_SECTION: {
+            BASE: 'HippotherapyLandingPageHippoventionSectionLocalizations',
+        },
+        INTRO_SECTION: {
+            BASE: 'HippotherapyLandingPageIntroSectionLocalizations',
+        },
+        PARTICIPANTS_SECTION: {
+            BASE: 'HippotherapyLandingPageParticipantsSectionLocalizations',
+        },
+        QUOTE_SECTION: {
+            BASE: 'HippotherapyLandingPageQuoteSectionLocalizations',
+        },
+        SCIENTIFIC_REFERENCES_SECTION: {
+            BASE: 'HippotherapyLandingPageScientificReferencesSectionLocalizations',
+        },
     },
 };

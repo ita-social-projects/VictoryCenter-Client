@@ -129,9 +129,9 @@ export const FEEDBACK_CATEGORIES: FeedbackCategoryItem[] = [
 ];
 
 const AUTHOR_NAME_MIN = 2;
-const AUTHOR_NAME_MAX = 200;
+const AUTHOR_NAME_MAX = 20;
 const REVIEW_TEXT_MIN = 10;
-const REVIEW_TEXT_MAX = 500;
+const REVIEW_TEXT_MAX = 200;
 
 export const FEEDBACK_REVIEW_VALIDATION = {
     authorName: {

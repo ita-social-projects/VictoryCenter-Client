@@ -7,6 +7,11 @@ $card-gap: 16px;
     margin-right: 56px;
     margin-left: 56px;
     padding-bottom: 64px;
+
+    @media (max-width: 375px) {
+        margin-right: 16px;
+        margin-left: 16px;
+    }
 }
 
 .title {

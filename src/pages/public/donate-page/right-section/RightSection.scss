@@ -23,8 +23,9 @@
 
 .switch {
     position: relative;
-    display: inline-block;
-    margin-left: -1.5rem;
+    flex: 1;
+    min-width: 0;
+    margin: 0 -1.5rem;
 }
 
 .slider {
@@ -94,8 +95,6 @@
     }
 
     .switch {
-        margin-left: 0;
-        display: block;
-        width: 100%;
+        margin: 0;
     }
 }

@@ -1,11 +1,12 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventCategoryModal } from './EventCategoryModal';
 import { EventCategoriesApi } from '@/services/api/admin/events/event-categories-api';
 import { executeCancelCofirmationFlow, executeConfirmCloseFlow } from '@/utils/test-mocks/events-modals-mocks';
 import { ModalMode } from '@/types/admin/common';
 import { EventCategoryDto } from '@/types/admin/event-category';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { EVENT_NOTIFICATION_TIMERS } from '@/const/admin/events';
 
 const mockValidateName = jest.fn();
 
@@ -218,6 +219,34 @@ describe('EventCategoryModal', () => {
                 expect(mockOnAddCategory).toHaveBeenCalledWith(newCategory);
                 expect(defaultProps.onClose).toHaveBeenCalled();
             });
+        });
+
+        it('shows the try again error and hides it after 3 seconds when saving fails', async () => {
+            jest.useFakeTimers();
+            (EventCategoriesApi.create as jest.Mock).mockRejectedValue(new Error('Network Error'));
+
+            render(<EventCategoryModal {...defaultProps} mode={ModalMode.Add} />);
+
+            fireEvent.change(screen.getByRole('textbox'), {
+                target: { value: 'New Category' },
+            });
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.SAVE,
+                }),
+            );
+
+            expect(await screen.findByRole('alert')).toHaveTextContent(COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN);
+            expect(mockOnAddCategory).not.toHaveBeenCalled();
+            expect(defaultProps.onClose).not.toHaveBeenCalled();
+
+            act(() => {
+                jest.advanceTimersByTime(EVENT_NOTIFICATION_TIMERS.SYNC_ERROR_MS);
+            });
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            jest.useRealTimers();
         });
     });
 

@@ -195,7 +195,7 @@ export const EventCategoryModal = (props: EventCategoryModalProps) => {
             } catch {
                 const errorMessage =
                     mode === ModalMode.Add
-                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
+                        ? COMMON_TEXT_ADMIN.MESSAGE.ERROR_TRY_AGAIN
                         : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
                 setError(errorMessage);
 

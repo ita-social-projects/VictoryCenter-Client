@@ -86,7 +86,7 @@ export const AdminContextProvider = ({ children }: Props) => {
             throw new CanceledError('Session ended during token refresh');
         }
         if (refresh.status === 'rejected') {
-            // the session can't be renewed, so end it locally; a following logout() then has no token to revoke
+            // the session can't be renewed, so end it locally + following logout() sends a cookie-only logout request
             updateToken('');
             throw refresh.reason;
         }

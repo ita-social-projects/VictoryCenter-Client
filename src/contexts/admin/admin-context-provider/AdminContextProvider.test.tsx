@@ -35,7 +35,7 @@ const fakeClient = {} as AxiosInstance;
 const logoutResponse = {} as LogoutResponse;
 const credentials: Credentials = { email: 'e', password: 'p' };
 
-let consoleErrorMock: jest.SpyInstance;
+let consoleErrorMock: jest.SpyInstance | undefined;
 let ctx: ReturnType<typeof useAdminContext>;
 
 const Consumer = () => {
@@ -63,6 +63,11 @@ const setPathname = (pathname: string) => {
     window.location.pathname = pathname;
 };
 
+const silenceConsoleError = () => {
+    consoleErrorMock ??= jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    return consoleErrorMock;
+};
+
 const expireAccessToken = () => isValidMock.mockReturnValue(false);
 
 const failRefreshOnMount = () => {
@@ -71,6 +76,7 @@ const failRefreshOnMount = () => {
 };
 
 const failNextLogout = (error = new Error('logout failed')) => {
+    silenceConsoleError();
     logoutRequestMock.mockRejectedValueOnce(error);
     return error;
 };
@@ -145,7 +151,6 @@ describe('<AdminContextProvider />', () => {
             value: { pathname: ADMIN_ROUTES.LOGIN.FULL },
             writable: true,
         });
-        consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
         loginRequestMock.mockResolvedValue('login_token');
         logoutRequestMock.mockResolvedValue(logoutResponse);
@@ -156,7 +161,8 @@ describe('<AdminContextProvider />', () => {
     });
 
     afterEach(() => {
-        consoleErrorMock.mockRestore();
+        consoleErrorMock?.mockRestore();
+        consoleErrorMock = undefined;
     });
 
     describe('silent refresh on mount', () => {
@@ -312,7 +318,7 @@ describe('<AdminContextProvider />', () => {
             await triggerLogout();
 
             expect(logoutRequestMock).toHaveBeenCalledWith('initial_token');
-            expect(consoleErrorMock).toHaveBeenCalledWith('Server-side logout failed:', logoutError);
+            expect(silenceConsoleError()).toHaveBeenCalledWith('Server-side logout failed:', logoutError);
             expectSignedOut();
             expectRevocationFailed(true);
             expect(screen.getByTestId('loading')).toHaveTextContent('false');
@@ -394,6 +400,7 @@ describe('<AdminContextProvider />', () => {
     });
 
     it('ignores a late logout failure after a new login has started a new session', async () => {
+        silenceConsoleError();
         await renderSignedIn();
         const pendingLogout = deferred<LogoutResponse>();
         logoutRequestMock.mockReturnValueOnce(pendingLogout.promise);

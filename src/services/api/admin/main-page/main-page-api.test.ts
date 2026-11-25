@@ -158,6 +158,27 @@ describe('MainPageApi (Admin)', () => {
             );
         });
 
+        it('resolves kind from the legacy type returned by the previous backend and keeps the type', async () => {
+            const { kind: _kind, ...legacyMetric } = fullMainPageDto.impactStatistics!.metrics![0];
+            const metrics = [0, 1, 2, 3].map((type, index) => ({ ...legacyMetric, id: index + 10, type }));
+            const dto = {
+                ...fullMainPageDto,
+                impactStatistics: { ...fullMainPageDto.impactStatistics!, metrics },
+            };
+            mockClient.get.mockImplementation((url: string) =>
+                Promise.resolve({ data: url === API_ROUTES.MAIN_PAGE.ADMIN ? dto : mockLanguages }),
+            );
+
+            const { page } = await MainPageApi.get(mockClient);
+
+            expect(page.impactStatistics!.metrics.map(({ kind, type }) => ({ kind, type }))).toEqual([
+                { kind: MetricKind.Standard, type: 0 },
+                { kind: MetricKind.Standard, type: 1 },
+                { kind: MetricKind.RaisedFunds, type: 2 },
+                { kind: MetricKind.Standard, type: 3 },
+            ]);
+        });
+
         it('should handle null values for nested entities (AboutUs, Partners, Statistics)', async () => {
             const emptyDto: MainPageDto = {
                 id: 1,

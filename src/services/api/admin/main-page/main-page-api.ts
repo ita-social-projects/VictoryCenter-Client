@@ -10,6 +10,7 @@ import {
 } from '@/types/admin/main-page';
 import type { LocalizationLanguage } from '@/types/common/language';
 import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { resolveMetricKind } from '@/utils/functions/mappers/common/metrics/metric-kind-mappers';
 import { AxiosInstance } from 'axios';
 
 const toDomainMainPage = (dto: MainPageDto): MainPage => {
@@ -21,7 +22,10 @@ const toDomainMainPage = (dto: MainPageDto): MainPage => {
         impactStatistics: dto.impactStatistics
             ? {
                   ...mapEntityWithLocalizations(dto.impactStatistics),
-                  metrics: (dto.impactStatistics.metrics ?? []).map((m) => mapEntityWithLocalizations(m)),
+                  metrics: (dto.impactStatistics.metrics ?? []).map((m) => ({
+                      ...mapEntityWithLocalizations(m),
+                      kind: resolveMetricKind(m),
+                  })),
               }
             : null,
     } as MainPage;

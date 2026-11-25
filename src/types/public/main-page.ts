@@ -31,6 +31,8 @@ export interface PublicMetricDto {
     value: number;
     name?: string;
     kind: MetricKind;
+    /** Legacy type from the previous backend; `kind` is resolved from it by PublicMainPageApi. */
+    type?: number;
     prefix?: MetricPrefix | null;
     priority: number;
     localizations?: PublicMainPageLocalizationDto[];

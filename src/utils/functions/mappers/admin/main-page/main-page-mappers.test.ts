@@ -444,6 +444,28 @@ describe('main-page-mappers', () => {
             ]);
         });
 
+        it('sends the legacy type back only for metrics that came with one', () => {
+            const metric = (id: number, type?: number) =>
+                ({
+                    id,
+                    value: id,
+                    name: `Metric ${id}`,
+                    kind: type === 2 ? MetricKind.RaisedFunds : MetricKind.Standard,
+                    ...(type === undefined ? {} : { type }),
+                    isHidden: false,
+                    priority: id,
+                    localizations: [],
+                }) as any;
+            const originalPage = { impactStatistics: { id: 9, metrics: [metric(1, 2), metric(2)] } } as any;
+
+            const patch = mapFormValuesToMainPagePatch(MAIN_PAGE_FORM_DEFAULTS, originalPage, languages);
+
+            expect(patch.impactStatistics?.metrics[0]).toEqual(
+                expect.objectContaining({ id: 1, kind: MetricKind.RaisedFunds, type: 2 }),
+            );
+            expect(patch.impactStatistics?.metrics[1]).not.toHaveProperty('type');
+        });
+
         it('uses default English language id and preserves metric localization without entity id when languages are missing', () => {
             const formValues: MainPageFormValues = {
                 ...MAIN_PAGE_FORM_DEFAULTS,

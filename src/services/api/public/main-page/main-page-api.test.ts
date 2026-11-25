@@ -1,6 +1,6 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { axiosInstance } from '@/services/api/axios';
-import { PublicMainPageDto } from '@/types/public/main-page';
+import { MetricKind, PublicMainPageDto, PublicMetricDto } from '@/types/public/main-page';
 import { PublicMainPageApi } from './main-page-api';
 
 jest.mock('@/services/api/axios');
@@ -34,6 +34,33 @@ describe('PublicMainPageApi', () => {
         expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.PUBLIC);
         expect(axiosInstance.get).toHaveBeenCalledTimes(1);
         expect(result).toEqual(mockData);
+    });
+
+    it('resolves metric kind from the legacy type returned by the previous backend', async () => {
+        const metric = (id: number, fields: Partial<PublicMetricDto>) =>
+            ({ id, value: id, name: `Metric ${id}`, priority: id, ...fields }) as PublicMetricDto;
+        const mockData = {
+            id: 1,
+            impactStatistics: {
+                id: 1,
+                metrics: [
+                    metric(1, { type: 0 }),
+                    metric(2, { type: 2 }),
+                    metric(3, { kind: MetricKind.RaisedFunds }),
+                    metric(4, { kind: MetricKind.Standard }),
+                ],
+            },
+        } as PublicMainPageDto;
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
+
+        const result = await PublicMainPageApi.get();
+
+        expect(result.impactStatistics?.metrics?.map((m) => m.kind)).toEqual([
+            MetricKind.Standard,
+            MetricKind.RaisedFunds,
+            MetricKind.RaisedFunds,
+            MetricKind.Standard,
+        ]);
     });
 
     it('should handle a null/empty response', async () => {

@@ -129,6 +129,7 @@ export function mapFormValuesToMainPagePatch(
             value: m.value,
             name: m.name,
             kind: m.kind,
+            ...(m.type === undefined ? {} : { type: m.type }),
             prefix: m.prefix,
             isAutoSynced: m.isAutoSynced,
             localization: enLoc

@@ -78,6 +78,8 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     value: number;
     name: string;
     kind: MetricKind;
+    /** Legacy type from the previous backend, sent back on publish. */
+    type?: number;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     isAutoSyncFailed?: boolean;
@@ -167,6 +169,7 @@ export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalization
     value?: number;
     name?: string | null;
     kind?: MetricKind;
+    type?: number;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     isAutoSyncFailed?: boolean;
@@ -385,6 +388,7 @@ export interface UpdateMetricDto {
     value: number;
     name: string;
     kind: MetricKind;
+    type?: number;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     localization?: UpdateMetricLocalizationDto | null;

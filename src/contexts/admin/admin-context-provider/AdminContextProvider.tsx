@@ -16,6 +16,7 @@ type ContextType = {
     client: AxiosInstance;
     isAuthenticated: boolean;
     isLoading: boolean;
+    isLogoutRevocationFailed: boolean;
     login: (creds: Credentials) => Promise<void>;
     logout: () => void;
     refreshAccessToken: () => Promise<void>;
@@ -26,11 +27,12 @@ export const AdminContext = createContext<ContextType | undefined>(undefined);
 export const AdminContextProvider = ({ children }: Props) => {
     const [token, setToken] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
+    const [isLogoutRevocationFailed, setIsLogoutRevocationFailed] = useState<boolean>(false);
     const isAuthenticated = isAccessTokenValid(token);
 
     const tokenRef = useRef<string>(token);
     const logoutCountRef = useRef<number>(0);
+    const sessionEpochRef = useRef<number>(0);
 
     const updateToken = useCallback((newToken: string) => {
         tokenRef.current = newToken;
@@ -42,7 +44,9 @@ export const AdminContextProvider = ({ children }: Props) => {
             const logoutCount = logoutCountRef.current;
             const newToken = await loginRequest(creds);
             if (logoutCount === logoutCountRef.current) {
+                sessionEpochRef.current += 1;
                 updateToken(newToken);
+                setIsLogoutRevocationFailed(false);
             }
         },
         [updateToken],
@@ -51,21 +55,28 @@ export const AdminContextProvider = ({ children }: Props) => {
     // local sign-out happens immediately; server-side logout is best effort and runs in the background
     const logout = useCallback(() => {
         logoutCountRef.current += 1;
+        sessionEpochRef.current += 1;
+        const epoch = sessionEpochRef.current;
         const currentToken = tokenRef.current;
         updateToken('');
 
-        if (!currentToken) {
-            return;
-        }
+        const accessToken = isAccessTokenValid(currentToken) ? currentToken : undefined;
+        const isCurrentSession = () => sessionEpochRef.current === epoch;
 
-        void (async () => {
-            // an expired access token would be rejected by the logout endpoint, leaving the refresh token unrevoked
-            const logoutToken = isAccessTokenValid(currentToken) ? currentToken : await tokenRefreshRequest();
-            await logoutRequest(logoutToken);
-        })().catch((error: unknown) => {
-            // eslint-disable-next-line no-console -- Required diagnostic for a failed best-effort logout request.
-            console.error('Server-side logout failed:', error);
-        });
+        logoutRequest(accessToken).then(
+            () => {
+                if (isCurrentSession()) {
+                    setIsLogoutRevocationFailed(false);
+                }
+            },
+            (error: unknown) => {
+                // eslint-disable-next-line no-console -- Required diagnostic for a failed logout request.
+                console.error('Server-side logout failed:', error);
+                if (isCurrentSession()) {
+                    setIsLogoutRevocationFailed(true);
+                }
+            },
+        );
     }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
@@ -75,7 +86,7 @@ export const AdminContextProvider = ({ children }: Props) => {
             throw new CanceledError('Session ended during token refresh');
         }
         if (refresh.status === 'rejected') {
-            // the session can't be renewed, so end it locally; a following logout() then has no token to revoke
+            // the session can't be renewed, so end it locally + following logout() sends a cookie-only logout request
             updateToken('');
             throw refresh.reason;
         }
@@ -113,8 +124,8 @@ export const AdminContextProvider = ({ children }: Props) => {
     );
 
     const contextValue = useMemo(
-        () => ({ client, isAuthenticated, isLoading, login, logout, refreshAccessToken }),
-        [client, isAuthenticated, isLoading, login, logout, refreshAccessToken],
+        () => ({ client, isAuthenticated, isLoading, isLogoutRevocationFailed, login, logout, refreshAccessToken }),
+        [client, isAuthenticated, isLoading, isLogoutRevocationFailed, login, logout, refreshAccessToken],
     );
 
     return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>;

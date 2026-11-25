@@ -72,4 +72,34 @@ describe('login-page-data-fetch', () => {
             },
         });
     });
+
+    it('logoutRequest without a token does not send the Authorization header', async () => {
+        const mockResponse = { status: 200, data: {} } as AxiosResponse;
+
+        (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+        const response = await logoutRequest();
+
+        expect(response).toBe(mockResponse);
+        expect(AuthClient.post).toHaveBeenCalledTimes(1);
+
+        const config = (AuthClient.post as jest.Mock).mock.calls[0][2];
+        expect(config?.headers?.Authorization).toBeUndefined();
+    });
+
+    it('logoutRequest without a token still posts to the logout endpoint', async () => {
+        (AuthClient.post as jest.Mock).mockResolvedValueOnce({ status: 200, data: {} } as AxiosResponse);
+
+        await logoutRequest();
+
+        expect((AuthClient.post as jest.Mock).mock.calls[0].slice(0, 2)).toEqual([API_ROUTES.AUTH.LOGOUT, null]);
+    });
+
+    it('logoutRequest without a token rejects when the request fails', async () => {
+        const errorMessage = 'Вихід не вдався';
+
+        (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+
+        await expect(logoutRequest()).rejects.toThrow(errorMessage);
+    });
 });

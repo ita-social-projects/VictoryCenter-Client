@@ -13,4 +13,5 @@ export const LOGIN_CONST = {
         SERVICE_UNAVAILABLE: 'Сервіс тимчасово недоступний. Спробуйте пізніше.',
         BUTTON: 'OK',
     },
+    LOGOUT_REVOCATION_WARNING: 'Не вдалося підтвердити вихід на сервері. Увійдіть і вийдіть ще раз.',
 };

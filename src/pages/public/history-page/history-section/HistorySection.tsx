@@ -109,7 +109,11 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
                 {(displayTitle || description) && (
                     <HistorySectionHeader displayTitle={displayTitle} description={description} />
                 )}
-                {imageSrc && <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />}
+                {imageSrc && (
+                    <div className={styles['single-image-bottom']}>
+                        <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />
+                    </div>
+                )}
             </section>
         );
     }

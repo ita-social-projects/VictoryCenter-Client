@@ -182,3 +182,16 @@
         margin-bottom: 144px;
     }
 }
+
+.single-image-bottom {
+    margin-top: 40px;
+
+    @media (min-width: 1440px) {
+        margin-top: 80px;
+    }
+
+    // Spacing after the section is handled by .sections-list
+    .full-width-image {
+        margin-bottom: 0;
+    }
+}

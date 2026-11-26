@@ -119,16 +119,38 @@ describe('useBankDetails', () => {
 
             await waitForLoadingComplete(result);
             expect(result.current.items).toEqual(mockData);
+            expect(result.current.error).toBeNull();
         });
 
-        it('handles fetch error and sets empty array', async () => {
-            mockFetchReject(Currencies.USD, new Error('fail'));
+        it('exposes the fetch error instead of silently returning an empty list', async () => {
+            const fetchError = new Error('fail');
+            mockFetchReject(Currencies.USD, fetchError);
 
             const { result } = renderHook(() => useBankDetails(Currencies.USD));
 
             expect(result.current.isLoading).toBe(true);
             await waitForLoadingComplete(result);
+            expect(result.current.error).toBe(fetchError);
             expect(result.current.items).toEqual([]);
+        });
+
+        it('clears the error and loads data when refetch succeeds', async () => {
+            const mockData = [createMockData(1, 'Bank1')];
+            (bankDetailsConfig.UAH.fetch as jest.Mock)
+                .mockRejectedValueOnce(new Error('fail'))
+                .mockResolvedValueOnce(mockData);
+
+            const { result } = renderHook(() => useBankDetails(Currencies.UAH));
+
+            await waitFor(() => expect(result.current.error).not.toBeNull());
+
+            await act(async () => {
+                await result.current.refetch();
+            });
+
+            expect(result.current.error).toBeNull();
+            expect(result.current.items).toEqual(mockData);
+            expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledTimes(2);
         });
 
         it('does not update state after unmount', async () => {
@@ -178,6 +200,108 @@ describe('useBankDetails', () => {
             await waitForLoadingComplete(result);
             expect(result.current.items).toEqual(usdData);
             expect(bankDetailsConfig.USD.fetch).toHaveBeenCalledTimes(1);
+        });
+
+        it('clears a previous error when currency changes and the new fetch succeeds', async () => {
+            const usdData = [createMockData(2, 'USD Bank')];
+            mockFetchReject(Currencies.UAH, new Error('fail'));
+            mockFetchResolve(Currencies.USD, usdData);
+
+            const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
+                initialProps: { currency: Currencies.UAH },
+            });
+
+            await waitFor(() => expect(result.current.error).not.toBeNull());
+
+            rerender({ currency: Currencies.USD });
+
+            await waitFor(() => expect(result.current.items).toEqual(usdData));
+            expect(result.current.error).toBeNull();
+        });
+
+        it('does not expose the previous currency items while the new currency is loading', async () => {
+            const uahData = [createMockData(1, 'UAH Bank')];
+            const usdData = [createMockData(2, 'USD Bank')];
+            const { promise: usdPromise, resolvePromise: resolveUsd } = createControlledPromise();
+            mockFetchResolve(Currencies.UAH, uahData);
+            mockFetchReturn(Currencies.USD, usdPromise);
+
+            const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
+                initialProps: { currency: Currencies.UAH },
+            });
+
+            await waitFor(() => expect(result.current.items).toEqual(uahData));
+
+            rerender({ currency: Currencies.USD });
+
+            await waitFor(() => expect(result.current.isLoading).toBe(true));
+            expect(result.current.items).toEqual([]);
+
+            await act(async () => {
+                resolveUsd(usdData);
+            });
+
+            expect(result.current.items).toEqual(usdData);
+        });
+
+        it('does not expose previously loaded items after a failed fetch or during retry', async () => {
+            const uahData = [createMockData(1, 'UAH Bank')];
+            const usdData = [createMockData(2, 'USD Bank')];
+            const { promise: retryPromise, resolvePromise: resolveRetry } = createControlledPromise();
+            mockFetchResolve(Currencies.UAH, uahData);
+            (bankDetailsConfig.USD.fetch as jest.Mock)
+                .mockRejectedValueOnce(new Error('fail'))
+                .mockReturnValueOnce(retryPromise);
+
+            const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
+                initialProps: { currency: Currencies.UAH },
+            });
+
+            await waitFor(() => expect(result.current.items).toEqual(uahData));
+
+            rerender({ currency: Currencies.USD });
+
+            await waitFor(() => expect(result.current.error).not.toBeNull());
+            expect(result.current.items).toEqual([]);
+
+            act(() => {
+                void result.current.refetch();
+            });
+
+            expect(result.current.isLoading).toBe(true);
+            expect(result.current.error).toBeNull();
+            expect(result.current.items).toEqual([]);
+
+            await act(async () => {
+                resolveRetry(usdData);
+            });
+
+            expect(result.current.items).toEqual(usdData);
+        });
+
+        it('cancels the previous request so its failure does not leak into the new currency', async () => {
+            const usdData = [createMockData(2, 'USD Bank')];
+            (bankDetailsConfig.UAH.fetch as jest.Mock).mockImplementation(
+                (_client, options) =>
+                    new Promise((_resolve, reject) => {
+                        options.cancellationSignal.addEventListener('abort', () =>
+                            reject(Object.assign(new Error('canceled'), { name: 'CanceledError' })),
+                        );
+                    }),
+            );
+            mockFetchResolve(Currencies.USD, usdData);
+
+            const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
+                initialProps: { currency: Currencies.UAH },
+            });
+
+            const [, uahOptions] = (bankDetailsConfig.UAH.fetch as jest.Mock).mock.calls[0];
+
+            rerender({ currency: Currencies.USD });
+
+            await waitFor(() => expect(result.current.items).toEqual(usdData));
+            expect(uahOptions.cancellationSignal.aborted).toBe(true);
+            expect(result.current.error).toBeNull();
         });
 
         it('returns correct config for each currency', async () => {
@@ -259,12 +383,13 @@ describe('useBankDetails', () => {
         ];
 
         errorScenarios.forEach(({ name, currency, error }) => {
-            it(`handles ${name} gracefully`, async () => {
+            it(`exposes ${name} via error`, async () => {
                 mockFetchReject(currency, error);
 
                 const { result } = renderHook(() => useBankDetails(currency));
 
                 await waitForLoadingComplete(result);
+                expect(result.current.error).toBe(error);
                 expect(result.current.items).toEqual([]);
             });
         });
@@ -418,7 +543,9 @@ describe('useBankDetails', () => {
             renderHook(() => useBankDetails(Currencies.EUR));
 
             await waitFor(() => {
-                expect(bankDetailsConfig.EUR.fetch).toHaveBeenCalledWith(mockClient);
+                expect(bankDetailsConfig.EUR.fetch).toHaveBeenCalledWith(mockClient, {
+                    cancellationSignal: expect.any(AbortSignal),
+                });
             });
         });
 
@@ -435,13 +562,13 @@ describe('useBankDetails', () => {
             const { rerender } = renderHook(() => useBankDetails(Currencies.UAH));
 
             await waitFor(() => {
-                expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledWith(mockClient1);
+                expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledWith(mockClient1, expect.anything());
             });
 
             rerender();
 
             await waitFor(() => {
-                expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledWith(mockClient2);
+                expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledWith(mockClient2, expect.anything());
             });
 
             expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledTimes(2);

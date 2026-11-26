@@ -6,11 +6,17 @@ import {
     CreateForeignBankDetails,
     UpdateForeignBankDetails,
 } from '@/types/admin/donate';
+import { RequestOptions } from '@/types/common/api';
 
 export const ForeignBankDetailsApi = {
-    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<ForeignBankDetailsDto[]> => {
+    getAll: async (
+        client: AxiosInstance,
+        currency: BankCurrency,
+        options: RequestOptions = {},
+    ): Promise<ForeignBankDetailsDto[]> => {
         const response = await client.get<ForeignBankDetailsDto[]>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, {
             params: { currency },
+            signal: options.cancellationSignal,
         });
         return response.data;
     },

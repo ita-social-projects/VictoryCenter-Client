@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { SupportOptionsApi } from '@/services/api/admin/donate/support-options/support-options-api';
 import { CorrespondentBankDetailsApi } from '@/services/api/admin/donate/correspondent-banks/correspondent-banks-api';
 import {
@@ -14,7 +15,9 @@ import {
     UpdateSupportOptionsDto,
     CorrespondentBankDetailsDto,
 } from '@/types/admin/donate';
+import { RequestOptions } from '@/types/common/api';
 import { DONATE_TEXT } from '@/const/admin/donate';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { GenericDetails } from '../generic-details/GenericDetails';
 import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
@@ -37,43 +40,45 @@ import {
 import './DonatePageContent.scss';
 import { GenericFormMode } from '../generic-form/GenericForm';
 
+const NO_SUPPORT_OPTIONS: SupportOptionsDto[] = [];
+
 export const DonatePageContent = () => {
     const { addToast } = useToast();
     const client = useAdminClient();
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
-    const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
-    const [supportOptions, setSupportOptions] = useState<SupportOptionsDto[]>([]);
-    const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
+    const {
+        items,
+        config,
+        setItems,
+        isLoading,
+        error: bankDetailsError,
+        refetch: refetchBankDetails,
+    } = useBankDetails(selectedCategory);
+    const [isSupportOptionsSaving, setIsSupportOptionsSaving] = useState(false);
     const [isChildEditing, setIsChildEditing] = useState(false);
 
     const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
-    useEffect(() => {
-        let isAlive = true;
-        const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
 
-        setIsSupportOptionsLoading(true);
-        SupportOptionsApi.getAll(client, bankCurrency)
-            .then((data) => {
-                if (isAlive) {
-                    setSupportOptions(data.toSorted((a, b) => b.id - a.id));
-                }
-            })
-            .catch(() => {
-                if (isAlive) {
-                    setSupportOptions([]);
-                }
-            })
-            .finally(() => {
-                if (isAlive) {
-                    setIsSupportOptionsLoading(false);
-                }
-            });
+    const fetchSupportOptions = useCallback(
+        async (options: RequestOptions) => {
+            const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
+            const data = await SupportOptionsApi.getAll(client, bankCurrency, options);
+            return data.toSorted((a, b) => b.id - a.id);
+        },
+        [client, selectedCategory],
+    );
 
-        return () => {
-            isAlive = false;
-        };
-    }, [client, selectedCategory]);
+    const {
+        data: supportOptions,
+        setData: setSupportOptions,
+        isLoading: isSupportOptionsFetching,
+        error: supportOptionsError,
+        refetch: refetchSupportOptions,
+    } = useDataFetch<SupportOptionsDto[]>({
+        initialData: [],
+        fetchHandler: fetchSupportOptions,
+    });
 
     const handleCategorySelect = useCallback(
         (currency: Currencies) => {
@@ -81,18 +86,26 @@ export const DonatePageContent = () => {
                 return;
             }
 
-            setSupportOptions([]);
-            setIsSupportOptionsLoading(true);
             setSelectedCategory(currency);
         },
         [selectedCategory],
     );
 
+    const visibleSupportOptions = isSupportOptionsFetching ? NO_SUPPORT_OPTIONS : supportOptions;
+
+    const handleRetryBankDetails = useCallback(() => {
+        void refetchBankDetails();
+    }, [refetchBankDetails]);
+
+    const handleRetrySupportOptions = useCallback(() => {
+        void refetchSupportOptions();
+    }, [refetchSupportOptions]);
+
     // Support Options handlers
     const handleCreateSupportOption = useCallback(
         async (name: string, value: string) => {
             const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
-            setIsSupportOptionsLoading(true);
+            setIsSupportOptionsSaving(true);
             try {
                 const createData: CreateSupportOptionsDto = { name, value, currency: bankCurrency };
                 const newOption = await SupportOptionsApi.create(client, createData);
@@ -100,38 +113,38 @@ export const DonatePageContent = () => {
 
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
             } finally {
-                setIsSupportOptionsLoading(false);
+                setIsSupportOptionsSaving(false);
             }
         },
-        [client, selectedCategory, addToast],
+        [client, selectedCategory, addToast, setSupportOptions],
     );
 
     const handleUpdateSupportOption = useCallback(
         async (id: number, name: string, value: string) => {
-            setIsSupportOptionsLoading(true);
+            setIsSupportOptionsSaving(true);
             try {
                 const updateData: UpdateSupportOptionsDto = { name, value };
                 const updatedOption = await SupportOptionsApi.update(client, id, updateData);
                 setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
             } finally {
-                setIsSupportOptionsLoading(false);
+                setIsSupportOptionsSaving(false);
             }
         },
-        [client],
+        [client, setSupportOptions],
     );
 
     const handleDeleteSupportOption = useCallback(
         async (id: number) => {
-            setIsSupportOptionsLoading(true);
+            setIsSupportOptionsSaving(true);
             try {
                 await SupportOptionsApi.delete(client, id);
                 setSupportOptions((prev) => prev.filter((option) => option.id !== id));
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.DELETED, ToastType.Info);
             } finally {
-                setIsSupportOptionsLoading(false);
+                setIsSupportOptionsSaving(false);
             }
         },
-        [client, addToast],
+        [client, addToast, setSupportOptions],
     );
 
     // Bank Details handlers
@@ -346,6 +359,15 @@ export const DonatePageContent = () => {
         ],
     );
 
+    const renderFetchError = (message: string, onRetry: () => void, testId: string) => (
+        <div className="donate-page-error" data-testid={testId}>
+            <p>{message}</p>
+            <button type="button" className="retry-link" onClick={onRetry} data-testid={`${testId}-retry`}>
+                {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
+            </button>
+        </div>
+    );
+
     return (
         <div className="donate-page-wrapper">
             <CategoryBar<Currencies>
@@ -358,7 +380,13 @@ export const DonatePageContent = () => {
             />
             <div className="donate-page-container">
                 <div className="donate-page-item">
-                    {config && (
+                    {bankDetailsError &&
+                        renderFetchError(
+                            DONATE_TEXT.BANK_DETAILS.FAIL_TO_FETCH,
+                            handleRetryBankDetails,
+                            'bank-details-fetch-error',
+                        )}
+                    {!bankDetailsError && config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
                             items={items.toSorted((a, b) => b.id - a.id)}
@@ -387,13 +415,21 @@ export const DonatePageContent = () => {
                 </div>
 
                 <div className="donate-page-item">
-                    <SupportOptionsForm
-                        supportOptions={supportOptions}
-                        isLoading={isSupportOptionsLoading}
-                        onCreateOption={handleCreateSupportOption}
-                        onUpdateOption={handleUpdateSupportOption}
-                        onDeleteOption={handleDeleteSupportOption}
-                    />
+                    {supportOptionsError ? (
+                        renderFetchError(
+                            DONATE_TEXT.SUPPORT_OPTIONS.FAIL_TO_FETCH,
+                            handleRetrySupportOptions,
+                            'support-options-fetch-error',
+                        )
+                    ) : (
+                        <SupportOptionsForm
+                            supportOptions={visibleSupportOptions}
+                            isLoading={isSupportOptionsFetching || isSupportOptionsSaving}
+                            onCreateOption={handleCreateSupportOption}
+                            onUpdateOption={handleUpdateSupportOption}
+                            onDeleteOption={handleDeleteSupportOption}
+                        />
+                    )}
                 </div>
             </div>
             <ToastContainer />

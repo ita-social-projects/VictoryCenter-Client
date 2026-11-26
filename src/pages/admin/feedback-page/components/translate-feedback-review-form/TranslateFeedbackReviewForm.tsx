@@ -109,6 +109,8 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
                         maxLimitWarning={FEEDBACK_REVIEW_VALIDATION.authorName.getMaxError()}
                         normalizeValue={getNormalizedInputTextWhileTyping}
                         showCounterBelow
+                        rows={1}
+                        autoGrow
                     />
                 </div>
                 <div className={styles['form-group']}>
@@ -121,6 +123,8 @@ export const TranslateFeedbackReviewForm = forwardRef<TranslateFeedbackReviewFor
                         onChange={textField.handleChange}
                         onBlur={textField.handleBlur(formState.text)}
                         rows={6}
+                        autoGrow
+                        maxRows={0}
                         disabled={isSubmitting || formDisabled}
                         maxLength={FEEDBACK_REVIEW_VALIDATION.text.max}
                         error={errors.text}

@@ -100,6 +100,8 @@ export const TranslateFeedbackVideoForm = forwardRef<TranslateFeedbackVideoFormR
                         )}
                         normalizeValue={getNormalizedInputTextWhileTyping}
                         showCounterBelow
+                        rows={1}
+                        autoGrow
                     />
                 </div>
             </form>

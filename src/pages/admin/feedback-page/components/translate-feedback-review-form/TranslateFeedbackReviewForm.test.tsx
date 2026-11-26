@@ -1,11 +1,13 @@
 import { createRef } from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackReviewForm, TranslateFeedbackReviewFormRef } from './TranslateFeedbackReviewForm';
 import {
     expectFormPreventsDefaultSubmit,
     expectFormRefExposesDirtyState,
     expectFieldsDisabledWhenFormDisabled,
+    expectFieldGrowsToFitContent,
+    mockTextareaScrollHeight,
 } from '@/utils/test-mocks/test-mocks';
 import { FEEDBACK_REVIEW_VALIDATION } from '@/const/admin/feedback';
 
@@ -132,5 +134,26 @@ describe('TranslateFeedbackReviewForm', () => {
         renderForm();
 
         expectFormPreventsDefaultSubmit('translate-feedback-review-form');
+    });
+
+    describe('field sizing', () => {
+        const CONTENT_HEIGHT = 5000;
+        mockTextareaScrollHeight(CONTENT_HEIGHT);
+
+        it('grows both fields to show maximum-length values without scrolling', async () => {
+            renderForm();
+
+            fireEvent.change(screen.getByLabelText(/Ім'я/), {
+                target: { value: 'a '.repeat(FEEDBACK_REVIEW_VALIDATION.authorName.max / 2).trim() },
+            });
+            fireEvent.change(screen.getByLabelText(/Відгук/), {
+                target: { value: 'a '.repeat(FEEDBACK_REVIEW_VALIDATION.text.max / 2).trim() },
+            });
+
+            await waitFor(() => {
+                expectFieldGrowsToFitContent(screen.getByLabelText(/Ім'я/), CONTENT_HEIGHT);
+                expectFieldGrowsToFitContent(screen.getByLabelText(/Відгук/), CONTENT_HEIGHT);
+            });
+        });
     });
 });

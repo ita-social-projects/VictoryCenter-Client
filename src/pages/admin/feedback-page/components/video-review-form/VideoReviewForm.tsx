@@ -85,6 +85,8 @@ export const VideoReviewForm = forwardRef<VideoReviewFormRef, VideoReviewFormPro
                     error={titleError}
                     disabled={formDisabled}
                     showCounterBelow
+                    rows={1}
+                    autoGrow
                     normalizeValue={getNormalizedInputTextWhileTyping}
                 />
 
@@ -105,6 +107,7 @@ export const VideoReviewForm = forwardRef<VideoReviewFormRef, VideoReviewFormPro
                         disabled={formDisabled}
                         rows={4}
                         autoGrow
+                        maxRows={0}
                         normalizeValue={getNormalizedInputTextWhileTyping}
                     />
                     <InputError error={linkError} />

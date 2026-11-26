@@ -1,12 +1,15 @@
 import { createRef } from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateFeedbackVideoForm, TranslateFeedbackVideoFormRef } from './TranslateFeedbackVideoForm';
 import {
     expectFormPreventsDefaultSubmit,
     expectFormRefExposesDirtyState,
     expectFieldsDisabledWhenFormDisabled,
+    expectFieldGrowsToFitContent,
+    mockTextareaScrollHeight,
 } from '@/utils/test-mocks/test-mocks';
+import { VIDEO_REVIEW_VALIDATION } from '@/const/admin/feedback';
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateFeedbackVideoFormRef>();
@@ -100,5 +103,22 @@ describe('TranslateFeedbackVideoForm', () => {
         renderForm();
 
         expectFormPreventsDefaultSubmit('translate-feedback-video-form');
+    });
+
+    describe('field sizing', () => {
+        const CONTENT_HEIGHT = 5000;
+        mockTextareaScrollHeight(CONTENT_HEIGHT);
+
+        it('grows the title field to show a maximum-length value without scrolling', async () => {
+            renderForm();
+
+            fireEvent.change(screen.getByLabelText(/Заголовок/), {
+                target: { value: 'a '.repeat(VIDEO_REVIEW_VALIDATION.title.max / 2).trim() },
+            });
+
+            await waitFor(() => {
+                expectFieldGrowsToFitContent(screen.getByLabelText(/Заголовок/), CONTENT_HEIGHT);
+            });
+        });
     });
 });

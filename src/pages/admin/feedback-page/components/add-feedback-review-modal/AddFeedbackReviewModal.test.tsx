@@ -5,6 +5,7 @@ import { FEEDBACK_REVIEW_VALIDATION, FEEDBACK_TEXT } from '@/const/admin/feedbac
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ModalMode, VisibilityStatus } from '@/types/admin/common';
 import { FeedbackReviewDto } from '@/types/admin/feedback';
+import { expectFieldGrowsToFitContent, mockTextareaScrollHeight } from '@/utils/test-mocks/test-mocks';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal');
 
@@ -498,6 +499,27 @@ describe('AddFeedbackReviewModal', () => {
                 fireEvent.click(await screen.findByTestId('confirm-yes'));
 
                 expect(props.onClose).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe('field sizing', () => {
+        const CONTENT_HEIGHT = 5000;
+        mockTextareaScrollHeight(CONTENT_HEIGHT);
+
+        it('grows both fields to show maximum-length values without scrolling', async () => {
+            render(<AddFeedbackReviewModal {...createProps()} />);
+
+            fireEvent.change(getAuthorNameInput(), {
+                target: { value: 'a '.repeat(FEEDBACK_REVIEW_VALIDATION.authorName.max / 2).trim() },
+            });
+            fireEvent.change(getTextInput(), {
+                target: { value: 'a '.repeat(FEEDBACK_REVIEW_VALIDATION.text.max / 2).trim() },
+            });
+
+            await waitFor(() => {
+                expectFieldGrowsToFitContent(getAuthorNameInput(), CONTENT_HEIGHT);
+                expectFieldGrowsToFitContent(getTextInput(), CONTENT_HEIGHT);
             });
         });
     });

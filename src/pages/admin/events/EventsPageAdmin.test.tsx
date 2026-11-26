@@ -1998,6 +1998,45 @@ describe('EventsPageAdmin', () => {
         expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
     });
 
+    it('keeps the filtered list when the already selected status is selected again', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await enableStatusFilter(user);
+
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        const fetchCallsBeforeReselect = mockedEventsApi.fetchEvents.mock.calls.length;
+
+        await user.click(screen.getByTestId('enable-status-filter'));
+
+        expect(screen.getByTestId('rendered-event-101')).toBeInTheDocument();
+        expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(fetchCallsBeforeReselect);
+    });
+
+    it('keeps the full list when "all statuses" is selected while no status filter is active', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        const fetchCallsBeforeReselect = mockedEventsApi.fetchEvents.mock.calls.length;
+
+        await user.click(screen.getByTestId('clear-status-filter'));
+
+        expect(screen.getByTestId('rendered-event-102')).toBeInTheDocument();
+        expect(mockedEventsApi.fetchEvents).toHaveBeenCalledTimes(fetchCallsBeforeReselect);
+    });
+
+    it('shows the matching events after switching the status filter away and back again', async () => {
+        const user = await setUpStatusAwareEventPage();
+
+        await enableStatusFilter(user);
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('clear-status-filter'));
+        expect(await screen.findByTestId('rendered-event-102')).toBeInTheDocument();
+
+        await enableStatusFilter(user);
+        expect(await screen.findByTestId('rendered-event-101')).toBeInTheDocument();
+    });
+
     it('reorders items and calls EventsApi.reorder with ordered ids', async () => {
         const user = userEvent.setup();
 

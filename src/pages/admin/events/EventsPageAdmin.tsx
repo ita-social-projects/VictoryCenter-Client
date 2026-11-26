@@ -211,15 +211,18 @@ export const EventsPageAdmin = () => {
         [client],
     );
 
-    // Toolbar handlers
     const onStatusFilterChange = useCallback(
         (status: VisibilityStatus | undefined) => {
-            setStatusFilter(status);
             setSelectedSearchItem(null);
 
+            if (status === statusFilter) {
+                return;
+            }
+
+            setStatusFilter(status);
             resetEventItemsState();
         },
-        [resetEventItemsState],
+        [statusFilter, resetEventItemsState],
     );
 
     const handleEventSearchSelect = useCallback(

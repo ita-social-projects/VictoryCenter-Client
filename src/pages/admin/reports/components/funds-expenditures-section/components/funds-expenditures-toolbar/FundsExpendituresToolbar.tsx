@@ -4,6 +4,7 @@ import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } fro
 import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresToolbar.module.scss';
+import { useMemo } from 'react';
 
 export type TypeFilterValue = FundsExpendituresTransactionType | undefined;
 export type CategoryFilterValue = number | undefined;
@@ -45,6 +46,11 @@ export const FundsExpendituresToolbar = ({
     onAddIncome,
     onAddExpense,
 }: FundsExpendituresToolbarProps) => {
+    const visibleCategories = useMemo(
+        () => (selectedType === undefined ? categories : categories.filter((c) => c.type === selectedType)),
+        [categories, selectedType],
+    );
+
     return (
         <div className={styles.toolbar} data-testid="funds-toolbar" data-controls-disabled={String(controlsDisabled)}>
             <div className={styles['toolbar-row']}>
@@ -81,7 +87,7 @@ export const FundsExpendituresToolbar = ({
                         optionClassName={styles['filter-option']}
                     >
                         <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
-                        {categories.map((category) => (
+                        {visibleCategories.map((category) => (
                             <Select.Option key={category.id} value={category.id} name={category.name} />
                         ))}
                     </Select>

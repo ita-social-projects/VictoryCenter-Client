@@ -98,7 +98,10 @@ const expectDatePickerLayerShowing = ({ year, monthIndex, day }: PickedDate) => 
 };
 
 const expectPublishDateEmpty = () => {
-    expect(screen.getByRole('button', { name: /Вибір дати/i })).toHaveTextContent('');
+    const trigger = screen.getByRole('button', { name: 'Вибір дати' });
+
+    expect(trigger).toHaveTextContent(EVENTS_TEXT.FORM.PUBLISH_DATE_PLACEHOLDER);
+    expect(trigger).not.toHaveTextContent(/\d{2}\/\d{2}\/\d{4}/);
 };
 
 const expectPublishDate = (label: string) => {

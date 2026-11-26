@@ -26,25 +26,39 @@
     }
 
     &-heading-row {
+        align-items: flex-start;
         justify-content: space-between;
+        gap: 8px;
     }
 
     &-heading-group {
         display: flex;
-        align-items: center;
-        gap: 12px;
+        flex: 1 1 auto;
+        align-items: flex-start;
+        gap: 8px;
         min-width: 0;
+        // (32px icon button - 22px line) / 2
+        margin-top: 5px;
 
         h2 {
             @include typography.small-text-medium;
 
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            height: 20px;
+            // Not flex: flex splits the required mark from the text when the heading wraps.
+            display: block;
+            min-width: 0;
             margin: 0;
+            line-height: 22px;
             color: colors.$graphite-black;
             text-transform: uppercase;
+            overflow-wrap: break-word;
+        }
+
+        > * {
+            flex-shrink: 0;
+        }
+
+        > h2 {
+            flex-shrink: 1;
         }
     }
 
@@ -52,7 +66,11 @@
         color: colors.$error;
     }
 
-    &-actions,
+    &-actions {
+        flex-shrink: 0;
+        gap: 8px;
+    }
+
     &-form-actions {
         gap: 12px;
     }

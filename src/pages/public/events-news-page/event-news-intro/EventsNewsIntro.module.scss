@@ -7,7 +7,7 @@ section {
 
 .events-news-intro {
     margin: 120px 16px 64px;
-    gap: 196px;
+    gap: 48px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -15,11 +15,17 @@ section {
 
     @media (min-width: 560px) {
         margin: 120px 64px 64px;
-        gap: 236px;
+        gap: 64px;
     }
 
     @media (min-width: 768px) {
         margin: 120px 36px 128px;
+        gap: 92px;
+    }
+
+    // Overrides the yellow-blue-text mixin's bottom margin
+    .slogan {
+        margin-bottom: 0;
     }
 
     @media (min-width: 1440px) {

@@ -4,6 +4,7 @@ import {
     hippotherapyUk,
     footerUk,
     aboutUsPageUk,
+    eventsNewsUk,
     programsPageUk,
     detailedProgramPageUk,
     donateUk,
@@ -16,6 +17,7 @@ import {
     historyPageUk,
     supportUsPageUk,
     notFoundPageUk,
+    feedbackPageUk,
 } from '../../locales/uk';
 
 declare module 'i18next' {
@@ -38,6 +40,7 @@ declare module 'i18next' {
             historyPage: typeof historyPageUk;
             supportUsPage: typeof supportUsPageUk;
             notFoundPage: typeof notFoundPageUk;
+            feedbackPage: typeof feedbackPageUk;
         };
     }
 }

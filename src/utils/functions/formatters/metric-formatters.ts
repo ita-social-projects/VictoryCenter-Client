@@ -1,4 +1,4 @@
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricPrefix, MetricKind } from '@/types/admin/main-page';
 import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import { DEFAULT_LOCALE, getLocaleSettings } from '@/const/common/locales';
 import { LocaleCurrency } from '@/const/common/currency';
@@ -46,7 +46,7 @@ export const formatMetricValue = (metric: Metric, language: 'UA' | 'EN' = 'UA') 
 
     let numValue = metric.value;
 
-    if (metric.type === MetricType.Raised && language === 'EN') {
+    if (metric.kind === MetricKind.RaisedFunds && language === 'EN') {
         numValue = resolveMetricValue(findEnglishLocalization(metric)?.value, metric.value).value;
     }
 

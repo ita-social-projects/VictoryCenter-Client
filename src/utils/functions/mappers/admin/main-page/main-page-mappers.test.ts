@@ -3,7 +3,7 @@ import {
     MainPage,
     MainPageFormValues,
     MetricPrefix,
-    MetricType,
+    MetricKind,
 } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
 import type { LocalizationLanguage } from '@/types/common/language';
@@ -25,21 +25,24 @@ describe('main-page-mappers', () => {
     it.each([false, true])(
         'preserves hidden metric IDs and translations in publish payloads (edited metrics: %s)',
         (edited) => {
-            const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-                (type, index) => ({
+            const prefixes = [MetricPrefix.Plus, null, MetricPrefix.Percent, MetricPrefix.None];
+            // Every field differs per metric, so a payload built from the wrong metric cannot match.
+            const metrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+                (kind, index) => ({
                     id: index + 1,
-                    name: 'Metric name',
-                    value: 123,
-                    type,
-                    isHidden: type === MetricType.Programs,
+                    name: `Metric ${index + 1}`,
+                    value: 100 + index * 11,
+                    kind,
+                    prefix: prefixes[index],
+                    isHidden: index === 1,
                     priority: index,
-                    isAutoSynced: false,
+                    isAutoSynced: kind === MetricKind.RaisedFunds,
                     localizations: [
                         {
                             language: { id: 2, code: 'en' },
                             translationStatus: TranslationStatus.Relevant,
-                            name: 'English metric',
-                            value: '123 translated',
+                            name: `EN metric ${index + 1}`,
+                            value: `${100 + index * 11} EN`,
                         },
                     ],
                 }),
@@ -64,17 +67,21 @@ describe('main-page-mappers', () => {
                 currentMetrics,
             );
 
-            expect(patch.impactStatistics!.metrics.map((metric) => metric.id)).toEqual(
-                (currentMetrics ?? metrics).map((metric) => metric.id),
-            );
-            expect(patch.impactStatistics!.metrics).toHaveLength(4);
-            expect(patch.impactStatistics!.metrics.find((metric) => metric.id === 2)).toEqual(
-                expect.objectContaining({
-                    id: 2,
-                    type: MetricType.Programs,
-                    value: 123,
-                    localization: { entityId: 2, languageId: 2, name: 'English metric', value: '123 translated' },
-                }),
+            expect(patch.impactStatistics!.metrics).toEqual(
+                (currentMetrics ?? metrics).map((metric) => ({
+                    id: metric.id,
+                    value: metric.value,
+                    name: metric.name,
+                    kind: metric.kind,
+                    prefix: metric.prefix,
+                    isAutoSynced: metric.isAutoSynced,
+                    localization: {
+                        entityId: metric.id,
+                        languageId: 2,
+                        name: metric.localizations[0].name,
+                        value: metric.localizations[0].value,
+                    },
+                })),
             );
         },
     );
@@ -294,7 +301,7 @@ describe('main-page-mappers', () => {
                             id: 1,
                             value: 100,
                             name: 'UA Metric',
-                            type: MetricType.Partners,
+                            kind: MetricKind.Standard,
                             prefix: MetricPrefix.Plus,
                             isAutoSynced: true,
                             localizations: [
@@ -306,7 +313,7 @@ describe('main-page-mappers', () => {
                             id: 2,
                             value: 50,
                             name: 'UA Metric 2',
-                            type: MetricType.Programs,
+                            kind: MetricKind.RaisedFunds,
                             prefix: MetricPrefix.None,
                             localizations: [],
                         } as any,
@@ -333,7 +340,7 @@ describe('main-page-mappers', () => {
                 id: 1,
                 value: 100,
                 name: 'UA Metric',
-                type: MetricType.Partners,
+                kind: MetricKind.Standard,
                 prefix: 1, // MetricPrefix.Plus is 1
                 isAutoSynced: true,
                 localization: {
@@ -344,6 +351,7 @@ describe('main-page-mappers', () => {
                 },
             });
 
+            expect(metrics?.[1].kind).toBe(MetricKind.RaisedFunds);
             expect(metrics?.[1].localization).toBeUndefined();
             expect(patch.impactStatistics?.localization).toEqual({
                 languageId: 2,
@@ -402,7 +410,7 @@ describe('main-page-mappers', () => {
                     id: 4,
                     value: 1200,
                     name: 'Години терапії',
-                    type: MetricType.TherapyHours,
+                    kind: MetricKind.Standard,
                     prefix: MetricPrefix.Plus,
                     isAutoSynced: false,
                     isHidden: false,
@@ -436,6 +444,28 @@ describe('main-page-mappers', () => {
             ]);
         });
 
+        it('sends the legacy type back only for metrics that came with one', () => {
+            const metric = (id: number, type?: number) =>
+                ({
+                    id,
+                    value: id,
+                    name: `Metric ${id}`,
+                    kind: type === 2 ? MetricKind.RaisedFunds : MetricKind.Standard,
+                    ...(type === undefined ? {} : { type }),
+                    isHidden: false,
+                    priority: id,
+                    localizations: [],
+                }) as any;
+            const originalPage = { impactStatistics: { id: 9, metrics: [metric(1, 2), metric(2)] } } as any;
+
+            const patch = mapFormValuesToMainPagePatch(MAIN_PAGE_FORM_DEFAULTS, originalPage, languages);
+
+            expect(patch.impactStatistics?.metrics[0]).toEqual(
+                expect.objectContaining({ id: 1, kind: MetricKind.RaisedFunds, type: 2 }),
+            );
+            expect(patch.impactStatistics?.metrics[1]).not.toHaveProperty('type');
+        });
+
         it('uses default English language id and preserves metric localization without entity id when languages are missing', () => {
             const formValues: MainPageFormValues = {
                 ...MAIN_PAGE_FORM_DEFAULTS,
@@ -457,7 +487,7 @@ describe('main-page-mappers', () => {
                         {
                             value: 8,
                             name: 'Програми',
-                            type: MetricType.Programs,
+                            kind: MetricKind.Standard,
                             isHidden: false,
                             priority: 2,
                             localizations: [{ language: { code: 'en' }, name: 'Programs', value: null } as any],

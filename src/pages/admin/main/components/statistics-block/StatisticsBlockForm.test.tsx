@@ -1,6 +1,6 @@
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { MainPage, MainPageFormValues, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { MainPage, MainPageFormValues, MetricPrefix, MetricKind } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -147,7 +147,7 @@ const mockInitialData: MainPage = {
                 id: 101,
                 name: 'Метрика 1',
                 value: 15,
-                type: MetricType.Partners,
+                kind: MetricKind.Standard,
                 prefix: MetricPrefix.Plus,
                 isHidden: false,
                 priority: 1,
@@ -157,7 +157,7 @@ const mockInitialData: MainPage = {
                 id: 102,
                 name: 'Метрика 2',
                 value: 42,
-                type: MetricType.Partners,
+                kind: MetricKind.Standard,
                 prefix: MetricPrefix.Percent,
                 isHidden: false,
                 priority: 2,
@@ -272,11 +272,11 @@ describe('StatisticsBlockForm', () => {
     it('retains all four metrics after load, reorders hidden metrics and restores their visibility', async () => {
         const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
         (useAdminClient as jest.Mock).mockReturnValue({});
-        const metrics = [MetricType.Partners, MetricType.Programs, MetricType.Raised, MetricType.TherapyHours].map(
-            (type, index) => ({
+        const metrics = [MetricKind.Standard, MetricKind.Standard, MetricKind.RaisedFunds, MetricKind.Standard].map(
+            (kind, index) => ({
                 ...mockInitialData.impactStatistics!.metrics[0],
                 id: index + 101,
-                type,
+                kind,
                 isHidden: index === 0,
                 priority: index,
             }),
@@ -476,7 +476,7 @@ describe('StatisticsBlockForm', () => {
                         id: undefined,
                         name: undefined,
                         value: 7,
-                        type: MetricType.Partners,
+                        kind: MetricKind.Standard,
                         prefix: undefined,
                         isHidden: false,
                         priority: 1,
@@ -581,7 +581,7 @@ describe('StatisticsBlockForm', () => {
                 metrics: [
                     {
                         ...mockInitialData.impactStatistics!.metrics[0],
-                        type: MetricType.Raised,
+                        kind: MetricKind.RaisedFunds,
                         isAutoSynced: true,
                         isAutoSyncFailed: true,
                     },
@@ -703,7 +703,7 @@ describe('StatisticsBlockForm', () => {
                         id: 999,
                         name: 'Test',
                         value: 10,
-                        type: MetricType.Partners,
+                        kind: MetricKind.Standard,
                         prefix: MetricPrefix.Plus,
                         isHidden: false,
                         priority: 1,

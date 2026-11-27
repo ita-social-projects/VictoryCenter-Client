@@ -1,5 +1,5 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric, MetricType } from '@/types/admin/main-page';
+import { Metric, MetricKind } from '@/types/admin/main-page';
 import {
     formatMetricValue,
     getMetricName,
@@ -44,7 +44,7 @@ export const StatisticsPreview = ({ language, onLanguageChange, metrics, hiddenM
                 {visibleMetrics.map((metric) => {
                     let value = formatMetricValue(metric, language);
 
-                    if (metric.type === MetricType.Raised) {
+                    if (metric.kind === MetricKind.RaisedFunds) {
                         const amount = language === 'EN' ? value.replace(/,/g, ' ') : value;
                         value = formatCurrency(amount, getRaisedMetricCurrency(metric, language));
                     }

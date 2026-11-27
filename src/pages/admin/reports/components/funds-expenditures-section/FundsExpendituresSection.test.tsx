@@ -646,20 +646,20 @@ describe('FundsExpenditureSection', () => {
         expect(screen.getByTestId('selected-category-id')).toHaveTextContent('none');
     });
 
-    it('should pass all non-reserved categories to toolbar when income type is selected', () => {
+    it('should pass only income categories to toolbar when income type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-income'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '4');
     });
 
-    it('should pass all non-reserved categories to toolbar when expense type is selected', () => {
+    it('should pass only expense categories to toolbar when expense type is selected', () => {
         render(<FundsExpenditureSection />);
 
         fireEvent.click(screen.getByTestId('filter-expense'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '3');
     });
 
     it('should pass all non-reserved categories to toolbar when no type is selected', () => {

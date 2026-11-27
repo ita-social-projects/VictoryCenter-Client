@@ -411,6 +411,14 @@ export const FundsExpenditureSection = ({
         [filteredCategories],
     );
 
+    const categoriesForFilter = useMemo(
+        (): ReportFundsExpendituresCategory[] =>
+            selectedType === undefined
+                ? manageableCategories
+                : manageableCategories.filter((c) => c.type === selectedType),
+        [manageableCategories, selectedType],
+    );
+
     const filteredRecords = useMemo((): EnrichedRecord[] => {
         return enrichedRecords.filter((record) => {
             const typeMatch = selectedType === undefined || record.type === selectedType;
@@ -912,7 +920,7 @@ export const FundsExpenditureSection = ({
             </div>
 
             <FundsExpendituresToolbar
-                categories={manageableCategories}
+                categories={categoriesForFilter}
                 selectedType={selectedType}
                 selectedCategoryId={selectedCategoryId}
                 exchangeRate={currentExchangeRate}

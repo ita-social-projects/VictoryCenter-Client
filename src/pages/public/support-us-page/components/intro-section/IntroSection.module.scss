@@ -1,3 +1,4 @@
+@use '@/assets/sass/variables/colors' as colors;
 @use '@/assets/sass/mixins/utilits.mixins' as utils;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
@@ -42,11 +43,15 @@
 
 .highlight-yellow,
 .highlight-blue {
-    @include utils.text-highlight;
+    @include type.h1-extrabold;
+    font-size: inherit;
+    line-height: inherit;
+    font-style: italic;
 }
 
 .highlight-yellow {
     @include utils.yellow-bg-text;
+    box-shadow: 0.225em 0 0 colors.$yellow-400;
 }
 
 .highlight-blue {

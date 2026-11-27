@@ -266,22 +266,21 @@ describe('ImagesBottomSection', () => {
         expect(tdProps.className).toContain('my-top');
     });
 
-    it('passes template title/description classNames when mode is Template; otherwise empty strings', () => {
-        {
-            renderComponent({ mode: SectionMode.Template });
+    it('does not pass per-template title/description classNames (typography comes from TitleDescriptionSection)', () => {
+        renderComponent({ mode: SectionMode.Template });
 
-            const tdProps = TitleDescriptionSection.mock.calls[0][0];
-            expect(tdProps.titleClassName).toBe('title-template');
-            expect(tdProps.descriptionClassName).toBe('description-template');
-        }
+        const tdProps = TitleDescriptionSection.mock.calls[0][0];
+        expect(tdProps.titleClassName).toBeUndefined();
+        expect(tdProps.descriptionClassName).toBeUndefined();
+    });
 
-        {
-            const { unmount } = renderComponent({ mode: SectionMode.Edit });
-            const tdProps = TitleDescriptionSection.mock.calls[0][0];
-            expect(tdProps.titleClassName).toBe('');
-            expect(tdProps.descriptionClassName).toBe('');
-            unmount();
-        }
+    it('adds the template class on root only in Template mode', () => {
+        const { root, unmount } = renderComponent({ mode: SectionMode.Template });
+        expect(root).toHaveClass('template');
+        unmount();
+
+        const { root: editRoot } = renderComponent({ mode: SectionMode.Edit });
+        expect(editRoot).not.toHaveClass('template');
     });
 
     it('slices images/handlers to imageCount for editable branch and keys length matches displayed images length', () => {

@@ -103,6 +103,7 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
+                    [baseStyles.template]: mode === SectionMode.Template,
                     [baseStyles['form-container']]: mode === SectionMode.Edit,
                 },
                 className,
@@ -113,8 +114,6 @@ export const ImagesBottomSection = ({
                 title={title}
                 description={description}
                 className={cn(baseStyles['top-section'], topSectionClassName)}
-                titleClassName={mode === SectionMode.Template ? baseStyles['title-template'] : ''}
-                descriptionClassName={mode === SectionMode.Template ? baseStyles['description-template'] : ''}
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}

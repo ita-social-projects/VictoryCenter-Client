@@ -23,20 +23,7 @@ export const TextOnly = (props: TextOnlyProps) => {
         [styles.template]: isTemplate,
         [styles['form-container']]: isEdit,
     });
-    const titleClassName = cn({
-        [styles['title-template']]: isTemplate,
-    });
-    const descriptionClassName = cn({
-        [styles['description-template']]: isTemplate,
-    });
     return (
-        <TitleDescriptionSection
-            {...rest}
-            mode={mode}
-            template={SectionTemplate.TextOnly}
-            className={rootClassName}
-            titleClassName={titleClassName}
-            descriptionClassName={descriptionClassName}
-        />
+        <TitleDescriptionSection {...rest} mode={mode} template={SectionTemplate.TextOnly} className={rootClassName} />
     );
 };

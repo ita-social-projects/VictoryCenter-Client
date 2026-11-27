@@ -21,16 +21,6 @@
     justify-content: center;
 }
 
-.description-template {
-    font-size: clamp(3px, 0.9vw, 1.5vmin);
-    line-height: clamp(3px, 0.9vw, 1.5vmin);
-}
-
-.title-template {
-    font-size: clamp(3px, 1.7vw, 3vmin);
-    line-height: clamp(3px, 0.9vw, 2vmin);
-}
-
 .image-wrapper {
     height: 75%;
     flex: 1 1 0;
@@ -69,5 +59,48 @@
         [class~='input-group'] {
             height: 100%;
         }
+    }
+}
+
+// Template mode = "Додати секцію" preview, laid out as the 1440px Figma frame (see ScaledPreview).
+// Text block: TitleDescriptionSection `.container.template` (80px top/bottom padding).
+// Images start 64px below it and go edge to edge; elevated images sit higher by
+// --preview-image-offset. Each template sets --preview-image-height / --preview-image-offset.
+.container.template {
+    max-height: none;
+    gap: 0;
+    padding-bottom: 80px;
+    background-color: #fff;
+
+    .bottom-section {
+        height: auto;
+        max-height: none;
+        margin-top: 64px;
+    }
+
+    .images-grid {
+        height: calc(var(--preview-image-height) + var(--preview-image-offset));
+        align-items: flex-end;
+        justify-content: stretch;
+    }
+
+    .image-wrapper {
+        position: static;
+        flex: 1 1 0;
+        min-width: 0;
+        height: var(--preview-image-height);
+        max-width: none;
+        max-height: none;
+        aspect-ratio: auto;
+
+        &[data-elevated='true'] {
+            top: auto;
+            align-self: flex-start;
+        }
+    }
+
+    .image {
+        height: 100%;
+        object-fit: cover;
     }
 }

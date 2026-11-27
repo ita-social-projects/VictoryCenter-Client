@@ -1,8 +1,10 @@
 $img-width: 480px;
 $img-height: 480px;
 
+// T4 preview (Figma frame 1440 x 1302): 3 x 480px images, 487px high, #1 and #3 raised by 147px.
 .template {
-    aspect-ratio: 1440 / 1302;
+    --preview-image-height: 487px;
+    --preview-image-offset: 147px;
 }
 
 .bottom-section {

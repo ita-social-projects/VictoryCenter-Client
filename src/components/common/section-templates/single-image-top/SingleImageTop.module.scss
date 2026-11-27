@@ -33,29 +33,27 @@ $img-height: 680px;
     width: 100%;
 }
 
-.template {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+// T6 preview (Figma frame 1440 x 1208), laid out in Figma px (see ScaledPreview):
+// a full-width 684px image at the top, then the text block from TitleDescriptionSection
+// `.container.template`. Heights are natural (no %), so the description is never cut off.
+.container.template {
+    max-height: none;
 
-    .top-section {
-        flex: 0 0 45%;
-        padding: 24px 24px 0 24px;
-        box-sizing: border-box;
-    }
-
+    .top-section,
     .bottom-section {
-        flex: 0 0 55%;
+        flex: none;
     }
 
     .image-wrapper {
-        height: 100%;
         width: 100%;
+        height: 684px;
         aspect-ratio: auto;
     }
 
     .image {
-        border-radius: 4px;
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 }
 

@@ -6,17 +6,15 @@ $img-number: 4;
     gap: 16px;
 }
 
+// T1 preview (Figma frame 1440 x 1183): 4 x 360px images, 395px high, #1 and #3 raised by 120px.
 .template {
-    aspect-ratio: 1440 / 1183;
+    --preview-image-height: 395px;
+    --preview-image-offset: 120px;
 }
 
 .bottom-section {
     height: $img-height + ($img-height * 0.25) + 50px;
     justify-content: end;
-
-    .template & {
-        max-height: 45%;
-    }
 }
 
 .image-wrapper {

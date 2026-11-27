@@ -47,8 +47,6 @@ export const SingleImageBottom = ({
                 title={title}
                 description={description}
                 className={baseStyles['top-section']}
-                titleClassName={mode === SectionMode.Template ? styles['title-template'] : ''}
-                descriptionClassName={mode === SectionMode.Template ? styles['description-template'] : ''}
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}

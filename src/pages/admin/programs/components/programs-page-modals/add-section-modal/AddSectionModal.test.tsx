@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { AddSectionModal } from './AddSectionModal';
@@ -205,6 +205,18 @@ describe('AddSectionModal', () => {
     it('renders modal content container', () => {
         renderModal();
         expect(screen.getAllByTestId('add-section-modal-content')[0]).toBeInTheDocument();
+    });
+
+    it('wraps the 7 standard templates in a ScaledPreview and leaves program-only templates as they are', () => {
+        renderModal();
+
+        const contentAreas = screen.getAllByTestId('add-section-modal-content');
+        const standardTemplatesCount = 7;
+
+        const hasScaledPreview = contentAreas.map((area) => within(area).queryByTestId('scaled-preview') !== null);
+        const expected = defaultTemplates.map((_, index) => index < standardTemplatesCount);
+
+        expect(hasScaledPreview).toEqual(expected);
     });
 
     it('close button calls onClose', () => {

@@ -9,21 +9,13 @@
     justify-content: space-between;
 }
 
+// T3 preview: paddings and typography come from TitleDescriptionSection's `.container.template`
+// (Figma 1440 frame: 80px top/bottom, 165px sides).
 .template {
-    padding: 2vw 6vw 0vw 6vw;
+    box-sizing: border-box;
 }
 
 .form-container {
     justify-content: center;
     overflow: visible;
-}
-
-.title-template {
-    font-size: clamp(3px, 2vw, 3.5vmin);
-    line-height: clamp(3px, 1.3vw, 3.5vmin);
-}
-
-.description-template {
-    font-size: clamp(3px, 1vw, 2vmin);
-    line-height: clamp(3px, 1.2vw, 2vmin);
 }

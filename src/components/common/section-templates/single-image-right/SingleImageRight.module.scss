@@ -104,22 +104,48 @@
     aspect-ratio: 700 / 600;
 }
 
-.template {
-    padding: 4%;
-    gap: 16px;
+// T7 preview (Figma frame 1440 x 736), laid out in Figma px (see ScaledPreview).
+// Text column (165px from the left, vertically centred) + a 714 x 576 image flush right.
+// Same typography as TitleDescriptionSection `.container.template`: H4 32/40 and Body_1 18/28.
+// `.container.template` outranks the viewport media queries above, so they don't affect the preview.
+.container.template {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    padding: 80px 0 80px 165px;
+    max-height: none;
 
     .left-section {
-        padding-left: 0;
-        gap: 16px;
+        flex: 1 1 auto;
+        justify-content: center;
+        gap: 64px;
+        padding: 0 64px 0 0;
+    }
+
+    .title-section,
+    .description-section {
+        max-width: 436px;
     }
 
     .title {
-        @include type.subtitle-1-bold;
-        text-transform: uppercase;
+        @include type.h4-bold-uppercase;
     }
 
     .description {
-        @include type.small-text-regular;
+        @include type.body-1-regular;
+    }
+
+    .right-section {
+        flex: 0 0 714px;
+    }
+
+    .image-wrapper {
+        height: 576px;
+    }
+
+    .image {
+        display: block;
+        aspect-ratio: auto;
     }
 }
 

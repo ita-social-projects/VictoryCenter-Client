@@ -4,7 +4,9 @@ import { Button } from '@/components/admin/button/Button';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
+import { ScaledPreview } from '@/components/common/scaled-preview';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { STANDARD_TEMPLATES_MAP } from '@/utils/functions/render-standard-section-template';
 import { MockQuestions } from '@/utils/mock-data/public/programs-page';
 import placeholderImage from '@/assets/images/section-photo-placeholder.png';
 import styles from './AddSectionModal.module.scss';
@@ -34,6 +36,9 @@ const SWIPER_NAVIGATION_CONFIG = {
         className: swiperStyles.right,
     },
 };
+
+// Standard templates are previewed as the real 1440px Figma frame, scaled down to fit the modal.
+const isScaledPreviewTemplate = (templateId: SectionTemplate) => templateId in STANDARD_TEMPLATES_MAP;
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate, templates }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
@@ -186,9 +191,18 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate, templates }
                         items={templates}
                         renderItem={(templateId) => (
                             <div className={styles['middle-section']}>
-                                <div className={styles['template-content']} data-testid="add-section-modal-content">
-                                    {renderSection(templateId)}
-                                </div>
+                                {isScaledPreviewTemplate(templateId) ? (
+                                    <div
+                                        className={styles['scaled-template-content']}
+                                        data-testid="add-section-modal-content"
+                                    >
+                                        <ScaledPreview>{renderSection(templateId)}</ScaledPreview>
+                                    </div>
+                                ) : (
+                                    <div className={styles['template-content']} data-testid="add-section-modal-content">
+                                        {renderSection(templateId)}
+                                    </div>
+                                )}
                             </div>
                         )}
                         slidesPerView={1}

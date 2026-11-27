@@ -6,8 +6,10 @@ $img-number: 2;
     gap: 16px;
 }
 
+// T2 preview (Figma frame 1440 x 1235): 2 x 720px images, 436px high, #1 raised by 131px.
 .template {
-    aspect-ratio: 1440 / 1235;
+    --preview-image-height: 436px;
+    --preview-image-offset: 131px;
 }
 
 .bottom-section {

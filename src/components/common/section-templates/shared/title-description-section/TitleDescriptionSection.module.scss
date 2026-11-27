@@ -49,26 +49,36 @@
         }
     }
 
+    // Template mode = the "Додати секцію" preview. It is always laid out as the 1440px Figma frame
+    // (ScaledPreview scales the whole frame down), so every value here is a Figma pixel value.
+    // No vw/vmin/clamp and no media queries: the higher specificity of `.container.template`
+    // also keeps the viewport media queries below from changing the preview on narrow screens.
+    // This is the single source of preview typography for every template built on this component.
     &.template {
-        padding: 4%;
-        gap: 12px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 80px 165px;
+        gap: 32px;
 
         .title-section {
-            flex: 0 0 50%;
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
         }
 
         .description-section {
-            flex: 0 0 50%;
+            flex: 0 0 436px;
+            width: 436px;
         }
 
         .title {
-            @include type.subtitle-1-bold;
-            text-transform: uppercase;
-            margin-top: 0;
+            @include type.h4-bold-uppercase; // Figma: H4 / Bold, 32px / 40px
+            margin: 0;
         }
 
         .description {
-            @include type.small-text-regular;
+            @include type.body-1-regular; // Figma: Body_1 / Regular, 18px / 28px
         }
     }
 

@@ -88,7 +88,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         <div data-testid="events-toolbar">
             <span>{placeholder}</span>
 
-            <button type="button" onClick={onAddItem}>
+            <button type="button" data-testid="toolbar-add-item" onClick={onAddItem}>
                 {AddItemButtonText}
             </button>
 
@@ -530,6 +530,19 @@ const renderEventsPage = async () => {
     expect(await screen.findByTestId('events-page-content')).toBeInTheDocument();
 };
 
+const getToolbarAddButton = () => screen.getByTestId('toolbar-add-item');
+
+const queryEmptyStateAddButton = () =>
+    within(screen.getByTestId('infinite-scroll-list')).queryByRole('button', {
+        name: EVENTS_TEXT.BUTTON.ADD_MATERIAL,
+    });
+
+const getEmptyStateAddButton = () => {
+    const button = queryEmptyStateAddButton();
+    if (!button) throw new Error('Empty state add button is not rendered');
+    return button;
+};
+
 describe('EventsPageAdmin', () => {
     const categories: EventCategoryDto[] = [
         {
@@ -817,7 +830,7 @@ describe('EventsPageAdmin', () => {
 
         expect(await screen.findByTestId('events-toolbar')).toBeInTheDocument();
         expect(screen.getByText(EVENTS_TEXT.PLACEHOLDER.SEARCH_EVENTS)).toBeInTheDocument();
-        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_EVENT)).toBeInTheDocument();
+        expect(getToolbarAddButton()).toHaveTextContent(EVENTS_TEXT.BUTTON.ADD_MATERIAL);
     });
 
     it('keeps both content sections in edit mode independently', async () => {
@@ -1539,7 +1552,7 @@ describe('EventsPageAdmin', () => {
 
         await renderEventsPage();
 
-        await user.click(await screen.findByText(EVENTS_TEXT.BUTTON.ADD_EVENT));
+        await user.click(getToolbarAddButton());
 
         expect(mockOpenAddItemModal).toHaveBeenCalledTimes(1);
     });
@@ -1686,7 +1699,7 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
-        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+        expect(getEmptyStateAddButton()).toBeInTheDocument();
     });
 
     it('renders filtered empty state without add material button', async () => {
@@ -1702,12 +1715,12 @@ describe('EventsPageAdmin', () => {
         render(<EventsPageAdmin />);
 
         expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
-        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+        expect(getEmptyStateAddButton()).toBeInTheDocument();
 
         await user.click(screen.getByTestId('enable-status-filter'));
 
         expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
-        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+        expect(queryEmptyStateAddButton()).not.toBeInTheDocument();
 
         await waitFor(() => {
             expect(mockedEventsApi.fetchEvents).toHaveBeenLastCalledWith({}, categories[0].id, 0, 5, undefined, 1);
@@ -1736,7 +1749,7 @@ describe('EventsPageAdmin', () => {
             );
         });
         expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
-        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+        expect(queryEmptyStateAddButton()).not.toBeInTheDocument();
 
         await user.click(screen.getByTestId('category-2'));
 
@@ -1769,12 +1782,12 @@ describe('EventsPageAdmin', () => {
         await user.click(screen.getByTestId('enable-status-filter'));
 
         expect(await screen.findByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
-        expect(screen.queryByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).not.toBeInTheDocument();
+        expect(queryEmptyStateAddButton()).not.toBeInTheDocument();
 
         await user.click(screen.getByTestId('clear-status-filter'));
 
         expect(await screen.findByText(EVENT_ITEMS_TEXT.NO_RECORDS)).toBeInTheDocument();
-        expect(screen.getByText(EVENTS_TEXT.BUTTON.ADD_MATERIAL)).toBeInTheDocument();
+        expect(getEmptyStateAddButton()).toBeInTheDocument();
     });
 
     it('loads more event items when the load-more action is triggered', async () => {

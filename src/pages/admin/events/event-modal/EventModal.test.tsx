@@ -32,22 +32,80 @@ jest.mock('@/services/api/admin/events/events-api', () => ({
 
 const mockedEventsApi = EventsApi as jest.Mocked<typeof EventsApi>;
 
-const getTodayLabel = () => {
-    const today = new Date();
+const MONTH_LABELS = ['Січ', 'Лют', 'Бер', 'Кві', 'Тра', 'Чер', 'Лип', 'Сер', 'Вер', 'Жов', 'Лис', 'Гру'];
+const MONTH_NAMES = [
+    'січень',
+    'лютий',
+    'березень',
+    'квітень',
+    'травень',
+    'червень',
+    'липень',
+    'серпень',
+    'вересень',
+    'жовтень',
+    'листопад',
+    'грудень',
+];
 
-    return `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(
-        2,
-        '0',
-    )}/${today.getFullYear()}`;
+type PickedDate = { year: number; monthIndex: number; day: number };
+
+const getDateLabel = ({ year, monthIndex, day }: PickedDate) =>
+    `${String(day).padStart(2, '0')}/${String(monthIndex + 1).padStart(2, '0')}/${year}`;
+
+const getToday = (): PickedDate => {
+    const today = new Date();
+    return { year: today.getFullYear(), monthIndex: today.getMonth(), day: today.getDate() };
 };
 
+const getTodayLabel = () => getDateLabel(getToday());
+
+const openDatePicker = () => fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+const clickOk = () => fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+const openMonthYearSelector = () => fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+
 const openDatePickerAndSelectToday = (todayLabel: string) => {
-    fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
+    openDatePicker();
     fireEvent.click(screen.getByRole('button', { name: todayLabel }));
+};
+
+const selectDayViaMonthYearSelector = (date: PickedDate) => {
+    openDatePicker();
+    openMonthYearSelector();
+    fireEvent.click(screen.getByRole('button', { name: String(date.year) }));
+    fireEvent.click(screen.getByRole('button', { name: MONTH_LABELS[date.monthIndex] }));
+    fireEvent.click(screen.getByRole('button', { name: getDateLabel(date) }));
 };
 
 const expectDatePickerClosed = () => {
     expect(screen.queryByRole('dialog', { name: 'Вибір дати' })).not.toBeInTheDocument();
+};
+
+const expectDatePickerOpen = () => {
+    expect(screen.getByRole('dialog', { name: 'Вибір дати' })).toBeInTheDocument();
+};
+
+const expectDatePickerLayerShowing = ({ year, monthIndex, day }: PickedDate) => {
+    expectDatePickerOpen();
+    expect(screen.getByRole('button', { name: 'Вибрати місяць і рік' })).toHaveTextContent(
+        new RegExp(`${MONTH_NAMES[monthIndex]}.*${year}`, 'i'),
+    );
+    expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: getDateLabel({ year, monthIndex, day }) })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+    );
+};
+
+const expectPublishDateEmpty = () => {
+    const trigger = screen.getByRole('button', { name: 'Вибір дати' });
+
+    expect(trigger).toHaveTextContent(EVENTS_TEXT.FORM.PUBLISH_DATE_PLACEHOLDER);
+    expect(trigger).not.toHaveTextContent(/\d{2}\/\d{2}\/\d{4}/);
+};
+
+const expectPublishDate = (label: string) => {
+    expect(screen.getByRole('button', { name: `Вибір дати: ${label}` })).toBeInTheDocument();
 };
 
 const fillTextField = (label: string, value: string) => {
@@ -760,25 +818,27 @@ describe('EventModal', () => {
     });
 
     describe('date picker', () => {
+        const previousYear = new Date().getFullYear() - 1;
+        const currentYear = new Date().getFullYear();
+
         it('applies the selected date only after confirming', () => {
             render(<EventModal {...defaultProps} />);
             const todayLabel = getTodayLabel();
 
             openDatePickerAndSelectToday(todayLabel);
-            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            clickOk();
 
-            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expectPublishDate(todayLabel);
             expectDatePickerClosed();
         });
 
         it('discards a pending date when cancelled', () => {
             render(<EventModal {...defaultProps} />);
-            const todayLabel = getTodayLabel();
 
-            openDatePickerAndSelectToday(todayLabel);
+            openDatePickerAndSelectToday(getTodayLabel());
             fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
 
-            expect(screen.getByRole('button', { name: /Вибір дати/i })).toHaveTextContent('');
+            expectPublishDateEmpty();
             expectDatePickerClosed();
         });
 
@@ -789,39 +849,42 @@ describe('EventModal', () => {
             openDatePickerAndSelectToday(todayLabel);
             expect(screen.getByRole('button', { name: todayLabel })).toHaveAttribute('aria-pressed', 'false');
 
-            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            clickOk();
 
-            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            expectPublishDate(todayLabel);
             expectDatePickerClosed();
         });
 
-        it('confirms the current date after deselecting a previously selected day', () => {
+        it('keeps the initial date when the previously selected day is deselected and confirmed', () => {
             render(<EventModal {...defaultProps} mode={ModalMode.Edit} eventToEdit={eventToEdit} />);
-            const todayLabel = getTodayLabel();
+            const initialLabel = getDateLabel({ year: 2026, monthIndex: 7, day: 18 });
 
-            fireEvent.click(screen.getByRole('button', { name: 'Вибір дати: 18/08/2026' }));
-            fireEvent.click(screen.getByRole('button', { name: '18/08/2026' }));
-            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK }));
+            fireEvent.click(screen.getByRole('button', { name: `Вибір дати: ${initialLabel}` }));
+            fireEvent.click(screen.getByRole('button', { name: initialLabel }));
+            expect(screen.getByRole('button', { name: initialLabel })).toHaveAttribute('aria-pressed', 'false');
 
-            expect(screen.getByRole('button', { name: `Вибір дати: ${todayLabel}` })).toBeInTheDocument();
+            clickOk();
+
+            expectPublishDate(initialLabel);
             expectDatePickerClosed();
         });
 
         it('opens month and year selection from the calendar header', () => {
             render(<EventModal {...defaultProps} />);
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+            openDatePicker();
+            openMonthYearSelector();
 
-            expect(screen.getByRole('button', { name: String(new Date().getFullYear()) })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: String(currentYear) })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: String(previousYear) })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Січ' })).toBeInTheDocument();
         });
 
         it('opens a month calendar with an inactive confirmation button', () => {
             render(<EventModal {...defaultProps} />);
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+            openDatePicker();
+            openMonthYearSelector();
             fireEvent.click(screen.getByRole('button', { name: 'Січ' }));
 
             expect(screen.getByText('ПН')).toBeInTheDocument();
@@ -830,14 +893,80 @@ describe('EventModal', () => {
             expect(screen.queryByRole('button', { name: 'Вибрати місяць і рік' })).not.toBeInTheDocument();
         });
 
+        it('activates the confirmation button after a day is selected in the calendar', () => {
+            render(<EventModal {...defaultProps} />);
+
+            selectDayViaMonthYearSelector({ year: previousYear, monthIndex: 0, day: 1 });
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).toBeEnabled();
+        });
+
         it('does not allow interaction with the parent date picker while the month selector is open', () => {
             render(<EventModal {...defaultProps} />);
 
-            fireEvent.click(screen.getByRole('button', { name: /Вибір дати/i }));
-            fireEvent.click(screen.getByRole('button', { name: 'Вибрати місяць і рік' }));
+            openDatePicker();
+            openMonthYearSelector();
 
             expect(screen.queryByText('ПН')).not.toBeInTheDocument();
             expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.OK })).not.toBeInTheDocument();
+        });
+
+        describe('confirming a day chosen via the month/year selector', () => {
+            it.each([
+                ['previous year, January, day 1', { year: previousYear, monthIndex: 0, day: 1 }],
+                ['current year, December, day 31', { year: currentYear, monthIndex: 11, day: 31 }],
+            ])('%s: OK in the calendar returns to the date picker, OK there fills the field', (_, date) => {
+                render(<EventModal {...defaultProps} />);
+
+                selectDayViaMonthYearSelector(date);
+                clickOk();
+
+                expectDatePickerLayerShowing(date);
+                expectPublishDateEmpty();
+
+                clickOk();
+
+                expectDatePickerClosed();
+                expectPublishDate(getDateLabel(date));
+            });
+
+            it('keeps the field empty when the date picker is cancelled after returning from the calendar', () => {
+                render(<EventModal {...defaultProps} />);
+
+                selectDayViaMonthYearSelector({ year: previousYear, monthIndex: 0, day: 1 });
+                clickOk();
+                fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+                expectDatePickerClosed();
+                expectPublishDateEmpty();
+            });
+        });
+
+        describe('closing the month/year selector with the X button', () => {
+            const closeSelector = () =>
+                fireEvent.click(screen.getByRole('button', { name: 'Закрити вибір місяця і року' }));
+
+            it('returns from the calendar to the date picker with the initial date', () => {
+                render(<EventModal {...defaultProps} />);
+
+                selectDayViaMonthYearSelector({ year: previousYear, monthIndex: 0, day: 1 });
+                closeSelector();
+
+                expectDatePickerLayerShowing(getToday());
+                expectPublishDateEmpty();
+            });
+
+            it('restores the initial date, not the one confirmed in the calendar', () => {
+                render(<EventModal {...defaultProps} />);
+
+                selectDayViaMonthYearSelector({ year: previousYear, monthIndex: 0, day: 1 });
+                clickOk();
+                openMonthYearSelector();
+                closeSelector();
+
+                expectDatePickerLayerShowing(getToday());
+                expectPublishDateEmpty();
+            });
         });
     });
 

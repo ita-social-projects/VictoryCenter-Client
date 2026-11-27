@@ -244,12 +244,22 @@ export const EventModal = (props: EventModalProps) => {
     };
 
     const handleDatePickerConfirm = useCallback(
-        (onChange: (value: string) => void) => () => {
-            onChange(formatDateValue(pendingDate ?? new Date()));
+        (onChange: (value: string | null) => void) => () => {
+            if (activePickerLayer !== 'date-picker') {
+                if (!pendingDate) return;
+
+                setVisibleMonth(new Date(pendingDate.getFullYear(), pendingDate.getMonth(), 1));
+                setSelectedMonth(pendingDate.getMonth());
+                setHasDeselectedDate(false);
+                setActivePickerLayer('date-picker');
+                return;
+            }
+
+            onChange(formatDateValue(pendingDate ?? initialPickerDate ?? new Date()));
             setIsDatePickerOpen(false);
             setActivePickerLayer('date-picker');
         },
-        [pendingDate],
+        [activePickerLayer, initialPickerDate, pendingDate],
     );
 
     const handleDateSelect = (date: Date) => {
@@ -476,8 +486,10 @@ export const EventModal = (props: EventModalProps) => {
                                                         : 'Вибір дати'
                                                 }
                                             >
-                                                <span>
-                                                    {field.value ? formatDateLabel(parseDateValue(field.value)) : ''}
+                                                <span className={field.value ? undefined : styles['date-placeholder']}>
+                                                    {field.value
+                                                        ? formatDateLabel(parseDateValue(field.value))
+                                                        : EVENTS_TEXT.FORM.PUBLISH_DATE_PLACEHOLDER}
                                                 </span>
                                                 <CalendarIcon aria-hidden="true" />
                                             </button>

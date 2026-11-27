@@ -524,6 +524,19 @@
     }
 }
 
+@media (max-width: 375px) {
+    .footer-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+
+        .main-block,
+        .contact-block {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+
 @media (max-width: 368px) {
     .footer-content {
         margin-top: 2rem;

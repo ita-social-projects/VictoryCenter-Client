@@ -42,12 +42,12 @@ export const TeamMembersApi = {
         offset: number = 0,
         limit: number = 5,
         signal?: AbortSignal,
-    ): Promise<PaginationResult<TeamMember>> => {
+    ): Promise<PaginationResult<TeamMemberDto>> => {
         const params: Record<string, any> = { fullName };
         params.offset = offset;
         params.limit = Math.floor(limit);
 
-        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.SEARCH}`, {
+        const response = await client.get<PaginationResult<TeamMemberDto>>(`${API_ROUTES.TEAM.SEARCH}`, {
             params,
             signal,
         });

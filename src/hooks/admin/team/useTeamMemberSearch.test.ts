@@ -11,8 +11,8 @@ const mockClient = {} as AxiosInstance;
 
 const mockSearchResults = {
     items: [
-        { id: 1, fullName: 'John Doe', categoryId: 1 },
-        { id: 2, fullName: 'Jane Smith', categoryId: 2 },
+        { id: 1, fullName: 'John Doe', categoryId: 1, localizations: [] },
+        { id: 2, fullName: 'Jane Smith', categoryId: 2, localizations: [] },
     ],
     totalItemsCount: 10,
 };
@@ -21,6 +21,31 @@ describe('useTeamMemberSearch', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockTeamMembersApi.search.mockResolvedValue(mockSearchResults as any);
+    });
+
+    it('should map localizationInfoDto to language in search suggestions', async () => {
+        const language = { id: 2, code: 'en', name: 'English' };
+        mockTeamMembersApi.search.mockResolvedValueOnce({
+            items: [
+                {
+                    id: 1,
+                    fullName: 'John Doe',
+                    categoryId: 1,
+                    localizations: [{ fullName: 'John Doe EN', localizationInfoDto: language }],
+                },
+            ],
+            totalItemsCount: 1,
+        } as any);
+
+        const { result } = renderHook(() => useTeamMemberSearch(mockClient));
+
+        await act(async () => {
+            await result.current.handleSearchQueryByName('John');
+        });
+
+        await waitFor(() => {
+            expect(result.current.searchSuggestions[0].localizations).toEqual([{ fullName: 'John Doe EN', language }]);
+        });
     });
 
     it('should handle API errors gracefully and reset state', async () => {

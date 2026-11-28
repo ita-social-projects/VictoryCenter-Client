@@ -1,8 +1,11 @@
 import { useCallback, useRef, useState } from 'react';
 import axios, { AxiosInstance } from 'axios';
 import { TEAM_SEARCH } from '@/const/admin/team';
-import { TeamMember } from '@/types/admin/team-members';
+import { TeamMember, TeamMemberDto } from '@/types/admin/team-members';
 import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
+
+const mapSearchItems = (items: TeamMemberDto[]): TeamMember[] => items.map((item) => mapEntityWithLocalizations(item));
 
 export const useTeamMemberSearch = (client: AxiosInstance) => {
     const [searchSuggestions, setSearchSuggestions] = useState<TeamMember[]>([]);
@@ -45,7 +48,7 @@ export const useTeamMemberSearch = (client: AxiosInstance) => {
                 );
                 if (abortController.signal.aborted) return;
 
-                setSearchSuggestions(res.items);
+                setSearchSuggestions(mapSearchItems(res.items));
                 searchPageRef.current = 1;
                 setHasMoreSearch(res.items.length < res.totalItemsCount);
             } catch (e: any) {
@@ -85,7 +88,7 @@ export const useTeamMemberSearch = (client: AxiosInstance) => {
 
             setSearchSuggestions((prev) => {
                 const existingIds = new Set(prev.map((m) => m.id));
-                const newItems = res.items.filter((m) => !existingIds.has(m.id));
+                const newItems = mapSearchItems(res.items).filter((m) => !existingIds.has(m.id));
 
                 const updatedList = [...prev, ...newItems];
                 actualLoadedCount = updatedList.length;

@@ -2,15 +2,23 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReportItem } from './report-item';
 import { Button } from '@/components/public/ui/button';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
-import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
-import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
-import { PdfReportDto } from '@/types/admin/pdf-section';
 import { useSignalR } from '@/hooks/public/SignalR/useSignalR';
+import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
+import { PdfSectionPublicApi } from '@/services/api/public/pdf-section/pdf-section-api';
+import { PdfReportDto } from '@/types/admin/pdf-section';
+import { PublicPdfSectionDto } from '@/types/public/reports';
+import { getPublicLocalization } from '@/utils/functions/localization/get-public-localization';
 import styles from './ReportsSection.module.scss';
 
 const INITIAL_VISIBLE_COUNT = 5;
 const FETCH_LIMIT = 50;
+
+const getFilledText = (...values: Array<string | null | undefined>): string => {
+    return values.find((value) => value?.trim())?.trim() ?? '';
+};
 
 export const ReportsSection = () => {
     const { t } = useTranslation('reportsPage');
@@ -21,6 +29,15 @@ export const ReportsSection = () => {
     const activeLanguageIdRef = useRef<number | null>(null);
 
     const signalRConnection = useSignalR(process.env.REACT_APP_SIGNALR_PDF_REPORTS_URL || '');
+
+    const {
+        data: pdfSection,
+        isLoading: isSectionLoading,
+        setData: setPdfSection,
+    } = useDataFetch<PublicPdfSectionDto | null>({
+        initialData: null,
+        fetchHandler: PdfSectionPublicApi.get,
+    });
 
     const fetchAllReports = useCallback(async (languageId: number) => {
         let offset = 0;
@@ -97,10 +114,16 @@ export const ReportsSection = () => {
             }
         };
 
+        const handleSectionUpdated = (updatedSection: PublicPdfSectionDto) => {
+            if (!mounted) return;
+            setPdfSection(updatedSection);
+        };
+
         signalRConnection.on('PdfReportCreated', handleCreated);
         signalRConnection.on('PdfReportUpdated', handleUpdated);
         signalRConnection.on('PdfReportDeleted', handleDeleted);
         signalRConnection.on('PdfReportsReordered', handleReordered);
+        signalRConnection.on('PdfSectionUpdated', handleSectionUpdated);
 
         return () => {
             mounted = false;
@@ -108,8 +131,17 @@ export const ReportsSection = () => {
             signalRConnection.off('PdfReportUpdated', handleUpdated);
             signalRConnection.off('PdfReportDeleted', handleDeleted);
             signalRConnection.off('PdfReportsReordered', handleReordered);
+            signalRConnection.off('PdfSectionUpdated', handleSectionUpdated);
         };
-    }, [signalRConnection, fetchAllReports]);
+    }, [signalRConnection, fetchAllReports, setPdfSection]);
+
+    const langCode = currentLanguage?.startsWith('en') ? 'en' : 'uk';
+    const localization = langCode === 'uk' ? null : getPublicLocalization(pdfSection?.localizations, langCode);
+    const sectionTitle =
+        getFilledText(localization?.title, pdfSection?.title) || (isSectionLoading ? '' : t('reports.title'));
+    const sectionDescription =
+        getFilledText(localization?.description, pdfSection?.description) ||
+        (isSectionLoading ? '' : t('reports.description'));
 
     const hasOverflow = reports.length > INITIAL_VISIBLE_COUNT;
     const visibleReports = hasOverflow && !isExpanded ? reports.slice(0, INITIAL_VISIBLE_COUNT) : reports;
@@ -117,8 +149,8 @@ export const ReportsSection = () => {
     return (
         <section className={styles.root}>
             <div className={styles.text}>
-                <h2 className={styles.title}>{t('reports.title')}</h2>
-                <p className={styles.description}>{t('reports.description')}</p>
+                <h2 className={styles.title}>{sectionTitle}</h2>
+                <p className={styles.description}>{sectionDescription}</p>
             </div>
 
             <div className={styles.list}>

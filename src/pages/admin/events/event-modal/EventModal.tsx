@@ -255,11 +255,11 @@ export const EventModal = (props: EventModalProps) => {
                 return;
             }
 
-            onChange(formatDateValue(pendingDate ?? initialPickerDate ?? new Date()));
+            onChange(formatDateValue(pendingDate ?? new Date()));
             setIsDatePickerOpen(false);
             setActivePickerLayer('date-picker');
         },
-        [activePickerLayer, initialPickerDate, pendingDate],
+        [activePickerLayer, pendingDate],
     );
 
     const handleDateSelect = (date: Date) => {
